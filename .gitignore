@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.tempmediaStorage/
+test_*.py
+debug_*.py
+inspect_*.py
+liquipedia_test.py
