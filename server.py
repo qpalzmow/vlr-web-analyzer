@@ -77,12 +77,16 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             try:
                 details = scraper.get_match_details(match_url)
                 
-                # Fetch recent 12 events for both teams
-                team_a_events = scraper.get_team_events(details["team_a_id"])[:12]
-                team_b_events = scraper.get_team_events(details["team_b_id"])[:12]
-                
-                # Fetch dynamic tournament map pool
-                map_pool = scraper.get_event_map_pool(details.get("event_id"))
+                # Fetch recent 12 events and map pool in parallel!
+                from concurrent.futures import ThreadPoolExecutor
+                with ThreadPoolExecutor(max_workers=3) as executor:
+                    future_a = executor.submit(scraper.get_team_events, details["team_a_id"]) if details.get("team_a_id") else None
+                    future_b = executor.submit(scraper.get_team_events, details["team_b_id"]) if details.get("team_b_id") else None
+                    future_pool = executor.submit(scraper.get_event_map_pool, details.get("event_id")) if details.get("event_id") else None
+                    
+                    team_a_events = future_a.result()[:12] if future_a else []
+                    team_b_events = future_b.result()[:12] if future_b else []
+                    map_pool = future_pool.result() if future_pool else []
                 
                 # Fetch initial live score
                 live_score = get_cached_live_score(match_url)
@@ -188,8 +192,8 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 self.send_error_response(str(e))
             return
 
-        # 1. API: Run full analysis
-        elif path == '/api/analyze':
+        # 1. API: Get recent form
+        elif path == '/api/analyze/form':
             try:
                 content_length = int(self.headers['Content-Length'])
                 post_data = self.rfile.read(content_length)
@@ -197,27 +201,85 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 
                 team_a_id = body.get('team_a_id', '')
                 team_b_id = body.get('team_b_id', '')
-                event_ids = body.get('event_ids', None) # List of event IDs
                 
-                # Perform analysis crawling step by step
-                form_a = scraper.get_team_form(team_a_id)
-                form_b = scraper.get_team_form(team_b_id)
+                from concurrent.futures import ThreadPoolExecutor
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    future_a = executor.submit(scraper.get_team_form, team_a_id) if team_a_id else None
+                    future_b = executor.submit(scraper.get_team_form, team_b_id) if team_b_id else None
+                    
+                    form_a = future_a.result() if future_a else []
+                    form_b = future_b.result() if future_b else []
                 
-                maps_a = scraper.get_team_maps_stats(team_a_id, event_ids)
-                maps_b = scraper.get_team_maps_stats(team_b_id, event_ids)
+                response_data = {
+                    "form_a": form_a,
+                    "form_b": form_b
+                }
                 
-                roster_a = scraper.get_team_roster(team_a_id)
-                roster_b = scraper.get_team_roster(team_b_id)
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                send_cors_headers()
+                self.end_headers()
+                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
+            except Exception as e:
+                self.send_error_response(str(e))
+            return
+
+        # 2. API: Get map stats
+        elif path == '/api/analyze/maps':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                body = json.loads(post_data.decode('utf-8'))
                 
-                # Find Ace players
+                team_a_id = body.get('team_a_id', '')
+                team_b_id = body.get('team_b_id', '')
+                event_ids = body.get('event_ids', None)
+                
+                from concurrent.futures import ThreadPoolExecutor
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    future_a = executor.submit(scraper.get_team_maps_stats, team_a_id, event_ids) if team_a_id else None
+                    future_b = executor.submit(scraper.get_team_maps_stats, team_b_id, event_ids) if team_b_id else None
+                    
+                    maps_a = future_a.result() if future_a else {}
+                    maps_b = future_b.result() if future_b else {}
+                
+                response_data = {
+                    "maps_a": maps_a,
+                    "maps_b": maps_b
+                }
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                send_cors_headers()
+                self.end_headers()
+                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
+            except Exception as e:
+                self.send_error_response(str(e))
+            return
+
+        # 3. API: Get ace players
+        elif path == '/api/analyze/aces':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                body = json.loads(post_data.decode('utf-8'))
+                
+                team_a_id = body.get('team_a_id', '')
+                team_b_id = body.get('team_b_id', '')
+                event_ids = body.get('event_ids', None)
+                
+                from concurrent.futures import ThreadPoolExecutor
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    future_a = executor.submit(scraper.get_team_roster, team_a_id) if team_a_id else None
+                    future_b = executor.submit(scraper.get_team_roster, team_b_id) if team_b_id else None
+                    
+                    roster_a = future_a.result() if future_a else []
+                    roster_b = future_b.result() if future_b else []
+                
                 ace_a = self.find_ace_player(roster_a, event_ids)
                 ace_b = self.find_ace_player(roster_b, event_ids)
                 
                 response_data = {
-                    "form_a": form_a,
-                    "form_b": form_b,
-                    "maps_a": maps_a,
-                    "maps_b": maps_b,
                     "ace_a": ace_a,
                     "ace_b": ace_b
                 }
@@ -228,7 +290,7 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
             except Exception as e:
-                self.send_error_response(str(e) + "\n" + traceback.format_exc())
+                self.send_error_response(str(e))
             return
         else:
             self.send_response(404)
@@ -237,41 +299,46 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             self.wfile.write(b"404 Not Found")
 
     def find_ace_player(self, roster, event_ids):
-        best_player = None
-        best_acs = -1.0
-        
-        for p in roster:
-            try:
-                stats = scraper.get_player_stats(p["id"], event_ids)
-                rounds = stats["rounds"]
-                acs = stats["weighted_acs"] / rounds if rounds > 0 else 0.0
-                
-                p_data = {
-                    "nickname": p["name"],
-                    "acs": acs,
-                    "kd_margin": stats["kills"] - stats["deaths"],
-                    "agents": sorted(stats["agents"].items(), key=lambda x: x[1], reverse=True)
-                }
-                
-                # Extract top 3 agents
-                p_data["agents"] = [x[0].capitalize() for x in p_data["agents"][:3]]
-                if not p_data["agents"]:
-                    p_data["agents"] = ["N/A"]
-                    
-                if acs > best_acs:
-                    best_acs = acs
-                    best_player = p_data
-            except Exception:
-                continue
-                
-        if not best_player:
+        if not roster:
             return {
                 "nickname": "N/A",
                 "acs": 0.0,
                 "kd_margin": 0,
                 "agents": ["N/A"]
             }
-        return best_player
+            
+        def get_stats_for_player(p):
+            try:
+                stats = scraper.get_player_stats(p["id"], event_ids)
+                rounds = stats["rounds"]
+                acs = stats["weighted_acs"] / rounds if rounds > 0 else 0.0
+                p_data = {
+                    "nickname": p["name"],
+                    "acs": acs,
+                    "kd_margin": stats["kills"] - stats["deaths"],
+                    "agents": sorted(stats["agents"].items(), key=lambda x: x[1], reverse=True)
+                }
+                p_data["agents"] = [x[0].capitalize() for x in p_data["agents"][:3]]
+                if not p_data["agents"]:
+                    p_data["agents"] = ["N/A"]
+                return p_data
+            except Exception:
+                return None
+
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            players_data = list(executor.map(get_stats_for_player, roster))
+            
+        valid_players = [p for p in players_data if p is not None]
+        if not valid_players:
+            return {
+                "nickname": "N/A",
+                "acs": 0.0,
+                "kd_margin": 0,
+                "agents": ["N/A"]
+            }
+            
+        return max(valid_players, key=lambda x: x["acs"])
 
     def serve_file(self, filepath, content_type):
         if not os.path.exists(filepath):

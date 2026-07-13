@@ -330,7 +330,32 @@ async function runAnalysis() {
     analyzeBtn.disabled = true;
     progressBarContainer.classList.remove('hidden');
     
-    updateStatus('info', '양 팀 분석 정보를 수집하는 중... [10%]', 'Form 경기 흐름 데이터를 요청 중입니다.', 10);
+    // Set individual loading indicators (with spinner SVG)
+    const spinnerHtml = `<span class="flex items-center gap-1 text-slate-500 italic"><svg class="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 분석 중...</span>`;
+    
+    document.getElementById('team-a-form').innerHTML = spinnerHtml;
+    document.getElementById('team-b-form').innerHTML = spinnerHtml;
+    
+    document.getElementById('team-a-maps-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center">${spinnerHtml}</td></tr>`;
+    document.getElementById('team-b-maps-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center">${spinnerHtml}</td></tr>`;
+    
+    document.getElementById('ai-ban-list').innerHTML = `<p>${spinnerHtml}</p>`;
+    document.getElementById('ai-pick-list').innerHTML = `<p>${spinnerHtml}</p>`;
+    
+    document.getElementById('team-a-agents').innerHTML = spinnerHtml;
+    document.getElementById('team-b-agents').innerHTML = spinnerHtml;
+    
+    document.getElementById('ace-a-nickname').textContent = '분석 중...';
+    document.getElementById('ace-a-acs').textContent = '0.0';
+    document.getElementById('ace-a-kd').textContent = '0';
+    document.getElementById('ace-a-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
+    
+    document.getElementById('ace-b-nickname').textContent = '분석 중...';
+    document.getElementById('ace-b-acs').textContent = '0.0';
+    document.getElementById('ace-b-kd').textContent = '0';
+    document.getElementById('ace-b-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
+
+    updateStatus('info', '전력 분석을 시작합니다...', '경기 흐름, 맵 전적, 에이스 데이터를 요청 중입니다.', 10);
     
     const payload = {
         team_a_id: selectedMatch.team_a_id,
@@ -338,50 +363,92 @@ async function runAnalysis() {
         event_ids: selectedEvents.size > 0 ? Array.from(selectedEvents) : null
     };
     
-    // Simulate intermediate progress bar ticks to show dynamic life
-    let progress = 10;
-    const progressInterval = setInterval(() => {
-        if (progress < 85) {
-            progress += Math.floor(Math.random() * 5) + 2;
-            let subtext = '양 팀 맵별 전적 취합 및 에이스 통계를 융합하는 중..';
-            if (progress > 30 && progress < 50) subtext = '양 팀 진영별 맵 승률 데이터를 매핑하고 있습니다.';
-            if (progress >= 50 && progress < 70) subtext = '선수단 명단 및 에이스 플레이어 가중치를 평가 중입니다.';
-            if (progress >= 70) subtext = 'AI 밴픽 시뮬레이션 모델을 가동하고 있습니다.';
-            
-            updateStatus('info', `전력 분석 데이터를 분석하는 중... [${progress}%]`, subtext, progress);
-        }
-    }, 800);
+    let completedSteps = 0;
+    const totalSteps = 3;
     
+    function updateProgress(stepName) {
+        completedSteps++;
+        const progressPercent = 10 + Math.floor((completedSteps / totalSteps) * 90);
+        updateStatus('info', `데이터 수집 및 매핑 중... [${progressPercent}%]`, `${stepName} 데이터를 성공적으로 로드했습니다.`, progressPercent);
+    }
+
+    // 1. Fetch Form (W/L Flow)
+    const formPromise = fetch('/api/analyze/form', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal
+    }).then(async res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        renderFormBadges('team-a-form', data.form_a);
+        renderFormBadges('team-b-form', data.form_b);
+        lucide.createIcons();
+        updateProgress('경기 흐름');
+    }).catch(err => {
+        if (err.name === 'AbortError') return;
+        document.getElementById('team-a-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
+        document.getElementById('team-b-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
+        console.error('Form fetch error:', err);
+    });
+
+    // 2. Fetch Maps & AI Simulation
+    const mapsPromise = fetch('/api/analyze/maps', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal
+    }).then(async res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        renderMapsTable('team-a-maps-table', data.maps_a);
+        renderMapsTable('team-b-maps-table', data.maps_b);
+        calculateAISimulation(data.maps_a, data.maps_b);
+        lucide.createIcons();
+        updateProgress('진영별 맵 승률');
+    }).catch(err => {
+        if (err.name === 'AbortError') return;
+        document.getElementById('team-a-maps-table').innerHTML = '<tr><td colspan="5" class="py-4 text-center text-red-400">로드 실패</td></tr>';
+        document.getElementById('team-b-maps-table').innerHTML = '<tr><td colspan="5" class="py-4 text-center text-red-400">로드 실패</td></tr>';
+        document.getElementById('ai-ban-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
+        document.getElementById('ai-pick-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
+        console.error('Maps fetch error:', err);
+    });
+
+    // 3. Fetch Aces
+    const acesPromise = fetch('/api/analyze/aces', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal
+    }).then(async res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        renderAgentBadges('team-a-agents', data.ace_a.agents);
+        renderAgentBadges('team-b-agents', data.ace_b.agents);
+        populateAceCard('a', data.ace_a);
+        populateAceCard('b', data.ace_b);
+        lucide.createIcons();
+        updateProgress('에이스 통계');
+    }).catch(err => {
+        if (err.name === 'AbortError') return;
+        document.getElementById('team-a-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
+        document.getElementById('team-b-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
+        document.getElementById('ace-a-nickname').textContent = 'N/A';
+        document.getElementById('ace-b-nickname').textContent = 'N/A';
+        console.error('Aces fetch error:', err);
+    });
+
     try {
-        const response = await fetch('/api/analyze', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload),
-            signal
-        });
+        await Promise.all([formPromise, mapsPromise, acesPromise]);
         
-        clearInterval(progressInterval);
-        
-        if (!response.ok) {
-            throw new Error(`분석 에러: ${response.status}`);
+        if (!signal.aborted) {
+            updateStatus('success', '전력 분석 완료.', '양 팀의 최신 경기 데이터 융합 분석이 무결하게 완료되었습니다.', 100);
         }
-        
-        const results = await response.json();
-        
-        // Render results to UI
-        renderAnalysisResults(results);
-        
-        updateStatus('success', '전력 분석 완료.', '양 팀의 최신 경기 데이터 융합 분석이 무결하게 완료되었습니다.', 100);
-        
     } catch (err) {
-        if (err.name === 'AbortError') {
-            console.log('Analysis request aborted.');
-            return;
+        if (err.name !== 'AbortError') {
+            updateStatus('error', '일부 전력 분석 실패', '일부 데이터를 불러오는 중 에러가 발생했습니다.', 0);
         }
-        clearInterval(progressInterval);
-        updateStatus('error', '전력 분석 실패', err.message, 0);
     } finally {
         if (!signal.aborted) {
             analysisRunning = false;
@@ -391,31 +458,6 @@ async function runAnalysis() {
             }, 3000);
         }
     }
-}
-
-// 7. Render Analysis Results to DOM
-function renderAnalysisResults(results) {
-    // A. Forms Badges
-    renderFormBadges('team-a-form', results.form_a);
-    renderFormBadges('team-b-form', results.form_b);
-    
-    // B. Maps table
-    renderMapsTable('team-a-maps-table', results.maps_a);
-    renderMapsTable('team-b-maps-table', results.maps_b);
-    
-    // C. Most Agents
-    renderAgentBadges('team-a-agents', results.ace_a.agents);
-    renderAgentBadges('team-b-agents', results.ace_b.agents);
-    
-    // D. Ace player compares
-    populateAceCard('a', results.ace_a);
-    populateAceCard('b', results.ace_b);
-    
-    // E. AI Simulator Recommendations
-    calculateAISimulation(results.maps_a, results.maps_b);
-    
-    // Update icons
-    lucide.createIcons();
 }
 
 // Helper: Render Form Badges
