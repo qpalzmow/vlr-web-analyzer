@@ -832,7 +832,7 @@ function updateLiveScoreboard() {
     const seriesScoreEl = document.getElementById('live-series-score');
     const teamA = selectedMatch.team_a;
     const teamB = selectedMatch.team_b;
-    seriesScoreEl.innerHTML = `${teamA} <span class="text-emerald-400 font-extrabold">${scoreData.series_score_a}</span> : <span class="text-emerald-400 font-extrabold">${scoreData.series_score_b}</span> ${teamB}`;
+    seriesScoreEl.innerHTML = `<span class="break-all">${teamA}</span> <span class="text-emerald-400 font-extrabold">${scoreData.series_score_a}</span> : <span class="text-emerald-400 font-extrabold">${scoreData.series_score_b}</span> <span class="break-all">${teamB}</span>`;
     
     // Render status badge
     const badge = document.getElementById('live-status-badge');
