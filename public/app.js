@@ -280,7 +280,7 @@ function drawTournamentChecklist() {
         const shortName = evName.length > 25 ? evName.substring(0, 25) + '..' : evName;
         
         const label = document.createElement('label');
-        label.className = 'flex items-center space-x-2 bg-zinc-900 border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:border-slate-600 transition-colors cursor-pointer';
+        label.className = 'flex items-center space-x-1.5 sm:space-x-2 bg-zinc-900 border border-slate-800 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold text-slate-300 hover:border-slate-600 transition-colors cursor-pointer';
         
         const cb = document.createElement('input');
         cb.type = 'checkbox';
