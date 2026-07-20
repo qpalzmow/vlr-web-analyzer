@@ -10,28 +10,49 @@ import threading
 
 PORT = int(os.environ.get("PORT", 8000))
 
+# Resolve public directory absolutely so the server can be safely started from anywhere.
+PUBLIC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'public'))
+
 LIVE_SCORE_CACHE = {} # key: match_url, value: (timestamp, data)
 cache_lock = threading.Lock()
+CACHE_TTL = 20          # seconds — live score TTL
+CACHE_GC_INTERVAL = 60  # seconds — how often to run garbage collection
+_last_gc_ts = 0.0
 
 def get_cached_live_score(match_url):
+    global _last_gc_ts
     now = time.time()
     with cache_lock:
-        # Clear expired entries to prevent memory leaks
-        expired = [k for k, (ts, _) in LIVE_SCORE_CACHE.items() if now - ts > 60]
-        for k in expired:
-            del LIVE_SCORE_CACHE[k]
+        # Periodic full GC — prevents memory leak when traffic is low.
+        if now - _last_gc_ts > CACHE_GC_INTERVAL:
+            expired = [k for k, (ts, _) in LIVE_SCORE_CACHE.items() if now - ts > CACHE_GC_INTERVAL]
+            for k in expired:
+                del LIVE_SCORE_CACHE[k]
+            _last_gc_ts = now
             
         if match_url in LIVE_SCORE_CACHE:
             ts, data = LIVE_SCORE_CACHE[match_url]
-            if now - ts < 20: # 20 second TTL
+            if now - ts < CACHE_TTL:
                 return data
-                
-    data = scraper.get_live_score(match_url)
+
+    try:
+        data = scraper.get_live_score(match_url)
+    except Exception:
+        data = {"series_score_a": "0", "series_score_b": "0", "status": "error", "maps": []}
     
     with cache_lock:
         LIVE_SCORE_CACHE[match_url] = (now, data)
         
     return data
+
+def _safe_future_result(future, default):
+    """Safely resolve a future, returning `default` if it raised."""
+    if future is None:
+        return default
+    try:
+        return future.result()
+    except Exception:
+        return default
 
 class VLRWebServer(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -84,9 +105,9 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                     future_b = executor.submit(scraper.get_team_events, details["team_b_id"]) if details.get("team_b_id") else None
                     future_pool = executor.submit(scraper.get_event_map_pool, details.get("event_id")) if details.get("event_id") else None
                     
-                    team_a_events = future_a.result()[:12] if future_a else []
-                    team_b_events = future_b.result()[:12] if future_b else []
-                    map_pool = future_pool.result() if future_pool else []
+                    team_a_events = _safe_future_result(future_a, [])[:12]
+                    team_b_events = _safe_future_result(future_b, [])[:12]
+                    map_pool = _safe_future_result(future_pool, [])
                 
                 # Fetch initial live score
                 live_score = get_cached_live_score(match_url)
@@ -128,19 +149,25 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             return
 
         # 3. Generic Static Files Server
-        # Map requested path to public directory
+        # Map requested path to public directory (resolved absolutely at import time).
         req_path = path
         if req_path == '/' or req_path == '/index.html':
             req_path = '/index.html'
             
-        # Clean and prevent traversal
+        # Clean and prevent traversal. Use realpath to resolve any symlinks.
         safe_path = os.path.normpath(req_path.lstrip('/'))
-        full_filepath = os.path.join(os.getcwd(), 'public', safe_path)
+        # Reject any path containing backslashes or null bytes outright.
+        if '\x00' in safe_path or '..' in safe_path.split(os.sep):
+            self.send_response(404)
+            send_cors_headers()
+            self.end_headers()
+            self.wfile.write(b"404 Not Found")
+            return
+        full_filepath = os.path.realpath(os.path.join(PUBLIC_DIR, safe_path))
         
-        # Verify the file is strictly inside the public folder
-        public_dir = os.path.join(os.getcwd(), 'public')
+        # Verify the file is strictly inside the public folder.
         try:
-            is_sub = os.path.commonpath([public_dir]) == os.path.commonpath([public_dir, full_filepath])
+            is_sub = os.path.commonpath([PUBLIC_DIR]) == os.path.commonpath([PUBLIC_DIR, full_filepath])
         except Exception:
             is_sub = False
             
@@ -207,8 +234,8 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                     future_a = executor.submit(scraper.get_team_form, team_a_id) if team_a_id else None
                     future_b = executor.submit(scraper.get_team_form, team_b_id) if team_b_id else None
                     
-                    form_a = future_a.result() if future_a else []
-                    form_b = future_b.result() if future_b else []
+                    form_a = _safe_future_result(future_a, [])
+                    form_b = _safe_future_result(future_b, [])
                 
                 response_data = {
                     "form_a": form_a,
@@ -240,8 +267,8 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                     future_a = executor.submit(scraper.get_team_maps_stats, team_a_id, event_ids) if team_a_id else None
                     future_b = executor.submit(scraper.get_team_maps_stats, team_b_id, event_ids) if team_b_id else None
                     
-                    maps_a = future_a.result() if future_a else {}
-                    maps_b = future_b.result() if future_b else {}
+                    maps_a = _safe_future_result(future_a, {})
+                    maps_b = _safe_future_result(future_b, {})
                 
                 response_data = {
                     "maps_a": maps_a,
@@ -273,8 +300,8 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                     future_a = executor.submit(scraper.get_team_roster, team_a_id) if team_a_id else None
                     future_b = executor.submit(scraper.get_team_roster, team_b_id) if team_b_id else None
                     
-                    roster_a = future_a.result() if future_a else []
-                    roster_b = future_b.result() if future_b else []
+                    roster_a = _safe_future_result(future_a, [])
+                    roster_b = _safe_future_result(future_b, [])
                 
                 ace_a = self.find_ace_player(roster_a, event_ids)
                 ace_b = self.find_ace_player(roster_b, event_ids)
@@ -318,7 +345,13 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                     "kd_margin": stats["kills"] - stats["deaths"],
                     "agents": sorted(stats["agents"].items(), key=lambda x: x[1], reverse=True)
                 }
-                p_data["agents"] = [x[0].capitalize() for x in p_data["agents"][:3]]
+                # Capitalize first char only, preserving the rest of the name.
+                # e.g. "reyna" -> "Reyna", "ojİye" -> "Ojİye"
+                def _cap(s):
+                    if not s:
+                        return s
+                    return s[0].upper() + s[1:]
+                p_data["agents"] = [_cap(x[0]) for x in p_data["agents"][:3]]
                 if not p_data["agents"]:
                     p_data["agents"] = ["N/A"]
                 return p_data
