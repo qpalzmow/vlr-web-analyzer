@@ -856,14 +856,14 @@ function updateLiveScoreboard() {
         mapsContainer.classList.remove('hidden');
         maps.forEach(m => {
             const card = document.createElement('div');
-            card.className = 'bg-zinc-950/80 border border-slate-800/80 rounded-xl p-3 flex flex-col items-center justify-center space-y-1';
+            card.className = 'bg-zinc-950/80 border border-slate-800/80 rounded-xl p-2 sm:p-3 flex flex-col items-center justify-center space-y-1';
             
             const mapNameEl = document.createElement('span');
-            mapNameEl.className = 'text-[10px] font-bold text-slate-400 uppercase tracking-wider';
+            mapNameEl.className = 'text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider';
             mapNameEl.textContent = m.map;
             
             const scoreEl = document.createElement('span');
-            scoreEl.className = 'text-sm font-extrabold text-white';
+            scoreEl.className = 'text-xs sm:text-sm font-extrabold text-white';
             scoreEl.textContent = `${m.score_a} - ${m.score_b}`;
             
             card.appendChild(mapNameEl);
