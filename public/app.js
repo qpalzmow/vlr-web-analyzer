@@ -712,13 +712,13 @@ function calculateAISimulation(mapsA, mapsB) {
     }
     
     banList.innerHTML = `
-        <p class="text-slate-200 font-semibold"><span class="text-xs text-slate-500">Team A:</span> ${banA} <span class="text-[10px] text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30">${banReasonA}</span></p>
-        <p class="text-slate-200 font-semibold"><span class="text-xs text-slate-500">Team B:</span> ${banB} <span class="text-[10px] text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30">${banReasonB}</span></p>
+        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team A:</span> ${banA} <span class="text-[9px] sm:text-[10px] text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30">${banReasonA}</span></p>
+        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team B:</span> ${banB} <span class="text-[9px] sm:text-[10px] text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30">${banReasonB}</span></p>
     `;
     
     pickList.innerHTML = `
-        <p class="text-slate-200 font-semibold"><span class="text-xs text-slate-500">Team A:</span> ${pickA} <span class="text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">핵심 카드 픽</span></p>
-        <p class="text-slate-200 font-semibold"><span class="text-xs text-slate-500">Team B:</span> ${pickB} <span class="text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">핵심 카드 픽</span></p>
+        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team A:</span> ${pickA} <span class="text-[9px] sm:text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">핵심 카드 픽</span></p>
+        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team B:</span> ${pickB} <span class="text-[9px] sm:text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">핵심 카드 픽</span></p>
     `;
 }
 
