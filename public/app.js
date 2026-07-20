@@ -488,8 +488,8 @@ function renderFormBadges(containerId, formList) {
         
         const badge = document.createElement('span');
         badge.className = isWin 
-            ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 px-2.5 py-1 rounded-lg text-xs font-bold'
-            : 'bg-red-950/40 text-red-400 border border-red-800/40 px-2.5 py-1 rounded-lg text-xs font-bold';
+            ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold'
+            : 'bg-red-950/40 text-red-400 border border-red-800/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold';
             
         let displayText = score ? `${outcomeText} ${score}` : outcomeText;
         if (opponent) {
