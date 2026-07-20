@@ -146,18 +146,18 @@
         </section>
 
         <!-- Live Scoreboard Card (visible only when match is live or has live data) -->
-        <section id="live-scoreboard-panel" class="hidden bg-zinc-900/40 border border-emerald-500/20 rounded-2xl p-6 space-y-4 shadow-xl backdrop-blur-sm">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <section id="live-scoreboard-panel" class="hidden bg-zinc-900/40 border border-emerald-500/20 rounded-2xl p-3 sm:p-6 space-y-4 shadow-xl backdrop-blur-sm">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
                 <div class="flex items-center space-x-3">
                     <span class="flex h-2.5 w-2.5 relative">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                     </span>
-                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <span class="text-[10px] sm:text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
                         <i data-lucide="tv" class="w-4 h-4"></i> 실시간 스코어보드 (Live Scoreboard)
                     </span>
                 </div>
-                <div id="live-series-score" class="text-xl md:text-2xl font-black tracking-wider text-white text-center md:text-left">
+                <div id="live-series-score" class="text-base sm:text-xl md:text-2xl font-black tracking-wider text-white text-center md:text-left">
                     - <span class="text-emerald-400">0</span> : <span class="text-emerald-400">0</span> -
                 </div>
                 <div class="flex items-center justify-center">
@@ -167,8 +167,8 @@
                 </div>
             </div>
             <div id="live-maps-container" class="pt-2 border-t border-slate-800/60 hidden">
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">세부 세트별 스코어</p>
-                <div id="live-maps-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">세부 세트별 스코어</p>
+                <div id="live-maps-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
                     <!-- Dynamic map score items injected here -->
                 </div>
             </div>
