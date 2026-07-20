@@ -123,17 +123,17 @@
 
             <!-- Action Button -->
             <div class="flex items-center justify-between pt-2">
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-3 shrink-0">
                     <!-- Status display -->
-                    <span id="status-icon-container" class="p-2 bg-slate-800/40 rounded-xl">
-                        <i id="status-icon" data-lucide="info" class="w-5 h-5 text-slate-400"></i>
+                    <span id="status-icon-container" class="p-1.5 sm:p-2 bg-slate-800/40 rounded-xl">
+                        <i id="status-icon" data-lucide="info" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-400"></i>
                     </span>
-                    <div>
-                        <p id="status-text" class="text-sm font-semibold text-slate-200">일정을 불러오는 중입니다...</p>
-                        <p id="sub-status-text" class="text-xs text-slate-500">잠시만 기다려 주세요.</p>
+                    <div class="min-w-0">
+                        <p id="status-text" class="text-xs sm:text-sm font-semibold text-slate-200">일정을 불러오는 중입니다...</p>
+                        <p id="sub-status-text" class="text-[10px] sm:text-xs text-slate-500">잠시만 기다려 주세요.</p>
                     </div>
                 </div>
-                <button id="analyze-btn" class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-slate-600 border border-emerald-500/20 text-white font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg flex items-center space-x-2 transition-all cursor-pointer" disabled>
+                <button id="analyze-btn" class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-slate-600 border border-emerald-500/20 text-white font-bold text-xs sm:text-sm px-4 py-2.5 sm:px-6 sm:py-3.5 rounded-xl shadow-lg flex items-center space-x-2 transition-all cursor-pointer shrink-0" disabled>
                     <i data-lucide="sparkles" class="w-4 h-4"></i>
                     <span>전력 분석 시작</span>
                 </button>
