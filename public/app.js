@@ -729,26 +729,17 @@ function updateStatus(type, title, desc, progressVal) {
     
     // Status style mapping
     if (type === 'success') {
-        statusIconContainer.className = 'p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl';
-        statusIcon.className = 'w-5 h-5 text-emerald-400';
+        statusIconContainer.className = 'p-1.5 sm:p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl';
         statusIcon.setAttribute('data-lucide', 'check-circle');
     } else if (type === 'error') {
-        statusIconContainer.className = 'p-2 bg-red-500/10 border border-red-500/20 rounded-xl';
-        statusIcon.className = 'w-5 h-5 text-red-400';
+        statusIconContainer.className = 'p-1.5 sm:p-2 bg-red-500/10 border border-red-500/20 rounded-xl';
         statusIcon.setAttribute('data-lucide', 'x-circle');
     } else if (type === 'info') {
-        statusIconContainer.className = 'p-2 bg-sky-500/10 border border-sky-500/20 rounded-xl';
-        statusIcon.className = 'w-5 h-5 text-sky-400';
+        statusIconContainer.className = 'p-1.5 sm:p-2 bg-sky-500/10 border border-sky-500/20 rounded-xl';
         statusIcon.setAttribute('data-lucide', 'loader-2');
-        statusIcon.classList.add('animate-spin');
     } else {
-        statusIconContainer.className = 'p-2 bg-slate-800/50 rounded-xl';
-        statusIcon.className = 'w-5 h-5 text-slate-400';
+        statusIconContainer.className = 'p-1.5 sm:p-2 bg-slate-800/50 rounded-xl';
         statusIcon.setAttribute('data-lucide', 'info');
-    }
-    
-    if (type !== 'info') {
-        statusIcon.classList.remove('animate-spin');
     }
     
     // Update progress bar
@@ -758,8 +749,26 @@ function updateStatus(type, title, desc, progressVal) {
         progressBar.style.width = '0%';
     }
     
-    // Trigger icons refresh
+    // Trigger icons refresh — Lucide replaces the element with a new SVG,
+    // so we must query the fresh element afterwards to add/remove spin class.
     lucide.createIcons();
+    
+    // Re-query the icon after Lucide replaces it
+    const freshIcon = statusIconContainer.querySelector('svg');
+    if (freshIcon) {
+        const wClass = type === 'info' ? 'w-4 h-4 sm:w-5 sm:h-5' : 'w-4 h-4 sm:w-5 sm:h-5';
+        let colorClass = 'text-slate-400';
+        if (type === 'success') colorClass = 'text-emerald-400';
+        else if (type === 'error') colorClass = 'text-red-400';
+        else if (type === 'info') colorClass = 'text-sky-400';
+        
+        freshIcon.setAttribute('class', `${wClass} ${colorClass}`);
+        
+        // Only spin during 'info' (loading) state
+        if (type === 'info') {
+            freshIcon.classList.add('animate-spin');
+        }
+    }
 }
 
 // 9. Live Scoreboard Polling & Rendering Logic
