@@ -610,7 +610,7 @@ function populateAceCard(teamLetter, aceData) {
         }
         
         const chip = document.createElement('span');
-        chip.className = `${classes.bg} ${classes.text} border px-2 py-0.5 rounded text-[10px] font-bold`;
+        chip.className = `${classes.bg} ${classes.text} border px-1.5 py-0.5 sm:px-2 rounded text-[9px] sm:text-[10px] font-bold`;
         chip.textContent = agent;
         agentsContainer.appendChild(chip);
     });
