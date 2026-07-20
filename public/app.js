@@ -521,7 +521,7 @@ function renderAgentBadges(containerId, agentList) {
         }
         
         const badge = document.createElement('span');
-        badge.className = `${classes.bg} ${classes.text} border px-2.5 py-1 rounded-lg text-xs font-bold`;
+        badge.className = `${classes.bg} ${classes.text} border px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold`;
         badge.textContent = agent;
         el.appendChild(badge);
     });
