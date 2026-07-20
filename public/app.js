@@ -569,15 +569,15 @@ function renderMapsTable(tableId, mapsData) {
         const defPct = s.def_total > 0 ? Math.round((s.def_won / s.def_total) * 100) + '%' : '0%';
         
         const badgeHtml = isActive 
-            ? `<span class="ml-2 text-[9px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-1 py-0.5 rounded uppercase tracking-wider">Active</span>`
-            : `<span class="ml-2 text-[9px] font-bold text-slate-500 bg-zinc-800/40 border border-slate-700/20 px-1 py-0.5 rounded uppercase tracking-wider">Legacy</span>`;
+            ? `<span class="ml-1 sm:ml-2 text-[8px] sm:text-[9px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-1 py-0.5 rounded uppercase tracking-wider">Active</span>`
+            : `<span class="ml-1 sm:ml-2 text-[8px] sm:text-[9px] font-bold text-slate-500 bg-zinc-800/40 border border-slate-700/20 px-1 py-0.5 rounded uppercase tracking-wider">Legacy</span>`;
             
         tr.innerHTML = `
-            <td class="py-3 pl-2 text-slate-100 font-bold text-sm flex items-center">${mapName} ${badgeHtml}</td>
-            <td class="py-3 text-center text-slate-300">${s.played}</td>
-            <td class="py-3 text-center text-sky-400 font-bold">${atkPct}</td>
-            <td class="py-3 text-center text-orange-400 font-bold">${defPct}</td>
-            <td class="py-3 text-center text-slate-400 text-xs">${s.w}승 - ${s.l}패</td>
+            <td class="py-2 sm:py-3 pl-2 text-slate-100 font-bold text-[11px] sm:text-sm flex items-center">${mapName} ${badgeHtml}</td>
+            <td class="py-2 sm:py-3 text-center text-slate-300">${s.played}</td>
+            <td class="py-2 sm:py-3 text-center text-sky-400 font-bold">${atkPct}</td>
+            <td class="py-2 sm:py-3 text-center text-orange-400 font-bold">${defPct}</td>
+            <td class="py-2 sm:py-3 text-center text-slate-400 text-[10px] sm:text-xs">${s.w}승 - ${s.l}패</td>
         `;
         el.appendChild(tr);
     });
