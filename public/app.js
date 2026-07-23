@@ -60,6 +60,8 @@ function setUITheme(theme) {
     const btnOriginal = document.getElementById('theme-btn-original');
     const btnIos = document.getElementById('theme-btn-ios');
     
+    htmlEl.setAttribute('data-theme', theme);
+
     if (theme === 'ios') {
         htmlEl.classList.add('theme-ios');
         if (btnOriginal && btnIos) {

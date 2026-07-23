@@ -1,17 +1,17 @@
 /* ==========================================================================
-   Apple iOS 27 Design System & Theme Engine
-   VLR Web Analyzer - Glassmorphic eSports Analytics Interface
+   Apple iOS 27 Design System & Deep Native Theme Engine (B-A-B Deep Architecture)
+   VLR Web Analyzer - Full Inset Grouped Glassmorphism Interface
    ========================================================================== */
 
-/* 1. iOS 27 Design Tokens */
+/* 1. iOS 27 System Color Tokens & Material Definitions */
 :root[data-theme="ios"],
-html.theme-ios {
-    /* Color Palette */
-    --ios-blue: #007aff;
-    --ios-blue-rgb: 0, 122, 255;
+html[data-theme="ios"] {
+    /* iOS System Dark Palette */
+    --ios-blue: #0a84ff;
+    --ios-blue-rgb: 10, 132, 255;
     --ios-green: #30d158;
     --ios-green-rgb: 48, 209, 88;
-    --ios-indigo: #5856d6;
+    --ios-indigo: #5e5ce6;
     --ios-orange: #ff9f0a;
     --ios-pink: #ff375f;
     --ios-purple: #bf5af2;
@@ -19,219 +19,268 @@ html.theme-ios {
     --ios-red-rgb: 255, 69, 58;
     --ios-teal: #64d2ff;
     --ios-yellow: #ffd60a;
+    --ios-gray: #8e8e93;
 
-    /* Backgrounds & Glass Materials */
-    --ios-bg-base: #05070c;
-    --ios-glass-thick: rgba(18, 24, 38, 0.72);
-    --ios-glass-regular: rgba(22, 28, 45, 0.55);
-    --ios-glass-thin: rgba(255, 255, 255, 0.05);
-    --ios-glass-subtle: rgba(255, 255, 255, 0.03);
-    --ios-glass-hover: rgba(255, 255, 255, 0.08);
-    --ios-glass-active: rgba(255, 255, 255, 0.12);
+    /* Materials & Translucency (iOS Glassmorphism) */
+    --ios-bg-canvas: #000000;
+    --ios-bg-grouped: #1c1c1e;
+    --ios-bg-secondary-grouped: #2c2c2e;
+    
+    --ios-material-thick: rgba(30, 30, 32, 0.78);
+    --ios-material-regular: rgba(36, 36, 40, 0.62);
+    --ios-material-thin: rgba(45, 45, 50, 0.40);
+    --ios-material-ultrathin: rgba(255, 255, 255, 0.05);
 
-    /* Separators & Borders */
-    --ios-border-glass: rgba(255, 255, 255, 0.14);
-    --ios-border-subtle: rgba(255, 255, 255, 0.08);
-    --ios-separator: rgba(255, 255, 255, 0.1);
+    /* Text & Label Hierarchy */
+    --ios-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+    --ios-label-primary: rgba(255, 255, 255, 1);
+    --ios-label-secondary: rgba(235, 235, 245, 0.60);
+    --ios-label-tertiary: rgba(235, 235, 245, 0.30);
+    --ios-label-quaternary: rgba(235, 235, 245, 0.18);
 
-    /* Typography & Labels */
-    --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
-    --ios-label-primary: #ffffff;
-    --ios-label-secondary: rgba(235, 235, 245, 0.65);
-    --ios-label-tertiary: rgba(235, 235, 245, 0.38);
+    /* Separators & Outlines */
+    --ios-separator: rgba(84, 84, 88, 0.5);
+    --ios-separator-opaque: #38383a;
+    --ios-glass-border: rgba(255, 255, 255, 0.16);
 
-    /* Corner Radii */
-    --ios-radius-xs: 8px;
-    --ios-radius-sm: 12px;
-    --ios-radius-md: 16px;
-    --ios-radius-lg: 22px;
-    --ios-radius-full: 9999px;
+    /* Radii & Padding Tokens */
+    --ios-radius-card: 18px;
+    --ios-radius-grouped: 14px;
+    --ios-radius-button: 12px;
+    --ios-radius-pill: 9999px;
 
-    /* Shadows & Glows */
-    --ios-shadow-card: 0 16px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
-    --ios-shadow-button: 0 8px 24px -4px rgba(0, 122, 255, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
-    --ios-glow-accent: 0 0 20px rgba(0, 122, 255, 0.35);
+    /* Shadows & Elevation */
+    --ios-shadow-elevation-1: 0 4px 20px rgba(0, 0, 0, 0.35);
+    --ios-shadow-elevation-2: 0 12px 40px -8px rgba(0, 0, 0, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+    --ios-shadow-glow-blue: 0 8px 25px -4px rgba(10, 132, 255, 0.5);
 }
 
-/* 2. Global Body & Canvas Overrides */
-html.theme-ios body {
-    background-color: var(--ios-bg-base) !important;
+/* 2. Base Canvas Overrides */
+html[data-theme="ios"] body {
+    background-color: var(--ios-bg-canvas) !important;
     background-image: 
-        radial-gradient(ellipse at 15% 15%, rgba(0, 122, 255, 0.15), transparent 45%),
-        radial-gradient(ellipse at 85% 75%, rgba(88, 86, 214, 0.18), transparent 50%),
-        radial-gradient(ellipse at 50% 40%, rgba(48, 209, 88, 0.08), transparent 60%) !important;
+        radial-gradient(circle at 10% 15%, rgba(10, 132, 255, 0.14), transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(94, 92, 230, 0.16), transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(48, 209, 88, 0.06), transparent 60%) !important;
     background-attachment: fixed !important;
-    font-family: var(--ios-font) !important;
-    letter-spacing: -0.015em !important;
+    font-family: var(--ios-font-family) !important;
+    letter-spacing: -0.018em !important;
     color: var(--ios-label-primary) !important;
+    -webkit-font-smoothing: antialiased !important;
 }
 
-/* 3. Navigation Header Bar */
-html.theme-ios header {
-    background: var(--ios-glass-thick) !important;
+/* 3. iOS 27 Navigation Header (Translucent Blur Bar) */
+html[data-theme="ios"] header {
+    background: var(--ios-material-thick) !important;
+    backdrop-filter: blur(40px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(210%) !important;
+    border-bottom: 0.5px solid var(--ios-separator) !important;
+    box-shadow: var(--ios-shadow-elevation-1) !important;
+}
+
+html[data-theme="ios"] header h1 {
+    font-weight: 700 !important;
+    letter-spacing: -0.025em !important;
+    font-size: 1.15rem !important;
+}
+
+/* 4. Inset Grouped Cards & Sections (Native iOS 27 Cards) */
+html[data-theme="ios"] section,
+html[data-theme="ios"] .bg-zinc-900\/30,
+html[data-theme="ios"] .bg-zinc-900\/40,
+html[data-theme="ios"] .bg-zinc-900\/50,
+html[data-theme="ios"] .bg-zinc-900\/90,
+html[data-theme="ios"] .bg-gradient-to-b {
+    background: var(--ios-material-regular) !important;
     backdrop-filter: blur(32px) saturate(190%) !important;
     -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
-    border-bottom: 1px solid var(--ios-border-glass) !important;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3) !important;
+    border: 0.5px solid var(--ios-glass-border) !important;
+    border-radius: var(--ios-radius-card) !important;
+    box-shadow: var(--ios-shadow-elevation-2) !important;
+    transition: transform 0.2s ease, border-color 0.2s ease !important;
 }
 
-/* 4. Glass Cards (Inset Grouped Section Style) */
-html.theme-ios section,
-html.theme-ios .bg-zinc-900\/30,
-html.theme-ios .bg-zinc-900\/40,
-html.theme-ios .bg-zinc-900\/50,
-html.theme-ios .bg-zinc-900\/90,
-html.theme-ios .bg-gradient-to-b {
-    background: var(--ios-glass-regular) !important;
-    backdrop-filter: blur(28px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-    border: 1px solid var(--ios-border-glass) !important;
-    border-radius: var(--ios-radius-lg) !important;
-    box-shadow: var(--ios-shadow-card) !important;
-    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease !important;
-}
-
-/* Hover effect on clickable cards */
-html.theme-ios section:hover {
-    border-color: rgba(255, 255, 255, 0.22) !important;
-}
-
-/* 5. Inputs & Form Controls (iOS Picker Style) */
-html.theme-ios select,
-html.theme-ios input {
-    background-color: var(--ios-glass-thin) !important;
-    border: 1px solid var(--ios-border-glass) !important;
-    border-radius: var(--ios-radius-sm) !important;
+/* 5. Input Controls & Select Pickers (iOS Inset Grouped Selector) */
+html[data-theme="ios"] select,
+html[data-theme="ios"] input[type="text"] {
+    background-color: rgba(255, 255, 255, 0.07) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: var(--ios-radius-grouped) !important;
     color: var(--ios-label-primary) !important;
-    font-family: var(--ios-font) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    transition: all 0.2s ease !important;
+    font-family: var(--ios-font-family) !important;
+    font-size: 0.9rem !important;
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    transition: all 0.18s ease-in-out !important;
 }
 
-html.theme-ios select:focus,
-html.theme-ios input:focus {
+html[data-theme="ios"] select:focus,
+html[data-theme="ios"] input[type="text"]:focus {
     border-color: var(--ios-blue) !important;
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.25) !important;
-    background-color: var(--ios-glass-hover) !important;
+    box-shadow: 0 0 0 3.5px rgba(10, 132, 255, 0.3) !important;
+    background-color: rgba(255, 255, 255, 0.12) !important;
     outline: none !important;
 }
 
-html.theme-ios select option {
-    background-color: #121724 !important;
+html[data-theme="ios"] select option {
+    background-color: #1c1c1e !important;
     color: #ffffff !important;
 }
 
-/* 6. Primary Action Buttons */
-html.theme-ios #analyze-btn {
-    background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo)) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    border-radius: var(--ios-radius-md) !important;
-    font-family: var(--ios-font) !important;
+/* 6. Primary Filled Button (iOS SF Accent Button) */
+html[data-theme="ios"] #analyze-btn {
+    background: linear-gradient(135deg, #0a84ff, #5e5ce6) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: var(--ios-radius-grouped) !important;
+    font-family: var(--ios-font-family) !important;
     font-weight: 600 !important;
+    font-size: 0.95rem !important;
     letter-spacing: -0.01em !important;
-    box-shadow: var(--ios-shadow-button) !important;
-    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+    box-shadow: var(--ios-shadow-glow-blue) !important;
+    transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.15s ease !important;
 }
 
-html.theme-ios #analyze-btn:hover:not(:disabled) {
-    transform: translateY(-1px) scale(1.01) !important;
-    box-shadow: 0 12px 32px -4px rgba(0, 122, 255, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.4) !important;
+html[data-theme="ios"] #analyze-btn:hover:not(:disabled) {
+    transform: scale(1.015) translateY(-1px) !important;
+    box-shadow: 0 10px 30px -2px rgba(10, 132, 255, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.4) !important;
 }
 
-html.theme-ios #analyze-btn:active:not(:disabled) {
-    transform: scale(0.97) !important;
-    opacity: 0.9 !important;
+html[data-theme="ios"] #analyze-btn:active:not(:disabled) {
+    transform: scale(0.96) !important;
+    opacity: 0.85 !important;
 }
 
-html.theme-ios #analyze-btn:disabled {
+html[data-theme="ios"] #analyze-btn:disabled {
     background: rgba(255, 255, 255, 0.05) !important;
     border-color: rgba(255, 255, 255, 0.06) !important;
     box-shadow: none !important;
     color: var(--ios-label-tertiary) !important;
 }
 
-/* 7. Status Badges & Pills */
-html.theme-ios .bg-emerald-500\/10,
-html.theme-ios .bg-emerald-500\/20 {
+/* 7. Status Badges & Pills (System Color Badges) */
+html[data-theme="ios"] .bg-emerald-500\/10,
+html[data-theme="ios"] .bg-emerald-500\/20 {
     background: rgba(var(--ios-green-rgb), 0.15) !important;
     color: var(--ios-green) !important;
-    border: 1px solid rgba(var(--ios-green-rgb), 0.3) !important;
-    border-radius: var(--ios-radius-full) !important;
+    border: 0.5px solid rgba(var(--ios-green-rgb), 0.35) !important;
+    border-radius: var(--ios-radius-pill) !important;
+    font-weight: 600 !important;
 }
 
-html.theme-ios .bg-sky-500\/10,
-html.theme-ios .bg-sky-500\/20 {
+html[data-theme="ios"] .bg-sky-500\/10,
+html[data-theme="ios"] .bg-sky-500\/20 {
     background: rgba(var(--ios-blue-rgb), 0.15) !important;
     color: var(--ios-blue) !important;
-    border: 1px solid rgba(var(--ios-blue-rgb), 0.3) !important;
-    border-radius: var(--ios-radius-full) !important;
+    border: 0.5px solid rgba(var(--ios-blue-rgb), 0.35) !important;
+    border-radius: var(--ios-radius-pill) !important;
+    font-weight: 600 !important;
 }
 
-html.theme-ios .bg-orange-500\/10 {
+html[data-theme="ios"] .bg-orange-500\/10 {
     background: rgba(255, 159, 10, 0.15) !important;
     color: var(--ios-orange) !important;
-    border: 1px solid rgba(255, 159, 10, 0.3) !important;
-    border-radius: var(--ios-radius-full) !important;
+    border: 0.5px solid rgba(255, 159, 10, 0.35) !important;
+    border-radius: var(--ios-radius-pill) !important;
+    font-weight: 600 !important;
 }
 
-html.theme-ios .bg-red-950\/20 {
+html[data-theme="ios"] .bg-red-950\/20 {
     background: rgba(var(--ios-red-rgb), 0.12) !important;
-    border: 1px solid rgba(var(--ios-red-rgb), 0.28) !important;
-    border-radius: var(--ios-radius-md) !important;
+    border: 0.5px solid rgba(var(--ios-red-rgb), 0.3) !important;
+    border-radius: var(--ios-radius-grouped) !important;
 }
 
-html.theme-ios .bg-emerald-950\/20 {
+html[data-theme="ios"] .bg-emerald-950\/20 {
     background: rgba(var(--ios-green-rgb), 0.12) !important;
-    border: 1px solid rgba(var(--ios-green-rgb), 0.28) !important;
-    border-radius: var(--ios-radius-md) !important;
+    border: 0.5px solid rgba(var(--ios-green-rgb), 0.3) !important;
+    border-radius: var(--ios-radius-grouped) !important;
 }
 
 /* 8. Progress Indicator Bar */
-html.theme-ios #progress-bar-container {
-    background: rgba(255, 255, 255, 0.06) !important;
-    border: 1px solid var(--ios-border-subtle) !important;
-    border-radius: var(--ios-radius-full) !important;
-    height: 6px !important;
+html[data-theme="ios"] #progress-bar-container {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: var(--ios-radius-pill) !important;
+    height: 5px !important;
 }
 
-html.theme-ios #progress-bar {
+html[data-theme="ios"] #progress-bar {
     background: linear-gradient(90deg, var(--ios-blue), var(--ios-teal)) !important;
-    border-radius: var(--ios-radius-full) !important;
-    box-shadow: 0 0 12px rgba(0, 122, 255, 0.6) !important;
+    border-radius: var(--ios-radius-pill) !important;
+    box-shadow: 0 0 10px rgba(10, 132, 255, 0.6) !important;
 }
 
-/* 9. Segmented Control Toggle Style */
-html.theme-ios #theme-btn-ios {
+/* 9. Segmented Control Switcher Button */
+html[data-theme="ios"] #theme-btn-ios {
     background: var(--ios-blue) !important;
     color: #ffffff !important;
     font-weight: 600 !important;
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4) !important;
-    border-radius: var(--ios-radius-sm) !important;
+    box-shadow: 0 2px 10px rgba(10, 132, 255, 0.45) !important;
+    border-radius: var(--ios-radius-button) !important;
 }
 
-html.theme-ios #theme-btn-original {
+html[data-theme="ios"] #theme-btn-original {
     background: transparent !important;
     color: var(--ios-label-secondary) !important;
     box-shadow: none !important;
 }
 
-/* 10. Micro-Animations */
+/* 10. Tables & Inset Rows Styling */
+html[data-theme="ios"] table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+}
+
+html[data-theme="ios"] th {
+    color: var(--ios-label-secondary) !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    border-bottom: 0.5px solid var(--ios-separator) !important;
+    padding-bottom: 0.5rem !important;
+}
+
+html[data-theme="ios"] td {
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.06) !important;
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
+}
+
+/* 11. Custom Translucent Scrollbars */
+html[data-theme="ios"] ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+html[data-theme="ios"] ::-webkit-scrollbar-track {
+    background: transparent;
+}
+html[data-theme="ios"] ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+}
+html[data-theme="ios"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* 12. Native Spring Micro-Animations */
 @keyframes iosSpringIn {
-    0% { transform: scale(0.94) translateY(10px); opacity: 0; }
-    60% { transform: scale(1.01) translateY(-2px); }
+    0% { transform: scale(0.94) translateY(12px); opacity: 0; }
+    65% { transform: scale(1.015) translateY(-2px); }
     100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
 @keyframes iosFadeIn {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-html.theme-ios .ios-animate-spring {
-    animation: iosSpringIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+html[data-theme="ios"] .ios-animate-spring {
+    animation: iosSpringIn 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
-html.theme-ios .ios-animate-fade {
-    animation: iosFadeIn 0.35s ease-out forwards !important;
+html[data-theme="ios"] .ios-animate-fade {
+    animation: iosFadeIn 0.32s ease-out forwards !important;
 }
