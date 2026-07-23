@@ -10,8 +10,15 @@ import threading
 
 PORT = int(os.environ.get("PORT", 8000))
 
+import sys
+
+if getattr(sys, 'frozen', False):
+    BASE_DIR = sys._MEIPASS
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Resolve public directory absolutely so the server can be safely started from anywhere.
-PUBLIC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'public'))
+PUBLIC_DIR = os.path.abspath(os.path.join(BASE_DIR, 'public'))
 
 LIVE_SCORE_CACHE = {} # key: match_url, value: (timestamp, data)
 cache_lock = threading.Lock()

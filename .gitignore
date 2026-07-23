@@ -8,3 +8,8 @@ liquipedia_test.py
 auto_push.ps1
 run_auto_push.bat
 create_startup.ps1
+VLR_Analyzer.exe
+dist/
+build/
+*.spec
+app_launcher.py
