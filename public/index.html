@@ -44,6 +44,95 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Apple iOS 27 UI Kit Theme Styles */
+        html.theme-ios body {
+            background: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.12), transparent 45%),
+                        radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.15), transparent 45%),
+                        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08), transparent 60%),
+                        #070a12 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif !important;
+            letter-spacing: -0.015em;
+        }
+
+        /* Glassmorphism iOS Cards */
+        html.theme-ios section, 
+        html.theme-ios .bg-zinc-900\/30, 
+        html.theme-ios .bg-zinc-900\/40,
+        html.theme-ios .bg-zinc-900\/50,
+        html.theme-ios .bg-gradient-to-b {
+            background: rgba(18, 22, 34, 0.65) !important;
+            backdrop-filter: blur(28px) saturate(190%) !important;
+            -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            border-radius: 1.5rem !important;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.12) !important;
+        }
+
+        /* iOS Header Glass Bar */
+        html.theme-ios header {
+            background: rgba(10, 14, 24, 0.75) !important;
+            backdrop-filter: blur(30px) saturate(200%) !important;
+            -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* iOS Select Controls */
+        html.theme-ios select {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 1rem !important;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        /* iOS Primary Action Button */
+        html.theme-ios #analyze-btn {
+            background: linear-gradient(135deg, #007aff, #5856d6) !important;
+            border-radius: 1.25rem !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 122, 255, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.25) !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.01em !important;
+        }
+        html.theme-ios #analyze-btn:hover {
+            transform: scale(1.01);
+            box-shadow: 0 12px 30px -4px rgba(0, 122, 255, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.35) !important;
+        }
+
+        /* iOS Dynamic Accent Badges */
+        html.theme-ios .bg-emerald-500\/10 {
+            background: rgba(48, 209, 88, 0.15) !important;
+            color: #30d158 !important;
+            border-color: rgba(48, 209, 88, 0.3) !important;
+            border-radius: 9999px !important;
+        }
+
+        html.theme-ios .bg-sky-500\/10 {
+            background: rgba(10, 132, 255, 0.15) !important;
+            color: #0a84ff !important;
+            border-color: rgba(10, 132, 255, 0.3) !important;
+            border-radius: 9999px !important;
+        }
+
+        html.theme-ios .bg-orange-500\/10 {
+            background: rgba(255, 159, 10, 0.15) !important;
+            color: #ff9f0a !important;
+            border-color: rgba(255, 159, 10, 0.3) !important;
+            border-radius: 9999px !important;
+        }
+
+        html.theme-ios .bg-red-950\/20 {
+            background: rgba(255, 69, 58, 0.14) !important;
+            border-color: rgba(255, 69, 58, 0.3) !important;
+            border-radius: 1.25rem !important;
+        }
+
+        html.theme-ios .bg-emerald-950\/20 {
+            background: rgba(48, 209, 88, 0.14) !important;
+            border-color: rgba(48, 209, 88, 0.3) !important;
+            border-radius: 1.25rem !important;
         }
     </style>
 </head>
@@ -61,9 +150,26 @@
                     <p class="text-[10px] sm:text-xs text-slate-400 font-medium truncate">vlr.gg 기반 e스포츠 매치업 정밀 전력 분석기</p>
                 </div>
             </div>
-            <div class="hidden sm:flex items-center space-x-2 text-xs text-slate-500 font-medium shrink-0">
-                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500/80"></i>
-                <span>웹 실시간 크롤링 작동 중</span>
+            
+            <!-- UI Theme Switcher Segmented Control -->
+            <div class="flex items-center space-x-2">
+                <div class="flex items-center bg-zinc-900/90 border border-slate-800 p-1 rounded-xl text-xs font-semibold shrink-0 shadow-inner">
+                    <button id="theme-btn-original" onclick="setUITheme('original')" class="px-2.5 py-1.5 sm:px-3 rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 font-bold shadow-sm">
+                        <i data-lucide="gamepad-2" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">e스포츠 다크</span>
+                        <span class="sm:hidden">다크</span>
+                    </button>
+                    <button id="theme-btn-ios" onclick="setUITheme('ios')" class="px-2.5 py-1.5 sm:px-3 rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-1.5">
+                        <i data-lucide="apple" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Apple iOS 27</span>
+                        <span class="sm:hidden">iOS 27</span>
+                    </button>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-2 text-xs text-slate-500 font-medium shrink-0">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500/80"></i>
+                    <span>웹 실시간 크롤링 작동 중</span>
+                </div>
             </div>
         </div>
     </header>

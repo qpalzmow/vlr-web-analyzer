@@ -54,8 +54,40 @@ const analyzeBtn = document.getElementById('analyze-btn');
 const progressBarContainer = document.getElementById('progress-bar-container');
 const progressBar = document.getElementById('progress-bar');
 
+// Theme Manager (Original eSports Dark vs Apple iOS 27 Glass UI Kit)
+function setUITheme(theme) {
+    const htmlEl = document.documentElement;
+    const btnOriginal = document.getElementById('theme-btn-original');
+    const btnIos = document.getElementById('theme-btn-ios');
+    
+    if (theme === 'ios') {
+        htmlEl.classList.add('theme-ios');
+        if (btnOriginal && btnIos) {
+            btnOriginal.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-1.5';
+            btnIos.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-blue-600/30 text-sky-300 border border-sky-400/30 font-bold shadow-sm backdrop-blur-md';
+        }
+        localStorage.setItem('vlr_ui_theme', 'ios');
+    } else {
+        htmlEl.classList.remove('theme-ios');
+        if (btnOriginal && btnIos) {
+            btnOriginal.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 font-bold shadow-sm';
+            btnIos.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-1.5';
+        }
+        localStorage.setItem('vlr_ui_theme', 'original');
+    }
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+}
+
+function initUITheme() {
+    const savedTheme = localStorage.getItem('vlr_ui_theme') || 'original';
+    setUITheme(savedTheme);
+}
+
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
+    initUITheme();
     fetchMatches();
     
     // Wire up events
