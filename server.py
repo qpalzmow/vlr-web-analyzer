@@ -12,6 +12,13 @@ PORT = int(os.environ.get("PORT", 8000))
 
 import sys
 
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
 if getattr(sys, 'frozen', False):
     BASE_DIR = sys._MEIPASS
 else:
