@@ -408,17 +408,29 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
         except Exception:
             pass  # Ignore if client already closed the connection
 
-def run():
-    # Use ThreadingHTTPServer so that concurrent requests don't block the server!
+ACTUAL_PORT = PORT
+
+def run(start_port=None):
+    global ACTUAL_PORT
     from http.server import ThreadingHTTPServer
-    server_address = ('', PORT)
-    httpd = ThreadingHTTPServer(server_address, VLRWebServer)
-    print(f"Starting server on port {PORT}...")
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\nStopping server...")
-        httpd.server_close()
+    target_port = start_port or PORT
+    
+    for attempt_port in range(target_port, target_port + 10):
+        try:
+            server_address = ('', attempt_port)
+            httpd = ThreadingHTTPServer(server_address, VLRWebServer)
+            ACTUAL_PORT = attempt_port
+            print(f"Starting server on port {ACTUAL_PORT}...")
+            try:
+                httpd.serve_forever()
+            except KeyboardInterrupt:
+                print("\nStopping server...")
+                httpd.server_close()
+            return
+        except OSError as e:
+            if attempt_port == target_port + 9:
+                raise e
+            continue
 
 if __name__ == '__main__':
     run()

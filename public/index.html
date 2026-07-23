@@ -40,99 +40,13 @@
     </script>
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Apple iOS 27 UI Kit Theme Stylesheet -->
+    <link rel="stylesheet" href="ios-theme.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
             transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        /* Apple iOS 27 UI Kit Theme Styles */
-        html.theme-ios body {
-            background: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.12), transparent 45%),
-                        radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.15), transparent 45%),
-                        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08), transparent 60%),
-                        #070a12 !important;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif !important;
-            letter-spacing: -0.015em;
-        }
-
-        /* Glassmorphism iOS Cards */
-        html.theme-ios section, 
-        html.theme-ios .bg-zinc-900\/30, 
-        html.theme-ios .bg-zinc-900\/40,
-        html.theme-ios .bg-zinc-900\/50,
-        html.theme-ios .bg-gradient-to-b {
-            background: rgba(18, 22, 34, 0.65) !important;
-            backdrop-filter: blur(28px) saturate(190%) !important;
-            -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.14) !important;
-            border-radius: 1.5rem !important;
-            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.12) !important;
-        }
-
-        /* iOS Header Glass Bar */
-        html.theme-ios header {
-            background: rgba(10, 14, 24, 0.75) !important;
-            backdrop-filter: blur(30px) saturate(200%) !important;
-            -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-        }
-
-        /* iOS Select Controls */
-        html.theme-ios select {
-            background-color: rgba(255, 255, 255, 0.08) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            border-radius: 1rem !important;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
-            backdrop-filter: blur(10px) !important;
-        }
-
-        /* iOS Primary Action Button */
-        html.theme-ios #analyze-btn {
-            background: linear-gradient(135deg, #007aff, #5856d6) !important;
-            border-radius: 1.25rem !important;
-            box-shadow: 0 10px 25px -5px rgba(0, 122, 255, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.25) !important;
-            font-weight: 700 !important;
-            letter-spacing: -0.01em !important;
-        }
-        html.theme-ios #analyze-btn:hover {
-            transform: scale(1.01);
-            box-shadow: 0 12px 30px -4px rgba(0, 122, 255, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.35) !important;
-        }
-
-        /* iOS Dynamic Accent Badges */
-        html.theme-ios .bg-emerald-500\/10 {
-            background: rgba(48, 209, 88, 0.15) !important;
-            color: #30d158 !important;
-            border-color: rgba(48, 209, 88, 0.3) !important;
-            border-radius: 9999px !important;
-        }
-
-        html.theme-ios .bg-sky-500\/10 {
-            background: rgba(10, 132, 255, 0.15) !important;
-            color: #0a84ff !important;
-            border-color: rgba(10, 132, 255, 0.3) !important;
-            border-radius: 9999px !important;
-        }
-
-        html.theme-ios .bg-orange-500\/10 {
-            background: rgba(255, 159, 10, 0.15) !important;
-            color: #ff9f0a !important;
-            border-color: rgba(255, 159, 10, 0.3) !important;
-            border-radius: 9999px !important;
-        }
-
-        html.theme-ios .bg-red-950\/20 {
-            background: rgba(255, 69, 58, 0.14) !important;
-            border-color: rgba(255, 69, 58, 0.3) !important;
-            border-radius: 1.25rem !important;
-        }
-
-        html.theme-ios .bg-emerald-950\/20 {
-            background: rgba(48, 209, 88, 0.14) !important;
-            border-color: rgba(48, 209, 88, 0.3) !important;
-            border-radius: 1.25rem !important;
         }
     </style>
 </head>
