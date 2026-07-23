@@ -476,6 +476,14 @@ async function runAnalysis() {
         
         if (!signal.aborted) {
             updateStatus('success', '전력 분석 완료.', '양 팀의 최신 경기 데이터 융합 분석이 무결하게 완료되었습니다.', 100);
+            
+            // Trigger iOS Spring micro-animation on results container
+            const resultsContainer = document.getElementById('analysis-results-container');
+            if (resultsContainer) {
+                resultsContainer.classList.remove('ios-animate-spring');
+                void resultsContainer.offsetWidth; // Force reflow
+                resultsContainer.classList.add('ios-animate-spring');
+            }
         }
     } catch (err) {
         if (err.name !== 'AbortError') {
