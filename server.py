@@ -6,6 +6,7 @@ import traceback
 import scraper
 import time
 import threading
+import atexit
 from datetime import datetime, timedelta
 
 PORT = int(os.environ.get("PORT", 8000))
@@ -43,64 +44,85 @@ CACHE = {
     'team_form': {'data': {}, 'ttl': 300},  # 5 minutes
 }
 
-cache_lock = threading.Lock()
+_cache_lock = threading.RLock()  # 재진입 가능 락으로 데드락 방지
 _cache_timestamps = {}
+
+# 전역 스레드 풀 (H-4: 매 요청마다 생성 방지)
+from concurrent.futures import ThreadPoolExecutor
+_global_executor = ThreadPoolExecutor(max_workers=8, thread_name_prefix="vlr-api")
+atexit.register(_global_executor.shutdown, wait=True)
+
+# 캐시 GC 백그라운드 타이머 (C-2: 중첩 락 제거)
+_cache_gc_timer = None
 
 def _make_cache_key(entity_id, event_ids=None):
     """Build a clean, deterministic cache key for an entity and optional event_ids list."""
-    if not event_ids:
-        return str(entity_id)
+    if event_ids is None:
+        return f"{entity_id}_all"  # M-4: None과 빈 리스트 구분
     if isinstance(event_ids, (list, set, tuple)):
         sorted_events = "_".join(sorted(str(e) for e in event_ids))
         return f"{entity_id}_{sorted_events}"
     return f"{entity_id}_{event_ids}"
 
-def cleanup_expired_cache():
-    """Periodically clean up expired cache entries (thread-safe)."""
-    now = time.time()
+def _cleanup_expired_cache_nolock(now: float):
+    """락 없이 호출되는 정리 루틴 (타이머 스레드에서만 실행)."""
     expired_keys = []
-    
-    with cache_lock:
-        for cache_type, cache_config in CACHE.items():
-            if cache_type in _cache_timestamps:
-                for key in list(cache_config['data'].keys()):
-                    if now - _cache_timestamps[cache_type].get(key, 0) > cache_config['ttl']:
-                        expired_keys.append((cache_type, key))
-        
-        for cache_type, key in expired_keys:
-            if key in CACHE[cache_type]['data']:
-                del CACHE[cache_type]['data'][key]
-            if cache_type in _cache_timestamps and key in _cache_timestamps[cache_type]:
-                del _cache_timestamps[cache_type][key]
+    for cache_type, cache_config in CACHE.items():
+        if cache_type in _cache_timestamps:
+            for key in list(cache_config['data'].keys()):
+                if now - _cache_timestamps[cache_type].get(key, 0) > cache_config['ttl']:
+                    expired_keys.append((cache_type, key))
+    for cache_type, key in expired_keys:
+        CACHE[cache_type]['data'].pop(key, None)
+        _cache_timestamps.get(cache_type, {}).pop(key, None)
 
-def is_cache_valid(cache_type, key):
-    """Check if cache entry is valid (not expired) (thread-safe)."""
-    cleanup_expired_cache()
-    
-    with cache_lock:
-        if cache_type not in CACHE:
-            return False
-        
-        if key not in CACHE[cache_type]['data']:
-            return False
-            
-        if cache_type not in _cache_timestamps:
-            return True
-            
-        if key not in _cache_timestamps[cache_type]:
-            return True
-            
-        elapsed = time.time() - _cache_timestamps[cache_type][key]
-        return elapsed < CACHE[cache_type]['ttl']
 
-def get_cached_data(cache_type, key, fetch_func, *args, **kwargs):
-    """Get cached data or fetch from function if not cached/valid (thread-safe)."""
+def _cache_gc_loop():
+    """백그라운드에서 주기적으로 만료 항목 정리."""
+    global _cache_gc_timer
+    _cleanup_expired_cache_nolock(time.time())
+    _cache_gc_timer = threading.Timer(60.0, _cache_gc_loop)
+    _cache_gc_timer.daemon = True
+    _cache_gc_timer.start()
+
+
+# 모듈 로드 시 GC 루프 시작
+_cache_gc_loop()
+
+
+def is_cache_valid(cache_type: str, key: str) -> bool:
+    """락 없이 타임스탬프만 확인 (빠른 경로)."""
+    if cache_type not in CACHE:
+        return False
+    if key not in CACHE[cache_type]['data']:
+        return False
+    ts_map = _cache_timestamps.get(cache_type)
+    if not ts_map or key not in ts_map:
+        return True  # 타임스탬프 없으면 유효로 간주 (최초 1회)
+    return (time.time() - ts_map[key]) < CACHE[cache_type]['ttl']
+
+
+def get_cached_data(cache_type: str, key: str, fetch_func, *args, **kwargs):
+    """캐시 조회 → 미스 시 fetch → 저장 (락은 쓰기만)."""
     if is_cache_valid(cache_type, key):
-        with cache_lock:
-            return CACHE[cache_type]['data'][key]
+        return CACHE[cache_type]['data'][key]
     
+    # 캐시 미스: fetch 수행 (락 없이 병렬 허용된 중복 fetch 가능, 마지막 쓰기 승)
     try:
         data = fetch_func(*args, **kwargs)
+    except Exception as e:
+        print(f"Error fetching {cache_type} for key {key}: {e}")
+        raise
+    
+    with _cache_lock:
+        CACHE[cache_type]['data'][key] = data
+        if cache_type not in _cache_timestamps:
+            _cache_timestamps[cache_type] = {}
+        _cache_timestamps[cache_type][key] = time.time()
+    return data
+
+def get_cached_live_score(match_url):
+    """Original live score caching for backward compatibility"""
         with cache_lock:
             CACHE[cache_type]['data'][key] = data
             if cache_type not in _cache_timestamps:
@@ -149,7 +171,7 @@ def _safe_future_result(future, default):
     if future is None:
         return default
     try:
-        return future.result()
+        return future.result(timeout=30)  # 30초 타임아웃 가드
     except Exception:
         return default
 class VLRWebServer(http.server.BaseHTTPRequestHandler):
@@ -171,7 +193,10 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
             self.send_header('Pragma', 'no-cache')
             self.send_header('Expires', '0')
-            
+            # HSTS 등 보안 헤더 추가
+            self.send_header('X-Content-Type-Options', 'nosniff')
+            self.send_header('X-Frame-Options', 'DENY')
+
         # 1. API: Get Matches List
         if path == '/api/matches':
             try:
@@ -182,10 +207,13 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(matches, ensure_ascii=False).encode('utf-8'))
             except Exception as e:
-                self.send_error_response(str(e))
+                # 스택 트레이스 노출 방지
+                self.send_error_response("Internal server error", 500)
+                # 서버 로그엔 상세 기록
+                import traceback
+                traceback.print_exc()
             return
-            
-        # 2. API: Get Match Details & Events list
+
         elif path == '/api/match-details':
             query = urlparse.parse_qs(parsed.query)
             match_url = query.get('url', [None])[0]
@@ -194,26 +222,24 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 return
                 
             try:
-                # Fetch match details with caching
                 details = get_cached_data('match_details', match_url, scraper.get_match_details, match_url)
-                
+            
                 # Fetch recent 12 events and map pool with caching
-                from concurrent.futures import ThreadPoolExecutor
-                with ThreadPoolExecutor(max_workers=3) as executor:
-                    future_a = executor.submit(
-                        get_cached_data, 'team_events', details["team_a_id"], scraper.get_team_events, details["team_a_id"]
-                    ) if details.get("team_a_id") else None
-                    future_b = executor.submit(
-                        get_cached_data, 'team_events', details["team_b_id"], scraper.get_team_events, details["team_b_id"]
-                    ) if details.get("team_b_id") else None
-                    future_pool = executor.submit(
-                        get_cached_data, 'event_map_pool', details.get("event_id"), scraper.get_event_map_pool, details.get("event_id")
-                    ) if details.get("event_id") else None
-                    
-                    team_a_events = _safe_future_result(future_a, [])[:12]
-                    team_b_events = _safe_future_result(future_b, [])[:12]
-                    map_pool = _safe_future_result(future_pool, [])
-                
+                # 전역 풀 재사용 (H-4)
+                future_a = _global_executor.submit(
+                    get_cached_data, 'team_events', details["team_a_id"], scraper.get_team_events, details["team_a_id"]
+                ) if details.get("team_a_id") else None
+                future_b = _global_executor.submit(
+                    get_cached_data, 'team_events', details["team_b_id"], scraper.get_team_events, details["team_b_id"]
+                ) if details.get("team_b_id") else None
+                future_pool = _global_executor.submit(
+                    get_cached_data, 'event_map_pool', details.get("event_id"), scraper.get_event_map_pool, details.get("event_id")
+                ) if details.get("event_id") else None
+            
+                team_a_events = _safe_future_result(future_a, [])[:12]
+                team_b_events = _safe_future_result(future_b, [])[:12]
+                map_pool = _safe_future_result(future_pool, [])
+            
                 # Fetch initial live score
                 live_score = get_cached_live_score(match_url)
                 
@@ -268,11 +294,13 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(b"404 Not Found")
             return
-        full_filepath = os.path.realpath(os.path.join(PUBLIC_DIR, safe_path))
+        full_filepath = os.path.normcase(os.path.realpath(os.path.join(PUBLIC_DIR, safe_path)))
         
         # Verify the file is strictly inside the public folder.
+        # C-5: 윈도우 드라이브 레터 대소문자 정규화 후 비교
+        PUBLIC_DIR_NORM = os.path.normcase(os.path.normpath(PUBLIC_DIR))
         try:
-            is_sub = os.path.commonpath([PUBLIC_DIR]) == os.path.commonpath([PUBLIC_DIR, full_filepath])
+            is_sub = os.path.commonpath([PUBLIC_DIR_NORM]) == os.path.commonpath([PUBLIC_DIR_NORM, full_filepath])
         except Exception:
             is_sub = False
             
@@ -372,20 +400,18 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 event_ids = body.get('event_ids', None)
                 
                 # For map stats, we create composite cache keys
-                cache_key_a = _make_cache_key(team_a_id, event_ids)
-                cache_key_b = _make_cache_key(team_b_id, event_ids)
+                cache_key_a = _make_cache_key(team_a_id, event_ids) if team_a_id else ""
+                cache_key_b = _make_cache_key(team_b_id, event_ids) if team_b_id else ""
                 
-                from concurrent.futures import ThreadPoolExecutor
-                with ThreadPoolExecutor(max_workers=2) as executor:
-                    future_a = executor.submit(
-                        get_cached_data, 'team_stats', cache_key_a, scraper.get_team_maps_stats, team_a_id, event_ids
-                    ) if team_a_id else None
-                    future_b = executor.submit(
-                        get_cached_data, 'team_stats', cache_key_b, scraper.get_team_maps_stats, team_b_id, event_ids
-                    ) if team_b_id else None
-                    
-                    maps_a = _safe_future_result(future_a, {})
-                    maps_b = _safe_future_result(future_b, {})
+                future_a = _global_executor.submit(
+                    get_cached_data, 'team_stats', cache_key_a, scraper.get_team_maps_stats, team_a_id, event_ids
+                ) if team_a_id else None
+                future_b = _global_executor.submit(
+                    get_cached_data, 'team_stats', cache_key_b, scraper.get_team_maps_stats, team_b_id, event_ids
+                ) if team_b_id else None
+                
+                maps_a = _safe_future_result(future_a, {})
+                maps_b = _safe_future_result(future_b, {})
                 
                 response_data = {
                     "maps_a": maps_a,
@@ -412,17 +438,15 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 team_b_id = body.get('team_b_id', '')
                 event_ids = body.get('event_ids', None)
                 
-                from concurrent.futures import ThreadPoolExecutor
-                with ThreadPoolExecutor(max_workers=2) as executor:
-                    future_a = executor.submit(
-                        get_cached_data, 'team_roster', team_a_id, scraper.get_team_roster, team_a_id
-                    ) if team_a_id else None
-                    future_b = executor.submit(
-                        get_cached_data, 'team_roster', team_b_id, scraper.get_team_roster, team_b_id
-                    ) if team_b_id else None
-                    
-                    roster_a = _safe_future_result(future_a, [])
-                    roster_b = _safe_future_result(future_b, [])
+                future_a = _global_executor.submit(
+                    get_cached_data, 'team_roster', team_a_id, scraper.get_team_roster, team_a_id
+                ) if team_a_id else None
+                future_b = _global_executor.submit(
+                    get_cached_data, 'team_roster', team_b_id, scraper.get_team_roster, team_b_id
+                ) if team_b_id else None
+                
+                roster_a = _safe_future_result(future_a, [])
+                roster_b = _safe_future_result(future_b, [])
                 
                 ace_a = self.find_ace_player(roster_a, event_ids)
                 ace_b = self.find_ace_player(roster_b, event_ids)
