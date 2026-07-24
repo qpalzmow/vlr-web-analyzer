@@ -4,9 +4,9 @@ import urllib.parse as urlparse
 import os
 import traceback
 import scraper
-
 import time
 import threading
+from datetime import datetime, timedelta
 
 PORT = int(os.environ.get("PORT", 8000))
 
@@ -27,13 +27,79 @@ else:
 # Resolve public directory absolutely so the server can be safely started from anywhere.
 PUBLIC_DIR = os.path.abspath(os.path.join(BASE_DIR, 'public'))
 
-LIVE_SCORE_CACHE = {} # key: match_url, value: (timestamp, data)
+# Comprehensive caching system with multiple TTL tiers
+CACHE = {
+    'matches': {'data': {}, 'ttl': 600},  # 10 minutes for matches list
+    'match_details': {'data': {}, 'ttl': 300},  # 5 minutes
+    'team_events': {'data': {}, 'ttl': 300},  # 5 minutes
+    'event_map_pool': {'data': {}, 'ttl': 600},  # 10 minutes
+    'live_score': {'data': {}, 'ttl': 10},  # 10 seconds for live scores
+    'team_stats': {'data': {}, 'ttl': 600},  # 10 minutes
+    'team_roster': {'data': {}, 'ttl': 600},  # 10 minutes
+    'player_stats': {'data': {}, 'ttl': 300},  # 5 minutes
+    'agent_composition': {'data': {}, 'ttl': 1800},  # 30 minutes
+    'pistol_stats': {'data': {}, 'ttl': 300},  # 5 minutes
+    'fk_fd_margin': {'data': {}, 'ttl': 300},  # 5 minutes
+    'team_form': {'data': {}, 'ttl': 300},  # 5 minutes
+}
+
 cache_lock = threading.Lock()
-CACHE_TTL = 20          # seconds — live score TTL
-CACHE_GC_INTERVAL = 60  # seconds — how often to run garbage collection
-_last_gc_ts = 0.0
+_cache_timestamps = {}
+
+def cleanup_expired_cache():
+    """Periodically clean up expired cache entries"""
+    now = time.time()
+    expired_keys = []
+    
+    for cache_type, cache_config in CACHE.items():
+        if cache_type in _cache_timestamps:
+            for key in list(cache_config['data'].keys()):
+                if now - _cache_timestamps[cache_type].get(key, 0) > cache_config['ttl']:
+                    expired_keys.append((cache_type, key))
+    
+    for cache_type, key in expired_keys:
+        del CACHE[cache_type]['data'][key]
+        if cache_type in _cache_timestamps and key in _cache_timestamps[cache_type]:
+            del _cache_timestamps[cache_type][key]
+
+def is_cache_valid(cache_type, key):
+    """Check if cache entry is valid (not expired)"""
+    cleanup_expired_cache()
+    
+    if cache_type not in CACHE:
+        return False
+    
+    if key not in CACHE[cache_type]['data']:
+        return False
+        
+    if cache_type not in _cache_timestamps:
+        return True
+        
+    if key not in _cache_timestamps[cache_type]:
+        return True
+        
+    elapsed = time.time() - _cache_timestamps[cache_type][key]
+    return elapsed < CACHE[cache_type]['ttl']
+
+def get_cached_data(cache_type, key, fetch_func, *args, **kwargs):
+    """Get cached data or fetch from function if not cached/valid"""
+    if is_cache_valid(cache_type, key):
+        return CACHE[cache_type]['data'][key]
+    
+    try:
+        data = fetch_func(*args, **kwargs)
+        with cache_lock:
+            CACHE[cache_type]['data'][key] = data
+            if cache_type not in _cache_timestamps:
+                _cache_timestamps[cache_type] = {}
+            _cache_timestamps[cache_type][key] = time.time()
+        return data
+    except Exception as e:
+        print(f"Error fetching {cache_type} for key {key}: {e}")
+        raise
 
 def get_cached_live_score(match_url):
+    """Original live score caching for backward compatibility"""
     global _last_gc_ts
     now = time.time()
     with cache_lock:
@@ -59,6 +125,13 @@ def get_cached_live_score(match_url):
         
     return data
 
+# Legacy cache for backward compatibility
+LIVE_SCORE_CACHE = {} # key: match_url, value: (timestamp, data)
+cache_lock = threading.Lock()
+CACHE_TTL = 20          # seconds — live score TTL
+CACHE_GC_INTERVAL = 60  # seconds — how often to run garbage collection
+_last_gc_ts = 0.0
+
 def _safe_future_result(future, default):
     """Safely resolve a future, returning `default` if it raised."""
     if future is None:
@@ -67,7 +140,6 @@ def _safe_future_result(future, default):
         return future.result()
     except Exception:
         return default
-
 class VLRWebServer(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         # Handle CORS preflight request
@@ -91,7 +163,7 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
         # 1. API: Get Matches List
         if path == '/api/matches':
             try:
-                matches = scraper.get_matches()
+                matches = get_cached_data('matches', 'matches_list', scraper.get_matches)
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json; charset=utf-8')
                 send_cors_headers()
@@ -110,14 +182,21 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 return
                 
             try:
-                details = scraper.get_match_details(match_url)
+                # Fetch match details with caching
+                details = get_cached_data('match_details', match_url, scraper.get_match_details, match_url)
                 
-                # Fetch recent 12 events and map pool in parallel!
+                # Fetch recent 12 events and map pool with caching
                 from concurrent.futures import ThreadPoolExecutor
                 with ThreadPoolExecutor(max_workers=3) as executor:
-                    future_a = executor.submit(scraper.get_team_events, details["team_a_id"]) if details.get("team_a_id") else None
-                    future_b = executor.submit(scraper.get_team_events, details["team_b_id"]) if details.get("team_b_id") else None
-                    future_pool = executor.submit(scraper.get_event_map_pool, details.get("event_id")) if details.get("event_id") else None
+                    future_a = executor.submit(
+                        get_cached_data, 'team_events', details["team_a_id"], scraper.get_team_events, details["team_a_id"]
+                    ) if details.get("team_a_id") else None
+                    future_b = executor.submit(
+                        get_cached_data, 'team_events', details["team_b_id"], scraper.get_team_events, details["team_b_id"]
+                    ) if details.get("team_b_id") else None
+                    future_pool = executor.submit(
+                        get_cached_data, 'event_map_pool', details.get("event_id"), scraper.get_event_map_pool, details.get("event_id")
+                    ) if details.get("event_id") else None
                     
                     team_a_events = _safe_future_result(future_a, [])[:12]
                     team_b_events = _safe_future_result(future_b, [])[:12]
@@ -245,8 +324,12 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 
                 from concurrent.futures import ThreadPoolExecutor
                 with ThreadPoolExecutor(max_workers=2) as executor:
-                    future_a = executor.submit(scraper.get_team_form, team_a_id) if team_a_id else None
-                    future_b = executor.submit(scraper.get_team_form, team_b_id) if team_b_id else None
+                    future_a = executor.submit(
+                        get_cached_data, 'team_form', team_a_id, scraper.get_team_form, team_a_id
+                    ) if team_a_id else None
+                    future_b = executor.submit(
+                        get_cached_data, 'team_form', team_b_id, scraper.get_team_form, team_b_id
+                    ) if team_b_id else None
                     
                     form_a = _safe_future_result(future_a, [])
                     form_b = _safe_future_result(future_b, [])
@@ -276,10 +359,18 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 team_b_id = body.get('team_b_id', '')
                 event_ids = body.get('event_ids', None)
                 
+                # For map stats, we create composite cache keys
+                cache_key_a = f"{team_a_id}_{event_ids}" if event_ids else team_a_id
+                cache_key_b = f"{team_b_id}_{event_ids}" if event_ids else team_b_id
+                
                 from concurrent.futures import ThreadPoolExecutor
                 with ThreadPoolExecutor(max_workers=2) as executor:
-                    future_a = executor.submit(scraper.get_team_maps_stats, team_a_id, event_ids) if team_a_id else None
-                    future_b = executor.submit(scraper.get_team_maps_stats, team_b_id, event_ids) if team_b_id else None
+                    future_a = executor.submit(
+                        get_cached_data, 'team_stats', cache_key_a, scraper.get_team_maps_stats, team_a_id, event_ids
+                    ) if team_a_id else None
+                    future_b = executor.submit(
+                        get_cached_data, 'team_stats', cache_key_b, scraper.get_team_maps_stats, team_b_id, event_ids
+                    ) if team_b_id else None
                     
                     maps_a = _safe_future_result(future_a, {})
                     maps_b = _safe_future_result(future_b, {})
@@ -311,8 +402,12 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 
                 from concurrent.futures import ThreadPoolExecutor
                 with ThreadPoolExecutor(max_workers=2) as executor:
-                    future_a = executor.submit(scraper.get_team_roster, team_a_id) if team_a_id else None
-                    future_b = executor.submit(scraper.get_team_roster, team_b_id) if team_b_id else None
+                    future_a = executor.submit(
+                        get_cached_data, 'team_roster', team_a_id, scraper.get_team_roster, team_a_id
+                    ) if team_a_id else None
+                    future_b = executor.submit(
+                        get_cached_data, 'team_roster', team_b_id, scraper.get_team_roster, team_b_id
+                    ) if team_b_id else None
                     
                     roster_a = _safe_future_result(future_a, [])
                     roster_b = _safe_future_result(future_b, [])
@@ -350,7 +445,7 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             
         def get_stats_for_player(p):
             try:
-                stats = scraper.get_player_stats(p["id"], event_ids)
+                stats = get_cached_data('player_stats', f"{p['id']}_{event_ids}", scraper.get_player_stats, p["id"], event_ids)
                 rounds = stats["rounds"]
                 acs = stats["weighted_acs"] / rounds if rounds > 0 else 0.0
                 p_data = {
@@ -416,7 +511,6 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             pass  # Ignore if client already closed the connection
 
 ACTUAL_PORT = PORT
-
 def run(start_port=None):
     global ACTUAL_PORT
     from http.server import ThreadingHTTPServer
