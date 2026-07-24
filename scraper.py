@@ -52,6 +52,8 @@ def _request_with_retry(url, max_retries=3, timeout=10):
             time.sleep(wait)
     raise last_err if last_err else Exception("Request failed")
 
+def clean_text(text):
+    if not text:
         return ""
     # Remove excessive spaces and newlines
     return re.sub(r'\s+', ' ', text).strip()
@@ -686,15 +688,15 @@ def get_team_maps_stats(team_id, event_ids=None):
             ev_data = future.result()
             for map_name, stats in ev_data.items():
                 if map_name not in aggregated:
-                aggregated[map_name] = {
-                    "played": 0,
-                    "w": 0,
-                    "l": 0,
-                    "atk_won": 0,
-                    "atk_total": 0,
-                    "def_won": 0,
-                    "def_total": 0
-                }
+                    aggregated[map_name] = {
+                        "played": 0,
+                        "w": 0,
+                        "l": 0,
+                        "atk_won": 0,
+                        "atk_total": 0,
+                        "def_won": 0,
+                        "def_total": 0
+                    }
             aggregated[map_name]["played"] += stats["played"]
             aggregated[map_name]["w"] += stats.get("w", 0)
             aggregated[map_name]["l"] += stats.get("l", 0)
