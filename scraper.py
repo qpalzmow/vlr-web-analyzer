@@ -25,23 +25,33 @@ def _request_with_retry(url, max_retries=3, timeout=10):
     last_err = None
     for attempt in range(max_retries):
         try:
-            res = requests.get(url, headers=_get_headers(), timeout=timeout)
-            if res.status_code == 200 or res.status_code == 404:
+            # C-3: 404는 성공으로 간주하지 않음, 타임아웃 분리 (연결 5초, 읽기 15초)
+            res = requests.get(url, headers=_get_headers(), timeout=(5, 15))
+            if res.status_code == 200:
                 return res
+            if res.status_code == 404:
+                raise requests.HTTPError(f"404 Not Found: {url}", response=res)
             if res.status_code in (429, 502, 503, 504):
                 # transient — retry
                 last_err = Exception(f"Status {res.status_code}")
-                time.sleep(1.5 * (attempt + 1) + random.random())
+                # 지수 백오프 + 지터, Retry-After 헤더 존중
+                retry_after = res.headers.get('Retry-After')
+                if retry_after and retry_after.isdigit():
+                    wait = min(int(retry_after), 60)
+                else:
+                    wait = min(30, 2 ** attempt + random.uniform(0, 1))
+                time.sleep(wait)
                 continue
             # non-retryable status (e.g. 404, 403)
             return res
+        except requests.HTTPError:
+            raise
         except Exception as e:
             last_err = e
-            time.sleep(1.5 * (attempt + 1) + random.random())
+            wait = min(30, 2 ** attempt + random.uniform(0, 1))
+            time.sleep(wait)
     raise last_err if last_err else Exception("Request failed")
 
-def clean_text(text):
-    if not text:
         return ""
     # Remove excessive spaces and newlines
     return re.sub(r'\s+', ' ', text).strip()
@@ -91,19 +101,19 @@ def _parse_column_indices_from_header(table):
             continue
         if 'map' in txt and 'map' not in mapping:
             mapping['map'] = i
-        elif txt == 'w' or txt.startswith('win') and 'w' not in mapping:
+        elif txt in ('w', 'win', 'wins') and 'w' not in mapping:
             mapping['w'] = i
-        elif txt == 'l' or txt.startswith('loss') and 'l' not in mapping:
+        elif txt in ('l', 'loss', 'losses') and 'l' not in mapping:
             mapping['l'] = i
         elif 'rounds' in txt or txt == 'rnd' and 'rounds' not in mapping:
             mapping['rounds'] = i
-        elif 'atk' in txt and 'won' in txt:
+        elif txt in ('atk won', 'attack won', 'attacker wins', 'atk wins'):
             mapping['atk_won'] = i
-        elif 'atk' in txt and 'lost' in txt:
+        elif txt in ('atk lost', 'attack lost', 'attacker losses', 'atk losses'):
             mapping['atk_lost'] = i
-        elif 'def' in txt and 'won' in txt:
+        elif txt in ('def won', 'defense won', 'defender wins', 'def wins'):
             mapping['def_won'] = i
-        elif 'def' in txt and 'lost' in txt:
+        elif txt in ('def lost', 'defense lost', 'defender losses', 'def losses'):
             mapping['def_lost'] = i
     return mapping if mapping else None
 
@@ -136,8 +146,13 @@ def get_matches():
     matches = []
     
     # S-Tier and A-Tier keywords
-    s_keywords = ["Champions", "Masters", "International League", "Pacific", "Americas", "EMEA", "CN", "World Cup", "EWC", "Championship"]
-    a_keywords = ["Challengers", "Game Changers"]
+    # H-1: 키워드 리스트를 상수로 분리 (추후 설정 파일로 이동 가능)
+    s_keywords = [
+        "Champions", "Masters", "International League", "Pacific", "Americas", 
+        "EMEA", "CN", "World Cup", "EWC", "Championship",
+        "Kickoff", "Stage 1", "Stage 2", "Playoffs", "Grand Final"
+    ]
+    a_keywords = ["Challengers", "Game Changers", "Academy", "Rising Stars"]
     
     # Build a robust label -> [cards] mapping by walking the DOM in document order.
     # vlr.gg lays out date labels followed by wf-card containers in order:
@@ -336,28 +351,39 @@ def get_event_map_pool(event_id):
         
     soup = BeautifulSoup(res.text, 'html.parser')
     all_known_maps = ["Ascent", "Bind", "Breeze", "Haven", "Icebox", "Lotus", "Split", "Sunset", "Abyss", "Fracture", "Pearl", "Summit"]
-    
-    # Strategy: prefer detecting maps from table cells (the agents page lists maps as
-    # column headers or row headers). Fallback to whole-page word-boundary match.
+    # H-2: 맵 리스트 상수화 (신규 맵 추가 용이)
+    ALL_KNOWN_MAPS = [
+        "Ascent", "Bind", "Breeze", "Haven", "Icebox", "Lotus", "Split", 
+        "Sunset", "Abyss", "Fracture", "Pearl", "Summit", "Gekko", "Tejo"
+    ]
+
+    # Strategy 1: agents 페이지에서 테이블 셀 기반 감지
     detected = set()
     
-    # 1) Look for map names inside known container classes used by vlr.gg.
-    for container in soup.find_all(class_=['mod-agents', 'vm-stats-container', 'mod-team-maps']):
+    for container in soup.find_all(class_=['mod-agents', 'vm-stats-container', 'mod-team-maps', 'mod-map-pool']):
         for cell in container.find_all(['th', 'td', 'div', 'span']):
             cell_text = clean_text(cell.get_text())
             if not cell_text:
                 continue
-            for m in all_known_maps:
+            for m in ALL_KNOWN_MAPS:
                 if m not in detected and re.search(r'\b' + re.escape(m) + r'\b', cell_text, re.I):
                     detected.add(m)
     
-    # 2) Fallback: whole page text, word-boundary match.
+    # Strategy 2: 전체 페이지 텍스트 스캔 (폴백)
     if not detected:
         page_text = soup.get_text(' ')
-        for m in all_known_maps:
+        for m in ALL_KNOWN_MAPS:
             if re.search(r'\b' + re.escape(m) + r'\b', page_text, re.I):
                 detected.add(m)
-                
+    
+    # Strategy 3: 맵 이미지 alt 속성에서 감지 (가장 강건)
+    if not detected:
+        for img in soup.find_all('img', alt=True):
+            alt = clean_text(img['alt'])
+            for m in ALL_KNOWN_MAPS:
+                if re.search(r'\b' + re.escape(m) + r'\b', alt, re.I):
+                    detected.add(m)
+    
     return sorted(detected)
 
 def get_team_events(team_id):
@@ -421,13 +447,20 @@ def get_team_roster(team_id):
     soup = BeautifulSoup(res.text, 'html.parser')
     players = []
     
+    # H-2: 스태프 키워드 확장 (한글/영문 혼용)
+    STAFF_KEYWORDS = [
+        "coach", "manager", "analyst", "staff", "director", "owner", "inactive",
+        "코치", "매니저", "분석가", "스태프", "감독", "단장", "대표", "비활성"
+    ]
+    
     roster_items = soup.find_all(class_='team-roster-item')
     for item in roster_items:
         role_elem = item.find(class_='team-roster-item-role')
         role_text = role_elem.get_text(strip=True).lower() if role_elem else ""
         
         item_text = item.get_text(' ', strip=True).lower()
-        is_staff = any(kw in item_text for kw in ["coach", "manager", "analyst", "staff", "director", "owner", "inactive"])
+        is_staff = any(kw in role_text for kw in STAFF_KEYWORDS) or \
+                   any(kw in item_text for kw in STAFF_KEYWORDS)
         
         if is_staff:
             continue
@@ -590,11 +623,15 @@ def get_single_team_stats_page(team_id, event_id=None):
     # Dynamically map column headers to indices. Falls back to defaults if parse fails.
     col_map = _parse_column_indices_from_header(table) or dict(DEFAULT_TEAM_STATS_COLUMNS)
     
-    # Determine the minimum number of cells required to read safely.
-    required_indices = [col_map.get(k, DEFAULT_TEAM_STATS_COLUMNS.get(k, 0)) for k in 
-                        ('map', 'w', 'l', 'atk_won', 'atk_lost', 'def_won', 'def_lost')]
-    min_cells_needed = (max(required_indices) + 1) if required_indices else 13
+    # M-3: 헤더 파싱 실패 시 예외 발생 (잘못된 데이터 방지)
+    required_keys = ('map', 'w', 'l', 'atk_won', 'atk_lost', 'def_won', 'def_lost')
+    missing_keys = [k for k in required_keys if k not in col_map]
+    if missing_keys:
+        raise ValueError(f"팀 통계 테이블 컬럼 매핑 실패: 누락된 키 {missing_keys}. VLR.gg 페이지 구조 변경 가능성.")
     
+    required_indices = [col_map[k] for k in required_keys]
+    min_cells_needed = max(required_indices) + 1
+
     maps_data = {}
     rows = tbody.find_all('tr')
     for row in rows:
@@ -638,11 +675,17 @@ def get_team_maps_stats(team_id, event_ids=None):
         return get_single_team_stats_page(team_id)
         
     aggregated = {}
-    for ev_id in event_ids:
-        time.sleep(0.5)
-        ev_data = get_single_team_stats_page(team_id, ev_id)
-        for map_name, stats in ev_data.items():
-            if map_name not in aggregated:
+    # H-5: 병렬 처리로 직렬 sleep 제거 (ThreadPoolExecutor 활용)
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        future_to_event = {
+            executor.submit(get_single_team_stats_page, team_id, ev_id): ev_id 
+            for ev_id in event_ids
+        }
+        for future in as_completed(future_to_event):
+            ev_data = future.result()
+            for map_name, stats in ev_data.items():
+                if map_name not in aggregated:
                 aggregated[map_name] = {
                     "played": 0,
                     "w": 0,
@@ -687,10 +730,16 @@ def get_player_stats_page(player_id, event_id=None):
     
     # Dynamically map column headers to indices. Falls back to defaults if parse fails.
     col_map = _parse_column_indices_from_header(table) or dict(DEFAULT_PLAYER_STATS_COLUMNS)
-    required_indices = [col_map.get(k, DEFAULT_PLAYER_STATS_COLUMNS.get(k, 0)) for k in 
-                        ('agent', 'rounds', 'acs', 'kills', 'deaths')]
-    min_cells_needed = (max(required_indices) + 1) if required_indices else 13
     
+    # M-3: 플레이어 통계 테이블도 필수 컬럼 검증
+    required_keys = ('agent', 'rounds', 'acs', 'kills', 'deaths')
+    missing_keys = [k for k in required_keys if k not in col_map]
+    if missing_keys:
+        raise ValueError(f"플레이어 통계 테이블 컬럼 매핑 실패: 누락된 키 {missing_keys}")
+    
+    required_indices = [col_map[k] for k in required_keys]
+    min_cells_needed = max(required_indices) + 1
+
     rows = tbody.find_all('tr')
     player_data = {
         "rounds": 0,
@@ -760,31 +809,48 @@ def get_player_stats(player_id, event_ids=None):
 
 def get_live_score(match_url):
     """Scrapes map scores, series score, and status from the match page."""
+    # C-4: 404 예외 처리, 파싱 실패 시 에러 상태 명시
     try:
         res = _request_with_retry(match_url)
+    except requests.HTTPError as e:
+        if e.response is not None and e.response.status_code == 404:
+            return {"series_score_a": "0", "series_score_b": "0", "status": "not_found", "maps": []}
+        return {"series_score_a": "0", "series_score_b": "0", "status": "error", "maps": []}
     except Exception:
         return {"series_score_a": "0", "series_score_b": "0", "status": "error", "maps": []}
-        
-    if res.status_code != 200:
-        return {"series_score_a": "0", "series_score_b": "0", "status": "error", "maps": []}
-        
+
     soup = BeautifulSoup(res.text, 'html.parser')
     
     # 1. Parse Series Score
     score_left = "0"
     score_right = "0"
-    vs_score_container = soup.find(class_='match-header-vs-score')
+    # C-4: 더 강건한 셀렉터 (data 속성 우선, 클래스 폴백)
+    vs_score_container = soup.find(attrs={'data-vlr-score': True}) or soup.find(class_='match-header-vs-score')
     if vs_score_container:
-        spans = vs_score_container.find_all('span')
-        score_spans = []
-        for s in spans:
-            cls = s.get('class', [])
-            if any('match-header-vs-score-' in c for c in cls) and 'colon' not in ''.join(cls):
-                score_spans.append(s)
-        if len(score_spans) >= 2:
-            score_left = clean_text(score_spans[0].get_text())
-            score_right = clean_text(score_spans[1].get_text())
-            
+        # data-vlr-score 속성이 있으면 직접 사용
+        if vs_score_container.has_attr('data-vlr-score'):
+            scores = vs_score_container['data-vlr-score'].split(':')
+            if len(scores) >= 2:
+                score_left, score_right = scores[0], scores[1]
+        else:
+            spans = vs_score_container.find_all('span')
+            score_spans = []
+            for s in spans:
+                cls = s.get('class', [])
+                if any('match-header-vs-score-' in c for c in cls) and 'colon' not in ''.join(cls):
+                    score_spans.append(s)
+            if len(score_spans) >= 2:
+                score_left = clean_text(score_spans[0].get_text())
+                score_right = clean_text(score_spans[1].get_text())
+    # 최종 폴백: og:description 메타 태그에서 스코어 추출
+    if score_left == "0" and score_right == "0":
+        og_desc = soup.find('meta', property='og:description')
+        if og_desc and og_desc.get('content'):
+            import re
+            m = re.search(r'(\d+)\s*[:-]\s*(\d+)', og_desc['content'])
+            if m:
+                score_left, score_right = m.group(1), m.group(2)
+    
     # 2. Parse Series Game Status (final, live, upcoming)
     status = "upcoming"
     vs_notes = soup.find_all(class_='match-header-vs-note')
