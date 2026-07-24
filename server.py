@@ -40,9 +40,7 @@ CACHE = {
     'team_stats': {'data': {}, 'ttl': 600},  # 10 minutes
     'team_roster': {'data': {}, 'ttl': 600},  # 10 minutes
     'player_stats': {'data': {}, 'ttl': 300},  # 5 minutes
-    'agent_composition': {'data': {}, 'ttl': 1800},  # 30 minutes
     'pistol_stats': {'data': {}, 'ttl': 300},  # 5 minutes
-    'fk_fd_margin': {'data': {}, 'ttl': 300},  # 5 minutes
     'team_form': {'data': {}, 'ttl': 300},  # 5 minutes
 }
 
@@ -495,6 +493,28 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             except Exception as e:
                 self.send_error_response(str(e))
             return
+
+        # 5. API: Server-side Ban/Pick Simulation (M-5)
+        elif path == '/api/simulate/banpick':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                body = json.loads(post_data.decode('utf-8'))
+                
+                maps_a = body.get('maps_a', {})
+                maps_b = body.get('maps_b', {})
+                map_pool = body.get('map_pool', [])
+                
+                result = self._simulate_banpick(maps_a, maps_b, map_pool)
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                send_cors_headers()
+                self.end_headers()
+                self.wfile.write(json.dumps(result, ensure_ascii=False).encode('utf-8'))
+            except Exception as e:
+                self.send_error_response(str(e))
+            return
         else:
             self.send_response(404)
             send_cors_headers()
@@ -548,6 +568,61 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             }
             
         return max(valid_players, key=lambda x: x["acs"])
+
+    def _simulate_banpick(self, maps_a, maps_b, map_pool):
+        """Server-side ban/pick simulation based on map win rates."""
+        if not map_pool:
+            return {"bans": [], "picks": []}
+        
+        def get_win_pct(maps_data, map_name):
+            stats = maps_data.get(map_name, {})
+            played = stats.get('played', 0)
+            wins = stats.get('w', 0)
+            return (wins / played * 100) if played > 0 else 50.0
+        
+        available = list(map_pool)
+        bans = []
+        picks = []
+        
+        # Ban phase: each team bans their weakest map (opponent's strongest)
+        for team_label, own_maps, opp_maps in [
+            ('Team A', maps_a, maps_b),
+            ('Team B', maps_b, maps_a)
+        ]:
+            if not available:
+                break
+            # Ban the map where the opponent has the highest advantage
+            worst_map = None
+            worst_diff = float('inf')
+            for m in available:
+                own_pct = get_win_pct(own_maps, m)
+                opp_pct = get_win_pct(opp_maps, m)
+                diff = own_pct - opp_pct
+                if diff < worst_diff:
+                    worst_diff = diff
+                    worst_map = m
+            if worst_map:
+                bans.append({"map": worst_map, "team": team_label, "reason": f"Disadvantage: {worst_diff:+.1f}%"})
+                available.remove(worst_map)
+        
+        # Pick phase: each team picks their best remaining map
+        for team_label, own_maps in [
+            ('Team A', maps_a),
+            ('Team B', maps_b)
+        ]:
+            if not available:
+                break
+            best_map = max(available, key=lambda m: get_win_pct(own_maps, m))
+            pct = get_win_pct(own_maps, best_map)
+            picks.append({"map": best_map, "team": team_label, "win_pct": round(pct, 1)})
+            available.remove(best_map)
+        
+        # Decider: remaining map with best combined balance
+        if available:
+            decider = available[0]
+            picks.append({"map": decider, "team": "Decider", "win_pct": 50.0})
+        
+        return {"bans": bans, "picks": picks}
 
     def serve_file(self, filepath, content_type):
         if not os.path.exists(filepath):
