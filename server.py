@@ -46,45 +46,58 @@ CACHE = {
 cache_lock = threading.Lock()
 _cache_timestamps = {}
 
+def _make_cache_key(entity_id, event_ids=None):
+    """Build a clean, deterministic cache key for an entity and optional event_ids list."""
+    if not event_ids:
+        return str(entity_id)
+    if isinstance(event_ids, (list, set, tuple)):
+        sorted_events = "_".join(sorted(str(e) for e in event_ids))
+        return f"{entity_id}_{sorted_events}"
+    return f"{entity_id}_{event_ids}"
+
 def cleanup_expired_cache():
-    """Periodically clean up expired cache entries"""
+    """Periodically clean up expired cache entries (thread-safe)."""
     now = time.time()
     expired_keys = []
     
-    for cache_type, cache_config in CACHE.items():
-        if cache_type in _cache_timestamps:
-            for key in list(cache_config['data'].keys()):
-                if now - _cache_timestamps[cache_type].get(key, 0) > cache_config['ttl']:
-                    expired_keys.append((cache_type, key))
-    
-    for cache_type, key in expired_keys:
-        del CACHE[cache_type]['data'][key]
-        if cache_type in _cache_timestamps and key in _cache_timestamps[cache_type]:
-            del _cache_timestamps[cache_type][key]
+    with cache_lock:
+        for cache_type, cache_config in CACHE.items():
+            if cache_type in _cache_timestamps:
+                for key in list(cache_config['data'].keys()):
+                    if now - _cache_timestamps[cache_type].get(key, 0) > cache_config['ttl']:
+                        expired_keys.append((cache_type, key))
+        
+        for cache_type, key in expired_keys:
+            if key in CACHE[cache_type]['data']:
+                del CACHE[cache_type]['data'][key]
+            if cache_type in _cache_timestamps and key in _cache_timestamps[cache_type]:
+                del _cache_timestamps[cache_type][key]
 
 def is_cache_valid(cache_type, key):
-    """Check if cache entry is valid (not expired)"""
+    """Check if cache entry is valid (not expired) (thread-safe)."""
     cleanup_expired_cache()
     
-    if cache_type not in CACHE:
-        return False
-    
-    if key not in CACHE[cache_type]['data']:
-        return False
+    with cache_lock:
+        if cache_type not in CACHE:
+            return False
         
-    if cache_type not in _cache_timestamps:
-        return True
-        
-    if key not in _cache_timestamps[cache_type]:
-        return True
-        
-    elapsed = time.time() - _cache_timestamps[cache_type][key]
-    return elapsed < CACHE[cache_type]['ttl']
+        if key not in CACHE[cache_type]['data']:
+            return False
+            
+        if cache_type not in _cache_timestamps:
+            return True
+            
+        if key not in _cache_timestamps[cache_type]:
+            return True
+            
+        elapsed = time.time() - _cache_timestamps[cache_type][key]
+        return elapsed < CACHE[cache_type]['ttl']
 
 def get_cached_data(cache_type, key, fetch_func, *args, **kwargs):
-    """Get cached data or fetch from function if not cached/valid"""
+    """Get cached data or fetch from function if not cached/valid (thread-safe)."""
     if is_cache_valid(cache_type, key):
-        return CACHE[cache_type]['data'][key]
+        with cache_lock:
+            return CACHE[cache_type]['data'][key]
     
     try:
         data = fetch_func(*args, **kwargs)
@@ -125,9 +138,8 @@ def get_cached_live_score(match_url):
         
     return data
 
-# Legacy cache for backward compatibility
+# Legacy cache constants for backward compatibility
 LIVE_SCORE_CACHE = {} # key: match_url, value: (timestamp, data)
-cache_lock = threading.Lock()
 CACHE_TTL = 20          # seconds — live score TTL
 CACHE_GC_INTERVAL = 60  # seconds — how often to run garbage collection
 _last_gc_ts = 0.0
@@ -360,8 +372,8 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 event_ids = body.get('event_ids', None)
                 
                 # For map stats, we create composite cache keys
-                cache_key_a = f"{team_a_id}_{event_ids}" if event_ids else team_a_id
-                cache_key_b = f"{team_b_id}_{event_ids}" if event_ids else team_b_id
+                cache_key_a = _make_cache_key(team_a_id, event_ids)
+                cache_key_b = _make_cache_key(team_b_id, event_ids)
                 
                 from concurrent.futures import ThreadPoolExecutor
                 with ThreadPoolExecutor(max_workers=2) as executor:
@@ -445,7 +457,8 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             
         def get_stats_for_player(p):
             try:
-                stats = get_cached_data('player_stats', f"{p['id']}_{event_ids}", scraper.get_player_stats, p["id"], event_ids)
+                player_cache_key = _make_cache_key(p['id'], event_ids)
+                stats = get_cached_data('player_stats', player_cache_key, scraper.get_player_stats, p["id"], event_ids)
                 rounds = stats["rounds"]
                 acs = stats["weighted_acs"] / rounds if rounds > 0 else 0.0
                 p_data = {
