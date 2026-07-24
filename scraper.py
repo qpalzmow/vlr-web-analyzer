@@ -89,38 +89,59 @@ def safe_float(s, default=0.0):
 
 def _parse_column_indices_from_header(table):
     """
-    Dynamically map column headers to indices by reading <th> text.
+    Dynamically map team stats table column headers to indices by inspecting <th> classes, titles, and text.
     Returns a dict like {'map': 0, 'w': 3, 'l': 4, 'atk_won': 8, ...}.
-    Falls back to None for any column that can't be located.
+    Falls back to DEFAULT_TEAM_STATS_COLUMNS for missing keys.
     """
-    mapping = {}
+    col_map = dict(DEFAULT_TEAM_STATS_COLUMNS)
     headers = table.find_all('th')
     if not headers:
-        return None
-    header_texts = [clean_text(h.get_text()).lower() for h in headers]
-    for i, txt in enumerate(header_texts):
-        if not txt:
-            continue
-        if 'map' in txt and 'map' not in mapping:
-            mapping['map'] = i
-        elif txt in ('w', 'win', 'wins') and 'w' not in mapping:
-            mapping['w'] = i
-        elif txt in ('l', 'loss', 'losses') and 'l' not in mapping:
-            mapping['l'] = i
-        elif 'rounds' in txt or txt == 'rnd' and 'rounds' not in mapping:
-            mapping['rounds'] = i
-        elif txt in ('atk won', 'attack won', 'attacker wins', 'atk wins'):
-            mapping['atk_won'] = i
-        elif txt in ('atk lost', 'attack lost', 'attacker losses', 'atk losses'):
-            mapping['atk_lost'] = i
-        elif txt in ('def won', 'defense won', 'defender wins', 'def wins'):
-            mapping['def_won'] = i
-        elif txt in ('def lost', 'defense lost', 'defender losses', 'def losses'):
-            mapping['def_lost'] = i
-    return mapping if mapping else None
+        return col_map
+    for i, h in enumerate(headers):
+        txt = clean_text(h.get_text()).lower()
+        cls = ' '.join(h.get('class', []))
+        if 'map' in txt:
+            col_map['map'] = i
+        elif txt == 'w':
+            col_map['w'] = i
+        elif txt == 'l':
+            col_map['l'] = i
+        elif 'mod-atk' in cls and txt == 'rw':
+            col_map['atk_won'] = i
+        elif 'mod-atk' in cls and txt == 'rl':
+            col_map['atk_lost'] = i
+        elif 'mod-def' in cls and txt == 'rw':
+            col_map['def_won'] = i
+        elif 'mod-def' in cls and txt == 'rl':
+            col_map['def_lost'] = i
+    return col_map
+
+def _parse_player_column_indices_from_header(table):
+    """
+    Dynamically map player agent table column headers to indices by inspecting <th> classes, titles, and text.
+    """
+    col_map = dict(DEFAULT_PLAYER_STATS_COLUMNS)
+    headers = table.find_all('th')
+    if not headers:
+        return col_map
+    for i, h in enumerate(headers):
+        txt = clean_text(h.get_text()).lower()
+        title = h.get('title', '').lower()
+        cls = ' '.join(h.get('class', []))
+        if 'mod-agent' in cls or title == 'agent':
+            col_map['agent'] = i
+        elif txt == 'rnd' or 'rounds' in title:
+            col_map['rounds'] = i
+        elif txt == 'acs' or 'combat score' in title:
+            col_map['acs'] = i
+        elif txt == 'k' and title == 'total kills':
+            col_map['kills'] = i
+        elif txt == 'd' and title == 'total deaths':
+            col_map['deaths'] = i
+    return col_map
 
 # Default column indices as a fallback when the header parse fails.
-# These match the VLR.gg team stats table layout as of 2024-2025.
+# These match the VLR.gg team stats table layout as of 2024-2026.
 DEFAULT_TEAM_STATS_COLUMNS = {
     'map': 0, 'w': 3, 'l': 4,
     'atk_won': 8, 'atk_lost': 9,
@@ -731,7 +752,7 @@ def get_player_stats_page(player_id, event_id=None):
         return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "agents": {}}
     
     # Dynamically map column headers to indices. Falls back to defaults if parse fails.
-    col_map = _parse_column_indices_from_header(table) or dict(DEFAULT_PLAYER_STATS_COLUMNS)
+    col_map = _parse_player_column_indices_from_header(table)
     
     # M-3: 플레이어 통계 테이블도 필수 컬럼 검증
     required_keys = ('agent', 'rounds', 'acs', 'kills', 'deaths')
