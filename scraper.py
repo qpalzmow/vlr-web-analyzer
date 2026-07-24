@@ -1,3 +1,4 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -138,6 +139,10 @@ def _parse_player_column_indices_from_header(table):
             col_map['kills'] = i
         elif txt == 'd' and title == 'total deaths':
             col_map['deaths'] = i
+        elif txt == 'fk' and 'first kill' in title:
+            col_map['fk'] = i
+        elif txt == 'fd' and 'first death' in title:
+            col_map['fd'] = i
     return col_map
 
 # Default column indices as a fallback when the header parse fails.
@@ -151,8 +156,24 @@ DEFAULT_TEAM_STATS_COLUMNS = {
 # Default column indices for the player agent table.
 DEFAULT_PLAYER_STATS_COLUMNS = {
     'agent': 0, 'rounds': 2, 'acs': 4,
-    'kills': 11, 'deaths': 12,
+    'kills': 11, 'deaths': 12, 'fk': 14, 'fd': 15,
 }
+
+def _load_tier_config():
+    """Load tier keywords from external config. Falls back to hardcoded defaults."""
+    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tier_config.json')
+    try:
+        import json
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        return config.get('s_tier', []), config.get('a_tier', [])
+    except Exception:
+        return (
+            ["Champions", "Masters", "International League", "Pacific", "Americas",
+             "EMEA", "CN", "World Cup", "EWC", "Championship",
+             "Kickoff", "Stage 1", "Stage 2", "Playoffs", "Grand Final", "VCT", "Valorant Champions Tour"],
+            ["Challengers", "Game Changers", "Academy", "Rising Stars", "Ascension"]
+        )
 
 def get_matches():
     """Scrapes vlr.gg/matches, filters by Tier, and groups matches."""
@@ -169,13 +190,7 @@ def get_matches():
     matches = []
     
     # S-Tier and A-Tier keywords
-    # H-1: 키워드 리스트를 상수로 분리 (추후 설정 파일로 이동 가능)
-    s_keywords = [
-        "Champions", "Masters", "International League", "Pacific", "Americas", 
-        "EMEA", "CN", "World Cup", "EWC", "Championship",
-        "Kickoff", "Stage 1", "Stage 2", "Playoffs", "Grand Final"
-    ]
-    a_keywords = ["Challengers", "Game Changers", "Academy", "Rising Stars"]
+    s_keywords, a_keywords = _load_tier_config()
     
     # Build a robust label -> [cards] mapping by walking the DOM in document order.
     # vlr.gg lays out date labels followed by wf-card containers in order:
@@ -544,7 +559,7 @@ def _team_matches(a, b):
     tokens_b = set(b.split())
     return bool(tokens_a & tokens_b)
 
-def get_team_form(team_id):
+def get_team_form(team_id, max_results=10):
     """Scrapes the last 5 completed match results from the team page, including clean opponent names."""
     if not team_id:
         return []
@@ -615,9 +630,56 @@ def get_team_form(team_id):
             score_str = f"{score_a}-{score_b}"
             results.append(f"{outcome} ({score_str}) vs {opponent}")
             
-            if len(results) >= 5:
+            if len(results) >= max_results:
                 break
                 
+    # H-3: Pagination — try team matches page if form data is insufficient
+    if len(results) < max_results:
+        try:
+            res2 = _request_with_retry(f"https://www.vlr.gg/team/matches/{team_id}/?page=2")
+            if res2.status_code == 200:
+                soup2 = BeautifulSoup(res2.text, 'html.parser')
+                for a in soup2.find_all('a', href=True):
+                    href = a['href']
+                    parts = href.split('/')
+                    if len(parts) >= 3 and parts[1].isdigit() and '-vs-' in parts[2]:
+                        team_names = a.find_all(class_='m-item-team-name')
+                        if len(team_names) < 2:
+                            continue
+                        team_a = clean_text(team_names[0].get_text())
+                        team_b = clean_text(team_names[1].get_text())
+                        result_div = a.find(class_='m-item-result')
+                        if not result_div:
+                            continue
+                        score_text = clean_text(result_div.get_text())
+                        score_match = re.search(r'(\d+)\s*[:-]\s*(\d+)', score_text)
+                        if not score_match:
+                            continue
+                        score_a = int(score_match.group(1))
+                        score_b = int(score_match.group(2))
+                        team_a_norm = _normalize_team_name(team_a)
+                        team_b_norm = _normalize_team_name(team_b)
+                        opponent = team_b
+                        outcome = "L"
+                        if team_name_norm:
+                            if _team_matches(team_name_norm, team_a_norm):
+                                outcome = "W" if score_a > score_b else "L"
+                                opponent = team_b
+                            elif _team_matches(team_name_norm, team_b_norm):
+                                outcome = "W" if score_b > score_a else "L"
+                                opponent = team_a
+                            else:
+                                continue
+                        else:
+                            outcome = "W" if score_a > score_b else "L"
+                            opponent = team_b
+                        score_str = f"{score_a}-{score_b}"
+                        results.append(f"{outcome} ({score_str}) vs {opponent}")
+                        if len(results) >= max_results:
+                            break
+        except Exception:
+            pass
+            
     return results
 
 def get_single_team_stats_page(team_id, event_id=None):
@@ -737,19 +799,19 @@ def get_player_stats_page(player_id, event_id=None):
     try:
         res = _request_with_retry(url)
     except Exception:
-        return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "agents": {}}
+        return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "fk": 0, "fd": 0, "agents": {}}
         
     if res.status_code != 200:
-        return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "agents": {}}
+        return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "fk": 0, "fd": 0, "agents": {}}
         
     soup = BeautifulSoup(res.text, 'html.parser')
     table = soup.find('table', class_='mod-agent-rows')
     if not table:
-        return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "agents": {}}
+        return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "fk": 0, "fd": 0, "agents": {}}
         
     tbody = table.find('tbody')
     if not tbody:
-        return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "agents": {}}
+        return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "fk": 0, "fd": 0, "agents": {}}
     
     # Dynamically map column headers to indices. Falls back to defaults if parse fails.
     col_map = _parse_player_column_indices_from_header(table)
@@ -769,6 +831,8 @@ def get_player_stats_page(player_id, event_id=None):
         "weighted_acs": 0,
         "kills": 0,
         "deaths": 0,
+        "fk": 0,
+        "fd": 0,
         "agents": {}
     }
     
@@ -786,11 +850,15 @@ def get_player_stats_page(player_id, event_id=None):
         
         kills = safe_int(cells[col_map.get('kills', 11)].get_text())
         deaths = safe_int(cells[col_map.get('deaths', 12)].get_text())
+        fk = safe_int(cells[col_map.get('fk', 14)].get_text()) if len(cells) > col_map.get('fk', 14) else 0
+        fd = safe_int(cells[col_map.get('fd', 15)].get_text()) if len(cells) > col_map.get('fd', 15) else 0
         
         player_data["rounds"] += rounds
         player_data["weighted_acs"] += acs * rounds
         player_data["kills"] += kills
         player_data["deaths"] += deaths
+        player_data["fk"] += fk
+        player_data["fd"] += fd
         
         if agent_name not in player_data["agents"]:
             player_data["agents"][agent_name] = 0
@@ -808,6 +876,8 @@ def get_player_stats(player_id, event_ids=None):
         "weighted_acs": 0.0,
         "kills": 0,
         "deaths": 0,
+        "fk": 0,
+        "fd": 0,
         "agents": {}
     }
     
@@ -818,6 +888,8 @@ def get_player_stats(player_id, event_ids=None):
         aggregated["weighted_acs"] += ev_data["weighted_acs"]
         aggregated["kills"] += ev_data["kills"]
         aggregated["deaths"] += ev_data["deaths"]
+        aggregated["fk"] += ev_data.get("fk", 0)
+        aggregated["fd"] += ev_data.get("fd", 0)
         
         for agent, rounds in ev_data["agents"].items():
             if agent not in aggregated["agents"]:
@@ -953,9 +1025,8 @@ def get_live_score(match_url):
 def get_team_advanced_metrics(team_id, event_ids=None):
     """
     Computes advanced metrics for a team:
-    - Pistol round win rate (%)
-    - First Kill (FK) / First Death (FD) margin
-    - Top Agent Compositions used
+    - Pistol round win rate (%) — derived from map win rate (VLR doesn't expose pistol-specific data)
+    - First Kill (FK) / First Death (FD) margin — from real player stats
     """
     if not team_id:
         return {
@@ -964,20 +1035,37 @@ def get_team_advanced_metrics(team_id, event_ids=None):
             "top_compositions": []
         }
     
-    # Calculate derived stats based on map stats
+    # Get map stats for pistol win rate estimation
     maps_data = get_team_maps_stats(team_id, event_ids)
     total_played = sum(s.get("played", 0) for s in maps_data.values())
     total_wins = sum(s.get("w", 0) for s in maps_data.values())
-    
     overall_win_rate = (total_wins / total_played) if total_played > 0 else 0.5
+    pistol_win_rate = round(min(85.0, max(25.0, overall_win_rate * 100)), 1)
     
-    # Model pistol & FK/FD metrics around win rate with realistic variance
-    pistol_win_rate = round(min(85.0, max(25.0, overall_win_rate * 100 + (total_wins % 7 - 3) * 2.5)), 1)
-    fk_fd_margin = round((overall_win_rate - 0.5) * 0.4 + (total_played % 5 - 2) * 0.03, 2)
+    # Get real FK/FD from player stats
+    total_fk = 0
+    total_fd = 0
+    total_rounds = 0
+    try:
+        roster = get_team_roster(team_id)
+        for player in roster[:6]:  # Limit to starting 5 + 1 sub
+            try:
+                pstats = get_player_stats(player.get('id', ''), event_ids)
+                total_fk += pstats.get('fk', 0)
+                total_fd += pstats.get('fd', 0)
+                total_rounds += pstats.get('rounds', 0)
+            except Exception:
+                continue
+    except Exception:
+        pass
+    
+    fk_fd_margin = round((total_fk - total_fd) / max(total_rounds, 1), 2)
     
     return {
         "pistol_win_rate": pistol_win_rate,
         "fk_fd_margin": fk_fd_margin,
         "total_played": total_played,
-        "total_wins": total_wins
+        "total_wins": total_wins,
+        "total_fk": total_fk,
+        "total_fd": total_fd
     }

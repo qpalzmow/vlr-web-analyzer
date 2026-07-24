@@ -65,7 +65,7 @@ class FullSystemAuditTest(unittest.TestCase):
         self.assertEqual(scraper.get_team_roster(""), [])
         self.assertEqual(scraper.get_team_form(""), [])
         self.assertEqual(scraper.get_team_maps_stats(""), {})
-        self.assertEqual(scraper.get_player_stats(""), {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "agents": {}})
+        self.assertEqual(scraper.get_player_stats(""), {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "fk": 0, "fd": 0, "agents": {}})
 
         # Invalid match URL
         res = scraper.get_live_score("https://www.vlr.gg/000000/invalid-match-url")
