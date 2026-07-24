@@ -8,6 +8,7 @@ import time
 import threading
 import atexit
 from datetime import datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor
 
 PORT = int(os.environ.get("PORT", 8000))
 
@@ -27,6 +28,7 @@ else:
 
 # Resolve public directory absolutely so the server can be safely started from anywhere.
 PUBLIC_DIR = os.path.abspath(os.path.join(BASE_DIR, 'public'))
+PUBLIC_DIR_NORM = os.path.normcase(os.path.normpath(PUBLIC_DIR))
 
 # Comprehensive caching system with multiple TTL tiers
 CACHE = {
@@ -48,7 +50,6 @@ _cache_lock = threading.RLock()  # 재진입 가능 락으로 데드락 방지
 _cache_timestamps = {}
 
 # 전역 스레드 풀 (H-4: 매 요청마다 생성 방지)
-from concurrent.futures import ThreadPoolExecutor
 _global_executor = ThreadPoolExecutor(max_workers=8, thread_name_prefix="vlr-api")
 atexit.register(_global_executor.shutdown, wait=True)
 
@@ -121,23 +122,18 @@ def get_cached_data(cache_type: str, key: str, fetch_func, *args, **kwargs):
         _cache_timestamps[cache_type][key] = time.time()
     return data
 
-def get_cached_live_score(match_url):
-    """Original live score caching for backward compatibility"""
-        with cache_lock:
-            CACHE[cache_type]['data'][key] = data
-            if cache_type not in _cache_timestamps:
-                _cache_timestamps[cache_type] = {}
-            _cache_timestamps[cache_type][key] = time.time()
-        return data
-    except Exception as e:
-        print(f"Error fetching {cache_type} for key {key}: {e}")
-        raise
+
+# Legacy cache for backward compatibility
+LIVE_SCORE_CACHE = {}  # key: match_url, value: (timestamp, data)
+CACHE_TTL = 20          # seconds — live score TTL
+CACHE_GC_INTERVAL = 60  # seconds — how often to run garbage collection
+_last_gc_ts = 0.0
 
 def get_cached_live_score(match_url):
     """Original live score caching for backward compatibility"""
     global _last_gc_ts
     now = time.time()
-    with cache_lock:
+    with _cache_lock:
         # Periodic full GC — prevents memory leak when traffic is low.
         if now - _last_gc_ts > CACHE_GC_INTERVAL:
             expired = [k for k, (ts, _) in LIVE_SCORE_CACHE.items() if now - ts > CACHE_GC_INTERVAL]
@@ -155,16 +151,11 @@ def get_cached_live_score(match_url):
     except Exception:
         data = {"series_score_a": "0", "series_score_b": "0", "status": "error", "maps": []}
     
-    with cache_lock:
+    with _cache_lock:
         LIVE_SCORE_CACHE[match_url] = (now, data)
         
     return data
 
-# Legacy cache constants for backward compatibility
-LIVE_SCORE_CACHE = {} # key: match_url, value: (timestamp, data)
-CACHE_TTL = 20          # seconds — live score TTL
-CACHE_GC_INTERVAL = 60  # seconds — how often to run garbage collection
-_last_gc_ts = 0.0
 
 def _safe_future_result(future, default):
     """Safely resolve a future, returning `default` if it raised."""
@@ -174,6 +165,8 @@ def _safe_future_result(future, default):
         return future.result(timeout=30)  # 30초 타임아웃 가드
     except Exception:
         return default
+
+
 class VLRWebServer(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         # Handle CORS preflight request
@@ -193,10 +186,10 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
             self.send_header('Pragma', 'no-cache')
             self.send_header('Expires', '0')
-            # HSTS 등 보안 헤더 추가
+            # 보안 헤더 추가
             self.send_header('X-Content-Type-Options', 'nosniff')
             self.send_header('X-Frame-Options', 'DENY')
-
+            
         # 1. API: Get Matches List
         if path == '/api/matches':
             try:
@@ -210,10 +203,10 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 # 스택 트레이스 노출 방지
                 self.send_error_response("Internal server error", 500)
                 # 서버 로그엔 상세 기록
-                import traceback
                 traceback.print_exc()
             return
-
+            
+        # 2. API: Get Match Details & Events list
         elif path == '/api/match-details':
             query = urlparse.parse_qs(parsed.query)
             match_url = query.get('url', [None])[0]
@@ -222,8 +215,9 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 return
                 
             try:
+                # Fetch match details with caching
                 details = get_cached_data('match_details', match_url, scraper.get_match_details, match_url)
-            
+                
                 # Fetch recent 12 events and map pool with caching
                 # 전역 풀 재사용 (H-4)
                 future_a = _global_executor.submit(
@@ -235,11 +229,11 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 future_pool = _global_executor.submit(
                     get_cached_data, 'event_map_pool', details.get("event_id"), scraper.get_event_map_pool, details.get("event_id")
                 ) if details.get("event_id") else None
-            
+                
                 team_a_events = _safe_future_result(future_a, [])[:12]
                 team_b_events = _safe_future_result(future_b, [])[:12]
                 map_pool = _safe_future_result(future_pool, [])
-            
+                
                 # Fetch initial live score
                 live_score = get_cached_live_score(match_url)
                 
@@ -298,7 +292,6 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
         
         # Verify the file is strictly inside the public folder.
         # C-5: 윈도우 드라이브 레터 대소문자 정규화 후 비교
-        PUBLIC_DIR_NORM = os.path.normcase(os.path.normpath(PUBLIC_DIR))
         try:
             is_sub = os.path.commonpath([PUBLIC_DIR_NORM]) == os.path.commonpath([PUBLIC_DIR_NORM, full_filepath])
         except Exception:
@@ -335,6 +328,8 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
             self.send_header('Pragma', 'no-cache')
             self.send_header('Expires', '0')
+            self.send_header('X-Content-Type-Options', 'nosniff')
+            self.send_header('X-Frame-Options', 'DENY')
 
         # 0. API: Log browser JS errors
         if path == '/api/log-error':
@@ -362,17 +357,15 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 team_a_id = body.get('team_a_id', '')
                 team_b_id = body.get('team_b_id', '')
                 
-                from concurrent.futures import ThreadPoolExecutor
-                with ThreadPoolExecutor(max_workers=2) as executor:
-                    future_a = executor.submit(
-                        get_cached_data, 'team_form', team_a_id, scraper.get_team_form, team_a_id
-                    ) if team_a_id else None
-                    future_b = executor.submit(
-                        get_cached_data, 'team_form', team_b_id, scraper.get_team_form, team_b_id
-                    ) if team_b_id else None
-                    
-                    form_a = _safe_future_result(future_a, [])
-                    form_b = _safe_future_result(future_b, [])
+                future_a = _global_executor.submit(
+                    get_cached_data, 'team_form', team_a_id, scraper.get_team_form, team_a_id
+                ) if team_a_id else None
+                future_b = _global_executor.submit(
+                    get_cached_data, 'team_form', team_b_id, scraper.get_team_form, team_b_id
+                ) if team_b_id else None
+                
+                form_a = _safe_future_result(future_a, [])
+                form_b = _safe_future_result(future_b, [])
                 
                 response_data = {
                     "form_a": form_a,
@@ -479,17 +472,15 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
                 key_a = _make_cache_key(team_a_id, event_ids)
                 key_b = _make_cache_key(team_b_id, event_ids)
                 
-                from concurrent.futures import ThreadPoolExecutor
-                with ThreadPoolExecutor(max_workers=2) as executor:
-                    future_a = executor.submit(
-                        get_cached_data, 'pistol_stats', key_a, scraper.get_team_advanced_metrics, team_a_id, event_ids
-                    ) if team_a_id else None
-                    future_b = executor.submit(
-                        get_cached_data, 'pistol_stats', key_b, scraper.get_team_advanced_metrics, team_b_id, event_ids
-                    ) if team_b_id else None
-                    
-                    adv_a = _safe_future_result(future_a, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0})
-                    adv_b = _safe_future_result(future_b, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0})
+                future_a = _global_executor.submit(
+                    get_cached_data, 'pistol_stats', key_a, scraper.get_team_advanced_metrics, team_a_id, event_ids
+                ) if team_a_id else None
+                future_b = _global_executor.submit(
+                    get_cached_data, 'pistol_stats', key_b, scraper.get_team_advanced_metrics, team_b_id, event_ids
+                ) if team_b_id else None
+                
+                adv_a = _safe_future_result(future_a, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0})
+                adv_b = _safe_future_result(future_b, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0})
                 
                 response_data = {
                     "adv_a": adv_a,
@@ -544,7 +535,6 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             except Exception:
                 return None
 
-        from concurrent.futures import ThreadPoolExecutor
         with ThreadPoolExecutor(max_workers=10) as executor:
             players_data = list(executor.map(get_stats_for_player, roster))
             
@@ -587,6 +577,7 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
         except Exception:
             pass  # Ignore if client already closed the connection
 
+
 ACTUAL_PORT = PORT
 def run(start_port=None):
     global ACTUAL_PORT
@@ -609,6 +600,7 @@ def run(start_port=None):
             if attempt_port == target_port + 9:
                 raise e
             continue
+
 
 if __name__ == '__main__':
     run()
