@@ -13,6 +13,7 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 
 COPY --chown=user:user . .
 
+ENV PORT=7860
 EXPOSE 7860
 
 CMD ["python", "server.py"]
