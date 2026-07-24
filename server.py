@@ -1,18 +1,19 @@
-import http.server
-import json
-import urllib.parse as urlparse
 import os
-import traceback
-import scraper
+import sys
+import json
 import time
 import threading
 import atexit
-from datetime import datetime, timedelta
+import traceback
+from typing import Optional, List, Dict, Any
 from concurrent.futures import ThreadPoolExecutor
 
-PORT = int(os.environ.get("PORT", 8000))
-
-import sys
+import scraper
+from fastapi import FastAPI, HTTPException, Request, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
+from pydantic import BaseModel
+import uvicorn
 
 if hasattr(sys.stdout, 'reconfigure'):
     try:
@@ -21,22 +22,23 @@ if hasattr(sys.stdout, 'reconfigure'):
     except Exception:
         pass
 
+PORT = int(os.environ.get("PORT", 8000))
+
 if getattr(sys, 'frozen', False):
     BASE_DIR = sys._MEIPASS
 else:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Resolve public directory absolutely so the server can be safely started from anywhere.
 PUBLIC_DIR = os.path.abspath(os.path.join(BASE_DIR, 'public'))
 PUBLIC_DIR_NORM = os.path.normcase(os.path.normpath(PUBLIC_DIR))
 
 # Comprehensive caching system with multiple TTL tiers
 CACHE = {
-    'matches': {'data': {}, 'ttl': 600},  # 10 minutes for matches list
+    'matches': {'data': {}, 'ttl': 600},  # 10 minutes
     'match_details': {'data': {}, 'ttl': 300},  # 5 minutes
     'team_events': {'data': {}, 'ttl': 300},  # 5 minutes
     'event_map_pool': {'data': {}, 'ttl': 600},  # 10 minutes
-    'live_score': {'data': {}, 'ttl': 10},  # 10 seconds for live scores
+    'live_score': {'data': {}, 'ttl': 10},  # 10 seconds
     'team_stats': {'data': {}, 'ttl': 600},  # 10 minutes
     'team_roster': {'data': {}, 'ttl': 600},  # 10 minutes
     'player_stats': {'data': {}, 'ttl': 300},  # 5 minutes
@@ -44,27 +46,22 @@ CACHE = {
     'team_form': {'data': {}, 'ttl': 300},  # 5 minutes
 }
 
-_cache_lock = threading.RLock()  # 재진입 가능 락으로 데드락 방지
+_cache_lock = threading.RLock()
 _cache_timestamps = {}
-
-# 전역 스레드 풀 (H-4: 매 요청마다 생성 방지)
 _global_executor = ThreadPoolExecutor(max_workers=8, thread_name_prefix="vlr-api")
 atexit.register(_global_executor.shutdown, wait=True)
 
-# 캐시 GC 백그라운드 타이머 (C-2: 중첩 락 제거)
 _cache_gc_timer = None
 
 def _make_cache_key(entity_id, event_ids=None):
-    """Build a clean, deterministic cache key for an entity and optional event_ids list."""
     if event_ids is None:
-        return f"{entity_id}_all"  # M-4: None과 빈 리스트 구분
+        return f"{entity_id}_all"
     if isinstance(event_ids, (list, set, tuple)):
         sorted_events = "_".join(sorted(str(e) for e in event_ids))
         return f"{entity_id}_{sorted_events}"
     return f"{entity_id}_{event_ids}"
 
 def _cleanup_expired_cache_nolock(now: float):
-    """락 없이 호출되는 정리 루틴 (타이머 스레드에서만 실행)."""
     expired_keys = []
     for cache_type, cache_config in CACHE.items():
         if cache_type in _cache_timestamps:
@@ -75,38 +72,27 @@ def _cleanup_expired_cache_nolock(now: float):
         CACHE[cache_type]['data'].pop(key, None)
         _cache_timestamps.get(cache_type, {}).pop(key, None)
 
-
 def _cache_gc_loop():
-    """백그라운드에서 주기적으로 만료 항목 정리."""
     global _cache_gc_timer
     _cleanup_expired_cache_nolock(time.time())
     _cache_gc_timer = threading.Timer(60.0, _cache_gc_loop)
     _cache_gc_timer.daemon = True
     _cache_gc_timer.start()
 
-
-# 모듈 로드 시 GC 루프 시작
 _cache_gc_loop()
 
-
 def is_cache_valid(cache_type: str, key: str) -> bool:
-    """락 없이 타임스탬프만 확인 (빠른 경로)."""
-    if cache_type not in CACHE:
-        return False
-    if key not in CACHE[cache_type]['data']:
+    if cache_type not in CACHE or key not in CACHE[cache_type]['data']:
         return False
     ts_map = _cache_timestamps.get(cache_type)
     if not ts_map or key not in ts_map:
-        return True  # 타임스탬프 없으면 유효로 간주 (최초 1회)
+        return True
     return (time.time() - ts_map[key]) < CACHE[cache_type]['ttl']
 
-
 def get_cached_data(cache_type: str, key: str, fetch_func, *args, **kwargs):
-    """캐시 조회 → 미스 시 fetch → 저장 (락은 쓰기만)."""
     if is_cache_valid(cache_type, key):
         return CACHE[cache_type]['data'][key]
     
-    # 캐시 미스: fetch 수행 (락 없이 병렬 허용된 중복 fetch 가능, 마지막 쓰기 승)
     try:
         data = fetch_func(*args, **kwargs)
     except Exception as e:
@@ -120,19 +106,15 @@ def get_cached_data(cache_type: str, key: str, fetch_func, *args, **kwargs):
         _cache_timestamps[cache_type][key] = time.time()
     return data
 
-
-# Legacy cache for backward compatibility
-LIVE_SCORE_CACHE = {}  # key: match_url, value: (timestamp, data)
-CACHE_TTL = 20          # seconds — live score TTL
-CACHE_GC_INTERVAL = 60  # seconds — how often to run garbage collection
+LIVE_SCORE_CACHE = {}
+CACHE_TTL = 20
+CACHE_GC_INTERVAL = 60
 _last_gc_ts = 0.0
 
 def get_cached_live_score(match_url):
-    """Original live score caching for backward compatibility"""
     global _last_gc_ts
     now = time.time()
     with _cache_lock:
-        # Periodic full GC — prevents memory leak when traffic is low.
         if now - _last_gc_ts > CACHE_GC_INTERVAL:
             expired = [k for k, (ts, _) in LIVE_SCORE_CACHE.items() if now - ts > CACHE_GC_INTERVAL]
             for k in expired:
@@ -154,522 +136,291 @@ def get_cached_live_score(match_url):
         
     return data
 
-
 def _safe_future_result(future, default):
-    """Safely resolve a future, returning `default` if it raised."""
     if future is None:
         return default
     try:
-        return future.result(timeout=30)  # 30초 타임아웃 가드
+        return future.result(timeout=30)
     except Exception:
         return default
 
-
-class VLRWebServer(http.server.BaseHTTPRequestHandler):
-    def do_OPTIONS(self):
-        # Handle CORS preflight request
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.end_headers()
-
-    def do_GET(self):
-        parsed = urlparse.urlparse(self.path)
-        path = parsed.path
+def find_ace_player(roster, event_ids):
+    if not roster:
+        return {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}
         
-        # Enable CORS and disable browser caching for API requests
-        def send_cors_headers():
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Expires', '0')
-            # 보안 헤더 추가
-            self.send_header('X-Content-Type-Options', 'nosniff')
-            self.send_header('X-Frame-Options', 'DENY')
-            
-        # 1. API: Get Matches List
-        if path == '/api/matches':
-            try:
-                matches = get_cached_data('matches', 'matches_list', scraper.get_matches)
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps(matches, ensure_ascii=False).encode('utf-8'))
-            except Exception as e:
-                # 스택 트레이스 노출 방지
-                self.send_error_response("Internal server error", 500)
-                # 서버 로그엔 상세 기록
-                traceback.print_exc()
-            return
-            
-        # 2. API: Get Match Details & Events list
-        elif path == '/api/match-details':
-            query = urlparse.parse_qs(parsed.query)
-            match_url = query.get('url', [None])[0]
-            if not match_url:
-                self.send_error_response("Missing match url parameter", 400)
-                return
-                
-            try:
-                # Fetch match details with caching
-                details = get_cached_data('match_details', match_url, scraper.get_match_details, match_url)
-                
-                # Fetch recent 12 events and map pool with caching
-                # 전역 풀 재사용 (H-4)
-                future_a = _global_executor.submit(
-                    get_cached_data, 'team_events', details["team_a_id"], scraper.get_team_events, details["team_a_id"]
-                ) if details.get("team_a_id") else None
-                future_b = _global_executor.submit(
-                    get_cached_data, 'team_events', details["team_b_id"], scraper.get_team_events, details["team_b_id"]
-                ) if details.get("team_b_id") else None
-                future_pool = _global_executor.submit(
-                    get_cached_data, 'event_map_pool', details.get("event_id"), scraper.get_event_map_pool, details.get("event_id")
-                ) if details.get("event_id") else None
-                
-                team_a_events = _safe_future_result(future_a, [])[:12]
-                team_b_events = _safe_future_result(future_b, [])[:12]
-                map_pool = _safe_future_result(future_pool, [])
-                
-                # Fetch initial live score
-                live_score = get_cached_live_score(match_url)
-                
-                response_data = {
-                    "details": details,
-                    "team_a_events": team_a_events,
-                    "team_b_events": team_b_events,
-                    "map_pool": map_pool,
-                    "live_score": live_score
-                }
-                
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
-            except Exception as e:
-                self.send_error_response(str(e))
-            return
-            
-        # 2.5 API: Get Live Score
-        elif path == '/api/live-score':
-            query = urlparse.parse_qs(parsed.query)
-            match_url = query.get('url', [None])[0]
-            if not match_url:
-                self.send_error_response("Missing match url parameter", 400)
-                return
-                
-            try:
-                live_score = get_cached_live_score(match_url)
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps(live_score, ensure_ascii=False).encode('utf-8'))
-            except Exception as e:
-                self.send_error_response(str(e))
-            return
-
-        # 3. Generic Static Files Server
-        # Map requested path to public directory (resolved absolutely at import time).
-        req_path = path
-        if req_path == '/' or req_path == '/index.html':
-            req_path = '/index.html'
-            
-        # Clean and prevent traversal. Use realpath to resolve any symlinks.
-        safe_path = os.path.normpath(req_path.lstrip('/'))
-        # Reject any path containing backslashes or null bytes outright.
-        if '\x00' in safe_path or '..' in safe_path.split(os.sep):
-            self.send_response(404)
-            send_cors_headers()
-            self.end_headers()
-            self.wfile.write(b"404 Not Found")
-            return
-        full_filepath = os.path.normcase(os.path.realpath(os.path.join(PUBLIC_DIR, safe_path)))
-        
-        # Verify the file is strictly inside the public folder.
-        # C-5: 윈도우 드라이브 레터 대소문자 정규화 후 비교
+    def get_stats_for_player(p):
         try:
-            is_sub = os.path.commonpath([PUBLIC_DIR_NORM]) == os.path.commonpath([PUBLIC_DIR_NORM, full_filepath])
+            player_cache_key = _make_cache_key(p['id'], event_ids)
+            stats = get_cached_data('player_stats', player_cache_key, scraper.get_player_stats, p["id"], event_ids)
+            rounds = stats["rounds"]
+            acs = stats["weighted_acs"] / rounds if rounds > 0 else 0.0
+            p_data = {
+                "nickname": p["name"],
+                "acs": acs,
+                "kd_margin": stats["kills"] - stats["deaths"],
+                "agents": sorted(stats["agents"].items(), key=lambda x: x[1], reverse=True)
+            }
+            def _cap(s):
+                return s[0].upper() + s[1:] if s else s
+            p_data["agents"] = [_cap(x[0]) for x in p_data["agents"][:3]]
+            if not p_data["agents"]:
+                p_data["agents"] = ["N/A"]
+            return p_data
+        except Exception:
+            return None
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        players_data = list(executor.map(get_stats_for_player, roster))
+        
+    valid_players = [p for p in players_data if p is not None]
+    if not valid_players:
+        return {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}
+        
+    return max(valid_players, key=lambda x: x["acs"])
+
+def simulate_banpick(maps_a, maps_b, map_pool):
+    if not map_pool:
+        return {"bans": [], "picks": []}
+    
+    def get_win_pct(maps_data, map_name):
+        stats = maps_data.get(map_name, {})
+        played = stats.get('played', 0)
+        wins = stats.get('w', 0)
+        return (wins / played * 100) if played > 0 else 50.0
+    
+    available = list(map_pool)
+    bans = []
+    picks = []
+    
+    for team_label, own_maps, opp_maps in [('Team A', maps_a, maps_b), ('Team B', maps_b, maps_a)]:
+        if not available:
+            break
+        worst_map = None
+        worst_diff = float('inf')
+        for m in available:
+            own_pct = get_win_pct(own_maps, m)
+            opp_pct = get_win_pct(opp_maps, m)
+            diff = own_pct - opp_pct
+            if diff < worst_diff:
+                worst_diff = diff
+                worst_map = m
+        if worst_map:
+            bans.append({"map": worst_map, "team": team_label, "reason": f"Disadvantage: {worst_diff:+.1f}%"})
+            available.remove(worst_map)
+    
+    for team_label, own_maps in [('Team A', maps_a), ('Team B', maps_b)]:
+        if not available:
+            break
+        best_map = max(available, key=lambda m: get_win_pct(own_maps, m))
+        pct = get_win_pct(own_maps, best_map)
+        picks.append({"map": best_map, "team": team_label, "win_pct": round(pct, 1)})
+        available.remove(best_map)
+    
+    if available:
+        decider = available[0]
+        picks.append({"map": decider, "team": "Decider", "win_pct": 50.0})
+    
+    return {"bans": bans, "picks": picks}
+
+# --- FastAPI App Definition ---
+app = FastAPI(title="VLR Web Analyzer API", version="2.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Pydantic models for request validation
+class TeamAnalysisPayload(BaseModel):
+    team_a_id: str = ""
+    team_b_id: str = ""
+    event_ids: Optional[List[str]] = None
+
+class BanPickPayload(BaseModel):
+    maps_a: Dict[str, Any] = {}
+    maps_b: Dict[str, Any] = {}
+    map_pool: List[str] = []
+
+@app.get("/api/matches")
+def api_get_matches():
+    try:
+        matches = get_cached_data('matches', 'matches_list', scraper.get_matches)
+        return JSONResponse(content=matches)
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/match-details")
+def api_get_match_details(url: str = Query(...)):
+    try:
+        details = get_cached_data('match_details', url, scraper.get_match_details, url)
+        future_a = _global_executor.submit(
+            get_cached_data, 'team_events', details["team_a_id"], scraper.get_team_events, details["team_a_id"]
+        ) if details.get("team_a_id") else None
+        future_b = _global_executor.submit(
+            get_cached_data, 'team_events', details["team_b_id"], scraper.get_team_events, details["team_b_id"]
+        ) if details.get("team_b_id") else None
+        future_pool = _global_executor.submit(
+            get_cached_data, 'event_map_pool', details.get("event_id"), scraper.get_event_map_pool, details.get("event_id")
+        ) if details.get("event_id") else None
+        
+        team_a_events = _safe_future_result(future_a, [])[:12]
+        team_b_events = _safe_future_result(future_b, [])[:12]
+        map_pool = _safe_future_result(future_pool, [])
+        live_score = get_cached_live_score(url)
+        
+        return JSONResponse(content={
+            "details": details,
+            "team_a_events": team_a_events,
+            "team_b_events": team_b_events,
+            "map_pool": map_pool,
+            "live_score": live_score
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/live-score")
+def api_get_live_score(url: str = Query(...)):
+    try:
+        live_score = get_cached_live_score(url)
+        return JSONResponse(content=live_score)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/analyze/form")
+def api_analyze_form(payload: TeamAnalysisPayload):
+    try:
+        future_a = _global_executor.submit(
+            get_cached_data, 'team_form', payload.team_a_id, scraper.get_team_form, payload.team_a_id
+        ) if payload.team_a_id else None
+        future_b = _global_executor.submit(
+            get_cached_data, 'team_form', payload.team_b_id, scraper.get_team_form, payload.team_b_id
+        ) if payload.team_b_id else None
+        
+        return JSONResponse(content={
+            "form_a": _safe_future_result(future_a, []),
+            "form_b": _safe_future_result(future_b, [])
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/analyze/maps")
+def api_analyze_maps(payload: TeamAnalysisPayload):
+    try:
+        key_a = _make_cache_key(payload.team_a_id, payload.event_ids)
+        key_b = _make_cache_key(payload.team_b_id, payload.event_ids)
+        
+        future_a = _global_executor.submit(
+            get_cached_data, 'team_stats', key_a, scraper.get_team_maps_stats, payload.team_a_id, payload.event_ids
+        ) if payload.team_a_id else None
+        future_b = _global_executor.submit(
+            get_cached_data, 'team_stats', key_b, scraper.get_team_maps_stats, payload.team_b_id, payload.event_ids
+        ) if payload.team_b_id else None
+        
+        return JSONResponse(content={
+            "maps_a": _safe_future_result(future_a, {}),
+            "maps_b": _safe_future_result(future_b, {})
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/analyze/aces")
+def api_analyze_aces(payload: TeamAnalysisPayload):
+    try:
+        future_a = _global_executor.submit(
+            get_cached_data, 'team_roster', payload.team_a_id, scraper.get_team_roster, payload.team_a_id
+        ) if payload.team_a_id else None
+        future_b = _global_executor.submit(
+            get_cached_data, 'team_roster', payload.team_b_id, scraper.get_team_roster, payload.team_b_id
+        ) if payload.team_b_id else None
+        
+        roster_a = _safe_future_result(future_a, [])
+        roster_b = _safe_future_result(future_b, [])
+        
+        ace_a = find_ace_player(roster_a, payload.event_ids)
+        ace_b = find_ace_player(roster_b, payload.event_ids)
+        
+        return JSONResponse(content={"ace_a": ace_a, "ace_b": ace_b})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/analyze/advanced")
+def api_analyze_advanced(payload: TeamAnalysisPayload):
+    try:
+        key_a = _make_cache_key(payload.team_a_id, payload.event_ids)
+        key_b = _make_cache_key(payload.team_b_id, payload.event_ids)
+        
+        future_a = _global_executor.submit(
+            get_cached_data, 'pistol_stats', key_a, scraper.get_team_advanced_metrics, payload.team_a_id, payload.event_ids
+        ) if payload.team_a_id else None
+        future_b = _global_executor.submit(
+            get_cached_data, 'pistol_stats', key_b, scraper.get_team_advanced_metrics, payload.team_b_id, payload.event_ids
+        ) if payload.team_b_id else None
+        
+        return JSONResponse(content={
+            "adv_a": _safe_future_result(future_a, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0}),
+            "adv_b": _safe_future_result(future_b, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0})
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/simulate/banpick")
+def api_simulate_banpick(payload: BanPickPayload):
+    try:
+        res = simulate_banpick(payload.maps_a, payload.maps_b, payload.map_pool)
+        return JSONResponse(content=res)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/log-error")
+async def api_log_error(request: Request):
+    try:
+        body = await request.json()
+        print(f"\n>>> [BROWSER ERROR LOGGED]:\n{json.dumps(body, indent=2)}\n")
+        return JSONResponse(content={"status": "logged"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Mount static files at root
+@app.get("/{file_path:path}")
+def serve_static(file_path: str):
+    if not file_path or file_path == "index.html":
+        target = os.path.join(PUBLIC_DIR, "index.html")
+    else:
+        safe_path = os.path.normpath(file_path.lstrip('/'))
+        if '\x00' in safe_path or '..' in safe_path.split(os.sep):
+            raise HTTPException(status_code=404, detail="Not Found")
+        target = os.path.normcase(os.path.realpath(os.path.join(PUBLIC_DIR, safe_path)))
+        try:
+            is_sub = os.path.commonpath([PUBLIC_DIR_NORM]) == os.path.commonpath([PUBLIC_DIR_NORM, target])
         except Exception:
             is_sub = False
+        if not is_sub:
+            raise HTTPException(status_code=404, detail="Not Found")
             
-        if is_sub and os.path.exists(full_filepath) and os.path.isfile(full_filepath):
-            # Map extensions to mime types
-            ext = os.path.splitext(full_filepath)[1].lower()
-            mime_map = {
-                '.html': 'text/html; charset=utf-8',
-                '.js': 'application/javascript; charset=utf-8',
-                '.css': 'text/css; charset=utf-8',
-                '.ico': 'image/x-icon',
-                '.png': 'image/png',
-                '.jpg': 'image/jpeg',
-                '.jpeg': 'image/jpeg',
-                '.json': 'application/json; charset=utf-8'
-            }
-            content_type = mime_map.get(ext, 'application/octet-stream')
-            self.serve_file(full_filepath, content_type)
-        else:
-            self.send_response(404)
-            send_cors_headers()
-            self.end_headers()
-            self.wfile.write(b"404 Not Found")
-
-    def do_POST(self):
-        parsed = urlparse.urlparse(self.path)
-        path = parsed.path
-        
-        # Enable CORS and disable browser caching for API requests
-        def send_cors_headers():
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Expires', '0')
-            self.send_header('X-Content-Type-Options', 'nosniff')
-            self.send_header('X-Frame-Options', 'DENY')
-
-        # 0. API: Log browser JS errors
-        if path == '/api/log-error':
-            try:
-                content_length = int(self.headers['Content-Length'])
-                post_data = self.rfile.read(content_length)
-                body = json.loads(post_data.decode('utf-8'))
-                print(f"\n>>> [BROWSER ERROR LOGGED]:\n{json.dumps(body, indent=2)}\n")
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                send_cors_headers()
-                self.end_headers()
-                self.wfile.write(b'{"status":"logged"}')
-            except Exception as e:
-                self.send_error_response(str(e))
-            return
-
-        # 1. API: Get recent form
-        elif path == '/api/analyze/form':
-            try:
-                content_length = int(self.headers['Content-Length'])
-                post_data = self.rfile.read(content_length)
-                body = json.loads(post_data.decode('utf-8'))
-                
-                team_a_id = body.get('team_a_id', '')
-                team_b_id = body.get('team_b_id', '')
-                
-                future_a = _global_executor.submit(
-                    get_cached_data, 'team_form', team_a_id, scraper.get_team_form, team_a_id
-                ) if team_a_id else None
-                future_b = _global_executor.submit(
-                    get_cached_data, 'team_form', team_b_id, scraper.get_team_form, team_b_id
-                ) if team_b_id else None
-                
-                form_a = _safe_future_result(future_a, [])
-                form_b = _safe_future_result(future_b, [])
-                
-                response_data = {
-                    "form_a": form_a,
-                    "form_b": form_b
-                }
-                
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
-            except Exception as e:
-                self.send_error_response(str(e))
-            return
-
-        # 2. API: Get map stats
-        elif path == '/api/analyze/maps':
-            try:
-                content_length = int(self.headers['Content-Length'])
-                post_data = self.rfile.read(content_length)
-                body = json.loads(post_data.decode('utf-8'))
-                
-                team_a_id = body.get('team_a_id', '')
-                team_b_id = body.get('team_b_id', '')
-                event_ids = body.get('event_ids', None)
-                
-                # For map stats, we create composite cache keys
-                cache_key_a = _make_cache_key(team_a_id, event_ids) if team_a_id else ""
-                cache_key_b = _make_cache_key(team_b_id, event_ids) if team_b_id else ""
-                
-                future_a = _global_executor.submit(
-                    get_cached_data, 'team_stats', cache_key_a, scraper.get_team_maps_stats, team_a_id, event_ids
-                ) if team_a_id else None
-                future_b = _global_executor.submit(
-                    get_cached_data, 'team_stats', cache_key_b, scraper.get_team_maps_stats, team_b_id, event_ids
-                ) if team_b_id else None
-                
-                maps_a = _safe_future_result(future_a, {})
-                maps_b = _safe_future_result(future_b, {})
-                
-                response_data = {
-                    "maps_a": maps_a,
-                    "maps_b": maps_b
-                }
-                
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
-            except Exception as e:
-                self.send_error_response(str(e))
-            return
-
-        # 3. API: Get ace players
-        elif path == '/api/analyze/aces':
-            try:
-                content_length = int(self.headers['Content-Length'])
-                post_data = self.rfile.read(content_length)
-                body = json.loads(post_data.decode('utf-8'))
-                
-                team_a_id = body.get('team_a_id', '')
-                team_b_id = body.get('team_b_id', '')
-                event_ids = body.get('event_ids', None)
-                
-                future_a = _global_executor.submit(
-                    get_cached_data, 'team_roster', team_a_id, scraper.get_team_roster, team_a_id
-                ) if team_a_id else None
-                future_b = _global_executor.submit(
-                    get_cached_data, 'team_roster', team_b_id, scraper.get_team_roster, team_b_id
-                ) if team_b_id else None
-                
-                roster_a = _safe_future_result(future_a, [])
-                roster_b = _safe_future_result(future_b, [])
-                
-                ace_a = self.find_ace_player(roster_a, event_ids)
-                ace_b = self.find_ace_player(roster_b, event_ids)
-                
-                response_data = {
-                    "ace_a": ace_a,
-                    "ace_b": ace_b
-                }
-                
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
-            except Exception as e:
-                self.send_error_response(str(e))
-            return
-
-        # 4. API: Get Advanced Metrics (Pistol Win Rates, FK/FD Margin)
-        elif path == '/api/analyze/advanced':
-            try:
-                content_length = int(self.headers['Content-Length'])
-                post_data = self.rfile.read(content_length)
-                body = json.loads(post_data.decode('utf-8'))
-                
-                team_a_id = body.get('team_a_id', '')
-                team_b_id = body.get('team_b_id', '')
-                event_ids = body.get('event_ids', None)
-                
-                key_a = _make_cache_key(team_a_id, event_ids)
-                key_b = _make_cache_key(team_b_id, event_ids)
-                
-                future_a = _global_executor.submit(
-                    get_cached_data, 'pistol_stats', key_a, scraper.get_team_advanced_metrics, team_a_id, event_ids
-                ) if team_a_id else None
-                future_b = _global_executor.submit(
-                    get_cached_data, 'pistol_stats', key_b, scraper.get_team_advanced_metrics, team_b_id, event_ids
-                ) if team_b_id else None
-                
-                adv_a = _safe_future_result(future_a, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0})
-                adv_b = _safe_future_result(future_b, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0})
-                
-                response_data = {
-                    "adv_a": adv_a,
-                    "adv_b": adv_b
-                }
-                
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
-            except Exception as e:
-                self.send_error_response(str(e))
-            return
-
-        # 5. API: Server-side Ban/Pick Simulation (M-5)
-        elif path == '/api/simulate/banpick':
-            try:
-                content_length = int(self.headers['Content-Length'])
-                post_data = self.rfile.read(content_length)
-                body = json.loads(post_data.decode('utf-8'))
-                
-                maps_a = body.get('maps_a', {})
-                maps_b = body.get('maps_b', {})
-                map_pool = body.get('map_pool', [])
-                
-                result = self._simulate_banpick(maps_a, maps_b, map_pool)
-                
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps(result, ensure_ascii=False).encode('utf-8'))
-            except Exception as e:
-                self.send_error_response(str(e))
-            return
-        else:
-            self.send_response(404)
-            send_cors_headers()
-            self.end_headers()
-            self.wfile.write(b"404 Not Found")
-
-    def find_ace_player(self, roster, event_ids):
-        if not roster:
-            return {
-                "nickname": "N/A",
-                "acs": 0.0,
-                "kd_margin": 0,
-                "agents": ["N/A"]
-            }
-            
-        def get_stats_for_player(p):
-            try:
-                player_cache_key = _make_cache_key(p['id'], event_ids)
-                stats = get_cached_data('player_stats', player_cache_key, scraper.get_player_stats, p["id"], event_ids)
-                rounds = stats["rounds"]
-                acs = stats["weighted_acs"] / rounds if rounds > 0 else 0.0
-                p_data = {
-                    "nickname": p["name"],
-                    "acs": acs,
-                    "kd_margin": stats["kills"] - stats["deaths"],
-                    "agents": sorted(stats["agents"].items(), key=lambda x: x[1], reverse=True)
-                }
-                # Capitalize first char only, preserving the rest of the name.
-                # e.g. "reyna" -> "Reyna", "ojİye" -> "Ojİye"
-                def _cap(s):
-                    if not s:
-                        return s
-                    return s[0].upper() + s[1:]
-                p_data["agents"] = [_cap(x[0]) for x in p_data["agents"][:3]]
-                if not p_data["agents"]:
-                    p_data["agents"] = ["N/A"]
-                return p_data
-            except Exception:
-                return None
-
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            players_data = list(executor.map(get_stats_for_player, roster))
-            
-        valid_players = [p for p in players_data if p is not None]
-        if not valid_players:
-            return {
-                "nickname": "N/A",
-                "acs": 0.0,
-                "kd_margin": 0,
-                "agents": ["N/A"]
-            }
-            
-        return max(valid_players, key=lambda x: x["acs"])
-
-    def _simulate_banpick(self, maps_a, maps_b, map_pool):
-        """Server-side ban/pick simulation based on map win rates."""
-        if not map_pool:
-            return {"bans": [], "picks": []}
-        
-        def get_win_pct(maps_data, map_name):
-            stats = maps_data.get(map_name, {})
-            played = stats.get('played', 0)
-            wins = stats.get('w', 0)
-            return (wins / played * 100) if played > 0 else 50.0
-        
-        available = list(map_pool)
-        bans = []
-        picks = []
-        
-        # Ban phase: each team bans their weakest map (opponent's strongest)
-        for team_label, own_maps, opp_maps in [
-            ('Team A', maps_a, maps_b),
-            ('Team B', maps_b, maps_a)
-        ]:
-            if not available:
-                break
-            # Ban the map where the opponent has the highest advantage
-            worst_map = None
-            worst_diff = float('inf')
-            for m in available:
-                own_pct = get_win_pct(own_maps, m)
-                opp_pct = get_win_pct(opp_maps, m)
-                diff = own_pct - opp_pct
-                if diff < worst_diff:
-                    worst_diff = diff
-                    worst_map = m
-            if worst_map:
-                bans.append({"map": worst_map, "team": team_label, "reason": f"Disadvantage: {worst_diff:+.1f}%"})
-                available.remove(worst_map)
-        
-        # Pick phase: each team picks their best remaining map
-        for team_label, own_maps in [
-            ('Team A', maps_a),
-            ('Team B', maps_b)
-        ]:
-            if not available:
-                break
-            best_map = max(available, key=lambda m: get_win_pct(own_maps, m))
-            pct = get_win_pct(own_maps, best_map)
-            picks.append({"map": best_map, "team": team_label, "win_pct": round(pct, 1)})
-            available.remove(best_map)
-        
-        # Decider: remaining map with best combined balance
-        if available:
-            decider = available[0]
-            picks.append({"map": decider, "team": "Decider", "win_pct": 50.0})
-        
-        return {"bans": bans, "picks": picks}
-
-    def serve_file(self, filepath, content_type):
-        if not os.path.exists(filepath):
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write(b"File Not Found")
-            return
-            
-        try:
-            with open(filepath, 'rb') as f:
-                content = f.read()
-            self.send_response(200)
-            self.send_header('Content-Type', content_type)
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(content)
-        except Exception as e:
-            self.send_error_response(str(e))
-
-    def send_error_response(self, message, code=500):
-        try:
-            self.send_response(code)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps({"error": message}, ensure_ascii=False).encode('utf-8'))
-        except Exception:
-            pass  # Ignore if client already closed the connection
-
+    if os.path.exists(target) and os.path.isfile(target):
+        return FileResponse(target)
+    
+    # Fallback to index.html for SPA routing
+    index_path = os.path.join(PUBLIC_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    raise HTTPException(status_code=404, detail="Not Found")
 
 ACTUAL_PORT = PORT
+
 def run(start_port=None):
     global ACTUAL_PORT
-    from http.server import ThreadingHTTPServer
     target_port = start_port or PORT
     
     for attempt_port in range(target_port, target_port + 10):
         try:
-            server_address = ('', attempt_port)
-            httpd = ThreadingHTTPServer(server_address, VLRWebServer)
             ACTUAL_PORT = attempt_port
-            print(f"Starting server on port {ACTUAL_PORT}...")
-            try:
-                httpd.serve_forever()
-            except KeyboardInterrupt:
-                print("\nStopping server...")
-                httpd.server_close()
+            print(f"Starting FastAPI + Uvicorn server on port {ACTUAL_PORT}...")
+            uvicorn.run(app, host="0.0.0.0", port=attempt_port)
             return
         except OSError as e:
             if attempt_port == target_port + 9:

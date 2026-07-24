@@ -1,5 +1,5 @@
 import os
-import requests
+import httpx
 from bs4 import BeautifulSoup
 import re
 import urllib.parse as urlparse
@@ -21,37 +21,37 @@ def _get_headers():
         'Accept-Language': 'en-US,en;q=0.9',
     }
 
-def _request_with_retry(url, max_retries=3, timeout=10):
-    """HTTP GET with retry and exponential backoff for transient failures."""
+def _request_with_retry(url, max_retries=3, timeout=15):
+    """HTTP GET via httpx with retry and exponential backoff for transient failures."""
     last_err = None
-    for attempt in range(max_retries):
-        try:
-            # C-3: 404는 성공으로 간주하지 않음, 타임아웃 분리 (연결 5초, 읽기 15초)
-            res = requests.get(url, headers=_get_headers(), timeout=(5, 15))
-            if res.status_code == 200:
+    client = httpx.Client(follow_redirects=True, timeout=httpx.Timeout(15.0, connect=5.0))
+    try:
+        for attempt in range(max_retries):
+            try:
+                res = client.get(url, headers=_get_headers())
+                if res.status_code == 200:
+                    return res
+                if res.status_code == 404:
+                    raise httpx.HTTPStatusError(f"404 Not Found: {url}", request=res.request, response=res)
+                if res.status_code in (429, 502, 503, 504):
+                    last_err = Exception(f"Status {res.status_code}")
+                    retry_after = res.headers.get('Retry-After')
+                    if retry_after and retry_after.isdigit():
+                        wait = min(int(retry_after), 60)
+                    else:
+                        wait = min(30, 2 ** attempt + random.uniform(0, 1))
+                    time.sleep(wait)
+                    continue
                 return res
-            if res.status_code == 404:
-                raise requests.HTTPError(f"404 Not Found: {url}", response=res)
-            if res.status_code in (429, 502, 503, 504):
-                # transient — retry
-                last_err = Exception(f"Status {res.status_code}")
-                # 지수 백오프 + 지터, Retry-After 헤더 존중
-                retry_after = res.headers.get('Retry-After')
-                if retry_after and retry_after.isdigit():
-                    wait = min(int(retry_after), 60)
-                else:
-                    wait = min(30, 2 ** attempt + random.uniform(0, 1))
+            except httpx.HTTPStatusError:
+                raise
+            except Exception as e:
+                last_err = e
+                wait = min(30, 2 ** attempt + random.uniform(0, 1))
                 time.sleep(wait)
-                continue
-            # non-retryable status (e.g. 404, 403)
-            return res
-        except requests.HTTPError:
-            raise
-        except Exception as e:
-            last_err = e
-            wait = min(30, 2 ** attempt + random.uniform(0, 1))
-            time.sleep(wait)
-    raise last_err if last_err else Exception("Request failed")
+        raise last_err if last_err else Exception("Request failed")
+    finally:
+        client.close()
 
 def clean_text(text):
     if not text:
@@ -907,7 +907,7 @@ def get_live_score(match_url):
     # C-4: 404 예외 처리, 파싱 실패 시 에러 상태 명시
     try:
         res = _request_with_retry(match_url)
-    except requests.HTTPError as e:
+    except httpx.HTTPStatusError as e:
         if e.response is not None and e.response.status_code == 404:
             return {"series_score_a": "0", "series_score_b": "0", "status": "not_found", "maps": []}
         return {"series_score_a": "0", "series_score_b": "0", "status": "error", "maps": []}
