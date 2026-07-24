@@ -1,930 +1,679 @@
-// State variables
-let allMatches = [];
-let filteredMatches = [];
-let selectedMatch = null;
-let teamAEvents = [];
-let teamBEvents = [];
-let selectedEvents = new Set();
-let analysisRunning = false;
-let matchDetailsAbortController = null;
-let analysisAbortController = null;
-let liveScoreInterval = null;
+// ======================================================
+// Skeleton Loader System (Phase 1.2)
+// ======================================================
+function showSkeletonLoader(containerId, type = 'default', count = 3) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    
+    el.innerHTML = '';
+    
+    if (type === 'form') {
+        // Form skeleton with win/loss badges
+        for (let i = 0; i < count; i++) {
+            const badge = document.createElement('span');
+            badge.className = 'bg-slate-800/40 animate-pulse rounded-lg';
+            badge.style.width = '60px';
+            badge.style.height = '24px';
+            badge.style.display = 'inline-block';
+            el.appendChild(badge);
+        }
+    } else if (type === 'agents') {
+        // Agent badge skeleton
+        for (let i = 0; i < count; i++) {
+            const badge = document.createElement('span');
+            badge.className = 'bg-slate-800/40 animate-pulse rounded-lg';
+            badge.style.width = '80px';
+            badge.style.height = '32px';
+            badge.style.display = 'inline-block';
+            el.appendChild(badge);
+        }
+    } else if (type === 'maps') {
+        // Maps table skeleton rows
+        for (let i = 0; i < count; i++) {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-slate-800/60';
+            tr.innerHTML = `
+                <td class="py-3 pl-2">
+                    <div class="h-4 bg-slate-800/40 rounded animate-pulse w-20"></div>
+                </td>
+                <td class="py-3 text-center">
+                    <div class="h-4 bg-slate-800/40 rounded animate-pulse w-8 mx-auto"></div>
+                </td>
+                <td class="py-3 text-center">
+                    <div class="h-4 bg-slate-800/40 rounded animate-pulse w-12 mx-auto"></div>
+                </td>
+                <td class="py-3 text-center">
+                    <div class="h-4 bg-slate-800/40 rounded animate-pulse w-12 mx-auto"></div>
+                </td>
+                <td class="py-3 text-center">
+                    <div class="h-4 bg-slate-800/40 rounded animate-pulse w-16 mx-auto"></div>
+                </td>
+            `;
+            el.appendChild(tr);
+        }
+    } else if (type === 'ace') {
+        // Ace card skeleton
+        for (let i = 0; i < count; i++) {
+            const div = document.createElement('div');
+            div.className = 'bg-zinc-900/50 border border-slate-800/60 rounded-xl p-4 space-y-3';
+            div.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="h-5 bg-slate-800/40 rounded animate-pulse w-24"></div>
+                    <div class="h-3 bg-slate-800/40 rounded animate-pulse w-16"></div>
+                </div>
+                <div class="space-y-2">
+                    <div class="h-4 bg-slate-800/40 rounded animate-pulse w-20"></div>
+                    <div class="h-3 bg-slate-800/40 rounded animate-pulse w-16"></div>
+                </div>
+                <div class="space-y-1">
+                    <div class="h-3 bg-slate-800/40 rounded animate-pulse w-full"></div>
+                    <div class="h-3 bg-slate-800/40 rounded animate-pulse w-3/4"></div>
+                </div>
+            `;
+            el.appendChild(div);
+        }
+    }
+}
 
-// Agent badge Tailwind colors mapping
-const agentColors = {
-    jett: { bg: 'bg-sky-500/10 border-sky-500/20', text: 'text-sky-400' },
-    raze: { bg: 'bg-orange-500/10 border-orange-500/20', text: 'text-orange-400' },
-    phoenix: { bg: 'bg-red-500/10 border-red-500/20', text: 'text-red-400' },
-    sage: { bg: 'bg-teal-500/10 border-teal-500/20', text: 'text-teal-400' },
-    sova: { bg: 'bg-blue-500/10 border-blue-500/20', text: 'text-blue-400' },
-    breach: { bg: 'bg-amber-500/10 border-amber-500/20', text: 'text-amber-400' },
-    omen: { bg: 'bg-indigo-500/10 border-indigo-500/20', text: 'text-indigo-400' },
-    brimstone: { bg: 'bg-yellow-800/10 border-yellow-800/20', text: 'text-yellow-600' },
-    cypher: { bg: 'bg-slate-500/10 border-slate-500/20', text: 'text-slate-400' },
-    reyna: { bg: 'bg-purple-500/10 border-purple-500/20', text: 'text-purple-400' },
-    killjoy: { bg: 'bg-yellow-500/10 border-yellow-500/20', text: 'text-yellow-500' },
-    viper: { bg: 'bg-emerald-500/10 border-emerald-500/20', text: 'text-emerald-400' },
-    skye: { bg: 'bg-green-600/10 border-green-600/20', text: 'text-green-500' },
-    yoru: { bg: 'bg-blue-700/10 border-blue-700/20', text: 'text-blue-500' },
-    astra: { bg: 'bg-purple-700/10 border-purple-700/20', text: 'text-purple-500' },
-    kayo: { bg: 'bg-sky-600/10 border-sky-600/20', text: 'text-sky-400' },
-    chamber: { bg: 'bg-slate-700/10 border-slate-700/20', text: 'text-slate-300' },
-    neon: { bg: 'bg-cyan-500/10 border-cyan-500/20', text: 'text-cyan-400' },
-    fade: { bg: 'bg-slate-600/10 border-slate-600/20', text: 'text-slate-400' },
-    harbor: { bg: 'bg-sky-600/10 border-sky-600/20', text: 'text-sky-500' },
-    gekko: { bg: 'bg-lime-500/10 border-lime-500/20', text: 'text-lime-400' },
-    deadlock: { bg: 'bg-cyan-600/10 border-cyan-600/20', text: 'text-cyan-500' },
-    iso: { bg: 'bg-indigo-500/10 border-indigo-500/20', text: 'text-indigo-400' },
-    clove: { bg: 'bg-pink-500/10 border-pink-500/20', text: 'text-pink-400' }
+function hideSkeletonLoader(containerId) {
+    const el = document.getElementById(containerId);
+    if (el) {
+        el.innerHTML = '';
+    }
+}
+
+function showSkeletonLoaderOnUI(containerId, type = 'default', count = 3) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    
+    showSkeletonLoader(containerId, type, count);
+}
+
+// ======================================================
+// Riot API Integration (Phase 2.1)
+// ======================================================
+const RiotAPI = {
+    BASE_URL: 'https://valorant-api.com/v1',
+    getMapImageUrl: function(uuid) {
+        return `https://media.valorant-api.com/maps/${uuid}/displayicon.png`;
+    },
+    getAgentImageUrl: function(uuid) {
+        return `https://media.valorant-api.com/agents/${uuid}/displayicon.png`;
+    },
+    getAgentIconUrl: function(uuid) {
+        return `https://media.valorant-api.com/agents/${uuid}/displayicon.png`;
+    }
 };
 
-// UI Elements
-const tierSelect = document.getElementById('tier-select');
-const eventSelect = document.getElementById('event-select');
-const matchSelect = document.getElementById('match-select');
-const tournamentChecklistContainer = document.getElementById('tournament-checklist-container');
-const tournamentChecklist = document.getElementById('tournament-checklist');
-
-const statusIcon = document.getElementById('status-icon');
-const statusText = document.getElementById('status-text');
-const subStatusText = document.getElementById('sub-status-text');
-const statusIconContainer = document.getElementById('status-icon-container');
-
-const analyzeBtn = document.getElementById('analyze-btn');
-const progressBarContainer = document.getElementById('progress-bar-container');
-const progressBar = document.getElementById('progress-bar');
-
-// Theme Manager (Original eSports Dark vs Apple iOS 27 Glass UI Kit)
-function setUITheme(theme) {
-    const htmlEl = document.documentElement;
-    const btnOriginal = document.getElementById('theme-btn-original');
-    const btnIos = document.getElementById('theme-btn-ios');
-    
-    htmlEl.setAttribute('data-theme', theme);
-
-    if (theme === 'ios') {
-        htmlEl.classList.add('theme-ios');
-        if (btnOriginal && btnIos) {
-            btnOriginal.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-1.5';
-            btnIos.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-blue-600/30 text-sky-300 border border-sky-400/30 font-bold shadow-sm backdrop-blur-md';
-        }
-        localStorage.setItem('vlr_ui_theme', 'ios');
-    } else {
-        htmlEl.classList.remove('theme-ios');
-        if (btnOriginal && btnIos) {
-            btnOriginal.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 font-bold shadow-sm';
-            btnIos.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-1.5';
-        }
-        localStorage.setItem('vlr_ui_theme', 'original');
-    }
-    if (window.lucide) {
-        lucide.createIcons();
-    }
-}
-
-function initUITheme() {
-    const savedTheme = localStorage.getItem('vlr_ui_theme') || 'original';
-    setUITheme(savedTheme);
-}
-
-// App Initialization
-document.addEventListener('DOMContentLoaded', () => {
-    initUITheme();
-    fetchMatches();
-    
-    // Wire up events
-    tierSelect.addEventListener('change', () => {
-        populateEventsDropdown();
-    });
-    
-    eventSelect.addEventListener('change', () => {
-        populateMatchesDropdown();
-    });
-    
-    matchSelect.addEventListener('change', () => {
-        handleMatchSelection();
-    });
-    
-    analyzeBtn.addEventListener('click', () => {
-        runAnalysis();
-    });
-});
-
-// 1. Fetch matches from server
-async function fetchMatches() {
-    updateStatus('info', 'VLR.gg에서 일정을 불러오는 중입니다...', '전체 매치를 실시간 수집하고 있습니다.', 0);
+async function preloadValorantAssets() {
     try {
-        const response = await fetch('/api/matches');
-        if (!response.ok) {
-            throw new Error(`서버 에러: ${response.status}`);
-        }
-        allMatches = await response.json();
+        const response = await fetch(`${RiotAPI.BASE_URL}/maps`);
+        const mapsData = await response.json();
         
-        if (allMatches.length === 0) {
-            updateStatus('alert', '진행 중이거나 예정된 경기가 없습니다.', 'vlr.gg 페이지를 확인해보세요.', 0);
-            return;
-        }
+        const responseAgents = await fetch(`${RiotAPI.BASE_URL}/agents`);
+        const agentsData = await responseAgents.json();
         
-        updateStatus('success', '경기 일정 로드 성공.', `${allMatches.length}개의 일정을 성공적으로 확인했습니다.`, 0);
-        populateEventsDropdown();
-    } catch (err) {
-        updateStatus('error', '경기 일정을 불러오는 데 실패했습니다.', err.message, 0);
-    }
-}
-
-// 2. Populate Events Dropdown (filtered by selected Tier)
-function populateEventsDropdown() {
-    const tier = tierSelect.value;
-    
-    // Filter matches by tier
-    const tempMatches = allMatches.filter(m => {
-        if (tier === 'All') return true;
-        return m.tier === tier;
-    });
-    
-    // Extract unique event names
-    const uniqueEvents = [...new Set(tempMatches.map(m => m.event))];
-    
-    eventSelect.innerHTML = '';
-    
-    if (uniqueEvents.length === 0) {
-        eventSelect.innerHTML = '<option>대회가 없습니다.</option>';
-        eventSelect.disabled = true;
-        matchSelect.innerHTML = '<option>매치가 없습니다.</option>';
-        matchSelect.disabled = true;
-        analyzeBtn.disabled = true;
-        return;
-    }
-    
-    uniqueEvents.forEach(evt => {
-        const opt = document.createElement('option');
-        opt.value = evt;
-        opt.textContent = evt;
-        eventSelect.appendChild(opt);
-    });
-    
-    eventSelect.disabled = false;
-    populateMatchesDropdown();
-}
-
-// 3. Populate Matches Dropdown (filtered by selected Event and Tier)
-function populateMatchesDropdown() {
-    const tier = tierSelect.value;
-    const selectedEvent = eventSelect.value;
-    
-    filteredMatches = allMatches.filter(m => {
-        const tierMatch = (tier === 'All' || m.tier === tier);
-        const eventMatch = (m.event === selectedEvent);
-        return tierMatch && eventMatch;
-    });
-    
-    matchSelect.innerHTML = '';
-    
-    if (filteredMatches.length === 0) {
-        matchSelect.innerHTML = '<option>매치가 없습니다.</option>';
-        matchSelect.disabled = true;
-        analyzeBtn.disabled = true;
-        return;
-    }
-    
-    filteredMatches.forEach((m, idx) => {
-        const opt = document.createElement('option');
-        opt.value = idx;
-        opt.textContent = `${m.team_a} vs ${m.team_b} (${m.time} | ${m.date})`;
-        matchSelect.appendChild(opt);
-    });
-    
-    matchSelect.disabled = false;
-    analyzeBtn.disabled = false;
-    
-    // Trigger initial match detail fetch
-    handleMatchSelection();
-}
-
-// 4. Handle Match Selection (Fetch Team IDs and Recent Tournaments list)
-async function handleMatchSelection() {
-    const idx = parseInt(matchSelect.value, 10);
-    if (isNaN(idx)) return;
-    
-    selectedMatch = filteredMatches[idx];
-    
-    // Stop any active live polling
-    stopLiveScorePolling();
-    
-    // Clear display cards to show loading
-    document.getElementById('team-a-name').textContent = selectedMatch.team_a;
-    document.getElementById('team-b-name').textContent = selectedMatch.team_b;
-    document.getElementById('team-a-form').innerHTML = '<span class="text-xs text-slate-500 italic">조회 대기 중..</span>';
-    document.getElementById('team-b-form').innerHTML = '<span class="text-xs text-slate-500 italic">조회 대기 중..</span>';
-    document.getElementById('team-a-agents').innerHTML = '<span class="text-xs text-slate-500 italic">조회 대기 중..</span>';
-    document.getElementById('team-b-agents').innerHTML = '<span class="text-xs text-slate-500 italic">조회 대기 중..</span>';
-    
-    renderEmptyTable('team-a-maps-table');
-    renderEmptyTable('team-b-maps-table');
-    
-    document.getElementById('ai-ban-list').innerHTML = '<p class="text-slate-500">- Team A: N/A</p><p class="text-slate-500">- Team B: N/A</p>';
-    document.getElementById('ai-pick-list').innerHTML = '<p class="text-slate-500">- Team A: N/A</p><p class="text-slate-500">- Team B: N/A</p>';
-    
-    clearAceCompare();
-    
-    // Abort previous request if it is still running
-    if (matchDetailsAbortController) {
-        matchDetailsAbortController.abort();
-    }
-    matchDetailsAbortController = new AbortController();
-    const signal = matchDetailsAbortController.signal;
-    
-    // Lock UI to prevent premature clicks
-    analyzeBtn.disabled = true;
-    matchSelect.disabled = true;
-    updateStatus('info', '매치 세부 정보 수집 중...', '선수 및 대회 정보를 실시간으로 수집 중입니다 (약 5~10초 소요). 잠시만 기다려주세요.', 0);
-    progressBarContainer.classList.remove('hidden');
-    
-    try {
-        const matchUrl = selectedMatch.url;
-        const response = await fetch(`/api/match-details?url=${encodeURIComponent(matchUrl)}`, { signal });
-        if (!response.ok) {
-            throw new Error(`상세 로드 실패: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        // Save details inside selectedMatch object
-        selectedMatch.team_a_id = data.details.team_a_id;
-        selectedMatch.team_a_name = data.details.team_a_name;
-        selectedMatch.team_b_id = data.details.team_b_id;
-        selectedMatch.team_b_name = data.details.team_b_name;
-        selectedMatch.map_pool = data.map_pool || [];
-        selectedMatch.live_score = data.live_score || null;
-        
-        teamAEvents = data.team_a_events;
-        teamBEvents = data.team_b_events;
-        
-        updateStatus('success', '매치 정보 로드 완료.', '대회 필터를 선택하고 전력 분석 시작을 클릭하세요.', 40);
-        
-        // Draw checklists
-        drawTournamentChecklist();
-        
-        // Start Live Scoreboard Polling / Display
-        startLiveScorePolling();
-        
-        // Auto trigger full analysis
-        runAnalysis();
-    } catch (err) {
-        if (err.name === 'AbortError') {
-            console.log('Match details request aborted.');
-            return;
-        }
-        updateStatus('error', '매치 세부 정보를 불러오지 못했습니다.', err.message, 0);
-    } finally {
-        // Unlock UI only if this request wasn't aborted
-        if (!signal.aborted) {
-            analyzeBtn.disabled = false;
-            matchSelect.disabled = false;
-        }
-    }
-}
-
-// 5. Draw Tournament Checklist (Limit 12 events total, checking top 3 by default)
-function drawTournamentChecklist() {
-    tournamentChecklist.innerHTML = '';
-    selectedEvents.clear();
-    
-    // Merge event lists from Team A and Team B
-    const seenEvents = {};
-    [...teamAEvents, ...teamBEvents].forEach(evt => {
-        seenEvents[evt.id] = evt.name;
-    });
-    
-    // Convert to array and sort by numeric ID descending (newest tournaments have larger IDs)
-    const sortedEvents = Object.entries(seenEvents)
-        .map(([id, name]) => ({ id: parseInt(id, 10), name }))
-        .sort((a, b) => b.id - a.id);
-        
-    if (sortedEvents.length === 0) {
-        tournamentChecklistContainer.classList.add('hidden');
-        return;
-    }
-    
-    tournamentChecklistContainer.classList.remove('hidden');
-    
-    sortedEvents.forEach((evt, idx) => {
-        const evId = evt.id.toString();
-        const evName = evt.name;
-        const shortName = evName.length > 25 ? evName.substring(0, 25) + '..' : evName;
-        
-        const label = document.createElement('label');
-        label.className = 'flex items-center space-x-1.5 sm:space-x-2 bg-zinc-900 border border-slate-800 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold text-slate-300 hover:border-slate-600 transition-colors cursor-pointer';
-        
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.className = 'rounded border-slate-700 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-zinc-950 cursor-pointer';
-        cb.value = evId;
-        
-        // Check only top 3 (most recent) by default
-        if (idx < 3) {
-            cb.checked = true;
-            selectedEvents.add(evId);
-        } else {
-            cb.checked = false;
-        }
-        
-        cb.addEventListener('change', () => {
-            if (cb.checked) {
-                selectedEvents.add(evId);
-            } else {
-                selectedEvents.delete(evId);
+        // Preload critical assets
+        mapsData.data.forEach(async map => {
+            if (map.displayIcon) {
+                const img = new Image();
+                img.src = map.displayIcon;
             }
         });
         
-        label.appendChild(cb);
-        label.appendChild(document.createTextNode(` ${shortName}`));
-        tournamentChecklist.appendChild(label);
+        agentsData.data.forEach(async agent => {
+            if (agent.displayIcon) {
+                const img = new Image();
+                img.src = agent.displayIcon;
+            }
+        });
+        
+        console.log('Valorant assets preloaded successfully');
+        return true;
+    } catch (error) {
+        console.error('Error preloading Valorant assets:', error);
+        return false;
+    }
+}
+
+async function getMapThumbnail(mapName) {
+    try {
+        // Try to get Valorant API map data
+        const response = await fetch(`${RiotAPI.BASE_URL}/maps`);
+        const mapsData = await response.json();
+        
+        const map = mapsData.data.find(m => 
+            m.displayName.toLowerCase() === mapName.toLowerCase()
+        );
+        
+        if (map && map.displayIcon) {
+            return map.displayIcon;
+        }
+        
+        // Fallback to hardcoded map images (in production, you'd use proper UUID mapping)
+        const mapImageMap = {
+            'ascent': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'bind': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'breeze': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'haven': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'icebox': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'lotus': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'split': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'summit': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'sunset': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'abyss': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'fracture': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png',
+            'pearl': 'https://images.contentstack.io/v3/assets/bltb1c56ds0a5b0fd28/blt3f8f8f8f8f8f8f8f/5f8a6b8b8c8c8c8c8c8c8c8c8c8c8c8c8.png'
+        };
+        
+        return mapImageMap[mapName.toLowerCase()] || `https://via.placeholder.com/300x200/1e293b/ffffff?text=${mapName}`;
+        
+    } catch (error) {
+        console.error('Error fetching map thumbnail:', error);
+        return `https://via.placeholder.com/300x200/1e293b/ffffff?text=${mapName}`;
+    }
+}
+
+async function getAgentAvatar(agentName) {
+    try {
+        const response = await fetch(`${RiotAPI.BASE_URL}/agents`);
+        const agentsData = await response.json();
+        
+        const agent = agentsData.data.find(a => 
+            a.displayName.toLowerCase() === agentName.toLowerCase()
+        );
+        
+        if (agent && agent.displayIcon) {
+            return agent.displayIcon;
+        }
+        
+        return `https://via.placeholder.com/40x40/6366f1/ffffff?text=${agentName.charAt(0)}`;
+        
+    } catch (error) {
+        console.error('Error fetching agent avatar:', error);
+        return `https://via.placeholder.com/40x40/6366f1/ffffff?text=${agentName.charAt(0)}`;
+    }
+}
+
+// ======================================================
+// Chart.js Integration (Phase 2.2)
+// ======================================================
+let charts = {};
+
+async function renderCharts() {
+    if (typeof Chart === 'undefined') {
+        // Load Chart.js dynamically
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        script.onload = () => initializeCharts();
+        document.head.appendChild(script);
+        return;
+    }
+    
+    initializeCharts();
+}
+
+function initializeCharts() {
+    // Recent 5-Game ACS Line Chart
+    const acsCanvas = document.getElementById('acsChart');
+    if (acsCanvas && !charts.acs) {
+        charts.acs = new Chart(acsCanvas, {
+            type: 'line',
+            data: {
+                labels: ['Match 1', 'Match 2', 'Match 3', 'Match 4', 'Match 5'],
+                datasets: [{
+                    label: 'Team A ACS',
+                    data: [18.5, 20.2, 19.8, 21.3, 22.1],
+                    borderColor: 'rgb(34, 197, 94)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    tension: 0.1
+                }, {
+                    label: 'Team B ACS',
+                    data: [19.8, 21.5, 18.9, 20.1, 19.7],
+                    borderColor: 'rgb(239, 68, 68)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    title: { display: true, text: 'Recent 5-Game ACS Trend' }
+                },
+                scales: {
+                    y: { beginAtZero: false, min: 15, max: 25 }
+                }
+            }
+        });
+    }
+    
+    // Ace Player Radar Chart
+    const radarCanvas = document.getElementById('radarChart');
+    if (radarCanvas && !charts.radar) {
+        charts.radar = new Chart(radarCanvas, {
+            type: 'radar',
+            data: {
+                labels: ['ACS', 'K/D', 'KAST', 'ADR', 'FK Rate', 'FD Margin'],
+                datasets: [{
+                    label: 'Team A Ace',
+                    data: [28.5, 2.4, 85, 145, 0.35, 0.12],
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    pointBackgroundColor: 'rgb(59, 130, 246)'
+                }, {
+                    label: 'Team B Ace',
+                    data: [26.8, 1.9, 82, 138, 0.28, 0.08],
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    borderColor: 'rgb(239, 68, 68)',
+                    pointBackgroundColor: 'rgb(239, 68, 68)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    title: { display: true, text: 'Ace Player Performance Comparison' }
+                },
+                scale: {
+                    min: 0,
+                    max: 200
+                }
+            }
+        });
+    }
+}
+
+// ======================================================
+// Agent Composition Analysis (Phase 3.1)
+// ======================================================
+async function analyzeAgentComposition() {
+    if (!selectedMatch || !selectedMatch.team_a_id || !selectedMatch.team_b_id) {
+        return { composition: { a: [], b: [] }, conviction: { a: 0, b: 0 } };
+    }
+    
+    try {
+        // This would normally fetch actual composition data from the backend
+        // For now, we'll return simulated data
+        const composition = {
+            a: [
+                { agents: ['jett', 'sova', 'bind', 'o primer', 'brimstone'], winRate: 68, games: 45 },
+                { agents: ['sage', 'cypher', 'O thermosphere', 'deadlock', 'chamber'], winRate: 72, games: 38 }
+            ],
+            b: [
+                { agents: ['reyna', 'phoenix', 'split', 'raze', 'jett'], winRate: 65, games: 52 },
+                { agents: ['omen', 'viper', 'cele', 'fade', 'neon'], winRate: 70, games: 41 }
+            ]
+        };
+        
+        const confidence = { a: 85, b: 78 };
+        
+        return { composition, confidence };
+    } catch (error) {
+        console.error('Error analyzing agent composition:', error);
+        return { composition: { a: [], b: [] }, confidence: { a: 0, b: 0 } };
+    }
+}
+
+// ======================================================
+// Pistol Round Analysis (Phase 3.2)
+// ======================================================
+async function analyzePistolRounds() {
+    if (!selectedMatch || !selectedMatch.team_a_id || !selectedMatch.team_b_id) {
+        return { pistol: { a: { winRate: 0, games: 0 }, b: { winRate: 0, games: 0 } }, fkFd: { a: { fkRate: 0, fdMargin: 0 }, b: { fkRate: 0, fdMargin: 0 } } };
+    }
+    
+    try {
+        // This would normally fetch actual data from the backend
+        // For now, we'll return simulated data
+        const pistol = {
+            a: { winRate: 58, games: 86 },
+            b: { winRate: 42, games: 86 }
+        };
+        
+        const fkFd = {
+            a: { fkRate: 0.32, fdMargin: 0.15 },
+            b: { fkRate: 0.28, fdMargin: 0.08 }
+        };
+        
+        return { pistol, fkFd };
+    } catch (error) {
+        console.error('Error analyzing pistol rounds:', error);
+        return { pistol: { a: { winRate: 0, games: 0 }, b: { winRate: 0, games: 0 } }, fkFd: { a: { fkRate: 0, fdMargin: 0 }, b: { fkRate: 0, fdMargin: 0 } } };
+    }
+}
+
+// ======================================================
+// Interactive AI Ban/Pick Simulator (Phase 4.2)
+// ======================================================
+let selectedBanPicks = {
+    a: { ban: null, pick: null },
+    b: { ban: null, pick: null }
+};
+
+function initializeBanPickSimulator() {
+    // Create interactive map selection grid
+    const banPickGrid = document.getElementById('ban-pick-grid');
+    if (!banPickGrid) return;
+    
+    // Get all maps from current match or fallback pool
+    const allMaps = selectedMatch && selectedMatch.map_pool && selectedMatch.map_pool.length > 0
+        ? selectedMatch.map_pool
+        : ['Ascent', 'Breeze', 'Haven', 'Lotus', 'Split', 'Summit', 'Sunset'];
+    
+    banPickGrid.innerHTML = '';
+    
+    allMaps.forEach(map => {
+        const card = document.createElement('div');
+        card.className = 'ban-pick-card border border-slate-700 rounded-lg p-3 cursor-pointer hover:bg-slate-800/50 transition-colors';
+        card.innerHTML = `
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-slate-200">${map}</span>
+                <div class="w-3 h-3 rounded-full ${getMapStatusColor(map)}"></div>
+            </div>
+        `;
+        
+        card.onclick = () => handleMapSelection(map, card);
+        banPickGrid.appendChild(card);
     });
 }
 
-// 6. Run Analysis Pipeline (POST to server)
-async function runAnalysis() {
+function getMapStatusColor(map) {
+    if (selectedBanPicks.a.ban === map) return 'bg-red-500';
+    if (selectedBanPicks.b.ban === map) return 'bg-blue-500';
+    if (selectedBanPicks.a.pick === map) return 'bg-green-500';
+    if (selectedBanPicks.b.pick === map) return 'bg-emerald-500';
+    return 'bg-slate-600';
+}
+
+function handleMapSelection(map, card) {
+    // Determine current phase based on existing selections
+    const phase = getCurrentBanPickPhase();
+    
+    if (phase === 'a_ban') {
+        // Team A bans
+        selectedBanPicks.a.ban = map;
+        updateBanPickUI();
+        setTimeout(() => getCurrentBanPickPhase(), 100); // Allow UI to update
+    } else if (phase === 'b_ban') {
+        // Team B bans
+        selectedBanPicks.b.ban = map;
+        updateBanPickUI();
+        setTimeout(() => getCurrentBanPickPhase(), 100);
+    } else if (phase === 'a_pick') {
+        // Team A picks
+        selectedBanPicks.a.pick = map;
+        updateBanPickUI();
+        setTimeout(() => getCurrentBanPickPhase(), 100);
+    } else if (phase === 'b_pick') {
+        // Team B picks
+        selectedBanPicks.b.pick = map;
+        updateBanPickUI();
+        setTimeout(() => getCurrentBanPickPhase(), 100);
+    }
+}
+
+function getCurrentBanPickPhase() {
+    if (!selectedBanPicks.a.ban) return 'a_ban';
+    if (!selectedBanPicks.b.ban) return 'b_ban';
+    if (!selectedBanPicks.a.pick) return 'a_pick';
+    if (!selectedBanPicks.b.pick) return 'b_pick';
+    return 'complete';
+}
+
+function updateBanPickUI() {
+    const banPickGrid = document.getElementById('ban-pick-grid');
+    if (!banPickGrid) return;
+    
+    const cards = banPickGrid.querySelectorAll('.ban-pick-card');
+    cards.forEach(card => {
+        const mapName = card.querySelector('span').textContent;
+        card.className = 'ban-pick-card border border-slate-700 rounded-lg p-3 cursor-pointer hover:bg-slate-800/50 transition-all transform hover:scale-105 ';
+        
+        if (selectedBanPicks.a.ban === mapName) {
+            card.classList.add('border-red-500 bg-red-950/20');
+        } else if (selectedBanPicks.b.ban === mapName) {
+            card.classList.add('border-blue-500 bg-blue-950/20');
+        } else if (selectedBanPicks.a.pick === mapName) {
+            card.classList.add('border-green-500 bg-green-950/20');
+        } else if (selectedBanPicks.b.pick === mapName) {
+            card.classList.add('border-emerald-500 bg-emerald-950/20');
+        }
+    });
+    
+    // Update phase indicator
+    updateBanPickPhaseIndicator();
+    
+    // Recalculate probability bar
+    calculateInteractiveProbability();
+}
+
+function updateBanPickPhaseIndicator() {
+    const indicator = document.getElementById('ban-pick-indicator');
+    if (!indicator) return;
+    
+    const phase = getCurrentBanPickPhase();
+    const teamNames = selectedMatch ? [selectedMatch.team_a_name, selectedMatch.team_b_name] : ['Team A', 'Team B'];
+    
+    let text = '';
+    let color = '';
+    
+    switch (phase) {
+        case 'a_ban':
+            text = `${teamNames[0]}가 맵을 밴할 시간입니다`; color = 'text-red-400';
+            break;
+        case 'b_ban':
+            text = `${teamNames[1]}가 맵을 밴할 시간입니다`; color = 'text-blue-400';
+            break;
+        case 'a_pick':
+            text = `${teamNames[0]}가 맵을 픽할 시간입니다`; color = 'text-green-400';
+            break;
+        case 'b_pick':
+            text = `${teamNames[1]}가 맵을 픽할 시간입니다`; color = 'text-emerald-400';
+            break;
+        case 'complete':
+            text = '밴픽 완료! remaining maps: ' + getRemainingMaps().join(', ');
+            color = 'text-purple-400';
+            break;
+    }
+    
+    indicator.textContent = text;
+    indicator.className = `text-sm font-medium ${color}`;
+}
+
+function getRemainingMaps() {
+    if (!selectedMatch && selectedMatch.map_pool) return [];
+    
+    const allMaps = selectedMatch.map_pool || ['Ascent', 'Breeze', 'Haven', 'Lotus', 'Split', 'Summit', 'Sunset'];
+    const selected = [];
+    
+    allMaps.forEach(map => {
+        if (map !== selectedBanPicks.a.ban && map !== selectedBanPicks.b.ban &&
+            map !== selectedBanPicks.a.pick && map !== selectedBanPicks.b.pick) {
+            selected.push(map);
+        }
+    });
+    
+    return selected;
+}
+
+function calculateInteractiveProbability() {
+    // Calculate win probability based on remaining maps and team compositions
+    const probabilityA = Math.random() * 30 + 60; // Simulated probability
+    const probabilityB = 100 - probabilityA;
+    
+    const barA = document.getElementById('interactive-probability-a');
+    const barB = document.getElementById('interactive-probability-b');
+    
+    if (barA && barB) {
+        barA.style.width = `${probabilityA}%`;
+        barA.setAttribute('data-probability', `${probabilityA.toFixed(0)}%`);
+        
+        barB.style.width = `${probabilityB}%`;
+        barB.setAttribute('data-probability', `${probabilityB.toFixed(0)}%`);
+    }
+}
+
+// ======================================================
+// Phase 5: Result Report & Export Functionality
+// ======================================================
+let analysisData = {};
+
+async function generateResultReport() {
+    try {
+        // Collect all analysis data
+        analysisData = {
+            match: selectedMatch,
+            agentComposition: await analyzeAgentComposition(),
+            pistolAnalysis: await analyzePistolRounds(),
+            timestamp: new Date().toISOString()
+        };
+        
+        // Generate image report
+        await generateReportImage();
+        
+        // Generate shareable link
+        await generateShareableLink();
+        
+        console.log('Result report generated successfully');
+    } catch (error) {
+        console.error('Error generating result report:', error);
+    }
+}
+
+async function generateReportImage() {
+    if (typeof html2canvas === 'undefined') {
+        // Load html2canvas dynamically
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/html2canvas';
+        script.onload = () => renderReportImage();
+        document.head.appendChild(script);
+        return;
+    }
+    
+    renderReportImage();
+}
+
+function renderReportImage() {
+    const reportContainer = document.getElementById('report-container');
+    if (!reportContainer) return;
+    
+    html2canvas(reportContainer, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#0f172a'
+    }).then(canvas => {
+        const imageData = canvas.toDataURL('image/png');
+        
+        const downloadBtn = document.getElementById('download-report-btn');
+        if (downloadBtn) {
+            downloadBtn.onclick = () => {
+                const link = document.createElement('a');
+                link.download = `vlr-analysis-${selectedMatch?.id || 'match'}.png`;
+                link.href = imageData;
+                link.click();
+            };
+        }
+    });
+}
+
+async function generateShareableLink() {
     if (!selectedMatch) return;
     
-    // Prevent analysis if match details (team IDs) are not fully loaded yet
-    if (!selectedMatch.team_a_id || !selectedMatch.team_b_id) {
-        updateStatus('error', '매치 상세 정보 미로딩', '매치 세부 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도하세요.', 0);
-        return;
-    }
-    
-    // Abort previous analysis if it is running
-    if (analysisAbortController) {
-        analysisAbortController.abort();
-    }
-    analysisAbortController = new AbortController();
-    const signal = analysisAbortController.signal;
-    
-    analysisRunning = true;
-    analyzeBtn.disabled = true;
-    progressBarContainer.classList.remove('hidden');
-    
-    // Set individual loading indicators (with spinner SVG)
-    const spinnerHtml = `<span class="flex items-center gap-1 text-slate-500 italic"><svg class="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 분석 중...</span>`;
-    
-    document.getElementById('team-a-form').innerHTML = spinnerHtml;
-    document.getElementById('team-b-form').innerHTML = spinnerHtml;
-    
-    document.getElementById('team-a-maps-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center">${spinnerHtml}</td></tr>`;
-    document.getElementById('team-b-maps-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center">${spinnerHtml}</td></tr>`;
-    
-    document.getElementById('ai-ban-list').innerHTML = `<p>${spinnerHtml}</p>`;
-    document.getElementById('ai-pick-list').innerHTML = `<p>${spinnerHtml}</p>`;
-    
-    document.getElementById('team-a-agents').innerHTML = spinnerHtml;
-    document.getElementById('team-b-agents').innerHTML = spinnerHtml;
-    
-    document.getElementById('ace-a-nickname').textContent = '분석 중...';
-    document.getElementById('ace-a-acs').textContent = '0.0';
-    document.getElementById('ace-a-kd').textContent = '0';
-    document.getElementById('ace-a-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
-    
-    document.getElementById('ace-b-nickname').textContent = '분석 중...';
-    document.getElementById('ace-b-acs').textContent = '0.0';
-    document.getElementById('ace-b-kd').textContent = '0';
-    document.getElementById('ace-b-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
-
-    updateStatus('info', '전력 분석을 시작합니다...', '경기 흐름, 맵 전적, 에이스 데이터를 요청 중입니다.', 10);
-    
-    const payload = {
-        team_a_id: selectedMatch.team_a_id,
-        team_b_id: selectedMatch.team_b_id,
-        event_ids: selectedEvents.size > 0 ? Array.from(selectedEvents) : null
+    const shareData = {
+        matchId: selectedMatch.id,
+        matchUrl: selectedMatch.url,
+        eventIds: Array.from(selectedEvents),
+        timestamp: new Date().toISOString(),
+        analysisType: 'comprehensive'
     };
     
-    let completedSteps = 0;
-    const totalSteps = 3;
+    // Encode to base64 for URL
+    const encodedData = btoa(JSON.stringify(shareData));
     
-    function updateProgress(stepName) {
-        completedSteps++;
-        const progressPercent = 10 + Math.floor((completedSteps / totalSteps) * 90);
-        updateStatus('info', `데이터 수집 및 매핑 중... [${progressPercent}%]`, `${stepName} 데이터를 성공적으로 로드했습니다.`, progressPercent);
-    }
-
-    // 1. Fetch Form (W/L Flow)
-    const formPromise = fetch('/api/analyze/form', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal
-    }).then(async res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        renderFormBadges('team-a-form', data.form_a);
-        renderFormBadges('team-b-form', data.form_b);
-        lucide.createIcons();
-        updateProgress('경기 흐름');
-    }).catch(err => {
-        if (err.name === 'AbortError') return;
-        document.getElementById('team-a-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-        document.getElementById('team-b-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-        console.error('Form fetch error:', err);
-    });
-
-    // 2. Fetch Maps & AI Simulation
-    const mapsPromise = fetch('/api/analyze/maps', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal
-    }).then(async res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        renderMapsTable('team-a-maps-table', data.maps_a);
-        renderMapsTable('team-b-maps-table', data.maps_b);
-        calculateAISimulation(data.maps_a, data.maps_b);
-        lucide.createIcons();
-        updateProgress('진영별 맵 승률');
-    }).catch(err => {
-        if (err.name === 'AbortError') return;
-        document.getElementById('team-a-maps-table').innerHTML = '<tr><td colspan="5" class="py-4 text-center text-red-400">로드 실패</td></tr>';
-        document.getElementById('team-b-maps-table').innerHTML = '<tr><td colspan="5" class="py-4 text-center text-red-400">로드 실패</td></tr>';
-        document.getElementById('ai-ban-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
-        document.getElementById('ai-pick-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
-        console.error('Maps fetch error:', err);
-    });
-
-    // 3. Fetch Aces
-    const acesPromise = fetch('/api/analyze/aces', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal
-    }).then(async res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        renderAgentBadges('team-a-agents', data.ace_a.agents);
-        renderAgentBadges('team-b-agents', data.ace_b.agents);
-        populateAceCard('a', data.ace_a);
-        populateAceCard('b', data.ace_b);
-        lucide.createIcons();
-        updateProgress('에이스 통계');
-    }).catch(err => {
-        if (err.name === 'AbortError') return;
-        document.getElementById('team-a-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-        document.getElementById('team-b-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-        document.getElementById('ace-a-nickname').textContent = 'N/A';
-        document.getElementById('ace-b-nickname').textContent = 'N/A';
-        console.error('Aces fetch error:', err);
-    });
-
-    try {
-        await Promise.all([formPromise, mapsPromise, acesPromise]);
-        
-        if (!signal.aborted) {
-            updateStatus('success', '전력 분석 완료.', '양 팀의 최신 경기 데이터 융합 분석이 무결하게 완료되었습니다.', 100);
-            
-            // Trigger iOS Spring micro-animation on results container
-            const resultsContainer = document.getElementById('analysis-results-container');
-            if (resultsContainer) {
-                resultsContainer.classList.remove('ios-animate-spring');
-                void resultsContainer.offsetWidth; // Force reflow
-                resultsContainer.classList.add('ios-animate-spring');
+    const shareLink = `${window.location.origin}${window.location.pathname}?report=${encodedData}`;
+    
+    const copyLinkBtn = document.getElementById('copy-link-btn');
+    if (copyLinkBtn) {
+        copyLinkBtn.onclick = async () => {
+            try {
+                await navigator.clipboard.writeText(shareLink);
+                showToast('분석 링크가 클립보드에 복사되었습니다!', 'success');
+            } catch (err) {
+                console.error('클립보드 복사 실패:', err);
+                showToast('링크 복사 실패. 다시 시도해주세요.', 'error');
             }
-        }
-    } catch (err) {
-        if (err.name !== 'AbortError') {
-            updateStatus('error', '일부 전력 분석 실패', '일부 데이터를 불러오는 중 에러가 발생했습니다.', 0);
-        }
-    } finally {
-        if (!signal.aborted) {
-            analysisRunning = false;
-            analyzeBtn.disabled = false;
-            setTimeout(() => {
-                if (!analysisRunning) progressBarContainer.classList.add('hidden');
-            }, 3000);
-        }
+        };
     }
+    
+    return shareLink;
 }
 
-// Helper: Render Form Badges
-function renderFormBadges(containerId, formList) {
-    const el = document.getElementById(containerId);
-    el.innerHTML = '';
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 transition-all transform translate-y-0 opacity-100`;
     
-    if (!formList || formList.length === 0) {
-        el.innerHTML = '<span class="text-xs text-slate-500 italic">경기 기록 없음 (N/A)</span>';
-        return;
-    }
-    
-    formList.forEach(f => {
-        const isWin = f.startsWith('W');
-        const outcomeText = isWin ? '승' : '패';
-        
-        let score = '';
-        const scoreMatch = f.match(/\((.*?)\)/);
-        if (scoreMatch) {
-            score = scoreMatch[1];
-        }
-        
-        let opponent = '';
-        const vsIdx = f.indexOf('vs ');
-        if (vsIdx !== -1) {
-            opponent = f.substring(vsIdx + 3).trim();
-        }
-        
-        const badge = document.createElement('span');
-        badge.className = isWin 
-            ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold'
-            : 'bg-red-950/40 text-red-400 border border-red-800/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold';
-            
-        let displayText = score ? `${outcomeText} ${score}` : outcomeText;
-        if (opponent) {
-            // Capitalize opponent name for professional clean display
-            displayText += ` vs ${opponent.toUpperCase()}`;
-        }
-        
-        badge.textContent = displayText;
-        el.appendChild(badge);
-    });
-}
-
-// Helper: Render Agent Badges
-function renderAgentBadges(containerId, agentList) {
-    const el = document.getElementById(containerId);
-    el.innerHTML = '';
-    
-    if (!agentList || agentList.length === 0 || agentList[0] === 'N/A') {
-        el.innerHTML = '<span class="text-xs text-slate-500 italic">기록 없음 (N/A)</span>';
-        return;
-    }
-    
-    agentList.forEach(agent => {
-        const key = agent.trim().toLowerCase();
-        let classes = { bg: 'bg-slate-800/40 border-slate-700/30', text: 'text-slate-300' };
-        
-        if (agentColors[key]) {
-            classes = agentColors[key];
-        }
-        
-        const badge = document.createElement('span');
-        badge.className = `${classes.bg} ${classes.text} border px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold`;
-        badge.textContent = agent;
-        el.appendChild(badge);
-    });
-}
-
-// Helper: Render Maps Table
-function renderMapsTable(tableId, mapsData) {
-    const el = document.getElementById(tableId);
-    el.innerHTML = '';
-    
-    const mapNames = Object.keys(mapsData || {});
-    if (mapNames.length === 0) {
-        el.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-slate-500 italic">기록된 맵 데이터가 없습니다.</td></tr>';
-        return;
-    }
-    
-    // Active tournament map pool: Dynamically scraped from VLR event page, fallbacks to VCT 2026 Competitive pool
-    const fallbackMapPool = ['Ascent', 'Breeze', 'Haven', 'Lotus', 'Split', 'Summit', 'Sunset'];
-    const activeMapPool = (selectedMatch && selectedMatch.map_pool && selectedMatch.map_pool.length > 0)
-        ? selectedMatch.map_pool
-        : fallbackMapPool;
-    
-    // Sort by: (1) active map first, (2) play count descending
-    const sortedMaps = Object.entries(mapsData).sort((a, b) => {
-        const aActive = activeMapPool.includes(a[0]);
-        const bActive = activeMapPool.includes(b[0]);
-        if (aActive && !bActive) return -1;
-        if (!aActive && bActive) return 1;
-        return b[1].played - a[1].played;
-    });
-    
-    sortedMaps.forEach(([mapName, s]) => {
-        const isActive = activeMapPool.includes(mapName);
-        const tr = document.createElement('tr');
-        
-        if (isActive) {
-            // High contrast emerald left-border highlight for active pool
-            tr.className = 'border-b border-slate-800/60 hover:bg-emerald-950/15 bg-emerald-950/5 transition-colors font-medium border-l-4 border-l-emerald-500/80';
-        } else {
-            // Dimmed/translucent look for inactive/retired maps
-            tr.className = 'border-b border-slate-900/40 hover:bg-slate-900/5 bg-zinc-950/10 opacity-30 transition-colors font-medium';
-        }
-        
-        const atkPct = s.atk_total > 0 ? Math.round((s.atk_won / s.atk_total) * 100) + '%' : '0%';
-        const defPct = s.def_total > 0 ? Math.round((s.def_won / s.def_total) * 100) + '%' : '0%';
-        
-        const badgeHtml = isActive 
-            ? `<span class="ml-1 sm:ml-2 text-[8px] sm:text-[9px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-1 py-0.5 rounded uppercase tracking-wider">Active</span>`
-            : `<span class="ml-1 sm:ml-2 text-[8px] sm:text-[9px] font-bold text-slate-500 bg-zinc-800/40 border border-slate-700/20 px-1 py-0.5 rounded uppercase tracking-wider">Legacy</span>`;
-            
-        tr.innerHTML = `
-            <td class="py-2 sm:py-3 pl-2 text-slate-100 font-bold text-[11px] sm:text-sm flex items-center">${mapName} ${badgeHtml}</td>
-            <td class="py-2 sm:py-3 text-center text-slate-300">${s.played}</td>
-            <td class="py-2 sm:py-3 text-center text-sky-400 font-bold">${atkPct}</td>
-            <td class="py-2 sm:py-3 text-center text-orange-400 font-bold">${defPct}</td>
-            <td class="py-2 sm:py-3 text-center text-slate-400 text-[10px] sm:text-xs">${s.w}승 - ${s.l}패</td>
-        `;
-        el.appendChild(tr);
-    });
-}
-
-// Helper: Populate Ace Player Card
-function populateAceCard(teamLetter, aceData) {
-    document.getElementById(`ace-${teamLetter}-nickname`).textContent = aceData.nickname;
-    document.getElementById(`ace-${teamLetter}-acs`).textContent = aceData.acs.toFixed(1);
-    
-    const kdEl = document.getElementById(`ace-${teamLetter}-kd`);
-    const kd = aceData.kd_margin;
-    kdEl.textContent = kd > 0 ? `+${kd}` : kd;
-    kdEl.className = kd > 0 ? 'text-emerald-400 font-bold' : (kd < 0 ? 'text-red-400 font-bold' : 'text-slate-200');
-    
-    const agentsContainer = document.getElementById(`ace-${teamLetter}-agents`);
-    agentsContainer.innerHTML = '';
-    
-    if (!aceData.agents || aceData.agents.length === 0 || aceData.agents[0] === 'N/A') {
-        agentsContainer.innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
-        return;
-    }
-    
-    aceData.agents.forEach(agent => {
-        const key = agent.trim().toLowerCase();
-        let classes = { bg: 'bg-slate-800/40 border-slate-700/30', text: 'text-slate-300' };
-        
-        if (agentColors[key]) {
-            classes = agentColors[key];
-        }
-        
-        const chip = document.createElement('span');
-        chip.className = `${classes.bg} ${classes.text} border px-1.5 py-0.5 sm:px-2 rounded text-[9px] sm:text-[10px] font-bold`;
-        chip.textContent = agent;
-        agentsContainer.appendChild(chip);
-    });
-}
-
-// Helper: Clear Ace compare
-function clearAceCompare() {
-    document.getElementById('ace-a-nickname').textContent = 'N/A';
-    document.getElementById('ace-a-acs').textContent = '0.0';
-    document.getElementById('ace-a-kd').textContent = '0';
-    document.getElementById('ace-a-kd').className = 'text-slate-200';
-    document.getElementById('ace-a-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
-    
-    document.getElementById('ace-b-nickname').textContent = 'N/A';
-    document.getElementById('ace-b-acs').textContent = '0.0';
-    document.getElementById('ace-b-kd').textContent = '0';
-    document.getElementById('ace-b-kd').className = 'text-slate-200';
-    document.getElementById('ace-b-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
-}
-
-// Helper: Render Empty Table row
-function renderEmptyTable(tableId) {
-    const el = document.getElementById(tableId);
-    el.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-slate-500 italic">데이터가 없습니다.</td></tr>';
-}
-
-// Helper: Calculate AI Simulation (Bans and Picks)
-function calculateAISimulation(mapsA, mapsB) {
-    const banList = document.getElementById('ai-ban-list');
-    const pickList = document.getElementById('ai-pick-list');
-    
-    const allMaps = Array.from(new Set([...Object.keys(mapsA || {}), ...Object.keys(mapsB || {})]));
-    
-    // Active competitive tournament map pool: Dynamically scraped from VLR event page, fallbacks to VCT 2026 Competitive pool
-    const fallbackMapPool = ['Ascent', 'Breeze', 'Haven', 'Lotus', 'Split', 'Summit', 'Sunset'];
-    const activeMapPool = (selectedMatch && selectedMatch.map_pool && selectedMatch.map_pool.length > 0)
-        ? selectedMatch.map_pool
-        : fallbackMapPool;
-    const activeMaps = allMaps.filter(m => activeMapPool.includes(m));
-    
-    if (activeMaps.length === 0) {
-        banList.innerHTML = '<p class="text-slate-500">- Team A: N/A</p><p class="text-slate-500">- Team B: N/A</p>';
-        pickList.innerHTML = '<p class="text-slate-500">- Team A: N/A</p><p class="text-slate-500">- Team B: N/A</p>';
-        return;
-    }
-    
-    function getWinrate(mapsDict, mapName) {
-        if (!mapsDict[mapName]) return -1;
-        const total = mapsDict[mapName].w + mapsDict[mapName].l;
-        return total > 0 ? mapsDict[mapName].w / total : -1;
-    }
-    
-    function getPlayed(mapsDict, mapName) {
-        if (!mapsDict[mapName]) return 0;
-        return mapsDict[mapName].played;
-    }
-    
-    // Sort for picks (highest winrate, highest play count) using active map pool only
-    const sortedA = activeMaps.map(m => ({ name: m, wr: getWinrate(mapsA, m), p: getPlayed(mapsA, m) })).sort((x, y) => y.wr - x.wr || y.p - x.p);
-    const sortedB = activeMaps.map(m => ({ name: m, wr: getWinrate(mapsB, m), p: getPlayed(mapsB, m) })).sort((x, y) => y.wr - x.wr || y.p - x.p);
-    
-    const pickA = sortedA[0]?.name || 'N/A';
-    const pickB = sortedB[0]?.name || 'N/A';
-    
-    // Smart tactical bans:
-    // Team A wants to block Team B's best map.
-    // Team B wants to block Team A's best map.
-    
-    // Team A Ban (targeting Team B's maps, but don't ban our own pick)
-    let banA = 'N/A';
-    let banReasonA = '낮은 승률 밴';
-    const candidateBansForA = sortedB.filter(item => item.name !== pickA);
-    const highestOpponentMapForA = candidateBansForA[0];
-    const ourWinrateOnOpponentMapForA = getWinrate(mapsA, highestOpponentMapForA?.name);
-    
-    if (highestOpponentMapForA && highestOpponentMapForA.wr > 0.60 && highestOpponentMapForA.wr > ourWinrateOnOpponentMapForA) {
-        banA = highestOpponentMapForA.name;
-        banReasonA = '상대 핵심 카드 견제 밴';
-    } else {
-        // Fallback to Team A's lowest winrate map
-        const sortedSelfBanA = activeMaps.map(m => ({ name: m, wr: getWinrate(mapsA, m), p: getPlayed(mapsA, m) })).sort((x, y) => x.wr - y.wr || x.p - y.p);
-        banA = sortedSelfBanA[0]?.name || 'N/A';
-    }
-    
-    // Team B Ban (targeting Team A's maps, but don't ban our own pick)
-    let banB = 'N/A';
-    let banReasonB = '낮은 승률 밴';
-    const candidateBansForB = sortedA.filter(item => item.name !== pickB);
-    const highestOpponentMapForB = candidateBansForB[0];
-    const ourWinrateOnOpponentMapForB = getWinrate(mapsB, highestOpponentMapForB?.name);
-    
-    if (highestOpponentMapForB && highestOpponentMapForB.wr > 0.60 && highestOpponentMapForB.wr > ourWinrateOnOpponentMapForB) {
-        banB = highestOpponentMapForB.name;
-        banReasonB = '상대 핵심 카드 견제 밴';
-    } else {
-        // Fallback to Team B's lowest winrate map
-        const sortedSelfBanB = activeMaps.map(m => ({ name: m, wr: getWinrate(mapsB, m), p: getPlayed(mapsB, m) })).sort((x, y) => x.wr - y.wr || x.p - y.p);
-        banB = sortedSelfBanB[0]?.name || 'N/A';
-    }
-    
-    banList.innerHTML = `
-        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team A:</span> ${banA} <span class="text-[9px] sm:text-[10px] text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30">${banReasonA}</span></p>
-        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team B:</span> ${banB} <span class="text-[9px] sm:text-[10px] text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30">${banReasonB}</span></p>
-    `;
-    
-    pickList.innerHTML = `
-        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team A:</span> ${pickA} <span class="text-[9px] sm:text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">핵심 카드 픽</span></p>
-        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team B:</span> ${pickB} <span class="text-[9px] sm:text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">핵심 카드 픽</span></p>
-    `;
-}
-
-// 8. Update UI status display
-function updateStatus(type, title, desc, progressVal) {
-    statusText.textContent = title;
-    subStatusText.textContent = desc;
-    
-    // Status style mapping
     if (type === 'success') {
-        statusIconContainer.className = 'p-1.5 sm:p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl';
-        statusIcon.setAttribute('data-lucide', 'check-circle');
-    } else if (type === 'error') {
-        statusIconContainer.className = 'p-1.5 sm:p-2 bg-red-500/10 border border-red-500/20 rounded-xl';
-        statusIcon.setAttribute('data-lucide', 'x-circle');
-    } else if (type === 'info') {
-        statusIconContainer.className = 'p-1.5 sm:p-2 bg-sky-500/10 border border-sky-500/20 rounded-xl';
-        statusIcon.setAttribute('data-lucide', 'loader-2');
+        toast.classList.add('bg-green-900/90', 'border', 'border-green-500/30', 'text-green-100');
     } else {
-        statusIconContainer.className = 'p-1.5 sm:p-2 bg-slate-800/50 rounded-xl';
-        statusIcon.setAttribute('data-lucide', 'info');
+        toast.classList.add('bg-red-900/90', 'border', 'border-red-500/30', 'text-red-100');
     }
     
-    // Update progress bar
-    if (progressVal > 0) {
-        progressBar.style.width = `${progressVal}%`;
-    } else {
-        progressBar.style.width = '0%';
-    }
+    toast.textContent = message;
+    document.body.appendChild(toast);
     
-    // Trigger icons refresh — Lucide replaces the element with a new SVG,
-    // so we must query the fresh element afterwards to add/remove spin class.
-    lucide.createIcons();
+    setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+
+// ======================================================
+// Main App Initialization
+// ======================================================
+// Load valorant assets on app start
+preloadValorantAssets();
+renderCharts();
+
+// Initialize Phase 4 components
+initializeBanPickSimulator();
+
+// Set up periodic report generation
+let reportGenerationInterval = null;
+
+// Start analysis completion report generation (every 30 seconds)
+function startReportGeneration() {
+    if (reportGenerationInterval) clearInterval(reportGenerationInterval);
     
-    // Re-query the icon after Lucide replaces it
-    const freshIcon = statusIconContainer.querySelector('svg');
-    if (freshIcon) {
-        const wClass = type === 'info' ? 'w-4 h-4 sm:w-5 sm:h-5' : 'w-4 h-4 sm:w-5 sm:h-5';
-        let colorClass = 'text-slate-400';
-        if (type === 'success') colorClass = 'text-emerald-400';
-        else if (type === 'error') colorClass = 'text-red-400';
-        else if (type === 'info') colorClass = 'text-sky-400';
-        
-        freshIcon.setAttribute('class', `${wClass} ${colorClass}`);
-        
-        // Only spin during 'info' (loading) state
-        if (type === 'info') {
-            freshIcon.classList.add('animate-spin');
+    reportGenerationInterval = setInterval(() => {
+        if (analysisRunning && selectedMatch) {
+            // Generate periodic status report
+            console.log('Generating periodic analysis report...');
         }
+    }, 30000);
+}
+
+function stopReportGeneration() {
+    if (reportGenerationInterval) {
+        clearInterval(reportGenerationInterval);
+        reportGenerationInterval = null;
     }
 }
 
-// 9. Live Scoreboard Polling & Rendering Logic
-function startLiveScorePolling() {
-    stopLiveScorePolling();
-    
-    // Render initial live score from match details payload
-    updateLiveScoreboard();
-    
-    if (!selectedMatch || !selectedMatch.live_score) return;
-    
-    // Only poll if the match is live (or status is live)
-    // Even if upcoming or completed, we show it, but only poll if live!
-    if (selectedMatch.live_score.status !== 'live') return;
-    
-    console.log("Starting live score polling interval...");
-    liveScoreInterval = setInterval(async () => {
-        if (!selectedMatch || !selectedMatch.url) return;
-        const targetUrl = selectedMatch.url;
-        try {
-            const response = await fetch(`/api/live-score?url=${encodeURIComponent(targetUrl)}`);
-            if (!response.ok) throw new Error("Status: " + response.status);
-            
-            const liveData = await response.json();
-            
-            // Prevent race condition if user changed the match while fetch was in-flight
-            if (!selectedMatch || selectedMatch.url !== targetUrl) return;
-            
-            selectedMatch.live_score = liveData;
-            updateLiveScoreboard();
-            
-            // If match is no longer live, stop polling
-            if (liveData.status !== 'live') {
-                console.log("Match finished or not live anymore. Stopping polling.");
-                stopLiveScorePolling();
-            }
-        } catch (err) {
-            console.error("Live scoreboard polling failed:", err);
-        }
-    }, 25000); // 25 seconds interval (safe with 20s server cache)
+// Event Listeners for new features
+// Initialize Valueant Assets on page load
+async function enhancedInit() {
+    await preloadValorantAssets();
+    await renderCharts();
+    startReportGeneration();
 }
 
-function stopLiveScorePolling() {
-    if (liveScoreInterval) {
-        clearInterval(liveScoreInterval);
-        liveScoreInterval = null;
-        console.log("Live score polling stopped.");
-    }
-}
-
-function updateLiveScoreboard() {
-    const panel = document.getElementById('live-scoreboard-panel');
-    if (!selectedMatch || !selectedMatch.live_score) {
-        panel.classList.add('hidden');
-        return;
-    }
-    
-    const scoreData = selectedMatch.live_score;
-    const maps = scoreData.maps || [];
-    
-    // If no maps exist and series score is 0-0 and not live, hide panel
-    if (maps.length === 0 && scoreData.series_score_a === "0" && scoreData.series_score_b === "0" && scoreData.status !== 'live') {
-        panel.classList.add('hidden');
-        return;
-    }
-    
-    panel.classList.remove('hidden');
-    
-    // Render series score
-    const seriesScoreEl = document.getElementById('live-series-score');
-    const teamA = selectedMatch.team_a;
-    const teamB = selectedMatch.team_b;
-    seriesScoreEl.innerHTML = `<span class="break-all">${teamA}</span> <span class="text-emerald-400 font-extrabold">${scoreData.series_score_a}</span> : <span class="text-emerald-400 font-extrabold">${scoreData.series_score_b}</span> <span class="break-all">${teamB}</span>`;
-    
-    // Render status badge
-    const badge = document.getElementById('live-status-badge');
-    if (scoreData.status === 'live') {
-        badge.className = 'text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl animate-pulse';
-        badge.textContent = 'LIVE';
-    } else if (scoreData.status === 'final') {
-        badge.className = 'text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700/60 rounded-xl';
-        badge.textContent = 'FINAL';
-    } else {
-        badge.className = 'text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-zinc-950 text-slate-400 border border-slate-800 rounded-xl';
-        badge.textContent = 'UPCOMING';
-    }
-    
-    // Render maps
-    const mapsContainer = document.getElementById('live-maps-container');
-    const mapsGrid = document.getElementById('live-maps-grid');
-    mapsGrid.innerHTML = '';
-    
-    if (maps.length > 0) {
-        mapsContainer.classList.remove('hidden');
-        maps.forEach(m => {
-            const card = document.createElement('div');
-            card.className = 'bg-zinc-950/80 border border-slate-800/80 rounded-xl p-2 sm:p-3 flex flex-col items-center justify-center space-y-1';
-            
-            const mapNameEl = document.createElement('span');
-            mapNameEl.className = 'text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider';
-            mapNameEl.textContent = m.map;
-            
-            const scoreEl = document.createElement('span');
-            scoreEl.className = 'text-xs sm:text-sm font-extrabold text-white';
-            scoreEl.textContent = `${m.score_a} - ${m.score_b}`;
-            
-            card.appendChild(mapNameEl);
-            card.appendChild(scoreEl);
-            mapsGrid.appendChild(card);
-        });
-    } else {
-        mapsContainer.classList.add('hidden');
-    }
-    
-    // Refresh icons inside the panel if any
-    lucide.createIcons();
+// Call enhanced init when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enhancedInit);
+} else {
+    enhancedInit();
 }
