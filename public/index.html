@@ -40,6 +40,10 @@
     </script>
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas Export CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <!-- Apple iOS 27 UI Kit Theme Stylesheet -->
     <link rel="stylesheet" href="ios-theme.css">
     <style>
@@ -47,6 +51,15 @@
         body {
             font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
             transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.04) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.6s infinite ease-in-out;
         }
     </style>
 </head>
@@ -141,27 +154,51 @@
                 </div>
             </div>
 
-            <!-- Action Button -->
-            <div class="flex items-center justify-between pt-2">
-                <div class="flex items-center space-x-3 shrink-0">
+            <!-- Action Button & Export Options -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+                <div class="flex items-center space-x-3 min-w-0">
                     <!-- Status display -->
-                    <span id="status-icon-container" class="p-1.5 sm:p-2 bg-slate-800/40 rounded-xl">
+                    <span id="status-icon-container" class="p-1.5 sm:p-2 bg-slate-800/40 rounded-xl shrink-0">
                         <i id="status-icon" data-lucide="info" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-400"></i>
                     </span>
                     <div class="min-w-0">
                         <p id="status-text" class="text-xs sm:text-sm font-semibold text-slate-200">일정을 불러오는 중입니다...</p>
-                        <p id="sub-status-text" class="text-[10px] sm:text-xs text-slate-500">잠시만 기다려 주세요.</p>
+                        <p id="sub-status-text" class="text-[10px] sm:text-xs text-slate-500 truncate">잠시만 기다려 주세요.</p>
                     </div>
                 </div>
-                <button id="analyze-btn" class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-slate-600 border border-emerald-500/20 text-white font-bold text-xs sm:text-sm px-4 py-2.5 sm:px-6 sm:py-3.5 rounded-xl shadow-lg flex items-center space-x-2 transition-all cursor-pointer shrink-0" disabled>
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span>전력 분석 시작</span>
-                </button>
+                
+                <div class="flex items-center space-x-2 shrink-0">
+                    <button id="export-link-btn" onclick="generateShareableLink()" class="bg-zinc-800 hover:bg-zinc-700 text-slate-300 font-semibold text-xs px-3 py-2.5 rounded-xl border border-slate-700/80 flex items-center space-x-1.5 transition-all cursor-pointer">
+                        <i data-lucide="share-2" class="w-3.5 h-3.5 text-sky-400"></i>
+                        <span class="hidden sm:inline">분석 링크 복사</span>
+                    </button>
+                    <button id="export-img-btn" onclick="exportReportImage()" class="bg-zinc-800 hover:bg-zinc-700 text-slate-300 font-semibold text-xs px-3 py-2.5 rounded-xl border border-slate-700/80 flex items-center space-x-1.5 transition-all cursor-pointer">
+                        <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        <span class="hidden sm:inline">리포트 이미지 저장</span>
+                    </button>
+                    <button id="analyze-btn" class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-slate-600 border border-emerald-500/20 text-white font-bold text-xs sm:text-sm px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl shadow-lg flex items-center space-x-2 transition-all cursor-pointer shrink-0" disabled>
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>전력 분석 시작</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Custom Progress Bar -->
             <div class="w-full bg-zinc-900 border border-slate-800 rounded-full h-2 overflow-hidden hidden" id="progress-bar-container">
                 <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full transition-all duration-300" style="width: 0%;"></div>
+            </div>
+        </section>
+
+        <!-- Phase 4.1: Win Probability Gauge Bar (hidden by default until analyzed) -->
+        <section id="win-probability-section" class="hidden bg-zinc-900/40 border border-slate-800/80 rounded-2xl p-4 space-y-3 shadow-md backdrop-blur-sm">
+            <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider">
+                <span class="text-sky-400 flex items-center gap-1.5"><i data-lucide="shield" class="w-4 h-4"></i> <span id="win-prob-team-a">Team A</span> (<span id="win-prob-val-a">50%</span>)</span>
+                <span class="text-slate-300 font-extrabold text-xs sm:text-sm flex items-center gap-1.5"><i data-lucide="calculator" class="w-4 h-4 text-emerald-400"></i> AI 종합 예측 승률</span>
+                <span class="text-orange-400 flex items-center gap-1.5"><span id="win-prob-val-b">50%</span> <span id="win-prob-team-b">Team B</span> <i data-lucide="swords" class="w-4 h-4"></i></span>
+            </div>
+            <div class="w-full bg-zinc-950 border border-slate-800 rounded-full h-4 overflow-hidden flex shadow-inner">
+                <div id="win-prob-bar-a" class="bg-gradient-to-r from-sky-500 to-blue-600 h-full transition-all duration-700 flex items-center justify-end pr-2 text-[10px] font-bold text-white shadow-sm" style="width: 50%;"></div>
+                <div id="win-prob-bar-b" class="bg-gradient-to-r from-orange-500 to-rose-600 h-full transition-all duration-700 flex items-center justify-start pl-2 text-[10px] font-bold text-white shadow-sm" style="width: 50%;"></div>
             </div>
         </section>
 
@@ -280,10 +317,11 @@
                     </div>
                 </div>
 
-                <!-- Ace Matchup Compare -->
+                <!-- Ace Matchup Compare & Radar Chart -->
                 <div class="bg-zinc-900/30 border border-slate-800/80 rounded-2xl p-3 sm:p-6 space-y-3 sm:space-y-4 shadow-sm">
-                    <h3 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-2">
-                        <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i> 에이스 플레이어 맞대결 (Ace Matchup)
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center justify-between">
+                        <span class="flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i> 에이스 플레이어 맞대결</span>
+                        <span class="text-[10px] font-semibold text-slate-500">Radar & ACS Comparative</span>
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <!-- Team A Ace -->
@@ -335,6 +373,23 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Step 2.2: Ace Performance Radar Chart Canvas -->
+                    <div class="pt-2">
+                        <div class="h-48 sm:h-56 relative w-full flex items-center justify-center">
+                            <canvas id="ace-radar-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2.2: Recent 5 Games ACS Trend Line Chart -->
+                <div class="bg-zinc-900/30 border border-slate-800/80 rounded-2xl p-3 sm:p-6 space-y-3 sm:space-y-4 shadow-sm">
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-2">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-sky-400"></i> 최근 5경기 ACS 성능 추이 (Recent ACS Trend)
+                    </h3>
+                    <div class="h-44 sm:h-52 relative w-full">
+                        <canvas id="acs-trend-chart"></canvas>
                     </div>
                 </div>
             </section>

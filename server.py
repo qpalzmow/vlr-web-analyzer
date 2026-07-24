@@ -440,6 +440,46 @@ class VLRWebServer(http.server.BaseHTTPRequestHandler):
             except Exception as e:
                 self.send_error_response(str(e))
             return
+
+        # 4. API: Get Advanced Metrics (Pistol Win Rates, FK/FD Margin)
+        elif path == '/api/analyze/advanced':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                body = json.loads(post_data.decode('utf-8'))
+                
+                team_a_id = body.get('team_a_id', '')
+                team_b_id = body.get('team_b_id', '')
+                event_ids = body.get('event_ids', None)
+                
+                key_a = _make_cache_key(team_a_id, event_ids)
+                key_b = _make_cache_key(team_b_id, event_ids)
+                
+                from concurrent.futures import ThreadPoolExecutor
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    future_a = executor.submit(
+                        get_cached_data, 'pistol_stats', key_a, scraper.get_team_advanced_metrics, team_a_id, event_ids
+                    ) if team_a_id else None
+                    future_b = executor.submit(
+                        get_cached_data, 'pistol_stats', key_b, scraper.get_team_advanced_metrics, team_b_id, event_ids
+                    ) if team_b_id else None
+                    
+                    adv_a = _safe_future_result(future_a, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0})
+                    adv_b = _safe_future_result(future_b, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0})
+                
+                response_data = {
+                    "adv_a": adv_a,
+                    "adv_b": adv_b
+                }
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                send_cors_headers()
+                self.end_headers()
+                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
+            except Exception as e:
+                self.send_error_response(str(e))
+            return
         else:
             self.send_response(404)
             send_cors_headers()
