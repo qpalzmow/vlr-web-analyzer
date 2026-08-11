@@ -258,7 +258,7 @@ def get_player_stats_page(player_id, event_id=None):
         return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "fk": 0, "fd": 0, "agents": {}}
 
     soup = BeautifulSoup(res.text, 'html.parser')
-    table = soup.find('table', class_='mod-player-summary') or soup.find('table', class_='wf-table')
+    table = soup.find('table', class_='mod-player-summary') or soup.find('table', class_='wf-table') or soup.find('table', class_='st-table')
     if not table:
         return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "fk": 0, "fd": 0, "agents": {}}
     tbody = table.find('tbody')
