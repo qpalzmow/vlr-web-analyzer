@@ -54,6 +54,7 @@ function populateEventsDropdown() {
         matchSelect.innerHTML = '<option>매치가 없습니다.</option>';
         matchSelect.disabled = true;
         analyzeBtn.disabled = true;
+        clearDashboard();
         return;
     }
     
@@ -87,6 +88,7 @@ function populateMatchesDropdown() {
         matchSelect.innerHTML = '<option>매치가 없습니다.</option>';
         matchSelect.disabled = true;
         analyzeBtn.disabled = true;
+        clearDashboard();
         return;
     }
     
@@ -408,6 +410,39 @@ function clearAceCompare() {
 }
 
 // Helper: Render Empty Table row
+function clearDashboard() {
+    document.getElementById('team-a-name').textContent = 'Team A';
+    document.getElementById('team-b-name').textContent = 'Team B';
+    document.getElementById('team-a-form').innerHTML = '<span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>';
+    document.getElementById('team-b-form').innerHTML = '<span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>';
+    document.getElementById('team-a-agents').innerHTML = '<span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>';
+    document.getElementById('team-b-agents').innerHTML = '<span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>';
+    
+    renderEmptyTable('team-a-maps-table');
+    renderEmptyTable('team-b-maps-table');
+    
+    document.getElementById('ai-ban-list').innerHTML = '<p class="text-slate-500">- Team A: N/A</p><p class="text-slate-500">- Team B: N/A</p>';
+    document.getElementById('ai-pick-list').innerHTML = '<p class="text-slate-500">- Team A: N/A</p><p class="text-slate-500">- Team B: N/A</p>';
+    
+    clearAceCompare();
+    
+    if (window.matchDetailsAbortController) {
+        window.matchDetailsAbortController.abort();
+    }
+    
+    updateStatus('info', '대기 중', '매치를 선택해 주세요.', 0);
+    document.getElementById('progress-bar-container').classList.add('hidden');
+    document.getElementById('tournament-checklist-container').classList.add('hidden');
+    document.getElementById('win-probability-section').classList.add('hidden');
+    document.getElementById('live-scoreboard-panel').classList.add('hidden');
+    
+    // Clear charts if they exist
+    if (window.acsTrendChart) {
+        window.acsTrendChart.destroy();
+        window.acsTrendChart = null;
+    }
+}
+
 function renderEmptyTable(tableId) {
     const el = document.getElementById(tableId);
     el.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-slate-500 italic">데이터가 없습니다.</td></tr>';
