@@ -138,6 +138,7 @@ def parse_matches_list(html_text: str, s_keywords: list, a_keywords: list) -> li
                 "url": full_url,
                 "team_a": team_a,
                 "team_b": team_b,
+                "event": event_text,
                 "tier": tier,
                 "status": status_str,
                 "time": time_str,

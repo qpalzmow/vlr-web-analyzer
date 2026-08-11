@@ -40,6 +40,7 @@ class FullSystemAuditTest(unittest.TestCase):
             self.assertIn("url", first)
             self.assertIn("team_a", first)
             self.assertIn("team_b", first)
+            self.assertIn("event", first)
             self.assertIn("tier", first)
             print(f"Scraped {len(matches)} matches successfully. Sample: {first['team_a']} vs {first['team_b']} ({first['tier']})")
 

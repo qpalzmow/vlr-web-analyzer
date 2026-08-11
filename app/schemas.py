@@ -1,4 +1,4 @@
-﻿from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
 
 class TeamAnalysisPayload(BaseModel):
@@ -16,6 +16,7 @@ class MatchItem(BaseModel):
     url: str
     team_a: str
     team_b: str
+    event: str = ""
     tier: str
     status: str
     time: str
