@@ -148,9 +148,19 @@ def parse_matches_list(html_text: str, s_keywords: list, a_keywords: list) -> li
 
 def parse_match_details(html_text: str, match_url: str) -> dict:
     soup = BeautifulSoup(html_text, 'html.parser')
-    teams = soup.find_all(class_='wf-title-team')
-    team_a_name = clean_text(teams[0].get_text()) if len(teams) > 0 else "Team A"
-    team_b_name = clean_text(teams[1].get_text()) if len(teams) > 1 else "Team B"
+    teams = soup.find_all(class_=['wf-title-team', 'match-header-link-name'])
+    
+    def extract_name(elem):
+        med = elem.find(class_='wf-title-med')
+        if med:
+            alias = med.find('div')
+            if alias:
+                alias.extract()
+            return clean_text(med.get_text())
+        return clean_text(elem.get_text())
+        
+    team_a_name = extract_name(teams[0]) if len(teams) > 0 else "Team A"
+    team_b_name = extract_name(teams[1]) if len(teams) > 1 else "Team B"
 
     team_a_id = ""
     team_b_id = ""
