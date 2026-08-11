@@ -1,4 +1,4 @@
-﻿import re
+import re
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from app.config import load_tier_config
@@ -335,16 +335,14 @@ def get_team_roster(team_id):
 
     soup = BeautifulSoup(res.text, 'html.parser')
     players = []
-    container = soup.find(class_='team-roster') or soup.find(class_='mod-roster')
-    if container:
-        for a in container.find_all('a', href=True):
-            href = a['href']
-            parts = href.split('/')
-            if len(parts) >= 3 and parts[1] == 'player':
-                player_id = parts[2]
-                alias_elem = a.find(class_='team-roster-item-name-alias')
-                nickname = clean_text(alias_elem.get_text()) if alias_elem else clean_text(a.get_text()).split('\n')[0].strip()
-                players.append({"id": player_id, "name": nickname, "url": f"https://www.vlr.gg{href}"})
+    items = soup.find_all(class_='team-roster-item')
+    for item in items:
+        a = item.find('a', href=True)
+        if a and '/player' in a['href']:
+            player_id = a['href'].split('/')[2]
+            alias_elem = a.find(class_='team-roster-item-name-alias')
+            nickname = clean_text(alias_elem.get_text()) if alias_elem else clean_text(a.get_text()).split('\n')[0].strip()
+            players.append({"id": player_id, "name": nickname, "url": f"https://www.vlr.gg{a['href']}"})
 
     return players
 
