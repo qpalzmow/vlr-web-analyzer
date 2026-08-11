@@ -1,4 +1,4 @@
-﻿import re
+import re
 from typing import List, Dict, Any
 
 def normalize_team_name(name: str) -> str:
@@ -22,8 +22,9 @@ def team_matches(a: str, b: str) -> bool:
     if norm_a == norm_b:
         return True
     
-    long_tokens_a = set(t for t in norm_a.split() if len(t) >= 4)
-    long_tokens_b = set(t for t in norm_b.split() if len(t) >= 4)
+    COMMON_WORDS = {'team', 'esports', 'gaming', 'club', 'the', 'and', 'pro'}
+    long_tokens_a = set(t for t in norm_a.split() if len(t) >= 4 and t not in COMMON_WORDS)
+    long_tokens_b = set(t for t in norm_b.split() if len(t) >= 4 and t not in COMMON_WORDS)
     if long_tokens_a and long_tokens_b:
         return bool(long_tokens_a & long_tokens_b)
     
@@ -31,18 +32,19 @@ def team_matches(a: str, b: str) -> bool:
     tokens_b = set(norm_b.split())
     return bool(tokens_a & tokens_b)
 
-def calculate_advanced_metrics(maps_data: dict, total_fk: int, total_fd: int, total_rounds: int) -> dict:
+def calculate_advanced_metrics(maps_data: dict, total_fk: int, total_fd: int, total_rounds: int, pistol_wins: int = 0, pistol_total: int = 0) -> dict:
     total_played = sum(s.get("played", 0) for s in maps_data.values())
     total_wins = sum(s.get("w", 0) for s in maps_data.values())
     map_win_rate = round((total_wins / total_played * 100), 1) if total_played > 0 else 50.0
 
+    pistol_win_rate = round((pistol_wins / pistol_total * 100), 1) if pistol_total > 0 else map_win_rate
     fk_fd_diff = total_fk - total_fd
     fk_fd_per_round = round(fk_fd_diff / max(total_rounds, 1), 4)
     fk_fd_margin = round(fk_fd_diff / max(total_rounds, 1), 2)
 
     return {
         "map_win_rate": map_win_rate,
-        "pistol_win_rate": map_win_rate,
+        "pistol_win_rate": pistol_win_rate,
         "fk_fd_margin": fk_fd_margin,
         "fk_fd_diff": fk_fd_diff,
         "fk_fd_per_round": fk_fd_per_round,

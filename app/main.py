@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 import json
 import traceback
@@ -77,8 +77,8 @@ def find_ace_player(roster, event_ids):
         except Exception:
             return None
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        players_data = list(executor.map(get_stats_for_player, roster))
+    futures = [_global_executor.submit(get_stats_for_player, p) for p in roster]
+    players_data = [f.result(timeout=30) for f in futures]
 
     valid_players = [p for p in players_data if p is not None]
     return find_ace_player_from_stats(valid_players)
@@ -239,8 +239,13 @@ def api_simulate_banpick(payload: BanPickPayload):
 @app.post("/api/log-error")
 async def api_log_error(request: Request):
     try:
+        content_length = request.headers.get('content-length', '0')
+        if int(content_length) > 10240:  # 10KB limit
+            return JSONResponse(content={"status": "rejected", "reason": "payload too large"}, status_code=413)
         body = await request.json()
-        print(f"\n>>> [BROWSER ERROR LOGGED]:\n{json.dumps(body, indent=2)}\n")
+        # Sanitize: only log known fields
+        safe_fields = {k: str(v)[:500] for k, v in body.items() if k in ('message', 'source', 'lineno', 'colno', 'stack')}
+        print(f"\n>>> [BROWSER ERROR LOGGED]:\n{json.dumps(safe_fields, indent=2)}\n")
         return JSONResponse(content={"status": "logged"})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

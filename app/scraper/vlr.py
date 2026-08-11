@@ -1,6 +1,10 @@
 import re
+import logging
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+logger = logging.getLogger(__name__)
+
 from app.config import load_tier_config
 from app.scraper.http import request_with_retry
 from app.scraper.parsers import (
@@ -29,7 +33,8 @@ def get_event_map_pool(event_id):
     url = f"https://www.vlr.gg/event/agents/{event_id}"
     try:
         res = request_with_retry(url)
-    except Exception:
+    except Exception as e:
+        logger.warning('get_event_map_pool request failed: %s', e)
         return []
     if res.status_code != 200:
         return []
@@ -61,7 +66,8 @@ def get_team_events(team_id):
     url = f"https://www.vlr.gg/team/stats/{team_id}"
     try:
         res = request_with_retry(url)
-    except Exception:
+    except Exception as e:
+        logger.warning('get_team_events request failed: %s', e)
         return []
     if res.status_code != 200:
         return []
@@ -81,7 +87,8 @@ def get_team_events(team_id):
 def get_live_score(match_url):
     try:
         res = request_with_retry(match_url)
-    except Exception:
+    except Exception as e:
+        logger.warning('get_live_score request failed: %s', e)
         return {"series_score_a": "0", "series_score_b": "0", "status": "error", "maps": []}
     if res.status_code != 200:
         return {"series_score_a": "0", "series_score_b": "0", "status": "error", "maps": []}
@@ -98,7 +105,8 @@ def get_team_form(team_id, max_results=10):
         url = f"https://www.vlr.gg/team/matches/{team_id}/?page={page}" if page > 1 else f"https://www.vlr.gg/team/{team_id}"
         try:
             res = request_with_retry(url)
-        except Exception:
+        except Exception as e:
+            logger.warning('get_team_form request failed for page %d: %s', page, e)
             break
         if res.status_code != 200:
             break
@@ -163,7 +171,8 @@ def get_single_team_stats_page(team_id, event_id=None):
         url += f"/?event_id={event_id}"
     try:
         res = request_with_retry(url)
-    except Exception:
+    except Exception as e:
+        logger.warning('get_single_team_stats_page request failed: %s', e)
         return {}
     if res.status_code != 200:
         return {}
@@ -252,7 +261,8 @@ def get_player_stats_page(player_id, event_id=None):
         url += f"/?event_id={event_id}"
     try:
         res = request_with_retry(url)
-    except Exception:
+    except Exception as e:
+        logger.warning('get_player_stats_page request failed: %s', e)
         return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "fk": 0, "fd": 0, "agents": {}}
     if res.status_code != 200:
         return {"rounds": 0, "weighted_acs": 0, "kills": 0, "deaths": 0, "fk": 0, "fd": 0, "agents": {}}
@@ -328,7 +338,8 @@ def get_team_roster(team_id):
     url = f"https://www.vlr.gg/team/{team_id}"
     try:
         res = request_with_retry(url)
-    except Exception:
+    except Exception as e:
+        logger.warning('get_team_roster request failed: %s', e)
         return []
     if res.status_code != 200:
         return []
@@ -377,9 +388,11 @@ def get_team_advanced_metrics(team_id, event_ids=None):
                     total_fk += pstats.get('fk', 0)
                     total_fd += pstats.get('fd', 0)
                     total_rounds += p_rounds
-            except Exception:
+            except Exception as e:
+                logger.warning('get_team_advanced_metrics player stats failed: %s', e)
                 continue
-    except Exception:
+    except Exception as e:
+        logger.warning('get_team_advanced_metrics roster fetch failed: %s', e)
         pass
 
     return calculate_advanced_metrics(maps_data, total_fk, total_fd, total_rounds)

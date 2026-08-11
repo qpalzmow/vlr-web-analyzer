@@ -231,7 +231,31 @@ function generateShareableLink() {
         url.searchParams.set('events', Array.from(selectedEvents).join(','));
     }
     
-    navigator.clipboard.writeText(url.toString()).then(() => {
+    const link = url.toString();
+    
+    function copyToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+        } else {
+            // Fallback for non-HTTPS environments
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                return Promise.resolve();
+            } catch (err) {
+                return Promise.reject(err);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+    }
+    
+    copyToClipboard(link).then(() => {
         showToast('분석 공유 링크가 클립보드에 복사되었습니다! 🔗', 'success');
     }).catch(() => {
         showToast('클립보드 복사 실패. 주소창의 URL을 공유해 주세요.', 'error');
@@ -317,7 +341,7 @@ function renderMapsTable(tableId, mapsData) {
     }
     
     // Active tournament map pool: Dynamically scraped from VLR event page, fallbacks to VCT 2026 Competitive pool
-    const fallbackMapPool = ['Ascent', 'Breeze', 'Haven', 'Lotus', 'Split', 'Summit', 'Sunset'];
+    const fallbackMapPool = FALLBACK_MAP_POOL;
     const activeMapPool = (selectedMatch && selectedMatch.map_pool && selectedMatch.map_pool.length > 0)
         ? selectedMatch.map_pool
         : fallbackMapPool;
@@ -456,7 +480,7 @@ function calculateAISimulation(mapsA, mapsB) {
     const allMaps = Array.from(new Set([...Object.keys(mapsA || {}), ...Object.keys(mapsB || {})]));
     
     // Active competitive tournament map pool: Dynamically scraped from VLR event page, fallbacks to VCT 2026 Competitive pool
-    const fallbackMapPool = ['Ascent', 'Breeze', 'Haven', 'Lotus', 'Split', 'Summit', 'Sunset'];
+    const fallbackMapPool = FALLBACK_MAP_POOL;
     const activeMapPool = (selectedMatch && selectedMatch.map_pool && selectedMatch.map_pool.length > 0)
         ? selectedMatch.map_pool
         : fallbackMapPool;

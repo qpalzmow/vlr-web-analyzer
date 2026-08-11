@@ -159,7 +159,8 @@ async function runAnalysis() {
     };
     
     let completedSteps = 0;
-    const totalSteps = 3;
+    const totalSteps = 4;
+    let failedSteps = 0;
     
     function updateProgress(stepName) {
         completedSteps++;
@@ -183,6 +184,7 @@ async function runAnalysis() {
         updateProgress('경기 흐름');
     }).catch(err => {
         if (err.name === 'AbortError') return;
+        failedSteps++;
         document.getElementById('team-a-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
         document.getElementById('team-b-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
         console.error('Form fetch error:', err);
@@ -204,6 +206,7 @@ async function runAnalysis() {
         updateProgress('진영별 맵 승률');
     }).catch(err => {
         if (err.name === 'AbortError') return;
+        failedSteps++;
         document.getElementById('team-a-maps-table').innerHTML = '<tr><td colspan="5" class="py-4 text-center text-red-400">로드 실패</td></tr>';
         document.getElementById('team-b-maps-table').innerHTML = '<tr><td colspan="5" class="py-4 text-center text-red-400">로드 실패</td></tr>';
         document.getElementById('ai-ban-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
@@ -229,6 +232,7 @@ async function runAnalysis() {
         updateProgress('에이스 통계');
     }).catch(err => {
         if (err.name === 'AbortError') return;
+        failedSteps++;
         document.getElementById('team-a-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
         document.getElementById('team-b-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
         document.getElementById('ace-a-nickname').textContent = 'N/A';
@@ -252,20 +256,20 @@ async function runAnalysis() {
         const probA = Math.min(88, Math.max(12, Math.round((rateA / (rateA + rateB)) * 100)));
         const probB = 100 - probA;
         updateWinProbabilityBar(probA, probB);
-    }).catch(() => {});
+    }).catch(() => {
+        failedSteps++;
+    });
 
     try {
         await Promise.all([formPromise, mapsPromise, acesPromise, advPromise]);
         
         if (!signal.aborted) {
-            updateStatus('success', '전력 분석 완료.', '양 팀의 최신 경기 데이터 융합 분석이 무결하게 완료되었습니다.', 100);
-            
-            // Trigger iOS Spring micro-animation on results container
-            const resultsContainer = document.getElementById('analysis-results-container');
-            if (resultsContainer) {
-                resultsContainer.classList.remove('ios-animate-spring');
-                void resultsContainer.offsetWidth; // Force reflow
-                resultsContainer.classList.add('ios-animate-spring');
+            if (failedSteps === 0) {
+                updateStatus('success', '전력 분석 완료.', '양 팀의 최신 경기 데이터 융합 분석이 무결하게 완료되었습니다.', 100);
+            } else if (failedSteps < totalSteps) {
+                updateStatus('alert', '전력 분석 일부 완료.', `${failedSteps}개 항목의 데이터를 불러오지 못했습니다. 일부 결과가 정확하지 않을 수 있습니다.`, 100);
+            } else {
+                updateStatus('error', '전력 분석 실패.', '모든 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.', 0);
             }
         }
     } catch (err) {
