@@ -40,6 +40,7 @@ const agentColors = {
 
 // UI Elements
 const tierSelect = document.getElementById('tier-select');
+const regionSelect = document.getElementById('region-select');
 const eventSelect = document.getElementById('event-select');
 const matchSelect = document.getElementById('match-select');
 const tournamentChecklistContainer = document.getElementById('tournament-checklist-container');

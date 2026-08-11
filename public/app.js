@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
         populateEventsDropdown();
     });
     
+    regionSelect.addEventListener('change', () => {
+        populateEventsDropdown();
+    });
+    
     eventSelect.addEventListener('change', () => {
         populateMatchesDropdown();
     });
