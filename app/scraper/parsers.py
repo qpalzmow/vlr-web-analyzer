@@ -1,4 +1,4 @@
-﻿import re
+import re
 from bs4 import BeautifulSoup
 from app.config import ALL_KNOWN_MAPS
 
@@ -108,7 +108,9 @@ def parse_matches_list(html_text: str, s_keywords: list, a_keywords: list) -> li
         if len(parts) >= 3 and parts[1].isdigit():
             match_id = parts[1]
             full_url = f"https://www.vlr.gg{href}"
-            teams = a_tag.find_all(class_='match-item-team-name')
+            teams = a_tag.find_all(class_=['match-item-vs-team-name', 'match-item-team-name'])
+            if not teams:
+                teams = a_tag.find_all(class_='match-item-vs-team')
             team_a = clean_text(teams[0].get_text()) if len(teams) > 0 else "TBD"
             team_b = clean_text(teams[1].get_text()) if len(teams) > 1 else "TBD"
 
