@@ -374,6 +374,11 @@ def get_match_details(match_url):
         "event_id": event_id
     }
 
+ALL_KNOWN_MAPS = [
+    "Ascent", "Bind", "Breeze", "Haven", "Icebox", "Lotus", "Split", 
+    "Sunset", "Abyss", "Fracture", "Pearl", "Summit"
+]
+
 def get_event_map_pool(event_id):
     """Scrapes the VLR tournament agents page to detect the active map pool for this tournament."""
     if not event_id:
@@ -388,12 +393,6 @@ def get_event_map_pool(event_id):
         return []
         
     soup = BeautifulSoup(res.text, 'html.parser')
-    all_known_maps = ["Ascent", "Bind", "Breeze", "Haven", "Icebox", "Lotus", "Split", "Sunset", "Abyss", "Fracture", "Pearl", "Summit"]
-    # H-2: 맵 리스트 상수화 (신규 맵 추가 용이)
-    ALL_KNOWN_MAPS = [
-        "Ascent", "Bind", "Breeze", "Haven", "Icebox", "Lotus", "Split", 
-        "Sunset", "Abyss", "Fracture", "Pearl", "Summit", "Gekko", "Tejo"
-    ]
 
     # Strategy 1: agents 페이지에서 테이블 셀 기반 감지
     detected = set()
@@ -780,13 +779,13 @@ def get_team_maps_stats(team_id, event_ids=None):
                         "def_won": 0,
                         "def_total": 0
                     }
-            aggregated[map_name]["played"] += stats["played"]
-            aggregated[map_name]["w"] += stats.get("w", 0)
-            aggregated[map_name]["l"] += stats.get("l", 0)
-            aggregated[map_name]["atk_won"] += stats["atk_won"]
-            aggregated[map_name]["atk_total"] += stats["atk_total"]
-            aggregated[map_name]["def_won"] += stats["def_won"]
-            aggregated[map_name]["def_total"] += stats["def_total"]
+                aggregated[map_name]["played"] += stats.get("played", 0)
+                aggregated[map_name]["w"] += stats.get("w", 0)
+                aggregated[map_name]["l"] += stats.get("l", 0)
+                aggregated[map_name]["atk_won"] += stats.get("atk_won", 0)
+                aggregated[map_name]["atk_total"] += stats.get("atk_total", 0)
+                aggregated[map_name]["def_won"] += stats.get("def_won", 0)
+                aggregated[map_name]["def_total"] += stats.get("def_total", 0)
             
     return aggregated
 
@@ -1030,17 +1029,23 @@ def get_team_advanced_metrics(team_id, event_ids=None):
     """
     if not team_id:
         return {
+            "map_win_rate": 50.0,
             "pistol_win_rate": 50.0,
             "fk_fd_margin": 0.0,
+            "fk_fd_diff": 0,
+            "fk_fd_per_round": 0.0,
+            "total_played": 0,
+            "total_wins": 0,
+            "total_fk": 0,
+            "total_fd": 0,
             "top_compositions": []
         }
     
-    # Get map stats for pistol win rate estimation
+    # Get map stats for overall map win rate
     maps_data = get_team_maps_stats(team_id, event_ids)
     total_played = sum(s.get("played", 0) for s in maps_data.values())
     total_wins = sum(s.get("w", 0) for s in maps_data.values())
-    overall_win_rate = (total_wins / total_played) if total_played > 0 else 0.5
-    pistol_win_rate = round(min(85.0, max(25.0, overall_win_rate * 100)), 1)
+    map_win_rate = round((total_wins / total_played * 100), 1) if total_played > 0 else 50.0
     
     # Get real FK/FD from player stats
     total_fk = 0
@@ -1048,24 +1053,32 @@ def get_team_advanced_metrics(team_id, event_ids=None):
     total_rounds = 0
     try:
         roster = get_team_roster(team_id)
-        for player in roster[:6]:  # Limit to starting 5 + 1 sub
+        for player in roster:
             try:
                 pstats = get_player_stats(player.get('id', ''), event_ids)
-                total_fk += pstats.get('fk', 0)
-                total_fd += pstats.get('fd', 0)
-                total_rounds += pstats.get('rounds', 0)
+                p_rounds = pstats.get('rounds', 0)
+                if p_rounds > 0:
+                    total_fk += pstats.get('fk', 0)
+                    total_fd += pstats.get('fd', 0)
+                    total_rounds += p_rounds
             except Exception:
                 continue
     except Exception:
         pass
     
-    fk_fd_margin = round((total_fk - total_fd) / max(total_rounds, 1), 2)
+    fk_fd_diff = total_fk - total_fd
+    fk_fd_per_round = round(fk_fd_diff / max(total_rounds, 1), 4)
+    fk_fd_margin = round(fk_fd_diff / max(total_rounds, 1), 2)
     
     return {
-        "pistol_win_rate": pistol_win_rate,
+        "map_win_rate": map_win_rate,
+        "pistol_win_rate": map_win_rate,  # backward compatibility alias
         "fk_fd_margin": fk_fd_margin,
+        "fk_fd_diff": fk_fd_diff,
+        "fk_fd_per_round": fk_fd_per_round,
         "total_played": total_played,
         "total_wins": total_wins,
         "total_fk": total_fk,
-        "total_fd": total_fd
+        "total_fd": total_fd,
+        "top_compositions": []
     }

@@ -360,9 +360,10 @@ def api_analyze_advanced(payload: TeamAnalysisPayload):
             get_cached_data, 'pistol_stats', key_b, scraper.get_team_advanced_metrics, payload.team_b_id, payload.event_ids
         ) if payload.team_b_id else None
         
+        default_adv = scraper.get_team_advanced_metrics("")
         return JSONResponse(content={
-            "adv_a": _safe_future_result(future_a, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0}),
-            "adv_b": _safe_future_result(future_b, {"pistol_win_rate": 50.0, "fk_fd_margin": 0.0})
+            "adv_a": _safe_future_result(future_a, default_adv),
+            "adv_b": _safe_future_result(future_b, default_adv)
         })
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

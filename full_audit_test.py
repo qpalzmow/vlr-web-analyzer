@@ -72,5 +72,49 @@ class FullSystemAuditTest(unittest.TestCase):
         self.assertIn("status", res)
         self.assertIn("maps", res)
 
+    def test_known_maps_no_agent_names(self):
+        print("\n--- Auditing ALL_KNOWN_MAPS ---")
+        self.assertNotIn("Gekko", scraper.ALL_KNOWN_MAPS)
+        self.assertNotIn("Tejo", scraper.ALL_KNOWN_MAPS)
+        self.assertIn("Ascent", scraper.ALL_KNOWN_MAPS)
+        self.assertIn("Bind", scraper.ALL_KNOWN_MAPS)
+
+    def test_unified_advanced_metrics_schema(self):
+        print("\n--- Auditing Advanced Metrics Schema ---")
+        empty_metrics = scraper.get_team_advanced_metrics("")
+        expected_keys = {
+            "map_win_rate", "pistol_win_rate", "fk_fd_margin", "fk_fd_diff",
+            "fk_fd_per_round", "total_played", "total_wins", "total_fk",
+            "total_fd", "top_compositions"
+        }
+        self.assertEqual(set(empty_metrics.keys()), expected_keys)
+
+    def test_map_stats_aggregation(self):
+        print("\n--- Auditing Map Stats Multi-Event Aggregation ---")
+        from unittest.mock import patch
+        sample_ev1 = {
+            "Ascent": {"played": 7, "w": 5, "l": 2, "atk_won": 40, "atk_total": 70, "def_won": 45, "def_total": 75},
+            "Bind": {"played": 4, "w": 2, "l": 2, "atk_won": 20, "atk_total": 40, "def_won": 20, "def_total": 40}
+        }
+        sample_ev2 = {
+            "Ascent": {"played": 7, "w": 3, "l": 4, "atk_won": 35, "atk_total": 70, "def_won": 35, "def_total": 70},
+            "Split": {"played": 3, "w": 1, "l": 2, "atk_won": 15, "atk_total": 30, "def_won": 15, "def_total": 30}
+        }
+
+        def mock_get_single_page(team_id, event_id=None):
+            if event_id == "ev1":
+                return sample_ev1
+            if event_id == "ev2":
+                return sample_ev2
+            return {}
+
+        with patch("scraper.get_single_team_stats_page", side_effect=mock_get_single_page):
+            aggregated = scraper.get_team_maps_stats("878", ["ev1", "ev2"])
+            self.assertEqual(aggregated["Ascent"]["played"], 14)
+            self.assertEqual(aggregated["Ascent"]["w"], 8)
+            self.assertEqual(aggregated["Ascent"]["l"], 6)
+            self.assertEqual(aggregated["Bind"]["played"], 4)
+            self.assertEqual(aggregated["Split"]["played"], 3)
+
 if __name__ == '__main__':
     unittest.main()
