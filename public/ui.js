@@ -31,14 +31,16 @@ function initUITheme() {
     setUITheme(savedTheme);
 }
 
-// 2. Populate Events Dropdown (filtered by selected Tier)
+// 2. Populate Events Dropdown (filtered by selected Tier and Region)
 function populateEventsDropdown() {
     const tier = tierSelect.value;
+    const region = regionSelect.value;
     
-    // Filter matches by tier
+    // Filter matches by tier and region
     const tempMatches = allMatches.filter(m => {
-        if (tier === 'All') return true;
-        return m.tier === tier;
+        const tierMatch = (tier === 'All' || m.tier === tier);
+        const regionMatch = (region === 'All' || m.region === region);
+        return tierMatch && regionMatch;
     });
     
     // Extract unique event names
@@ -47,7 +49,7 @@ function populateEventsDropdown() {
     eventSelect.innerHTML = '';
     
     if (uniqueEvents.length === 0) {
-        eventSelect.innerHTML = '<option>대회가 없습니다.</option>';
+        eventSelect.innerHTML = '<option>일정이 없습니다.</option>';
         eventSelect.disabled = true;
         matchSelect.innerHTML = '<option>매치가 없습니다.</option>';
         matchSelect.disabled = true;
@@ -66,15 +68,17 @@ function populateEventsDropdown() {
     populateMatchesDropdown();
 }
 
-// 3. Populate Matches Dropdown (filtered by selected Event and Tier)
+// 3. Populate Matches Dropdown (filtered by selected Event, Tier, and Region)
 function populateMatchesDropdown() {
     const tier = tierSelect.value;
+    const region = regionSelect.value;
     const selectedEvent = eventSelect.value;
     
     filteredMatches = allMatches.filter(m => {
         const tierMatch = (tier === 'All' || m.tier === tier);
+        const regionMatch = (region === 'All' || m.region === region);
         const eventMatch = (m.event === selectedEvent);
-        return tierMatch && eventMatch;
+        return tierMatch && regionMatch && eventMatch;
     });
     
     matchSelect.innerHTML = '';
