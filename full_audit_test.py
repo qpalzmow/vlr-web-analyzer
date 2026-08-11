@@ -108,7 +108,7 @@ class FullSystemAuditTest(unittest.TestCase):
                 return sample_ev2
             return {}
 
-        with patch("scraper.get_single_team_stats_page", side_effect=mock_get_single_page):
+        with patch("app.scraper.vlr.get_single_team_stats_page", side_effect=mock_get_single_page):
             aggregated = scraper.get_team_maps_stats("878", ["ev1", "ev2"])
             self.assertEqual(aggregated["Ascent"]["played"], 14)
             self.assertEqual(aggregated["Ascent"]["w"], 8)
