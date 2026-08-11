@@ -133,12 +133,26 @@ def parse_matches_list(html_text: str, s_keywords: list, a_keywords: list) -> li
             elif any(k.lower() in event_text.lower() for k in a_keywords):
                 tier = "A-Tier"
 
+            region = "Other"
+            event_lower = event_text.lower()
+            if "champions" in event_lower or "masters" in event_lower:
+                region = "Global"
+            elif "pacific" in event_lower or "korea" in event_lower or "japan" in event_lower or "apac" in event_lower:
+                region = "Pacific"
+            elif "emea" in event_lower or "eu " in event_lower or "europe" in event_lower or "turkey" in event_lower:
+                region = "EMEA"
+            elif "americas" in event_lower or "na " in event_lower or "north america" in event_lower or "latam" in event_lower or "brazil" in event_lower:
+                region = "Americas"
+            elif "china" in event_lower or "cn" in event_lower:
+                region = "China"
+
             matches.append({
                 "id": match_id,
                 "url": full_url,
                 "team_a": team_a,
                 "team_b": team_b,
                 "event": event_text,
+                "region": region,
                 "tier": tier,
                 "status": status_str,
                 "time": time_str,

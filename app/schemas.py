@@ -17,6 +17,7 @@ class MatchItem(BaseModel):
     team_a: str
     team_b: str
     event: str = ""
+    region: str = ""
     tier: str
     status: str
     time: str
