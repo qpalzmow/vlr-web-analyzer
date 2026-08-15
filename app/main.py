@@ -107,8 +107,8 @@ def api_get_matches():
         matches = get_cached_data('matches', 'matches_list', get_matches)
         return JSONResponse(content=matches)
     except Exception as e:
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("api_get_matches failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.get("/api/match-details")
 def api_get_match_details(url: str = Query(...)):
@@ -141,7 +141,8 @@ def api_get_match_details(url: str = Query(...)):
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("api_get_match_details failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.get("/api/live-score")
 def api_get_live_score(url: str = Query(...)):
@@ -152,7 +153,8 @@ def api_get_live_score(url: str = Query(...)):
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("api_get_live_score failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/api/analyze/form")
 def api_analyze_form(payload: TeamAnalysisPayload):
@@ -169,7 +171,8 @@ def api_analyze_form(payload: TeamAnalysisPayload):
             "form_b": _safe_future_result(future_b, [])
         })
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("api_analyze_form failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/api/analyze/maps")
 def api_analyze_maps(payload: TeamAnalysisPayload):
@@ -189,7 +192,8 @@ def api_analyze_maps(payload: TeamAnalysisPayload):
             "maps_b": _safe_future_result(future_b, {})
         })
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("api_analyze_maps failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/api/analyze/aces")
 def api_analyze_aces(payload: TeamAnalysisPayload):
@@ -209,7 +213,8 @@ def api_analyze_aces(payload: TeamAnalysisPayload):
 
         return JSONResponse(content={"ace_a": ace_a, "ace_b": ace_b})
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("api_analyze_aces failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/api/analyze/advanced")
 def api_analyze_advanced(payload: TeamAnalysisPayload):
@@ -230,7 +235,8 @@ def api_analyze_advanced(payload: TeamAnalysisPayload):
             "adv_b": _safe_future_result(future_b, default_adv)
         })
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("api_analyze_advanced failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/api/simulate/banpick")
 def api_simulate_banpick(payload: BanPickPayload):
@@ -238,7 +244,8 @@ def api_simulate_banpick(payload: BanPickPayload):
         res = simulate_banpick(payload.maps_a, payload.maps_b, payload.map_pool)
         return JSONResponse(content=res)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("api_simulate_banpick failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/api/cache/warm")
 def api_trigger_cache_warm():
@@ -246,7 +253,8 @@ def api_trigger_cache_warm():
         _global_executor.submit(warm_cache_cycle)
         return JSONResponse(content={"status": "warming_triggered"})
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("api_trigger_cache_warm failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/api/log-error")
 async def api_log_error(request: Request):
@@ -260,15 +268,19 @@ async def api_log_error(request: Request):
             return JSONResponse(content={"status": "rejected", "reason": "invalid json"}, status_code=400)
         if not isinstance(body, dict):
             return JSONResponse(content={"status": "rejected", "reason": "json object required"}, status_code=400)
-        # Sanitize: only log known fields
         safe_fields = {k: str(v)[:500] for k, v in body.items() if k in ('message', 'source', 'lineno', 'colno', 'stack')}
         print(f"\n>>> [BROWSER ERROR LOGGED]:\n{json.dumps(safe_fields, indent=2)}\n")
         return JSONResponse(content={"status": "logged"})
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("api_log_error failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.get("/{file_path:path}")
 def serve_static(file_path: str):
+    # Do not serve index.html for nonexistent API routes
+    if file_path.startswith("api/") or file_path == "api":
+        raise HTTPException(status_code=404, detail="API endpoint not found")
+
     if not file_path or file_path == "index.html":
         target = os.path.join(PUBLIC_DIR, "index.html")
     else:

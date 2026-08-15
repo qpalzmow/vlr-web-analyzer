@@ -32,8 +32,8 @@ def validate_vlr_url(url: str) -> str:
     if not url:
         raise ValueError("URL cannot be empty")
     parsed = urlparse.urlparse(url)
-    if parsed.scheme not in ("https", "http"):
-        raise ValueError(f"Invalid URL scheme: {parsed.scheme}")
+    if parsed.scheme != "https":
+        raise ValueError(f"Invalid URL scheme: '{parsed.scheme}'. HTTPS is strictly required.")
     if parsed.hostname not in ALLOWED_VLR_HOSTS:
         raise ValueError(f"Host '{parsed.hostname}' is not in allowed VLR domain allowlist")
     return url
