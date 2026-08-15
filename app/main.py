@@ -77,9 +77,7 @@ def find_ace_player(roster, event_ids):
         except Exception:
             return None
 
-    futures = [_global_executor.submit(get_stats_for_player, p) for p in roster]
-    players_data = [f.result(timeout=30) for f in futures]
-
+    players_data = [get_stats_for_player(p) for p in roster]
     valid_players = [p for p in players_data if p is not None]
     return find_ace_player_from_stats(valid_players)
 
