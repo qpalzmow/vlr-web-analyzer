@@ -160,7 +160,65 @@ function populateMatchesDropdown() {
     handleMatchSelection();
 }
 
-// 5. Draw Tournament Checklist (Limit 12 events total, checking top 3 by default)
+function categorizeTournament(name) {
+    const lower = (name || '').toLowerCase();
+    if (/\b(champions|masters|world cup|ewc)\b/i.test(lower)) {
+        return {
+            type: 'global',
+            badgeText: '국제대회',
+            badgeCls: 'bg-amber-950/80 text-amber-300 border-amber-800/40',
+            order: 1
+        };
+    }
+    if (/\b(kickoff)\b/i.test(lower)) {
+        return {
+            type: 'vct',
+            badgeText: '킥오프',
+            badgeCls: 'bg-sky-950/80 text-sky-300 border-sky-800/40',
+            order: 2
+        };
+    }
+    if (/\b(stage\s*2|stage2)\b/i.test(lower)) {
+        return {
+            type: 'vct',
+            badgeText: '스테이지 2',
+            badgeCls: 'bg-emerald-950/80 text-emerald-300 border-emerald-800/40',
+            order: 3
+        };
+    }
+    if (/\b(stage\s*1|stage1)\b/i.test(lower)) {
+        return {
+            type: 'vct',
+            badgeText: '스테이지 1',
+            badgeCls: 'bg-teal-950/80 text-teal-300 border-teal-800/40',
+            order: 4
+        };
+    }
+    if (/\b(vct\s*\d{4})\b/i.test(lower)) {
+        return {
+            type: 'vct',
+            badgeText: 'VCT 정규',
+            badgeCls: 'bg-indigo-950/80 text-indigo-300 border-indigo-800/40',
+            order: 5
+        };
+    }
+    if (/\b(challengers|ascension|vcl)\b/i.test(lower)) {
+        return {
+            type: 'challengers',
+            badgeText: '챌린저스',
+            badgeCls: 'bg-rose-950/80 text-rose-300 border-rose-800/40',
+            order: 6
+        };
+    }
+    return {
+        type: 'offseason',
+        badgeText: '오프시즌',
+        badgeCls: 'bg-purple-950/80 text-purple-300 border-purple-800/40',
+        order: 7
+    };
+}
+
+// 5. Draw Tournament Checklist (Categorized by Kickoff, Stage 1/2, International, Off-Season)
 function drawTournamentChecklist() {
     tournamentChecklist.innerHTML = '';
     selectedEvents.clear();
@@ -168,12 +226,20 @@ function drawTournamentChecklist() {
     // Merge event lists from Team A and Team B
     const seenEvents = {};
     [...teamAEvents, ...teamBEvents].forEach(evt => {
-        seenEvents[evt.id] = evt.name;
+        const name = evt.name ? evt.name.trim() : '';
+        // Skip generic sub-stages
+        if (!name || /^(playoffs|group stage|play-ins|main event|quarterfinals|semifinals|grand final|tournament)$/i.test(name)) {
+            return;
+        }
+        seenEvents[evt.id] = name;
     });
     
-    // Convert to array and sort by numeric ID descending (newest tournaments have larger IDs)
+    // Convert to array and sort by numeric ID descending
     const sortedEvents = Object.entries(seenEvents)
-        .map(([id, name]) => ({ id: parseInt(id, 10), name }))
+        .map(([id, name]) => {
+            const cat = categorizeTournament(name);
+            return { id: parseInt(id, 10), name, ...cat };
+        })
         .sort((a, b) => b.id - a.id);
         
     if (sortedEvents.length === 0) {
@@ -183,20 +249,30 @@ function drawTournamentChecklist() {
     
     tournamentChecklistContainer.classList.remove('hidden');
     
+    // Wire up quick filter buttons
+    const btnAll = document.getElementById('btn-filter-all');
+    const btnVct = document.getElementById('btn-filter-vct');
+    const btnGlobal = document.getElementById('btn-filter-global');
+    const btnOffseason = document.getElementById('btn-filter-offseason');
+    const btnClear = document.getElementById('btn-filter-clear');
+
+    const checkboxes = [];
+
     sortedEvents.forEach((evt, idx) => {
         const evId = evt.id.toString();
         const evName = evt.name;
-        const shortName = evName.length > 25 ? evName.substring(0, 25) + '..' : evName;
+        const shortName = evName.length > 24 ? evName.substring(0, 24) + '..' : evName;
         
         const label = document.createElement('label');
-        label.className = 'flex items-center space-x-1.5 sm:space-x-2 bg-zinc-900 border border-slate-800 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold text-slate-300 hover:border-slate-600 transition-colors cursor-pointer';
+        label.className = 'flex items-center space-x-1.5 sm:space-x-2 bg-zinc-900 border border-slate-800 px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-medium text-slate-300 hover:border-slate-600 transition-colors cursor-pointer';
         
         const cb = document.createElement('input');
         cb.type = 'checkbox';
         cb.className = 'rounded border-slate-700 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-zinc-950 cursor-pointer';
         cb.value = evId;
+        cb.dataset.eventType = evt.type;
         
-        // Check only top 3 (most recent) by default
+        // Check top 2-3 most recent official VCT tournaments by default
         if (idx < 3) {
             cb.checked = true;
             selectedEvents.add(evId);
@@ -212,10 +288,65 @@ function drawTournamentChecklist() {
             }
         });
         
+        checkboxes.push(cb);
+        
+        const badge = document.createElement('span');
+        badge.className = `text-[8px] sm:text-[9px] font-bold px-1 py-0.5 rounded border ${evt.badgeCls}`;
+        badge.textContent = evt.badgeText;
+        
         label.appendChild(cb);
+        label.appendChild(badge);
         label.appendChild(document.createTextNode(` ${shortName}`));
         tournamentChecklist.appendChild(label);
     });
+
+    if (btnAll) {
+        btnAll.onclick = () => {
+            selectedEvents.clear();
+            checkboxes.forEach(cb => {
+                cb.checked = true;
+                selectedEvents.add(cb.value);
+            });
+        };
+    }
+    if (btnVct) {
+        btnVct.onclick = () => {
+            selectedEvents.clear();
+            checkboxes.forEach(cb => {
+                const isVct = cb.dataset.eventType === 'vct';
+                cb.checked = isVct;
+                if (isVct) selectedEvents.add(cb.value);
+            });
+        };
+    }
+    if (btnGlobal) {
+        btnGlobal.onclick = () => {
+            selectedEvents.clear();
+            checkboxes.forEach(cb => {
+                const isGlobal = cb.dataset.eventType === 'global';
+                cb.checked = isGlobal;
+                if (isGlobal) selectedEvents.add(cb.value);
+            });
+        };
+    }
+    if (btnOffseason) {
+        btnOffseason.onclick = () => {
+            selectedEvents.clear();
+            checkboxes.forEach(cb => {
+                const isOff = cb.dataset.eventType === 'offseason';
+                cb.checked = isOff;
+                if (isOff) selectedEvents.add(cb.value);
+            });
+        };
+    }
+    if (btnClear) {
+        btnClear.onclick = () => {
+            selectedEvents.clear();
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+            });
+        };
+    }
 }
 
 // Toast & Export Utilities
