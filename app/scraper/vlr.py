@@ -19,9 +19,27 @@ from app.scraper.metrics import (
 
 def get_matches():
     s_keywords, a_keywords = load_tier_config()
-    url = "https://www.vlr.gg/matches"
-    res = request_with_retry(url)
-    return parse_matches_list(res.text, s_keywords, a_keywords)
+    matches_live = []
+    try:
+        res_live = request_with_retry("https://www.vlr.gg/matches")
+        matches_live = parse_matches_list(res_live.text, s_keywords, a_keywords)
+    except Exception as e:
+        logger.warning('get_matches live request failed: %s', e)
+
+    matches_results = []
+    try:
+        res_results = request_with_retry("https://www.vlr.gg/matches/results")
+        matches_results = parse_matches_list(res_results.text, s_keywords, a_keywords)
+    except Exception as e:
+        logger.warning('get_matches results request failed: %s', e)
+
+    seen_ids = set()
+    combined = []
+    for m in matches_live + matches_results:
+        if m['id'] not in seen_ids:
+            seen_ids.add(m['id'])
+            combined.append(m)
+    return combined
 
 def get_match_details(match_url):
     res = request_with_retry(match_url)
