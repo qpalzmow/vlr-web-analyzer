@@ -32,8 +32,8 @@ def get_matches():
     except Exception as e:
         logger.warning('get_matches live request failed: %s', e)
 
-    # 2. Recent results (pages 1 to 3 to guarantee all 4 major leagues always have matches)
-    for page in range(1, 4):
+    # 2. Recent results (pages 1 to 2)
+    for page in range(1, 3):
         url = f"https://www.vlr.gg/matches/results/?page={page}" if page > 1 else "https://www.vlr.gg/matches/results"
         try:
             res_results = request_with_retry(url)
@@ -43,6 +43,55 @@ def get_matches():
                     combined.append(m)
         except Exception as e:
             logger.warning('get_matches results page %d failed: %s', page, e)
+
+    # 3. Dynamic Ongoing Major VCT Tournaments (Pacific, Americas, EMEA, China, Masters, Champions)
+    try:
+        res_events = request_with_retry("https://www.vlr.gg/events")
+        soup_events = BeautifulSoup(res_events.text, "html.parser")
+        major_events = []
+        for card in soup_events.find_all(class_="event-item"):
+            a = card.find("a", href=True) if card.name != "a" else card
+            if not a or not a.get("href"):
+                continue
+            title_elem = card.find(class_="event-item-title") or card.find(class_="wf-title")
+            title = clean_text(title_elem.get_text()) if title_elem else clean_text(a.get_text())
+            status_elem = card.find(class_="event-item-desc-item-status")
+            status = clean_text(status_elem.get_text()).lower() if status_elem else ""
+            if ("vct" in title.lower() or "champions" in title.lower() or "masters" in title.lower()) and "ongoing" in status:
+                parts = a["href"].split("/")
+                if len(parts) >= 3 and parts[2].isdigit():
+                    major_events.append({"id": parts[2], "title": title})
+
+        for ev in major_events:
+            try:
+                ev_res = request_with_retry(f"https://www.vlr.gg/event/matches/{ev['id']}")
+                ev_matches = parse_matches_list(ev_res.text, s_keywords, a_keywords)
+                
+                region = "Other"
+                if re.search(r'\b(champions|masters)\b', ev['title'], re.I):
+                    region = "Global"
+                elif re.search(r'\b(pacific|korea|japan|apac)\b', ev['title'], re.I):
+                    region = "Pacific"
+                elif re.search(r'\b(emea|europe)\b', ev['title'], re.I):
+                    region = "EMEA"
+                elif re.search(r'\b(americas|north america|brazil|latam)\b', ev['title'], re.I):
+                    region = "Americas"
+                elif re.search(r'\b(china|cn)\b', ev['title'], re.I):
+                    region = "China"
+
+                for m in ev_matches:
+                    if m['id'] not in seen_ids:
+                        seen_ids.add(m['id'])
+                        m['tier'] = "S-Tier"
+                        m['region'] = region
+                        if ev['title'] not in m['event']:
+                            m['event'] = f"{m['event']} {ev['title']}".strip()
+                        combined.append(m)
+            except Exception as e:
+                logger.warning('Failed to scrape event matches for %s: %s', ev['id'], e)
+
+    except Exception as e:
+        logger.warning('Failed to discover ongoing major VCT events: %s', e)
 
     return combined
 
