@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger(__name__)
 
-from app.config import load_tier_config
+from app.config import load_tier_config, ALL_KNOWN_MAPS
 from app.scraper.http import request_with_retry
 from app.scraper.parsers import (
     clean_text, safe_int, safe_float, parse_column_indices_from_header,
@@ -218,12 +218,17 @@ def get_single_team_stats_page(team_id, event_id=None):
         if len(cells) < min_cells_needed:
             continue
         raw_map = clean_text(cells[col_map.get('map', 0)].get_text())
-        map_name = raw_map.split('\n')[0].strip()
-        played = safe_int(cells[col_map.get('map', 0)].get_text())
-        if played == 0:
-            m_played = re.search(r'(\d+)', raw_map)
-            if m_played:
-                played = int(m_played.group(1))
+        map_name = raw_map
+        for km in ALL_KNOWN_MAPS:
+            if re.search(r'\b' + re.escape(km) + r'\b', raw_map, re.I):
+                map_name = km
+                break
+        else:
+            map_name = re.sub(r'\s*\(\d+\).*|\s+\d+.*', '', raw_map).strip()
+            map_name = map_name.capitalize() if map_name else "Unknown"
+
+        m_played = re.search(r'\((\d+)\)', raw_map) or re.search(r'\b(\d+)\b', raw_map)
+        played = int(m_played.group(1)) if m_played else safe_int(cells[col_map.get('map', 0)].get_text())
 
         atk_rounds_won = safe_int(cells[col_map.get('atk_won', 8)].get_text())
         atk_rounds_lost = safe_int(cells[col_map.get('atk_lost', 9)].get_text())
