@@ -93,6 +93,58 @@ def parse_player_column_indices_from_header(table):
             col_map['fd'] = i
     return col_map
 
+def parse_tournament_and_stage(event_str: str) -> tuple:
+    if not event_str:
+        return "기타 대회", "기타", ""
+    
+    tourney_match = re.search(
+        r'(VCT\s*\d{4}:?\s*[^–-]+|Game\s*Changers\s*\d{4}:?\s*[^–-]+|Champions\s*\d{4}:?\s*[^–-]+|Masters\s*\d{4}:?\s*[^–-]+|Challengers\s*\d{4}:?\s*[^–-]+|VCL\s*\d{2,4}:?\s*[^–-]+)',
+        event_str, re.I
+    )
+    tournament = tourney_match.group(1).strip() if tourney_match else event_str.strip()
+    
+    stage = "기타 스테이지"
+    if re.search(r'\b(playoffs?|finals?|knockout)\b', event_str, re.I):
+        stage = "🏆 플레이오프 (Playoffs)"
+    elif re.search(r'\b(play-?ins?|playin|qualifier|lcq)\b', event_str, re.I):
+        stage = "⚔️ 플레이인 (Play-Ins)"
+    elif re.search(r'\b(group\s*stage|regular\s*season|swiss|week\s*\d+)\b', event_str, re.I):
+        stage = "📅 그룹 스테이지 (Group Stage)"
+        
+    round_info = event_str
+    if tourney_match:
+        round_info = event_str.replace(tourney_match.group(1), "")
+    round_info = re.sub(r'[–-]', ' ', round_info)
+    round_info = re.sub(r'\s+', ' ', round_info).strip()
+    
+    friendly_round = round_info
+    if re.search(r'grand\s*final', round_info, re.I):
+        friendly_round = "결승전"
+    elif re.search(r'upper\s*final', round_info, re.I):
+        friendly_round = "상위 결승"
+    elif re.search(r'lower\s*final', round_info, re.I):
+        friendly_round = "하위 결승"
+    elif re.search(r'upper\s*semifinal', round_info, re.I):
+        friendly_round = "상위 4강"
+    elif re.search(r'lower\s*semifinal', round_info, re.I):
+        friendly_round = "하위 4강"
+    elif re.search(r'lower\s*round\s*3', round_info, re.I):
+        friendly_round = "하위 3R"
+    elif re.search(r'lower\s*round\s*2', round_info, re.I):
+        friendly_round = "하위 2R"
+    elif re.search(r'lower\s*round\s*1', round_info, re.I):
+        friendly_round = "하위 1R"
+    elif re.search(r'upper\s*quarterfinal', round_info, re.I):
+        friendly_round = "상위 8강"
+    elif re.search(r'upper\s*round\s*1', round_info, re.I):
+        friendly_round = "상위 1R"
+    else:
+        m_week = re.search(r'week\s*(\d+)', round_info, re.I)
+        if m_week:
+            friendly_round = f"{m_week.group(1)}주차"
+
+    return tournament, stage, friendly_round
+
 def parse_matches_list(html_text: str, s_keywords: list, a_keywords: list) -> list:
     soup = BeautifulSoup(html_text, 'html.parser')
     matches = []
@@ -145,12 +197,17 @@ def parse_matches_list(html_text: str, s_keywords: list, a_keywords: list) -> li
             elif re.search(r'\b(china|cn)\b', event_text, re.IGNORECASE):
                 region = "China"
 
+            tournament, stage, round_name = parse_tournament_and_stage(event_text)
+
             matches.append({
                 "id": match_id,
                 "url": full_url,
                 "team_a": team_a,
                 "team_b": team_b,
                 "event": event_text,
+                "tournament": tournament,
+                "stage": stage,
+                "round_name": round_name,
                 "region": region,
                 "tier": tier,
                 "status": status_str,

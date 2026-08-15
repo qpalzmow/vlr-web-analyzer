@@ -10,7 +10,7 @@ from app.scraper.http import request_with_retry
 from app.scraper.parsers import (
     clean_text, safe_int, safe_float, parse_column_indices_from_header,
     parse_player_column_indices_from_header, parse_matches_list,
-    parse_match_details, parse_live_score
+    parse_match_details, parse_live_score, parse_tournament_and_stage
 )
 from app.scraper.metrics import (
     normalize_team_name, team_matches, calculate_advanced_metrics,
@@ -84,8 +84,12 @@ def get_matches():
                         seen_ids.add(m['id'])
                         m['tier'] = "S-Tier"
                         m['region'] = region
+                        m['tournament'] = ev['title']
                         if ev['title'] not in m['event']:
                             m['event'] = f"{m['event']} {ev['title']}".strip()
+                        _, stage, round_name = parse_tournament_and_stage(m['event'])
+                        m['stage'] = stage
+                        m['round_name'] = round_name
                         combined.append(m)
             except Exception as e:
                 logger.warning('Failed to scrape event matches for %s: %s', ev['id'], e)
