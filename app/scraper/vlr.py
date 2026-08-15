@@ -150,13 +150,19 @@ def get_team_events(team_id):
 
     soup = BeautifulSoup(res.text, 'html.parser')
     events = []
-    selects = soup.find_all('select')
-    for select in selects:
-        options = select.find_all('option')
-        for opt in options:
+    # Target strictly the tournament event selector, NOT the sub-stage selectors (filter-series, filter-subseries)
+    event_select = soup.find('select', attrs={'name': 'event_id'}) or soup.find('select', class_='filter-event')
+    if not event_select:
+        selects = soup.find_all('select')
+        event_select = selects[0] if selects else None
+
+    if event_select:
+        for opt in event_select.find_all('option'):
             val = opt.get('value', '')
             text = clean_text(opt.get_text())
             if val and val != 'all' and text and text != 'All Events':
+                if text.lower() in ('playoffs', 'group stage', 'play-ins', 'main event', 'quarterfinals', 'semifinals', 'grand final', 'tournament'):
+                    continue
                 events.append({"id": val, "name": text})
     return events
 
