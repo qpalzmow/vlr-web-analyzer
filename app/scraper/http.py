@@ -1,26 +1,31 @@
-﻿import time
+import time
 import random
+import threading
 import urllib.parse as urlparse
 import httpx
 from app.config import ALLOWED_VLR_HOSTS, USER_AGENTS
 
 _shared_client: httpx.Client = None
+_client_lock = threading.Lock()
 
 def get_httpx_client() -> httpx.Client:
     global _shared_client
     if _shared_client is None or _shared_client.is_closed:
-        _shared_client = httpx.Client(
-            follow_redirects=False,
-            timeout=httpx.Timeout(15.0, connect=5.0),
-            limits=httpx.Limits(max_keepalive_connections=10, max_connections=20)
-        )
+        with _client_lock:
+            if _shared_client is None or _shared_client.is_closed:
+                _shared_client = httpx.Client(
+                    follow_redirects=False,
+                    timeout=httpx.Timeout(15.0, connect=5.0),
+                    limits=httpx.Limits(max_keepalive_connections=10, max_connections=20)
+                )
     return _shared_client
 
 def close_httpx_client():
     global _shared_client
-    if _shared_client is not None and not _shared_client.is_closed:
-        _shared_client.close()
-        _shared_client = None
+    with _client_lock:
+        if _shared_client is not None and not _shared_client.is_closed:
+            _shared_client.close()
+            _shared_client = None
 
 def validate_vlr_url(url: str) -> str:
     """SSRF Protection: Ensure URL uses HTTPS and points strictly to an allowed VLR domain."""

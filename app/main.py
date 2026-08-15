@@ -240,7 +240,12 @@ async def api_log_error(request: Request):
         content_length = request.headers.get('content-length', '0')
         if int(content_length) > 10240:  # 10KB limit
             return JSONResponse(content={"status": "rejected", "reason": "payload too large"}, status_code=413)
-        body = await request.json()
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse(content={"status": "rejected", "reason": "invalid json"}, status_code=400)
+        if not isinstance(body, dict):
+            return JSONResponse(content={"status": "rejected", "reason": "json object required"}, status_code=400)
         # Sanitize: only log known fields
         safe_fields = {k: str(v)[:500] for k, v in body.items() if k in ('message', 'source', 'lineno', 'colno', 'stack')}
         print(f"\n>>> [BROWSER ERROR LOGGED]:\n{json.dumps(safe_fields, indent=2)}\n")

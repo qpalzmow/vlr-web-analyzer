@@ -28,8 +28,8 @@ def team_matches(a: str, b: str) -> bool:
     if long_tokens_a and long_tokens_b:
         return bool(long_tokens_a & long_tokens_b)
     
-    tokens_a = set(norm_a.split())
-    tokens_b = set(norm_b.split())
+    tokens_a = set(t for t in norm_a.split() if t not in COMMON_WORDS)
+    tokens_b = set(t for t in norm_b.split() if t not in COMMON_WORDS)
     return bool(tokens_a & tokens_b)
 
 def calculate_advanced_metrics(maps_data: dict, total_fk: int, total_fd: int, total_rounds: int, pistol_wins: int = 0, pistol_total: int = 0) -> dict:

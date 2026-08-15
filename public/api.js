@@ -320,13 +320,10 @@ function startLiveScorePolling() {
     updateLiveScoreboard();
     
     if (!selectedMatch || !selectedMatch.live_score) return;
-    
-    // Only poll if the match is live (or status is live)
-    // Even if upcoming or completed, we show it, but only poll if live!
     if (selectedMatch.live_score.status !== 'live') return;
     
-    console.log("Starting live score polling interval...");
-    liveScoreInterval = setInterval(async () => {
+    console.log("Starting live score polling timeout loop...");
+    async function poll() {
         if (!selectedMatch || !selectedMatch.url) return;
         const targetUrl = selectedMatch.url;
         try {
@@ -345,17 +342,25 @@ function startLiveScorePolling() {
             if (liveData.status !== 'live') {
                 console.log("Match finished or not live anymore. Stopping polling.");
                 stopLiveScorePolling();
+                return;
             }
         } catch (err) {
             console.error("Live scoreboard polling failed:", err);
+        } finally {
+            // Reschedule only after previous fetch completes
+            if (selectedMatch && selectedMatch.url === targetUrl && selectedMatch.live_score && selectedMatch.live_score.status === 'live') {
+                liveScoreTimeout = setTimeout(poll, 25000);
+            }
         }
-    }, 25000); // 25 seconds interval (safe with 20s server cache)
+    }
+    
+    liveScoreTimeout = setTimeout(poll, 25000);
 }
 
 function stopLiveScorePolling() {
-    if (liveScoreInterval) {
-        clearInterval(liveScoreInterval);
-        liveScoreInterval = null;
+    if (liveScoreTimeout) {
+        clearTimeout(liveScoreTimeout);
+        liveScoreTimeout = null;
         console.log("Live score polling stopped.");
     }
 }

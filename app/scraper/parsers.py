@@ -199,7 +199,7 @@ def parse_match_details(html_text: str, match_url: str) -> dict:
                 break
 
     match_id = ""
-    m_match = re.search(r'/(\d+)/', match_url)
+    m_match = re.search(r'/(\d+)(?:/|$)', match_url)
     if m_match:
         match_id = m_match.group(1)
 

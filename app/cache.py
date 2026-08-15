@@ -1,4 +1,4 @@
-﻿import time
+import time
 import threading
 from app.config import CACHE_TTLS
 
@@ -33,7 +33,8 @@ def _cleanup_expired_cache_nolock(now: float):
 
 def _cache_gc_loop():
     global _cache_gc_timer
-    _cleanup_expired_cache_nolock(time.time())
+    with _cache_lock:
+        _cleanup_expired_cache_nolock(time.time())
     _cache_gc_timer = threading.Timer(60.0, _cache_gc_loop)
     _cache_gc_timer.daemon = True
     _cache_gc_timer.start()
@@ -50,8 +51,9 @@ def is_cache_valid(cache_type: str, key: str) -> bool:
     return (time.time() - ts_map[key]) < CACHE[cache_type]['ttl']
 
 def get_cached_data(cache_type: str, key: str, fetch_func, *args, **kwargs):
-    if is_cache_valid(cache_type, key):
-        return CACHE[cache_type]['data'][key]
+    with _cache_lock:
+        if is_cache_valid(cache_type, key):
+            return CACHE[cache_type]['data'].get(key)
     
     try:
         data = fetch_func(*args, **kwargs)
