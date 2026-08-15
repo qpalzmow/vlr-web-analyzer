@@ -50,23 +50,55 @@ def is_cache_valid(cache_type: str, key: str) -> bool:
         return True
     return (time.time() - ts_map[key]) < CACHE[cache_type]['ttl']
 
+_in_flight = {}
+_in_flight_results = {}
+
 def get_cached_data(cache_type: str, key: str, fetch_func, *args, **kwargs):
+    flight_key = (cache_type, key)
     with _cache_lock:
         if is_cache_valid(cache_type, key):
             return CACHE[cache_type]['data'].get(key)
-    
+        
+        if flight_key in _in_flight:
+            event = _in_flight[flight_key]
+            is_leader = False
+        else:
+            event = threading.Event()
+            _in_flight[flight_key] = event
+            is_leader = True
+
+    if not is_leader:
+        # Wait for the in-flight leader fetch to complete
+        event.wait(timeout=30.0)
+        with _cache_lock:
+            if is_cache_valid(cache_type, key):
+                return CACHE[cache_type]['data'].get(key)
+            if flight_key in _in_flight_results:
+                res, exc = _in_flight_results[flight_key]
+                if exc:
+                    raise exc
+                return res
+
+    # Leader executes upstream fetch
     try:
         data = fetch_func(*args, **kwargs)
+        with _cache_lock:
+            CACHE[cache_type]['data'][key] = data
+            if cache_type not in _cache_timestamps:
+                _cache_timestamps[cache_type] = {}
+            _cache_timestamps[cache_type][key] = time.time()
+            _in_flight_results[flight_key] = (data, None)
+        return data
     except Exception as e:
+        with _cache_lock:
+            _in_flight_results[flight_key] = (None, e)
         print(f"Error fetching {cache_type} for key {key}: {e}")
         raise
-    
-    with _cache_lock:
-        CACHE[cache_type]['data'][key] = data
-        if cache_type not in _cache_timestamps:
-            _cache_timestamps[cache_type] = {}
-        _cache_timestamps[cache_type][key] = time.time()
-    return data
+    finally:
+        with _cache_lock:
+            event.set()
+            _in_flight.pop(flight_key, None)
+            _in_flight_results.pop(flight_key, None)
 
 LIVE_SCORE_CACHE = {}
 CACHE_TTL = 20

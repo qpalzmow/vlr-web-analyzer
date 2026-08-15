@@ -37,10 +37,10 @@ def calculate_advanced_metrics(maps_data: dict, total_fk: int, total_fd: int, to
     total_wins = sum(s.get("w", 0) for s in maps_data.values())
     map_win_rate = round((total_wins / total_played * 100), 1) if total_played > 0 else 50.0
 
-    pistol_win_rate = round((pistol_wins / pistol_total * 100), 1) if pistol_total > 0 else map_win_rate
+    pistol_win_rate = round((pistol_wins / pistol_total * 100), 1) if pistol_total > 0 else None
     fk_fd_diff = total_fk - total_fd
-    fk_fd_per_round = round(fk_fd_diff / max(total_rounds, 1), 4)
-    fk_fd_margin = round(fk_fd_diff / max(total_rounds, 1), 2)
+    fk_fd_per_round = round(fk_fd_diff / max(total_rounds, 1), 4) if total_rounds > 0 else 0.0
+    fk_fd_margin = round(fk_fd_diff / max(total_rounds, 1), 2) if total_rounds > 0 else 0.0
 
     return {
         "map_win_rate": map_win_rate,
@@ -86,7 +86,8 @@ def simulate_banpick(maps_a: dict, maps_b: dict, map_pool: list) -> dict:
         wins = stats.get('w', 0)
         return (wins / played * 100) if played > 0 else 50.0
     
-    available = list(map_pool)
+    # Order-preserving deduplication of map pool
+    available = list(dict.fromkeys(map_pool))
     bans = []
     picks = []
     

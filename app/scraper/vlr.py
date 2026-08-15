@@ -441,7 +441,7 @@ def get_team_roster(team_id):
 def get_team_advanced_metrics(team_id, event_ids=None):
     default_res = {
         "map_win_rate": 50.0,
-        "pistol_win_rate": 50.0,
+        "pistol_win_rate": None,
         "fk_fd_margin": 0.0,
         "fk_fd_diff": 0,
         "fk_fd_per_round": 0.0,
@@ -457,7 +457,7 @@ def get_team_advanced_metrics(team_id, event_ids=None):
     maps_data = get_team_maps_stats(team_id, event_ids)
     total_fk = 0
     total_fd = 0
-    total_rounds = 0
+    max_player_rounds = 0
 
     try:
         roster = get_team_roster(team_id)
@@ -468,7 +468,7 @@ def get_team_advanced_metrics(team_id, event_ids=None):
                 if p_rounds > 0:
                     total_fk += pstats.get('fk', 0)
                     total_fd += pstats.get('fd', 0)
-                    total_rounds += p_rounds
+                    max_player_rounds = max(max_player_rounds, p_rounds)
             except Exception as e:
                 logger.warning('get_team_advanced_metrics player stats failed: %s', e)
                 continue
@@ -476,4 +476,9 @@ def get_team_advanced_metrics(team_id, event_ids=None):
         logger.warning('get_team_advanced_metrics roster fetch failed: %s', e)
         pass
 
-    return calculate_advanced_metrics(maps_data, total_fk, total_fd, total_rounds)
+    # True team round count (from map rounds, or max player rounds if map rounds empty)
+    team_rounds = sum(s.get("atk_total", 0) + s.get("def_total", 0) for s in maps_data.values())
+    if team_rounds <= 0:
+        team_rounds = max_player_rounds
+
+    return calculate_advanced_metrics(maps_data, total_fk, total_fd, team_rounds)
