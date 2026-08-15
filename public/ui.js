@@ -383,6 +383,16 @@ function renderAgentBadges(containerId, agentList) {
     });
 }
 
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Helper: Render Maps Table
 function renderMapsTable(tableId, mapsData) {
     const el = document.getElementById(tableId);
@@ -429,7 +439,7 @@ function renderMapsTable(tableId, mapsData) {
             : `<span class="ml-1 sm:ml-2 text-[8px] sm:text-[9px] font-bold text-slate-500 bg-zinc-800/40 border border-slate-700/20 px-1 py-0.5 rounded uppercase tracking-wider">Legacy</span>`;
             
         tr.innerHTML = `
-            <td class="py-2 sm:py-3 pl-2 text-slate-100 font-bold text-[11px] sm:text-sm flex items-center">${mapName} ${badgeHtml}</td>
+            <td class="py-2 sm:py-3 pl-2 text-slate-100 font-bold text-[11px] sm:text-sm flex items-center">${escapeHTML(mapName)} ${badgeHtml}</td>
             <td class="py-2 sm:py-3 text-center text-slate-300">${s.played}</td>
             <td class="py-2 sm:py-3 text-center text-sky-400 font-bold">${atkPct}</td>
             <td class="py-2 sm:py-3 text-center text-orange-400 font-bold">${defPct}</td>
@@ -504,8 +514,14 @@ function clearDashboard() {
     
     clearAceCompare();
     
-    if (window.matchDetailsAbortController) {
-        window.matchDetailsAbortController.abort();
+    if (typeof matchDetailsAbortController !== 'undefined' && matchDetailsAbortController) {
+        matchDetailsAbortController.abort();
+    }
+    if (typeof analysisAbortController !== 'undefined' && analysisAbortController) {
+        analysisAbortController.abort();
+    }
+    if (typeof stopLiveScorePolling === 'function') {
+        stopLiveScorePolling();
     }
     
     updateStatus('info', '대기 중', '매치를 선택해 주세요.', 0);
@@ -514,16 +530,50 @@ function clearDashboard() {
     document.getElementById('win-probability-section').classList.add('hidden');
     document.getElementById('live-scoreboard-panel').classList.add('hidden');
     
-    // Clear charts if they exist
-    if (window.acsTrendChart) {
-        window.acsTrendChart.destroy();
-        window.acsTrendChart = null;
+    // Clear all charts cleanly
+    if (typeof destroyCharts === 'function') {
+        destroyCharts();
     }
 }
 
 function renderEmptyTable(tableId) {
     const el = document.getElementById(tableId);
     el.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-slate-500 italic">데이터가 없습니다.</td></tr>';
+}
+
+// Render Server-Driven Ban & Pick Simulation Results
+function renderBanPickResults(simData) {
+    const banList = document.getElementById('ai-ban-list');
+    const pickList = document.getElementById('ai-pick-list');
+    if (!banList || !pickList) return;
+    
+    banList.innerHTML = '';
+    pickList.innerHTML = '';
+    
+    if (simData && simData.bans && simData.bans.length > 0) {
+        simData.bans.forEach(b => {
+            const p = document.createElement('p');
+            p.className = 'text-slate-200 font-semibold text-xs sm:text-sm';
+            p.innerHTML = `<span class="text-[10px] sm:text-xs text-slate-500">${escapeHTML(b.team)}:</span> ${escapeHTML(b.map)} <span class="text-[9px] sm:text-[10px] text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30">${escapeHTML(b.reason)}</span>`;
+            banList.appendChild(p);
+        });
+    } else {
+        banList.innerHTML = '<p class="text-slate-500">밴 시뮬레이션 데이터 없음</p>';
+    }
+    
+    if (simData && simData.picks && simData.picks.length > 0) {
+        simData.picks.forEach(p => {
+            const el = document.createElement('p');
+            el.className = 'text-slate-200 font-semibold text-xs sm:text-sm';
+            const isDecider = p.team === 'Decider';
+            const tagText = isDecider ? '결정 맵 (Decider)' : '핵심 카드 픽';
+            const tagColor = isDecider ? 'text-amber-400 bg-amber-950/40 border-amber-900/30' : 'text-emerald-400 bg-emerald-950/40 border-emerald-900/30';
+            el.innerHTML = `<span class="text-[10px] sm:text-xs text-slate-500">${escapeHTML(p.team)}:</span> ${escapeHTML(p.map)} <span class="text-[9px] sm:text-[10px] ${tagColor} px-1.5 py-0.5 rounded border">${tagText} (${p.win_pct}%)</span>`;
+            pickList.appendChild(el);
+        });
+    } else {
+        pickList.innerHTML = '<p class="text-slate-500">픽 시뮬레이션 데이터 없음</p>';
+    }
 }
 
 // Helper: Calculate AI Simulation (Bans and Picks)
