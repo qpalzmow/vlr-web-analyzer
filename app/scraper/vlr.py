@@ -19,26 +19,31 @@ from app.scraper.metrics import (
 
 def get_matches():
     s_keywords, a_keywords = load_tier_config()
-    matches_live = []
+    seen_ids = set()
+    combined = []
+
+    # 1. Upcoming & Live matches
     try:
         res_live = request_with_retry("https://www.vlr.gg/matches")
-        matches_live = parse_matches_list(res_live.text, s_keywords, a_keywords)
+        for m in parse_matches_list(res_live.text, s_keywords, a_keywords):
+            if m['id'] not in seen_ids:
+                seen_ids.add(m['id'])
+                combined.append(m)
     except Exception as e:
         logger.warning('get_matches live request failed: %s', e)
 
-    matches_results = []
-    try:
-        res_results = request_with_retry("https://www.vlr.gg/matches/results")
-        matches_results = parse_matches_list(res_results.text, s_keywords, a_keywords)
-    except Exception as e:
-        logger.warning('get_matches results request failed: %s', e)
+    # 2. Recent results (pages 1 to 3 to guarantee all 4 major leagues always have matches)
+    for page in range(1, 4):
+        url = f"https://www.vlr.gg/matches/results/?page={page}" if page > 1 else "https://www.vlr.gg/matches/results"
+        try:
+            res_results = request_with_retry(url)
+            for m in parse_matches_list(res_results.text, s_keywords, a_keywords):
+                if m['id'] not in seen_ids:
+                    seen_ids.add(m['id'])
+                    combined.append(m)
+        except Exception as e:
+            logger.warning('get_matches results page %d failed: %s', page, e)
 
-    seen_ids = set()
-    combined = []
-    for m in matches_live + matches_results:
-        if m['id'] not in seen_ids:
-            seen_ids.add(m['id'])
-            combined.append(m)
     return combined
 
 def get_match_details(match_url):
