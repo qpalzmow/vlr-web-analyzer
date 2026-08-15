@@ -27,6 +27,8 @@ from app.scraper.vlr import (
 )
 from app.scraper.metrics import find_ace_player_from_stats, simulate_banpick
 
+from app.cache_warmer import start_cache_warmer, stop_cache_warmer, warm_cache_cycle
+
 if hasattr(sys.stdout, 'reconfigure'):
     try:
         sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -38,7 +40,9 @@ _global_executor = ThreadPoolExecutor(max_workers=8, thread_name_prefix="vlr-api
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    start_cache_warmer()
     yield
+    stop_cache_warmer()
     _global_executor.shutdown(wait=True)
     close_httpx_client()
 
@@ -231,6 +235,14 @@ def api_simulate_banpick(payload: BanPickPayload):
     try:
         res = simulate_banpick(payload.maps_a, payload.maps_b, payload.map_pool)
         return JSONResponse(content=res)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/cache/warm")
+def api_trigger_cache_warm():
+    try:
+        _global_executor.submit(warm_cache_cycle)
+        return JSONResponse(content={"status": "warming_triggered"})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
