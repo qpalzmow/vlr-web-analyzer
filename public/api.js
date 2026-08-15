@@ -190,7 +190,7 @@ async function runAnalysis() {
         console.error('Form fetch error:', err);
     });
 
-    // 2. Fetch Maps & AI Simulation
+    // 2. Fetch Maps & Server AI Ban/Pick Simulation
     const mapsPromise = fetch('/api/analyze/maps', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -201,7 +201,31 @@ async function runAnalysis() {
         const data = await res.json();
         renderMapsTable('team-a-maps-table', data.maps_a);
         renderMapsTable('team-b-maps-table', data.maps_b);
-        calculateAISimulation(data.maps_a, data.maps_b);
+        
+        // Single Source of Truth: Call server banpick endpoint
+        const pool = (selectedMatch && selectedMatch.map_pool && selectedMatch.map_pool.length > 0)
+            ? selectedMatch.map_pool
+            : FALLBACK_MAP_POOL;
+        
+        try {
+            const simRes = await fetch('/api/simulate/banpick', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maps_a: data.maps_a || {}, maps_b: data.maps_b || {}, map_pool: pool }),
+                signal
+            });
+            if (simRes.ok) {
+                const simData = await simRes.json();
+                renderBanPickResults(simData);
+            } else {
+                calculateAISimulation(data.maps_a, data.maps_b);
+            }
+        } catch (simErr) {
+            if (simErr.name !== 'AbortError') {
+                calculateAISimulation(data.maps_a, data.maps_b);
+            }
+        }
+        
         lucide.createIcons();
         updateProgress('진영별 맵 승률');
     }).catch(err => {
@@ -240,24 +264,35 @@ async function runAnalysis() {
         console.error('Aces fetch error:', err);
     });
 
-    // 4. Fetch Advanced Metrics (Pistol Win Rates & FK/FD Margin)
+    // 4. Fetch Advanced Metrics (FK/FD Margin & Map Stats)
     const advPromise = fetch('/api/analyze/advanced', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
         signal
     }).then(async res => {
-        if (!res.ok) return;
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        const rateA = data.adv_a ? data.adv_a.pistol_win_rate : 50.0;
-        const rateB = data.adv_b ? data.adv_b.pistol_win_rate : 50.0;
         
-        // Calculate Win Probability: 30% Form + 50% Map Stats + 20% Pistol/FK
-        const probA = Math.min(88, Math.max(12, Math.round((rateA / (rateA + rateB)) * 100)));
+        // Calculate Win Probability using legitimate weighted metrics:
+        // 60% Map Win Rate + 40% First Kill/Death Margin
+        const mapWinA = (data.adv_a && typeof data.adv_a.map_win_rate === 'number') ? data.adv_a.map_win_rate : 50.0;
+        const mapWinB = (data.adv_b && typeof data.adv_b.map_win_rate === 'number') ? data.adv_b.map_win_rate : 50.0;
+        const fkMarginA = (data.adv_a && typeof data.adv_a.fk_fd_margin === 'number') ? data.adv_a.fk_fd_margin : 0.0;
+        const fkMarginB = (data.adv_b && typeof data.adv_b.fk_fd_margin === 'number') ? data.adv_b.fk_fd_margin : 0.0;
+
+        const scoreA = Math.max(10, (mapWinA * 0.6) + Math.max(0, (50 + fkMarginA * 5) * 0.4));
+        const scoreB = Math.max(10, (mapWinB * 0.6) + Math.max(0, (50 + fkMarginB * 5) * 0.4));
+        const total = (scoreA + scoreB) > 0 ? (scoreA + scoreB) : 100;
+        
+        const probA = Math.min(85, Math.max(15, Math.round((scoreA / total) * 100)));
         const probB = 100 - probA;
         updateWinProbabilityBar(probA, probB);
-    }).catch(() => {
+        updateProgress('고급 지표');
+    }).catch(err => {
+        if (err.name === 'AbortError') return;
         failedSteps++;
+        console.error('Advanced metrics error:', err);
     });
 
     try {
