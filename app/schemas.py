@@ -17,6 +17,9 @@ class MatchItem(BaseModel):
     team_a: str
     team_b: str
     event: str = ""
+    tournament: str = ""
+    stage: str = ""
+    round_name: str = ""
     region: str = ""
     tier: str
     status: str
