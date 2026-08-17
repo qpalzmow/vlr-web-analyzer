@@ -13,3 +13,8 @@ dist/
 build/
 *.spec
 app_launcher.py
+data/*.db
+data/*.db-wal
+data/*.db-shm
+*.db
+.pytest_cache/
