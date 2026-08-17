@@ -1,6 +1,9 @@
 import time
 import threading
+import logging
 from app.config import CACHE_TTLS
+
+logger = logging.getLogger(__name__)
 
 CACHE = {
     key: {'data': {}, 'ttl': ttl}
@@ -43,7 +46,10 @@ def _cache_gc_loop():
 _cache_gc_loop()
 
 def is_cache_valid(cache_type: str, key: str) -> bool:
-    if cache_type not in CACHE or key not in CACHE[cache_type]['data']:
+    if cache_type not in CACHE:
+        CACHE[cache_type] = {'data': {}, 'ttl': 300}
+        return False
+    if key not in CACHE[cache_type]['data']:
         return False
     ts_map = _cache_timestamps.get(cache_type)
     if not ts_map or key not in ts_map:
