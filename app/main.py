@@ -3,6 +3,7 @@ import sys
 import json
 import logging
 import traceback
+import threading
 from contextlib import asynccontextmanager
 from typing import Optional
 from concurrent.futures import ThreadPoolExecutor
