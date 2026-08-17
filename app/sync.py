@@ -93,17 +93,30 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
         regions = ["pacific", "americas", "emea", "china", "all"]
         discovered_teams: Dict[str, str] = {}  # team_id -> team_name
         total_matches = 0
+        failures: List[Dict[str, str]] = []
+
+        try:
+            all_matches = get_matches()
+        except Exception as e:
+            logger.error("Failed to fetch matches catalog: %s", e)
+            all_matches = []
+            failures.append({"step": "get_matches", "error": str(e)})
 
         for reg in regions:
             try:
-                matches = get_matches(tier="s_tier", region=reg)
+                if reg == "all":
+                    matches = all_matches
+                else:
+                    matches = [
+                        m for m in all_matches
+                        if m.get("region", "").lower() == reg.lower()
+                    ]
                 save_matches_cache(tier="s_tier", region=reg, matches=matches)
                 total_matches += len(matches)
 
                 for m in matches:
                     if m.get("match_url"):
                         try:
-                            # Quick details parse to extract team IDs if missing
                             details = get_match_details(m["match_url"])
                             if details.get("team_a_id"):
                                 discovered_teams[str(details["team_a_id"])] = details.get("team_a_name", m.get("team_a", ""))
@@ -113,6 +126,7 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
                             pass
             except Exception as me:
                 logger.warning("Failed to sync matches for region %s: %s", reg, me)
+                failures.append({"region": reg, "error": str(me)})
 
         logger.info("Discovered %d unique teams across %d matches.", len(discovered_teams), total_matches)
 
@@ -133,9 +147,15 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
             "total_teams_discovered": len(discovered_teams),
             "teams_synced_successfully": synced_count
         }
-        set_sync_status("completed", details)
-        logger.info(">>> [DAILY SYNC COMPLETED]: %d teams synced into SQLite DB.", synced_count)
-        return {"status": "completed", "details": details}
+        if failures:
+            details["failures"] = failures
+            status = "degraded" if synced_count > 0 else "error"
+        else:
+            status = "completed"
+
+        set_sync_status(status, details)
+        logger.info(">>> [DAILY SYNC %s]: %d teams synced into SQLite DB.", status.upper(), synced_count)
+        return {"status": status, "details": details}
     except Exception as e:
         logger.error("Daily sync encountered an error: %s", e, exc_info=True)
         set_sync_status("error", {"error": str(e), "failed_at": datetime.now(timezone.utc).isoformat()})

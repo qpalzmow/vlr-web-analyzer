@@ -1,15 +1,20 @@
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any, Annotated
+from pydantic import BaseModel, Field, ConfigDict, StringConstraints
+
+NumericId = Annotated[str, StringConstraints(pattern=r"^\d{0,12}$")]
+MapName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
 
 class TeamAnalysisPayload(BaseModel):
-    team_a_id: str = Field(default="", description="Team A ID")
-    team_b_id: str = Field(default="", description="Team B ID")
-    event_ids: Optional[List[str]] = Field(default=None, description="Event ID filters")
+    model_config = ConfigDict(extra="ignore")
+    team_a_id: NumericId = Field(default="", description="Team A ID")
+    team_b_id: NumericId = Field(default="", description="Team B ID")
+    event_ids: Optional[List[NumericId]] = Field(default=None, max_length=12, description="Event ID filters")
 
 class BanPickPayload(BaseModel):
-    maps_a: Dict[str, Any] = Field(default_factory=dict)
-    maps_b: Dict[str, Any] = Field(default_factory=dict)
-    map_pool: List[str] = Field(default_factory=list)
+    model_config = ConfigDict(extra="ignore")
+    maps_a: Dict[MapName, Any] = Field(default_factory=dict)
+    maps_b: Dict[MapName, Any] = Field(default_factory=dict)
+    map_pool: List[MapName] = Field(default_factory=list, max_length=15)
 
 class MatchItem(BaseModel):
     id: str
