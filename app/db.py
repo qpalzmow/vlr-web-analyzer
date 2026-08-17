@@ -69,36 +69,31 @@ def save_team_data(
     advanced_data: Optional[Dict[str, Any]] = None,
     events_data: Optional[List[Dict[str, Any]]] = None
 ):
-    """Saves or updates a team's complete pre-computed analytics record."""
+    """Saves or updates a team's analytics record atomically using COALESCE."""
     if not team_id:
         return
     now_iso = datetime.now(timezone.utc).isoformat()
+    maps_json = json.dumps(maps_data, ensure_ascii=False) if maps_data is not None else None
+    form_json = json.dumps(form_data, ensure_ascii=False) if form_data is not None else None
+    ace_json = json.dumps(ace_data, ensure_ascii=False) if ace_data is not None else None
+    adv_json = json.dumps(advanced_data, ensure_ascii=False) if advanced_data is not None else None
+    ev_json = json.dumps(events_data, ensure_ascii=False) if events_data is not None else None
+
     conn = get_db_connection()
     try:
         with conn:
-            # First fetch existing to merge if only partial data is provided
-            cursor = conn.execute("SELECT * FROM team_data WHERE team_id = ?", (str(team_id),))
-            existing = cursor.fetchone()
-
-            maps_json = json.dumps(maps_data, ensure_ascii=False) if maps_data is not None else (existing["maps_json"] if existing else "{}")
-            form_json = json.dumps(form_data, ensure_ascii=False) if form_data is not None else (existing["form_json"] if existing else "[]")
-            ace_json = json.dumps(ace_data, ensure_ascii=False) if ace_data is not None else (existing["ace_json"] if existing else "{}")
-            adv_json = json.dumps(advanced_data, ensure_ascii=False) if advanced_data is not None else (existing["advanced_json"] if existing else "{}")
-            ev_json = json.dumps(events_data, ensure_ascii=False) if events_data is not None else (existing["events_json"] if existing else "[]")
-            tname = team_name if team_name else (existing["team_name"] if existing and existing["team_name"] else "")
-
             conn.execute("""
                 INSERT INTO team_data (team_id, team_name, maps_json, form_json, ace_json, advanced_json, events_json, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(team_id) DO UPDATE SET
-                    team_name = excluded.team_name,
-                    maps_json = excluded.maps_json,
-                    form_json = excluded.form_json,
-                    ace_json = excluded.ace_json,
-                    advanced_json = excluded.advanced_json,
-                    events_json = excluded.events_json,
+                    team_name = CASE WHEN excluded.team_name <> '' THEN excluded.team_name ELSE team_data.team_name END,
+                    maps_json = COALESCE(excluded.maps_json, team_data.maps_json),
+                    form_json = COALESCE(excluded.form_json, team_data.form_json),
+                    ace_json = COALESCE(excluded.ace_json, team_data.ace_json),
+                    advanced_json = COALESCE(excluded.advanced_json, team_data.advanced_json),
+                    events_json = COALESCE(excluded.events_json, team_data.events_json),
                     updated_at = excluded.updated_at;
-            """, (str(team_id), tname, maps_json, form_json, ace_json, adv_json, ev_json, now_iso))
+            """, (str(team_id), team_name or "", maps_json, form_json, ace_json, adv_json, ev_json, now_iso))
     finally:
         conn.close()
 
@@ -148,8 +143,8 @@ def save_matches_cache(tier: str, region: str, matches: List[Dict[str, Any]]):
         conn.close()
 
 
-def get_cached_matches(tier: str, region: str) -> Optional[List[Dict[str, Any]]]:
-    """Retrieves cached matches list for tier and region."""
+def get_cached_matches(tier: str, region: str, max_age_seconds: int = 600) -> Optional[List[Dict[str, Any]]]:
+    """Retrieves cached matches list for tier and region with TTL verification."""
     cache_key = f"{tier}:{region}"
     conn = get_db_connection()
     try:
@@ -157,6 +152,14 @@ def get_cached_matches(tier: str, region: str) -> Optional[List[Dict[str, Any]]]
         row = cursor.fetchone()
         if not row or not row["matches_json"]:
             return None
+        if row["updated_at"]:
+            try:
+                updated_at = datetime.fromisoformat(row["updated_at"])
+                age = (datetime.now(timezone.utc) - updated_at).total_seconds()
+                if age > max_age_seconds:
+                    return None
+            except Exception:
+                pass
         return json.loads(row["matches_json"])
     except Exception as e:
         logger.warning("Error reading cached matches for %s: %s", cache_key, e)

@@ -160,10 +160,12 @@ def _get_advanced_for_team(team_id: str, event_ids: Optional[list] = None) -> di
         save_team_data(team_id, advanced_data=adv)
     return adv or default_adv
 
+_maintenance_lock = threading.Lock()
+
 @app.get("/api/matches")
 def api_get_matches():
     try:
-        cached_matches = get_cached_matches('s_tier', 'all')
+        cached_matches = get_cached_matches('s_tier', 'all', max_age_seconds=600)
         if cached_matches:
             return JSONResponse(content=cached_matches)
         matches = get_cached_data('matches', 'matches_list', get_matches)
@@ -282,10 +284,14 @@ def api_get_sync_status_endpoint():
 
 @app.post("/api/sync/trigger")
 def api_trigger_sync_endpoint():
+    if not _maintenance_lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="Maintenance task already running or queued")
     try:
-        _global_executor.submit(run_daily_sync, True)
+        future = _global_executor.submit(run_daily_sync, True)
+        future.add_done_callback(lambda _: _maintenance_lock.release())
         return JSONResponse(content={"status": "sync_triggered"})
     except Exception as e:
+        _maintenance_lock.release()
         logger.error("api_trigger_sync failed: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
 
@@ -300,10 +306,14 @@ def api_simulate_banpick(payload: BanPickPayload):
 
 @app.post("/api/cache/warm")
 def api_trigger_cache_warm():
+    if not _maintenance_lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="Maintenance task already running or queued")
     try:
-        _global_executor.submit(warm_cache_cycle)
+        future = _global_executor.submit(warm_cache_cycle)
+        future.add_done_callback(lambda _: _maintenance_lock.release())
         return JSONResponse(content={"status": "warming_triggered"})
     except Exception as e:
+        _maintenance_lock.release()
         logger.error("api_trigger_cache_warm failed: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
 
