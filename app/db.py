@@ -1,0 +1,214 @@
+import os
+import json
+import sqlite3
+import logging
+from datetime import datetime, timezone
+from typing import Optional, Dict, Any, List
+
+logger = logging.getLogger(__name__)
+
+DB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+DB_PATH = os.path.join(DB_DIR, "vlr_analyzer.db")
+
+
+def get_db_connection() -> sqlite3.Connection:
+    """Returns a SQLite connection with row_factory and WAL mode enabled."""
+    os.makedirs(DB_DIR, exist_ok=True)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0, check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    # Enable WAL mode for high concurrency
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
+    return conn
+
+
+def init_db():
+    """Initializes the database schema if tables do not exist."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS team_data (
+                    team_id TEXT PRIMARY KEY,
+                    team_name TEXT,
+                    maps_json TEXT,
+                    form_json TEXT,
+                    ace_json TEXT,
+                    advanced_json TEXT,
+                    events_json TEXT,
+                    updated_at TEXT
+                );
+            """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS matches_cache (
+                    cache_key TEXT PRIMARY KEY,
+                    matches_json TEXT,
+                    updated_at TEXT
+                );
+            """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS sync_meta (
+                    key TEXT PRIMARY KEY,
+                    last_synced_at TEXT,
+                    status TEXT,
+                    details_json TEXT
+                );
+            """)
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_team_updated ON team_data(updated_at);")
+        logger.info("SQLite database initialized at %s", DB_PATH)
+    finally:
+        conn.close()
+
+
+def save_team_data(
+    team_id: str,
+    team_name: str = "",
+    maps_data: Optional[Dict[str, Any]] = None,
+    form_data: Optional[List[str]] = None,
+    ace_data: Optional[Dict[str, Any]] = None,
+    advanced_data: Optional[Dict[str, Any]] = None,
+    events_data: Optional[List[Dict[str, Any]]] = None
+):
+    """Saves or updates a team's complete pre-computed analytics record."""
+    if not team_id:
+        return
+    now_iso = datetime.now(timezone.utc).isoformat()
+    conn = get_db_connection()
+    try:
+        with conn:
+            # First fetch existing to merge if only partial data is provided
+            cursor = conn.execute("SELECT * FROM team_data WHERE team_id = ?", (str(team_id),))
+            existing = cursor.fetchone()
+
+            maps_json = json.dumps(maps_data, ensure_ascii=False) if maps_data is not None else (existing["maps_json"] if existing else "{}")
+            form_json = json.dumps(form_data, ensure_ascii=False) if form_data is not None else (existing["form_json"] if existing else "[]")
+            ace_json = json.dumps(ace_data, ensure_ascii=False) if ace_data is not None else (existing["ace_json"] if existing else "{}")
+            adv_json = json.dumps(advanced_data, ensure_ascii=False) if advanced_data is not None else (existing["advanced_json"] if existing else "{}")
+            ev_json = json.dumps(events_data, ensure_ascii=False) if events_data is not None else (existing["events_json"] if existing else "[]")
+            tname = team_name if team_name else (existing["team_name"] if existing and existing["team_name"] else "")
+
+            conn.execute("""
+                INSERT INTO team_data (team_id, team_name, maps_json, form_json, ace_json, advanced_json, events_json, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(team_id) DO UPDATE SET
+                    team_name = excluded.team_name,
+                    maps_json = excluded.maps_json,
+                    form_json = excluded.form_json,
+                    ace_json = excluded.ace_json,
+                    advanced_json = excluded.advanced_json,
+                    events_json = excluded.events_json,
+                    updated_at = excluded.updated_at;
+            """, (str(team_id), tname, maps_json, form_json, ace_json, adv_json, ev_json, now_iso))
+    finally:
+        conn.close()
+
+
+def get_cached_team_data(team_id: str) -> Optional[Dict[str, Any]]:
+    """Retrieves cached analytics for a team. Returns None if not found."""
+    if not team_id:
+        return None
+    conn = get_db_connection()
+    try:
+        cursor = conn.execute("SELECT * FROM team_data WHERE team_id = ?", (str(team_id),))
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return {
+            "team_id": row["team_id"],
+            "team_name": row["team_name"],
+            "maps": json.loads(row["maps_json"] or "{}"),
+            "form": json.loads(row["form_json"] or "[]"),
+            "ace": json.loads(row["ace_json"] or "{}"),
+            "advanced": json.loads(row["advanced_json"] or "{}"),
+            "events": json.loads(row["events_json"] or "[]"),
+            "updated_at": row["updated_at"]
+        }
+    except Exception as e:
+        logger.warning("Error fetching cached team data for %s: %s", team_id, e)
+        return None
+    finally:
+        conn.close()
+
+
+def save_matches_cache(tier: str, region: str, matches: List[Dict[str, Any]]):
+    """Saves matches list for tier and region."""
+    cache_key = f"{tier}:{region}"
+    now_iso = datetime.now(timezone.utc).isoformat()
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute("""
+                INSERT INTO matches_cache (cache_key, matches_json, updated_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT(cache_key) DO UPDATE SET
+                    matches_json = excluded.matches_json,
+                    updated_at = excluded.updated_at;
+            """, (cache_key, json.dumps(matches, ensure_ascii=False), now_iso))
+    finally:
+        conn.close()
+
+
+def get_cached_matches(tier: str, region: str) -> Optional[List[Dict[str, Any]]]:
+    """Retrieves cached matches list for tier and region."""
+    cache_key = f"{tier}:{region}"
+    conn = get_db_connection()
+    try:
+        cursor = conn.execute("SELECT matches_json, updated_at FROM matches_cache WHERE cache_key = ?", (cache_key,))
+        row = cursor.fetchone()
+        if not row or not row["matches_json"]:
+            return None
+        return json.loads(row["matches_json"])
+    except Exception as e:
+        logger.warning("Error reading cached matches for %s: %s", cache_key, e)
+        return None
+    finally:
+        conn.close()
+
+
+def set_sync_status(status: str, details: Optional[Dict[str, Any]] = None):
+    """Updates global daily sync status metadata."""
+    now_iso = datetime.now(timezone.utc).isoformat()
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute("""
+                INSERT INTO sync_meta (key, last_synced_at, status, details_json)
+                VALUES ('daily_sync', ?, ?, ?)
+                ON CONFLICT(key) DO UPDATE SET
+                    last_synced_at = excluded.last_synced_at,
+                    status = excluded.status,
+                    details_json = excluded.details_json;
+            """, (now_iso, status, json.dumps(details or {}, ensure_ascii=False)))
+    finally:
+        conn.close()
+
+
+def get_sync_status() -> Dict[str, Any]:
+    """Returns the last daily sync status."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.execute("SELECT * FROM sync_meta WHERE key = 'daily_sync'")
+        row = cursor.fetchone()
+        
+        # Count total synced teams
+        cursor_teams = conn.execute("SELECT COUNT(*) as cnt FROM team_data")
+        team_count = cursor_teams.fetchone()["cnt"]
+
+        if not row:
+            return {
+                "last_synced_at": None,
+                "status": "not_started",
+                "synced_teams_count": team_count,
+                "details": {}
+            }
+        return {
+            "last_synced_at": row["last_synced_at"],
+            "status": row["status"],
+            "synced_teams_count": team_count,
+            "details": json.loads(row["details_json"] or "{}")
+        }
+    except Exception as e:
+        logger.warning("Error getting sync status: %s", e)
+        return {"status": "error", "error": str(e), "synced_teams_count": 0}
+    finally:
+        conn.close()
