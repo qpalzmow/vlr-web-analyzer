@@ -684,7 +684,9 @@ function clearDashboard() {
 
 function renderEmptyTable(tableId) {
     const el = document.getElementById(tableId);
-    el.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-slate-500 italic">데이터가 없습니다.</td></tr>';
+    if (el) {
+        el.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-500 italic">데이터가 없습니다.</td></tr>';
+    }
 }
 
 // Render Server-Driven Ban & Pick Simulation Results

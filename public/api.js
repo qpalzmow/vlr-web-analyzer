@@ -231,8 +231,8 @@ async function runAnalysis() {
     }).catch(err => {
         if (err.name === 'AbortError') return;
         failedSteps++;
-        document.getElementById('team-a-maps-table').innerHTML = '<tr><td colspan="5" class="py-4 text-center text-red-400">로드 실패</td></tr>';
-        document.getElementById('team-b-maps-table').innerHTML = '<tr><td colspan="5" class="py-4 text-center text-red-400">로드 실패</td></tr>';
+        document.getElementById('team-a-maps-table').innerHTML = '<tr><td colspan="4" class="py-4 text-center text-red-400">로드 실패</td></tr>';
+        document.getElementById('team-b-maps-table').innerHTML = '<tr><td colspan="4" class="py-4 text-center text-red-400">로드 실패</td></tr>';
         document.getElementById('ai-ban-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
         document.getElementById('ai-pick-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
         console.error('Maps fetch error:', err);
