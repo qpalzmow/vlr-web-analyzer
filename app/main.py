@@ -167,8 +167,14 @@ _maintenance_lock = threading.Lock()
 def api_get_matches():
     try:
         cached_matches = get_cached_matches('s_tier', 'all', max_age_seconds=600)
-        if cached_matches:
+        is_valid_cache = (
+            cached_matches and 
+            len(cached_matches) > 2 and 
+            not any(m.get('url') in ('/1001', '/1002') or m.get('id') in ('1001', '1002') for m in cached_matches)
+        )
+        if is_valid_cache:
             return JSONResponse(content=cached_matches)
+            
         matches = get_cached_data('matches', 'matches_list', get_matches)
         save_matches_cache('s_tier', 'all', matches)
         return JSONResponse(content=matches)
