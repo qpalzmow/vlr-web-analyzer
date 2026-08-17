@@ -64,7 +64,7 @@ def get_matches():
 
         for ev in major_events:
             try:
-                ev_res = request_with_retry(f"https://www.vlr.gg/event/matches/{ev['id']}")
+                ev_res = request_with_retry(f"https://www.vlr.gg/event/matches/{ev['id']}/?series_id=all")
                 ev_matches = parse_matches_list(ev_res.text, s_keywords, a_keywords)
                 
                 region = "Other"

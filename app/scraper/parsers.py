@@ -151,14 +151,25 @@ def parse_matches_list(html_text: str, s_keywords: list, a_keywords: list) -> li
     labels = soup.find_all(class_='wf-label')
     label_dates = {id(l): clean_text(l.get_text()) for l in labels}
 
-    for card in soup.find_all(class_='wf-card'):
-        a_tag = card.find('a', href=True) if card.name != 'a' else card
+    # Find all match items (wf-card contains multiple match-item elements on multi-match days)
+    match_elements = soup.find_all(class_='match-item')
+    if not match_elements:
+        for card in soup.find_all(class_='wf-card'):
+            match_elements.extend(card.find_all('a', href=True))
+
+    seen_match_ids = set()
+    for elem in match_elements:
+        a_tag = elem if elem.name == 'a' else elem.find('a', href=True)
         if not a_tag or not a_tag.get('href'):
             continue
         href = a_tag['href']
         parts = href.split('/')
         if len(parts) >= 3 and parts[1].isdigit():
             match_id = parts[1]
+            if match_id in seen_match_ids:
+                continue
+            seen_match_ids.add(match_id)
+
             full_url = f"https://www.vlr.gg{href}"
             teams = a_tag.find_all(class_=['match-item-vs-team-name', 'match-item-team-name'])
             if not teams:
