@@ -524,14 +524,15 @@ function escapeHTML(str) {
         .replace(/'/g, '&#039;');
 }
 
-// Helper: Render Maps Table
+// Helper: Render Maps Table (Compact, Zero-Scroll, Overall Winrate Display)
 function renderMapsTable(tableId, mapsData) {
     const el = document.getElementById(tableId);
+    if (!el) return;
     el.innerHTML = '';
     
     const mapNames = Object.keys(mapsData || {});
     if (mapNames.length === 0) {
-        el.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-slate-500 italic">기록된 맵 데이터가 없습니다.</td></tr>';
+        el.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-500 italic">기록된 맵 데이터가 없습니다.</td></tr>';
         return;
     }
     
@@ -556,25 +557,39 @@ function renderMapsTable(tableId, mapsData) {
         
         if (isActive) {
             // High contrast emerald left-border highlight for active pool
-            tr.className = 'border-b border-slate-800/60 hover:bg-emerald-950/15 bg-emerald-950/5 transition-colors font-medium border-l-4 border-l-emerald-500/80';
+            tr.className = 'border-b border-slate-800/60 hover:bg-emerald-950/15 bg-emerald-950/5 transition-colors font-medium border-l-2 border-l-emerald-500/80';
         } else {
             // Dimmed/translucent look for inactive/retired maps
-            tr.className = 'border-b border-slate-900/40 hover:bg-slate-900/5 bg-zinc-950/10 opacity-30 transition-colors font-medium';
+            tr.className = 'border-b border-slate-900/40 hover:bg-slate-900/5 bg-zinc-950/10 opacity-35 transition-colors font-medium';
         }
         
+        const totalPlayed = s.played || 0;
+        const overallWinrate = totalPlayed > 0 ? Math.round((s.w / totalPlayed) * 100) : 0;
+        let wrColor = 'text-slate-300';
+        if (overallWinrate >= 60) wrColor = 'text-emerald-400 font-extrabold';
+        else if (overallWinrate <= 40 && totalPlayed > 0) wrColor = 'text-red-400 font-bold';
+        else if (totalPlayed > 0) wrColor = 'text-amber-300 font-bold';
+
         const atkPct = s.atk_total > 0 ? Math.round((s.atk_won / s.atk_total) * 100) + '%' : '0%';
         const defPct = s.def_total > 0 ? Math.round((s.def_won / s.def_total) * 100) + '%' : '0%';
         
         const badgeHtml = isActive 
-            ? `<span class="ml-1 sm:ml-2 text-[8px] sm:text-[9px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-1 py-0.5 rounded uppercase tracking-wider">Active</span>`
-            : `<span class="ml-1 sm:ml-2 text-[8px] sm:text-[9px] font-bold text-slate-500 bg-zinc-800/40 border border-slate-700/20 px-1 py-0.5 rounded uppercase tracking-wider">Legacy</span>`;
+            ? `<span class="ml-1 text-[7px] sm:text-[8px] font-bold text-emerald-400 bg-emerald-950/90 border border-emerald-500/30 px-1 py-0.2 rounded uppercase">Act</span>`
+            : `<span class="ml-1 text-[7px] sm:text-[8px] font-bold text-slate-500 bg-zinc-800/40 border border-slate-700/20 px-1 py-0.2 rounded uppercase">Leg</span>`;
             
         tr.innerHTML = `
-            <td class="py-2 sm:py-3 pl-2 text-slate-100 font-bold text-[11px] sm:text-sm flex items-center">${escapeHTML(mapName)} ${badgeHtml}</td>
-            <td class="py-2 sm:py-3 text-center text-slate-300">${s.played}</td>
-            <td class="py-2 sm:py-3 text-center text-sky-400 font-bold">${atkPct}</td>
-            <td class="py-2 sm:py-3 text-center text-orange-400 font-bold">${defPct}</td>
-            <td class="py-2 sm:py-3 text-center text-slate-400 text-[10px] sm:text-xs">${s.w}승 - ${s.l}패</td>
+            <td class="py-2 px-1 text-slate-100 font-bold text-[11px] sm:text-xs truncate">
+                <div class="flex items-center gap-0.5 truncate">
+                    <span class="truncate">${escapeHTML(mapName)}</span>
+                    ${badgeHtml}
+                </div>
+            </td>
+            <td class="py-2 px-1 text-center truncate">
+                <span class="${wrColor} text-[11px] sm:text-xs">${overallWinrate}%</span>
+                <span class="text-[9px] text-slate-400 font-medium ml-1">(${s.w}승${s.l}패)</span>
+            </td>
+            <td class="py-2 px-1 text-center text-sky-400 font-bold text-[11px] sm:text-xs">${atkPct}</td>
+            <td class="py-2 px-1 text-center text-orange-400 font-bold text-[11px] sm:text-xs">${defPct}</td>
         `;
         el.appendChild(tr);
     });

@@ -101,10 +101,29 @@ html[data-theme="ios"] .bg-gradient-to-b {
 }
 
 /* 5. Input Controls & Select Pickers (iOS Inset Grouped Selector) */
+select {
+    color-scheme: dark !important;
+}
+
+select optgroup {
+    background-color: #18181b !important;
+    color: #a1a1aa !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+    padding: 4px 6px !important;
+}
+
+select option {
+    background-color: #18181b !important;
+    color: #f4f4f5 !important;
+    padding: 4px 6px !important;
+}
+
 html[data-theme="ios"] select,
 html[data-theme="ios"] input[type="text"] {
-    background-color: rgba(255, 255, 255, 0.07) !important;
-    border: 0.5px solid rgba(255, 255, 255, 0.18) !important;
+    color-scheme: dark !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: var(--ios-radius-grouped) !important;
     color: var(--ios-label-primary) !important;
     font-family: var(--ios-font-family) !important;
@@ -120,13 +139,22 @@ html[data-theme="ios"] select:focus,
 html[data-theme="ios"] input[type="text"]:focus {
     border-color: var(--ios-blue) !important;
     box-shadow: 0 0 0 3.5px rgba(10, 132, 255, 0.3) !important;
-    background-color: rgba(255, 255, 255, 0.12) !important;
+    background-color: rgba(255, 255, 255, 0.14) !important;
     outline: none !important;
+}
+
+html[data-theme="ios"] select optgroup {
+    background-color: #1c1c1e !important;
+    color: #8e8e93 !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+    padding: 4px 6px !important;
 }
 
 html[data-theme="ios"] select option {
     background-color: #1c1c1e !important;
     color: #ffffff !important;
+    padding: 4px 6px !important;
 }
 
 /* 6. Primary Filled Button (iOS SF Accent Button) */
