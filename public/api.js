@@ -25,14 +25,16 @@ async function handleMatchSelection() {
     const idx = parseInt(matchSelect.value, 10);
     if (isNaN(idx)) return;
     
-    selectedMatch = filteredMatches[idx];
+    const requestMatch = filteredMatches[idx];
+    if (!requestMatch) return;
+    selectedMatch = requestMatch;
     
     // Stop any active live polling
     stopLiveScorePolling();
     
     // Clear display cards to show loading
-    document.getElementById('team-a-name').textContent = selectedMatch.team_a;
-    document.getElementById('team-b-name').textContent = selectedMatch.team_b;
+    document.getElementById('team-a-name').textContent = requestMatch.team_a;
+    document.getElementById('team-b-name').textContent = requestMatch.team_b;
     document.getElementById('team-a-form').innerHTML = '<span class="text-xs text-slate-500 italic">조회 대기 중..</span>';
     document.getElementById('team-b-form').innerHTML = '<span class="text-xs text-slate-500 italic">조회 대기 중..</span>';
     document.getElementById('team-a-agents').innerHTML = '<span class="text-xs text-slate-500 italic">조회 대기 중..</span>';
@@ -60,7 +62,7 @@ async function handleMatchSelection() {
     progressBarContainer.classList.remove('hidden');
     
     try {
-        const matchUrl = selectedMatch.url;
+        const matchUrl = requestMatch.url;
         const response = await fetch(`/api/match-details?url=${encodeURIComponent(matchUrl)}`, { signal });
         if (!response.ok) {
             throw new Error(`상세 로드 실패: ${response.status}`);
@@ -68,13 +70,16 @@ async function handleMatchSelection() {
         
         const data = await response.json();
         
-        // Save details inside selectedMatch object
-        selectedMatch.team_a_id = data.details.team_a_id;
-        selectedMatch.team_a_name = data.details.team_a_name;
-        selectedMatch.team_b_id = data.details.team_b_id;
-        selectedMatch.team_b_name = data.details.team_b_name;
-        selectedMatch.map_pool = data.map_pool || [];
-        selectedMatch.live_score = data.live_score || null;
+        // Guard against race condition: ignore response if user switched match or aborted
+        if (signal.aborted || selectedMatch !== requestMatch) return;
+        
+        // Save details inside requestMatch object
+        requestMatch.team_a_id = data.details.team_a_id;
+        requestMatch.team_a_name = data.details.team_a_name;
+        requestMatch.team_b_id = data.details.team_b_id;
+        requestMatch.team_b_name = data.details.team_b_name;
+        requestMatch.map_pool = data.map_pool || [];
+        requestMatch.live_score = data.live_score || null;
         
         teamAEvents = data.team_a_events;
         teamBEvents = data.team_b_events;
@@ -94,10 +99,12 @@ async function handleMatchSelection() {
             console.log('Match details request aborted.');
             return;
         }
-        updateStatus('error', '매치 세부 정보를 불러오지 못했습니다.', err.message, 0);
+        if (selectedMatch === requestMatch) {
+            updateStatus('error', '매치 세부 정보를 불러오지 못했습니다.', err.message, 0);
+        }
     } finally {
-        // Unlock UI only if this request wasn't aborted
-        if (!signal.aborted) {
+        // Unlock UI only if this request wasn't aborted and is still active
+        if (!signal.aborted && selectedMatch === requestMatch) {
             analyzeBtn.disabled = false;
             matchSelect.disabled = false;
         }
@@ -106,10 +113,11 @@ async function handleMatchSelection() {
 
 // 6. Run Analysis Pipeline (POST to server)
 async function runAnalysis() {
-    if (!selectedMatch) return;
+    const analysisMatch = selectedMatch;
+    if (!analysisMatch) return;
     
     // Prevent analysis if match details (team IDs) are not fully loaded yet
-    if (!selectedMatch.team_a_id || !selectedMatch.team_b_id) {
+    if (!analysisMatch.team_a_id || !analysisMatch.team_b_id) {
         updateStatus('error', '매치 상세 정보 미로딩', '매치 세부 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도하세요.', 0);
         return;
     }
@@ -131,8 +139,8 @@ async function runAnalysis() {
     document.getElementById('team-a-form').innerHTML = spinnerHtml;
     document.getElementById('team-b-form').innerHTML = spinnerHtml;
     
-    document.getElementById('team-a-maps-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center">${spinnerHtml}</td></tr>`;
-    document.getElementById('team-b-maps-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center">${spinnerHtml}</td></tr>`;
+    document.getElementById('team-a-maps-table').innerHTML = `<tr><td colspan="4" class="py-4 text-center">${spinnerHtml}</td></tr>`;
+    document.getElementById('team-b-maps-table').innerHTML = `<tr><td colspan="4" class="py-4 text-center">${spinnerHtml}</td></tr>`;
     
     document.getElementById('ai-ban-list').innerHTML = `<p>${spinnerHtml}</p>`;
     document.getElementById('ai-pick-list').innerHTML = `<p>${spinnerHtml}</p>`;
@@ -153,8 +161,8 @@ async function runAnalysis() {
     updateStatus('info', '전력 분석을 시작합니다...', '경기 흐름, 맵 전적, 에이스 데이터를 요청 중입니다.', 10);
     
     const payload = {
-        team_a_id: selectedMatch.team_a_id,
-        team_b_id: selectedMatch.team_b_id,
+        team_a_id: analysisMatch.team_a_id,
+        team_b_id: analysisMatch.team_b_id,
         event_ids: selectedEvents.size > 0 ? Array.from(selectedEvents) : null
     };
     
@@ -177,6 +185,7 @@ async function runAnalysis() {
     }).then(async res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        if (signal.aborted || selectedMatch !== analysisMatch) return;
         renderFormBadges('team-a-form', data.form_a);
         renderFormBadges('team-b-form', data.form_b);
         renderAcsTrendChart(data.form_a, data.form_b);
@@ -185,8 +194,10 @@ async function runAnalysis() {
     }).catch(err => {
         if (err.name === 'AbortError') return;
         failedSteps++;
-        document.getElementById('team-a-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-        document.getElementById('team-b-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
+        if (selectedMatch === analysisMatch) {
+            document.getElementById('team-a-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
+            document.getElementById('team-b-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
+        }
         console.error('Form fetch error:', err);
     });
 
@@ -199,12 +210,13 @@ async function runAnalysis() {
     }).then(async res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        if (signal.aborted || selectedMatch !== analysisMatch) return;
         renderMapsTable('team-a-maps-table', data.maps_a);
         renderMapsTable('team-b-maps-table', data.maps_b);
         
         // Single Source of Truth: Call server banpick endpoint
-        const pool = (selectedMatch && selectedMatch.map_pool && selectedMatch.map_pool.length > 0)
-            ? selectedMatch.map_pool
+        const pool = (analysisMatch.map_pool && analysisMatch.map_pool.length > 0)
+            ? analysisMatch.map_pool
             : FALLBACK_MAP_POOL;
         
         try {
@@ -216,12 +228,16 @@ async function runAnalysis() {
             });
             if (simRes.ok) {
                 const simData = await simRes.json();
-                renderBanPickResults(simData);
+                if (!signal.aborted && selectedMatch === analysisMatch) {
+                    renderBanPickResults(simData);
+                }
             } else {
-                calculateAISimulation(data.maps_a, data.maps_b);
+                if (!signal.aborted && selectedMatch === analysisMatch) {
+                    calculateAISimulation(data.maps_a, data.maps_b);
+                }
             }
         } catch (simErr) {
-            if (simErr.name !== 'AbortError') {
+            if (simErr.name !== 'AbortError' && selectedMatch === analysisMatch) {
                 calculateAISimulation(data.maps_a, data.maps_b);
             }
         }
@@ -231,10 +247,12 @@ async function runAnalysis() {
     }).catch(err => {
         if (err.name === 'AbortError') return;
         failedSteps++;
-        document.getElementById('team-a-maps-table').innerHTML = '<tr><td colspan="4" class="py-4 text-center text-red-400">로드 실패</td></tr>';
-        document.getElementById('team-b-maps-table').innerHTML = '<tr><td colspan="4" class="py-4 text-center text-red-400">로드 실패</td></tr>';
-        document.getElementById('ai-ban-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
-        document.getElementById('ai-pick-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
+        if (selectedMatch === analysisMatch) {
+            document.getElementById('team-a-maps-table').innerHTML = '<tr><td colspan="4" class="py-4 text-center text-red-400">로드 실패</td></tr>';
+            document.getElementById('team-b-maps-table').innerHTML = '<tr><td colspan="4" class="py-4 text-center text-red-400">로드 실패</td></tr>';
+            document.getElementById('ai-ban-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
+            document.getElementById('ai-pick-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
+        }
         console.error('Maps fetch error:', err);
     });
 
@@ -247,6 +265,7 @@ async function runAnalysis() {
     }).then(async res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        if (signal.aborted || selectedMatch !== analysisMatch) return;
         renderAgentBadges('team-a-agents', data.ace_a.agents);
         renderAgentBadges('team-b-agents', data.ace_b.agents);
         populateAceCard('a', data.ace_a);
@@ -257,10 +276,12 @@ async function runAnalysis() {
     }).catch(err => {
         if (err.name === 'AbortError') return;
         failedSteps++;
-        document.getElementById('team-a-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-        document.getElementById('team-b-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-        document.getElementById('ace-a-nickname').textContent = 'N/A';
-        document.getElementById('ace-b-nickname').textContent = 'N/A';
+        if (selectedMatch === analysisMatch) {
+            document.getElementById('team-a-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
+            document.getElementById('team-b-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
+            document.getElementById('ace-a-nickname').textContent = 'N/A';
+            document.getElementById('ace-b-nickname').textContent = 'N/A';
+        }
         console.error('Aces fetch error:', err);
     });
 
@@ -273,6 +294,7 @@ async function runAnalysis() {
     }).then(async res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        if (signal.aborted || selectedMatch !== analysisMatch) return;
         
         // Calculate Win Probability using legitimate weighted metrics:
         // 60% Map Win Rate + 40% First Kill/Death Margin
@@ -298,7 +320,7 @@ async function runAnalysis() {
     try {
         await Promise.all([formPromise, mapsPromise, acesPromise, advPromise]);
         
-        if (!signal.aborted) {
+        if (!signal.aborted && selectedMatch === analysisMatch) {
             if (failedSteps === 0) {
                 updateStatus('success', '전력 분석 완료.', '양 팀의 최신 경기 데이터 융합 분석이 무결하게 완료되었습니다.', 100);
             } else if (failedSteps < totalSteps) {
@@ -308,11 +330,11 @@ async function runAnalysis() {
             }
         }
     } catch (err) {
-        if (err.name !== 'AbortError') {
+        if (err.name !== 'AbortError' && selectedMatch === analysisMatch) {
             updateStatus('error', '일부 전력 분석 실패', '일부 데이터를 불러오는 중 에러가 발생했습니다.', 0);
         }
     } finally {
-        if (!signal.aborted) {
+        if (!signal.aborted && selectedMatch === analysisMatch) {
             analysisRunning = false;
             analyzeBtn.disabled = false;
             setTimeout(() => {
