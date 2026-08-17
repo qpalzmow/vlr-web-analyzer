@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     initUITheme();
     fetchMatches();
+    checkSyncStatus();
     
     // Wire up events
     tierSelect.addEventListener('change', () => {

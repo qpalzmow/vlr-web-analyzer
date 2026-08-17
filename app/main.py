@@ -29,6 +29,11 @@ from app.scraper.vlr import (
 from app.scraper.metrics import find_ace_player_from_stats, simulate_banpick
 
 from app.cache_warmer import start_cache_warmer, stop_cache_warmer, warm_cache_cycle
+from app.db import (
+    init_db, get_cached_team_data, save_team_data,
+    get_sync_status, get_cached_matches, save_matches_cache
+)
+from app.sync import start_sync_scheduler, run_daily_sync
 
 if hasattr(sys.stdout, 'reconfigure'):
     try:
@@ -37,11 +42,13 @@ if hasattr(sys.stdout, 'reconfigure'):
     except Exception:
         pass
 
-_global_executor = ThreadPoolExecutor(max_workers=8, thread_name_prefix="vlr-api")
+_global_executor = ThreadPoolExecutor(max_workers=12, thread_name_prefix="vlr-api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    init_db()
     start_cache_warmer()
+    start_sync_scheduler()
     yield
     stop_cache_warmer()
     _global_executor.shutdown(wait=True)
@@ -49,7 +56,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="VLR Web Analyzer API",
-    version="2.0.0",
+    version="2.1.0",
     lifespan=lifespan
 )
 
@@ -102,10 +109,65 @@ def upstream_health_check():
     except Exception as e:
         return {"status": "degraded", "vlr": f"unreachable: {e}"}
 
+def _get_form_for_team(team_id: str) -> list:
+    if not team_id:
+        return []
+    cached = get_cached_team_data(team_id)
+    if cached and cached.get("form"):
+        return cached["form"]
+    form = get_cached_data('team_form', team_id, get_team_form, team_id)
+    if form:
+        save_team_data(team_id, form_data=form)
+    return form
+
+def _get_maps_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
+    if not team_id:
+        return {}
+    if not event_ids:
+        cached = get_cached_team_data(team_id)
+        if cached and cached.get("maps"):
+            return cached["maps"]
+    key = make_cache_key(team_id, event_ids)
+    maps = get_cached_data('team_stats', key, get_team_maps_stats, team_id, event_ids)
+    if maps and not event_ids:
+        save_team_data(team_id, maps_data=maps)
+    return maps
+
+def _get_ace_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
+    if not team_id:
+        return {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}
+    if not event_ids:
+        cached = get_cached_team_data(team_id)
+        if cached and cached.get("ace") and cached["ace"].get("nickname") != "N/A":
+            return cached["ace"]
+    roster = get_cached_data('team_roster', team_id, get_team_roster, team_id)
+    ace = find_ace_player(roster, event_ids)
+    if ace and ace.get("nickname") != "N/A" and not event_ids:
+        save_team_data(team_id, ace_data=ace)
+    return ace
+
+def _get_advanced_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
+    default_adv = get_team_advanced_metrics("")
+    if not team_id:
+        return default_adv
+    if not event_ids:
+        cached = get_cached_team_data(team_id)
+        if cached and cached.get("advanced") and cached["advanced"].get("total_played", 0) > 0:
+            return cached["advanced"]
+    key = make_cache_key(team_id, event_ids)
+    adv = get_cached_data('pistol_stats', key, get_team_advanced_metrics, team_id, event_ids)
+    if adv and not event_ids:
+        save_team_data(team_id, advanced_data=adv)
+    return adv or default_adv
+
 @app.get("/api/matches")
 def api_get_matches():
     try:
+        cached_matches = get_cached_matches('s_tier', 'all')
+        if cached_matches:
+            return JSONResponse(content=cached_matches)
         matches = get_cached_data('matches', 'matches_list', get_matches)
+        save_matches_cache('s_tier', 'all', matches)
         return JSONResponse(content=matches)
     except Exception as e:
         logger.error("api_get_matches failed: %s", e, exc_info=True)
@@ -160,12 +222,8 @@ def api_get_live_score(url: str = Query(...)):
 @app.post("/api/analyze/form")
 def api_analyze_form(payload: TeamAnalysisPayload):
     try:
-        future_a = _global_executor.submit(
-            get_cached_data, 'team_form', payload.team_a_id, get_team_form, payload.team_a_id
-        ) if payload.team_a_id else None
-        future_b = _global_executor.submit(
-            get_cached_data, 'team_form', payload.team_b_id, get_team_form, payload.team_b_id
-        ) if payload.team_b_id else None
+        future_a = _global_executor.submit(_get_form_for_team, payload.team_a_id) if payload.team_a_id else None
+        future_b = _global_executor.submit(_get_form_for_team, payload.team_b_id) if payload.team_b_id else None
 
         return JSONResponse(content={
             "form_a": _safe_future_result(future_a, []),
@@ -178,15 +236,8 @@ def api_analyze_form(payload: TeamAnalysisPayload):
 @app.post("/api/analyze/maps")
 def api_analyze_maps(payload: TeamAnalysisPayload):
     try:
-        key_a = make_cache_key(payload.team_a_id, payload.event_ids)
-        key_b = make_cache_key(payload.team_b_id, payload.event_ids)
-
-        future_a = _global_executor.submit(
-            get_cached_data, 'team_stats', key_a, get_team_maps_stats, payload.team_a_id, payload.event_ids
-        ) if payload.team_a_id else None
-        future_b = _global_executor.submit(
-            get_cached_data, 'team_stats', key_b, get_team_maps_stats, payload.team_b_id, payload.event_ids
-        ) if payload.team_b_id else None
+        future_a = _global_executor.submit(_get_maps_for_team, payload.team_a_id, payload.event_ids) if payload.team_a_id else None
+        future_b = _global_executor.submit(_get_maps_for_team, payload.team_b_id, payload.event_ids) if payload.team_b_id else None
 
         return JSONResponse(content={
             "maps_a": _safe_future_result(future_a, {}),
@@ -199,20 +250,13 @@ def api_analyze_maps(payload: TeamAnalysisPayload):
 @app.post("/api/analyze/aces")
 def api_analyze_aces(payload: TeamAnalysisPayload):
     try:
-        future_a = _global_executor.submit(
-            get_cached_data, 'team_roster', payload.team_a_id, get_team_roster, payload.team_a_id
-        ) if payload.team_a_id else None
-        future_b = _global_executor.submit(
-            get_cached_data, 'team_roster', payload.team_b_id, get_team_roster, payload.team_b_id
-        ) if payload.team_b_id else None
+        future_a = _global_executor.submit(_get_ace_for_team, payload.team_a_id, payload.event_ids) if payload.team_a_id else None
+        future_b = _global_executor.submit(_get_ace_for_team, payload.team_b_id, payload.event_ids) if payload.team_b_id else None
 
-        roster_a = _safe_future_result(future_a, [])
-        roster_b = _safe_future_result(future_b, [])
-
-        ace_a = find_ace_player(roster_a, payload.event_ids)
-        ace_b = find_ace_player(roster_b, payload.event_ids)
-
-        return JSONResponse(content={"ace_a": ace_a, "ace_b": ace_b})
+        return JSONResponse(content={
+            "ace_a": _safe_future_result(future_a, {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}),
+            "ace_b": _safe_future_result(future_b, {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]})
+        })
     except Exception as e:
         logger.error("api_analyze_aces failed: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
@@ -220,23 +264,29 @@ def api_analyze_aces(payload: TeamAnalysisPayload):
 @app.post("/api/analyze/advanced")
 def api_analyze_advanced(payload: TeamAnalysisPayload):
     try:
-        key_a = make_cache_key(payload.team_a_id, payload.event_ids)
-        key_b = make_cache_key(payload.team_b_id, payload.event_ids)
-
-        future_a = _global_executor.submit(
-            get_cached_data, 'pistol_stats', key_a, get_team_advanced_metrics, payload.team_a_id, payload.event_ids
-        ) if payload.team_a_id else None
-        future_b = _global_executor.submit(
-            get_cached_data, 'pistol_stats', key_b, get_team_advanced_metrics, payload.team_b_id, payload.event_ids
-        ) if payload.team_b_id else None
-
         default_adv = get_team_advanced_metrics("")
+        future_a = _global_executor.submit(_get_advanced_for_team, payload.team_a_id, payload.event_ids) if payload.team_a_id else None
+        future_b = _global_executor.submit(_get_advanced_for_team, payload.team_b_id, payload.event_ids) if payload.team_b_id else None
+
         return JSONResponse(content={
             "adv_a": _safe_future_result(future_a, default_adv),
             "adv_b": _safe_future_result(future_b, default_adv)
         })
     except Exception as e:
         logger.error("api_analyze_advanced failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/api/sync/status")
+def api_get_sync_status_endpoint():
+    return JSONResponse(content=get_sync_status())
+
+@app.post("/api/sync/trigger")
+def api_trigger_sync_endpoint():
+    try:
+        _global_executor.submit(run_daily_sync, True)
+        return JSONResponse(content={"status": "sync_triggered"})
+    except Exception as e:
+        logger.error("api_trigger_sync failed: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/api/simulate/banpick")

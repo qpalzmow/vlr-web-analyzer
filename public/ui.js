@@ -908,3 +908,16 @@ function updateLiveScoreboard() {
     // Refresh icons inside the panel if any
     lucide.createIcons();
 }
+
+// 12. Check SQLite DB sync status on startup
+function checkSyncStatus() {
+    fetch('/api/sync/status')
+        .then(r => r.json())
+        .then(data => {
+            const badgeText = document.getElementById('sync-badge-text');
+            if (badgeText && data && data.synced_teams_count > 0) {
+                badgeText.textContent = `⚡ DB 고속 모드 (${data.synced_teams_count}개 팀 동기화)`;
+            }
+        })
+        .catch(() => {});
+}
