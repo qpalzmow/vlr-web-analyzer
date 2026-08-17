@@ -324,7 +324,12 @@ def get_team_maps_stats(team_id, event_ids=None):
             for ev_id in event_ids
         }
         for future in as_completed(future_to_event):
-            ev_data = future.result()
+            ev_id = future_to_event[future]
+            try:
+                ev_data = future.result()
+            except Exception as exc:
+                logger.warning("Team maps stats skipped for team=%s event=%s: %s", team_id, ev_id, exc)
+                continue
             for map_name, stats in ev_data.items():
                 if map_name not in aggregated:
                     aggregated[map_name] = {
@@ -407,7 +412,12 @@ def get_player_stats(player_id, event_ids=None):
             for ev_id in event_ids
         }
         for future in as_completed(future_to_event):
-            pdata = future.result()
+            ev_id = future_to_event[future]
+            try:
+                pdata = future.result()
+            except Exception as exc:
+                logger.warning("Player stats skipped for player=%s event=%s: %s", player_id, ev_id, exc)
+                continue
             aggregated["rounds"] += pdata.get("rounds", 0)
             aggregated["weighted_acs"] += pdata.get("weighted_acs", 0)
             aggregated["kills"] += pdata.get("kills", 0)

@@ -878,9 +878,23 @@ function updateLiveScoreboard() {
     
     // Render series score
     const seriesScoreEl = document.getElementById('live-series-score');
-    const teamA = selectedMatch.team_a;
-    const teamB = selectedMatch.team_b;
-    seriesScoreEl.innerHTML = `<span class="break-all">${teamA}</span> <span class="text-emerald-400 font-extrabold">${scoreData.series_score_a}</span> : <span class="text-emerald-400 font-extrabold">${scoreData.series_score_b}</span> <span class="break-all">${teamB}</span>`;
+    const teamA = selectedMatch.team_a || 'Team A';
+    const teamB = selectedMatch.team_b || 'Team B';
+    const span = (className, value) => {
+        const el = document.createElement('span');
+        el.className = className;
+        el.textContent = String(value ?? '');
+        return el;
+    };
+    seriesScoreEl.replaceChildren(
+        span('break-all', teamA),
+        document.createTextNode(' '),
+        span('text-emerald-400 font-extrabold', scoreData.series_score_a),
+        document.createTextNode(' : '),
+        span('text-emerald-400 font-extrabold', scoreData.series_score_b),
+        document.createTextNode(' '),
+        span('break-all', teamB)
+    );
     
     // Render status badge
     const badge = document.getElementById('live-status-badge');
