@@ -62,7 +62,10 @@ async function handleMatchSelection() {
     progressBarContainer.classList.remove('hidden');
     
     try {
-        const matchUrl = requestMatch.url;
+        const matchUrl = requestMatch.url || requestMatch.match_url || (requestMatch.id ? `https://www.vlr.gg/${requestMatch.id}` : '');
+        if (!matchUrl) {
+            throw new Error('매치 URL 정보를 찾을 수 없습니다.');
+        }
         const response = await fetch(`/api/match-details?url=${encodeURIComponent(matchUrl)}`, { signal });
         if (!response.ok) {
             throw new Error(`상세 로드 실패: ${response.status}`);

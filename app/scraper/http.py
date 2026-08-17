@@ -28,14 +28,25 @@ def close_httpx_client():
             _shared_client = None
 
 def validate_vlr_url(url: str) -> str:
-    """SSRF Protection: Ensure URL uses HTTPS and points strictly to an allowed VLR domain."""
-    if not url:
-        raise ValueError("URL cannot be empty")
+    """SSRF Protection & Normalizer: Ensure URL points strictly to allowed VLR domain or valid path."""
+    if not url or str(url).strip() in ("", "undefined", "null", "None"):
+        raise ValueError("URL cannot be empty or undefined")
+    url = str(url).strip()
+    if url.isdigit():
+        url = f"https://www.vlr.gg/{url}"
+    elif url.startswith("/"):
+        url = f"https://www.vlr.gg{url}"
+    elif url.startswith("http://"):
+        url = "https://" + url[7:]
+    elif not url.startswith("https://"):
+        url = f"https://{url}"
+
     parsed = urlparse.urlparse(url)
     if parsed.scheme != "https":
         raise ValueError(f"Invalid URL scheme: '{parsed.scheme}'. HTTPS is strictly required.")
-    if parsed.hostname not in ALLOWED_VLR_HOSTS:
-        raise ValueError(f"Host '{parsed.hostname}' is not in allowed VLR domain allowlist")
+    hostname = (parsed.hostname or "").lower()
+    if hostname not in ALLOWED_VLR_HOSTS:
+        raise ValueError(f"Host '{hostname}' is not in allowed VLR domain allowlist")
     return url
 
 def _get_headers():

@@ -202,6 +202,7 @@ def parse_matches_list(html_text: str, s_keywords: list, a_keywords: list) -> li
             matches.append({
                 "id": match_id,
                 "url": full_url,
+                "match_url": full_url,
                 "team_a": team_a,
                 "team_b": team_b,
                 "event": event_text,
