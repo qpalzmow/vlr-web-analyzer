@@ -74,32 +74,7 @@ function populateEventsDropdown() {
     populateMatchesDropdown();
 }
 
-function parseMatchDateTimestamp(m) {
-    if (!m) return 0;
-    try {
-        const rawDate = (m.date || '').replace(/\s*(today|yesterday)\s*/gi, '').trim();
-        const rawTime = (m.time || '12:00 PM').trim();
-        if (rawDate) {
-            const parsed = Date.parse(`${rawDate} ${rawTime}`);
-            if (!isNaN(parsed)) return parsed;
-        }
-    } catch (e) {}
-    return parseInt(m.id, 10) || 0;
-}
-
-function formatMatchDateLabel(dateStr, timeStr) {
-    if (!dateStr && !timeStr) return '';
-    let cleaned = (dateStr || '').replace(/\s*(today|yesterday)\s*/gi, '').trim();
-    cleaned = cleaned
-        .replace(/January/g, 'Jan').replace(/February/g, 'Feb').replace(/March/g, 'Mar')
-        .replace(/April/g, 'Apr').replace(/May/g, 'May').replace(/June/g, 'Jun')
-        .replace(/July/g, 'Jul').replace(/August/g, 'Aug').replace(/September/g, 'Sep')
-        .replace(/October/g, 'Oct').replace(/November/g, 'Nov').replace(/December/g, 'Dec');
-    const parts = [cleaned, timeStr].filter(Boolean);
-    return parts.length > 0 ? ` (${parts.join(' | ')})` : '';
-}
-
-// 3. Populate Matches Dropdown (grouped by Stage, sorted by Date chronologically)
+// 3. Populate Matches Dropdown (grouped by Stage optgroups: Playoffs, Play-Ins, Group Stage)
 function populateMatchesDropdown() {
     const tier = tierSelect.value;
     const region = regionSelect.value;
@@ -140,13 +115,8 @@ function populateMatchesDropdown() {
         stageGroups[stage].push({ match: m, globalIdx: idx });
     });
     
-    // Sort matches within each stage group by date/time (earliest to latest)
-    Object.keys(stageGroups).forEach(stage => {
-        stageGroups[stage].sort((a, b) => parseMatchDateTimestamp(a.match) - parseMatchDateTimestamp(b.match));
-    });
-    
-    // Helper to append optgroup
-    const appendStageGroup = (stageName) => {
+    // Render optgroup in logical stage order
+    stageOrder.forEach(stageName => {
         if (stageGroups[stageName] && stageGroups[stageName].length > 0) {
             const optgroup = document.createElement('optgroup');
             optgroup.label = `${stageName} - ${stageGroups[stageName].length}경기`;
@@ -155,23 +125,31 @@ function populateMatchesDropdown() {
                 const opt = document.createElement('option');
                 opt.value = globalIdx;
                 const roundTag = m.round_name ? `[${m.round_name}] ` : '';
-                const liveTag = (m.status || '').toLowerCase().includes('live') ? '🔴 [LIVE] ' : '';
-                const timeDate = formatMatchDateLabel(m.date, m.time);
-                opt.textContent = `${liveTag}${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
+                const timeDate = m.time || m.date ? ` (${[m.time, m.date].filter(Boolean).join(' | ')})` : '';
+                opt.textContent = `${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
                 optgroup.appendChild(opt);
             });
             
             matchSelect.appendChild(optgroup);
         }
-    };
-
-    // Render in logical stage order
-    stageOrder.forEach(appendStageGroup);
+    });
     
     // Any remaining stages not in stageOrder
     Object.keys(stageGroups).forEach(stageName => {
-        if (!stageOrder.includes(stageName)) {
-            appendStageGroup(stageName);
+        if (!stageOrder.includes(stageName) && stageGroups[stageName].length > 0) {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = `${stageName} - ${stageGroups[stageName].length}경기`;
+            
+            stageGroups[stageName].forEach(({ match: m, globalIdx }) => {
+                const opt = document.createElement('option');
+                opt.value = globalIdx;
+                const roundTag = m.round_name ? `[${m.round_name}] ` : '';
+                const timeDate = m.time || m.date ? ` (${[m.time, m.date].filter(Boolean).join(' | ')})` : '';
+                opt.textContent = `${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
+                optgroup.appendChild(opt);
+            });
+            
+            matchSelect.appendChild(optgroup);
         }
     });
     
@@ -187,8 +165,8 @@ function categorizeTournament(name) {
     if (/\b(champions|masters|world cup|ewc)\b/i.test(lower)) {
         return {
             type: 'global',
-            badgeText: '국제',
-            badgeCls: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
+            badgeText: '국제대회',
+            badgeCls: 'bg-amber-950/80 text-amber-300 border-amber-800/40',
             order: 1
         };
     }
@@ -196,23 +174,23 @@ function categorizeTournament(name) {
         return {
             type: 'vct',
             badgeText: '킥오프',
-            badgeCls: 'bg-sky-500/15 text-sky-300 border-sky-500/40',
+            badgeCls: 'bg-sky-950/80 text-sky-300 border-sky-800/40',
             order: 2
         };
     }
     if (/\b(stage\s*2|stage2)\b/i.test(lower)) {
         return {
             type: 'vct',
-            badgeText: '스테이지2',
-            badgeCls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
+            badgeText: '스테이지 2',
+            badgeCls: 'bg-emerald-950/80 text-emerald-300 border-emerald-800/40',
             order: 3
         };
     }
     if (/\b(stage\s*1|stage1)\b/i.test(lower)) {
         return {
             type: 'vct',
-            badgeText: '스테이지1',
-            badgeCls: 'bg-teal-500/15 text-teal-300 border-teal-500/40',
+            badgeText: '스테이지 1',
+            badgeCls: 'bg-teal-950/80 text-teal-300 border-teal-800/40',
             order: 4
         };
     }
@@ -220,7 +198,7 @@ function categorizeTournament(name) {
         return {
             type: 'vct',
             badgeText: 'VCT 정규',
-            badgeCls: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/40',
+            badgeCls: 'bg-indigo-950/80 text-indigo-300 border-indigo-800/40',
             order: 5
         };
     }
@@ -228,19 +206,19 @@ function categorizeTournament(name) {
         return {
             type: 'challengers',
             badgeText: '챌린저스',
-            badgeCls: 'bg-rose-500/15 text-rose-300 border-rose-500/40',
+            badgeCls: 'bg-rose-950/80 text-rose-300 border-rose-800/40',
             order: 6
         };
     }
     return {
         type: 'offseason',
         badgeText: '오프시즌',
-        badgeCls: 'bg-purple-500/15 text-purple-300 border-purple-500/40',
+        badgeCls: 'bg-purple-950/80 text-purple-300 border-purple-800/40',
         order: 7
     };
 }
 
-// 5. Draw Tournament Checklist (Modern Clean Interactive Chip Grid)
+// 5. Draw Tournament Checklist (Categorized by Kickoff, Stage 1/2, International, Off-Season)
 function drawTournamentChecklist() {
     tournamentChecklist.innerHTML = '';
     selectedEvents.clear();
@@ -271,108 +249,102 @@ function drawTournamentChecklist() {
     
     tournamentChecklistContainer.classList.remove('hidden');
     
-    const updateSelectedCountBadge = () => {
-        const badge = document.getElementById('selected-tournaments-count');
-        if (badge) {
-            badge.textContent = `${selectedEvents.size}개 선택`;
-        }
-    };
-
-    const chips = [];
-
-    sortedEvents.forEach((evt, idx) => {
-        const evId = evt.id.toString();
-        const evName = evt.name;
-        
-        const card = document.createElement('label');
-        card.className = 'group relative flex items-center justify-between gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border text-xs transition-all duration-150 cursor-pointer select-none';
-        
-        const isDefaultChecked = (idx < 3);
-        if (isDefaultChecked) {
-            selectedEvents.add(evId);
-            card.className += ' bg-emerald-950/40 border-emerald-500/50 text-white shadow-sm ring-1 ring-emerald-500/20';
-        } else {
-            card.className += ' bg-zinc-900/60 border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-slate-200';
-        }
-        
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.className = 'sr-only';
-        cb.value = evId;
-        cb.dataset.eventType = evt.type;
-        cb.checked = isDefaultChecked;
-        
-        // Left Content: Category Badge + Tournament Name
-        const leftDiv = document.createElement('div');
-        leftDiv.className = 'flex items-center space-x-1.5 sm:space-x-2 min-w-0 flex-1';
-        
-        const badge = document.createElement('span');
-        badge.className = `text-[9px] font-bold px-1.5 py-0.5 rounded-md border shrink-0 ${evt.badgeCls}`;
-        badge.textContent = evt.badgeText;
-        
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'truncate font-medium text-slate-200 group-hover:text-white transition-colors text-[11px] sm:text-xs';
-        nameSpan.textContent = evName;
-        nameSpan.title = evName;
-        
-        leftDiv.appendChild(badge);
-        leftDiv.appendChild(nameSpan);
-        
-        // Right Indicator: Checkmark Pill
-        const checkIcon = document.createElement('span');
-        checkIcon.className = `w-4 h-4 rounded-full border flex items-center justify-center text-[9px] font-bold shrink-0 transition-all ${isDefaultChecked ? 'bg-emerald-500 border-emerald-400 text-zinc-950 font-black' : 'border-slate-700 bg-zinc-800/60 text-transparent'}`;
-        checkIcon.textContent = '✓';
-        
-        const setCardState = (checked) => {
-            cb.checked = checked;
-            if (checked) {
-                selectedEvents.add(evId);
-                card.className = 'group relative flex items-center justify-between gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border text-xs transition-all duration-150 cursor-pointer select-none bg-emerald-950/40 border-emerald-500/50 text-white shadow-sm ring-1 ring-emerald-500/20';
-                checkIcon.className = 'w-4 h-4 rounded-full border flex items-center justify-center text-[9px] font-bold shrink-0 transition-all bg-emerald-500 border-emerald-400 text-zinc-950 font-black';
-            } else {
-                selectedEvents.delete(evId);
-                card.className = 'group relative flex items-center justify-between gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border text-xs transition-all duration-150 cursor-pointer select-none bg-zinc-900/60 border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-slate-200';
-                checkIcon.className = 'w-4 h-4 rounded-full border flex items-center justify-center text-[9px] font-bold shrink-0 transition-all border-slate-700 bg-zinc-800/60 text-transparent';
-            }
-            updateSelectedCountBadge();
-        };
-        
-        cb.addEventListener('change', () => setCardState(cb.checked));
-        
-        card.appendChild(cb);
-        card.appendChild(leftDiv);
-        card.appendChild(checkIcon);
-        
-        chips.push({ cb, setCardState, type: evt.type });
-        tournamentChecklist.appendChild(card);
-    });
-
-    updateSelectedCountBadge();
-
     // Wire up quick filter buttons
     const btnAll = document.getElementById('btn-filter-all');
     const btnVct = document.getElementById('btn-filter-vct');
     const btnGlobal = document.getElementById('btn-filter-global');
+    const btnOffseason = document.getElementById('btn-filter-offseason');
     const btnClear = document.getElementById('btn-filter-clear');
+
+    const checkboxes = [];
+
+    sortedEvents.forEach((evt, idx) => {
+        const evId = evt.id.toString();
+        const evName = evt.name;
+        const shortName = evName.length > 24 ? evName.substring(0, 24) + '..' : evName;
+        
+        const label = document.createElement('label');
+        label.className = 'flex items-center space-x-1.5 sm:space-x-2 bg-zinc-900 border border-slate-800 px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-medium text-slate-300 hover:border-slate-600 transition-colors cursor-pointer';
+        
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'rounded border-slate-700 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-zinc-950 cursor-pointer';
+        cb.value = evId;
+        cb.dataset.eventType = evt.type;
+        
+        // Check top 2-3 most recent official VCT tournaments by default
+        if (idx < 3) {
+            cb.checked = true;
+            selectedEvents.add(evId);
+        } else {
+            cb.checked = false;
+        }
+        
+        cb.addEventListener('change', () => {
+            if (cb.checked) {
+                selectedEvents.add(evId);
+            } else {
+                selectedEvents.delete(evId);
+            }
+        });
+        
+        checkboxes.push(cb);
+        
+        const badge = document.createElement('span');
+        badge.className = `text-[8px] sm:text-[9px] font-bold px-1 py-0.5 rounded border ${evt.badgeCls}`;
+        badge.textContent = evt.badgeText;
+        
+        label.appendChild(cb);
+        label.appendChild(badge);
+        label.appendChild(document.createTextNode(` ${shortName}`));
+        tournamentChecklist.appendChild(label);
+    });
 
     if (btnAll) {
         btnAll.onclick = () => {
-            chips.forEach(({ setCardState }) => setCardState(true));
+            selectedEvents.clear();
+            checkboxes.forEach(cb => {
+                cb.checked = true;
+                selectedEvents.add(cb.value);
+            });
         };
     }
     if (btnVct) {
         btnVct.onclick = () => {
-            chips.forEach(({ setCardState, type }) => setCardState(type === 'vct'));
+            selectedEvents.clear();
+            checkboxes.forEach(cb => {
+                const isVct = cb.dataset.eventType === 'vct';
+                cb.checked = isVct;
+                if (isVct) selectedEvents.add(cb.value);
+            });
         };
     }
     if (btnGlobal) {
         btnGlobal.onclick = () => {
-            chips.forEach(({ setCardState, type }) => setCardState(type === 'global'));
+            selectedEvents.clear();
+            checkboxes.forEach(cb => {
+                const isGlobal = cb.dataset.eventType === 'global';
+                cb.checked = isGlobal;
+                if (isGlobal) selectedEvents.add(cb.value);
+            });
+        };
+    }
+    if (btnOffseason) {
+        btnOffseason.onclick = () => {
+            selectedEvents.clear();
+            checkboxes.forEach(cb => {
+                const isOff = cb.dataset.eventType === 'offseason';
+                cb.checked = isOff;
+                if (isOff) selectedEvents.add(cb.value);
+            });
         };
     }
     if (btnClear) {
         btnClear.onclick = () => {
-            chips.forEach(({ setCardState }) => setCardState(false));
+            selectedEvents.clear();
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+            });
         };
     }
 }
