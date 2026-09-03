@@ -32,7 +32,8 @@ from app.scraper.metrics import find_ace_player_from_stats, simulate_banpick
 from app.cache_warmer import start_cache_warmer, stop_cache_warmer, warm_cache_cycle
 from app.db import (
     init_db, get_cached_team_data, save_team_data,
-    get_sync_status, get_cached_matches, save_matches_cache
+    get_sync_status, get_cached_matches, save_matches_cache,
+    get_cached_match_details, save_cached_match_details
 )
 from app.sync import start_sync_scheduler, run_daily_sync
 
@@ -185,8 +186,23 @@ def api_get_matches():
 @app.get("/api/match-details")
 def api_get_match_details(url: str = Query(...)):
     try:
-        validate_vlr_url(url)
-        details = get_cached_data('match_details', url, get_match_details, url)
+        clean_url = validate_vlr_url(url)
+
+        # 1. Fast-path: Check SQLite persistent cache first (instant response)
+        cached_match = get_cached_match_details(clean_url, max_age_seconds=3600)
+        if cached_match and cached_match.get("details"):
+            live_score = get_cached_live_score(clean_url, get_live_score)
+            return JSONResponse(content={
+                "details": cached_match["details"],
+                "team_a_events": cached_match.get("team_a_events", [])[:12],
+                "team_b_events": cached_match.get("team_b_events", [])[:12],
+                "map_pool": cached_match.get("map_pool", []),
+                "live_score": live_score,
+                "cached": True
+            })
+
+        # 2. Fallback: On-demand fetch and save to SQLite cache
+        details = get_cached_data('match_details', clean_url, get_match_details, clean_url)
 
         future_a = _global_executor.submit(
             get_cached_data, 'team_events', details["team_a_id"], get_team_events, details["team_a_id"]
@@ -201,14 +217,23 @@ def api_get_match_details(url: str = Query(...)):
         team_a_events = _safe_future_result(future_a, [])[:12]
         team_b_events = _safe_future_result(future_b, [])[:12]
         map_pool = _safe_future_result(future_pool, [])
-        live_score = get_cached_live_score(url, get_live_score)
+        live_score = get_cached_live_score(clean_url, get_live_score)
+
+        save_cached_match_details(
+            match_url=clean_url,
+            details=details,
+            map_pool=map_pool,
+            team_a_events=team_a_events,
+            team_b_events=team_b_events
+        )
 
         return JSONResponse(content={
             "details": details,
             "team_a_events": team_a_events,
             "team_b_events": team_b_events,
             "map_pool": map_pool,
-            "live_score": live_score
+            "live_score": live_score,
+            "cached": False
         })
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))

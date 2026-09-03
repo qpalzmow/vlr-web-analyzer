@@ -58,7 +58,8 @@ async function handleMatchSelection() {
     // Lock UI to prevent premature clicks
     analyzeBtn.disabled = true;
     matchSelect.disabled = true;
-    updateStatus('info', '매치 세부 정보 수집 중...', '선수 및 대회 정보를 실시간으로 수집 중입니다 (약 5~10초 소요). 잠시만 기다려주세요.', 0);
+    const isSTier = requestMatch.tier === 'S-Tier';
+    updateStatus('info', isSTier ? '⚡ S-Tier DB 고속 모드...' : '매치 세부 정보 수집 중...', isSTier ? '1시간 단위로 사전 동기화된 SQLite 데이터베이스에서 즉시 불러옵니다.' : '선수 및 대회 정보를 실시간으로 수집 중입니다 (약 5~10초 소요). 잠시만 기다려주세요.', 0);
     progressBarContainer.classList.remove('hidden');
     
     try {
@@ -87,7 +88,9 @@ async function handleMatchSelection() {
         teamAEvents = data.team_a_events;
         teamBEvents = data.team_b_events;
         
-        updateStatus('success', '매치 정보 로드 완료.', '대회 필터를 선택하고 전력 분석 시작을 클릭하세요.', 40);
+        const successTitle = data.cached ? '⚡ S-Tier DB 즉시 로드 완료.' : '매치 정보 로드 완료.';
+        const successMsg = data.cached ? '사전 캐싱된 데이터로 0초 지연 분석을 즉시 실행합니다.' : '대회 필터를 선택하고 전력 분석 시작을 클릭하세요.';
+        updateStatus('success', successTitle, successMsg, 40);
         
         // Draw checklists
         drawTournamentChecklist();
