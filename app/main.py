@@ -88,14 +88,25 @@ def find_ace_player(roster, event_ids):
         try:
             player_cache_key = make_cache_key(p['id'], event_ids)
             stats = get_cached_data('player_stats', player_cache_key, get_player_stats, p["id"], event_ids)
-            stats["name"] = p.get("name", "N/A")
+            if stats:
+                stats["name"] = p.get("name", "N/A")
             return stats
         except Exception:
             return None
 
-    players_data = [get_stats_for_player(p) for p in roster]
-    valid_players = [p for p in players_data if p is not None]
-    return find_ace_player_from_stats(valid_players)
+    # Fetch stats concurrently across roster with up to 6 workers
+    with ThreadPoolExecutor(max_workers=6) as executor:
+        futures = [executor.submit(get_stats_for_player, p) for p in roster]
+        players_data = []
+        for f in futures:
+            try:
+                res = f.result(timeout=10)
+                if res is not None:
+                    players_data.append(res)
+            except Exception:
+                pass
+
+    return find_ace_player_from_stats(players_data)
 
 @app.get("/health", response_model=HealthResponse)
 def health_check():
@@ -125,39 +136,64 @@ def _get_form_for_team(team_id: str) -> list:
 def _get_maps_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
     if not team_id:
         return {}
-    if not event_ids:
-        cached = get_cached_team_data(team_id)
-        if cached and cached.get("maps"):
-            return cached["maps"]
+    cached = get_cached_team_data(team_id)
+    cached_maps = (cached.get("maps") or {}) if cached else {}
+    if not event_ids and cached_maps:
+        return cached_maps
+
     key = make_cache_key(team_id, event_ids)
-    maps = get_cached_data('team_stats', key, get_team_maps_stats, team_id, event_ids)
+    try:
+        maps = get_cached_data('team_stats', key, get_team_maps_stats, team_id, event_ids)
+    except Exception as e:
+        logger.warning("Error fetching maps for team %s: %s", team_id, e)
+        maps = {}
+
     if maps and not event_ids:
         save_team_data(team_id, maps_data=maps)
-    return maps
+    return maps if maps else cached_maps
 
 def _get_ace_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
+    fallback_ace = {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}
     if not team_id:
-        return {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}
-    if not event_ids:
-        cached = get_cached_team_data(team_id)
-        if cached and cached.get("ace") and cached["ace"].get("nickname") != "N/A":
-            return cached["ace"]
-    roster = get_cached_data('team_roster', team_id, get_team_roster, team_id)
-    ace = find_ace_player(roster, event_ids)
-    if ace and ace.get("nickname") != "N/A" and not event_ids:
-        save_team_data(team_id, ace_data=ace)
-    return ace
+        return fallback_ace
+    cached = get_cached_team_data(team_id)
+    cached_ace = cached.get("ace") if cached else None
+    if cached_ace and cached_ace.get("nickname") != "N/A":
+        fallback_ace = cached_ace
+        if not event_ids:
+            return cached_ace
+
+    try:
+        roster = get_cached_data('team_roster', team_id, get_team_roster, team_id)
+        ace = find_ace_player(roster, event_ids)
+    except Exception as e:
+        logger.warning("Error fetching ace for team %s: %s", team_id, e)
+        ace = None
+
+    if ace and ace.get("nickname") != "N/A":
+        if not event_ids:
+            save_team_data(team_id, ace_data=ace)
+        return ace
+    return fallback_ace
 
 def _get_advanced_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
     default_adv = get_team_advanced_metrics("")
     if not team_id:
         return default_adv
-    if not event_ids:
-        cached = get_cached_team_data(team_id)
-        if cached and cached.get("advanced") and cached["advanced"].get("total_played", 0) > 0:
-            return cached["advanced"]
+    cached = get_cached_team_data(team_id)
+    cached_adv = cached.get("advanced") if cached else None
+    if cached_adv and cached_adv.get("total_played", 0) > 0:
+        default_adv = cached_adv
+        if not event_ids:
+            return cached_adv
+
     key = make_cache_key(team_id, event_ids)
-    adv = get_cached_data('pistol_stats', key, get_team_advanced_metrics, team_id, event_ids)
+    try:
+        adv = get_cached_data('pistol_stats', key, get_team_advanced_metrics, team_id, event_ids)
+    except Exception as e:
+        logger.warning("Error fetching advanced for team %s: %s", team_id, e)
+        adv = None
+
     if adv and not event_ids:
         save_team_data(team_id, advanced_data=adv)
     return adv or default_adv

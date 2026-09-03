@@ -144,10 +144,16 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
                 if details:
                     event_id = details.get("event_id")
                     map_pool = get_event_map_pool(event_id) if event_id else []
+                    ta_id = details.get("team_a_id")
+                    tb_id = details.get("team_b_id")
+                    ev_a = get_team_events(ta_id) if ta_id else []
+                    ev_b = get_team_events(tb_id) if tb_id else []
                     save_cached_match_details(
                         match_url=m_url,
                         details=details,
-                        map_pool=map_pool
+                        map_pool=map_pool,
+                        team_a_events=ev_a,
+                        team_b_events=ev_b
                     )
                     return (
                         details.get("team_a_id"),
