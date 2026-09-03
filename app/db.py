@@ -47,6 +47,16 @@ def init_db():
                 );
             """)
             conn.execute("""
+                CREATE TABLE IF NOT EXISTS match_details_cache (
+                    match_url TEXT PRIMARY KEY,
+                    details_json TEXT,
+                    map_pool_json TEXT,
+                    team_a_events_json TEXT,
+                    team_b_events_json TEXT,
+                    updated_at TEXT
+                );
+            """)
+            conn.execute("""
                 CREATE TABLE IF NOT EXISTS sync_meta (
                     key TEXT PRIMARY KEY,
                     last_synced_at TEXT,
@@ -55,6 +65,7 @@ def init_db():
                 );
             """)
             conn.execute("CREATE INDEX IF NOT EXISTS idx_team_updated ON team_data(updated_at);")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_match_details_updated ON match_details_cache(updated_at);")
         logger.info("SQLite database initialized at %s", DB_PATH)
     finally:
         conn.close()
@@ -163,6 +174,75 @@ def get_cached_matches(tier: str, region: str, max_age_seconds: int = 600) -> Op
         return json.loads(row["matches_json"])
     except Exception as e:
         logger.warning("Error reading cached matches for %s: %s", cache_key, e)
+        return None
+    finally:
+        conn.close()
+
+
+def save_cached_match_details(
+    match_url: str,
+    details: Dict[str, Any],
+    map_pool: Optional[List[str]] = None,
+    team_a_events: Optional[List[Dict[str, Any]]] = None,
+    team_b_events: Optional[List[Dict[str, Any]]] = None
+):
+    """Saves or updates cached match details and map pool in SQLite."""
+    if not match_url or not details:
+        return
+    now_iso = datetime.now(timezone.utc).isoformat()
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute("""
+                INSERT INTO match_details_cache (match_url, details_json, map_pool_json, team_a_events_json, team_b_events_json, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(match_url) DO UPDATE SET
+                    details_json = excluded.details_json,
+                    map_pool_json = COALESCE(excluded.map_pool_json, match_details_cache.map_pool_json),
+                    team_a_events_json = COALESCE(excluded.team_a_events_json, match_details_cache.team_a_events_json),
+                    team_b_events_json = COALESCE(excluded.team_b_events_json, match_details_cache.team_b_events_json),
+                    updated_at = excluded.updated_at;
+            """, (
+                match_url,
+                json.dumps(details, ensure_ascii=False),
+                json.dumps(map_pool or [], ensure_ascii=False),
+                json.dumps(team_a_events or [], ensure_ascii=False),
+                json.dumps(team_b_events or [], ensure_ascii=False),
+                now_iso
+            ))
+    except Exception as e:
+        logger.warning("Error saving cached match details for %s: %s", match_url, e)
+    finally:
+        conn.close()
+
+
+def get_cached_match_details(match_url: str, max_age_seconds: int = 3600) -> Optional[Dict[str, Any]]:
+    """Retrieves cached match details from SQLite with TTL check."""
+    if not match_url:
+        return None
+    conn = get_db_connection()
+    try:
+        cursor = conn.execute("SELECT * FROM match_details_cache WHERE match_url = ?", (match_url,))
+        row = cursor.fetchone()
+        if not row or not row["details_json"]:
+            return None
+        if row["updated_at"]:
+            try:
+                updated_at = datetime.fromisoformat(row["updated_at"])
+                age = (datetime.now(timezone.utc) - updated_at).total_seconds()
+                if age > max_age_seconds:
+                    return None
+            except Exception:
+                pass
+        return {
+            "details": json.loads(row["details_json"]),
+            "map_pool": json.loads(row["map_pool_json"] or "[]"),
+            "team_a_events": json.loads(row["team_a_events_json"] or "[]"),
+            "team_b_events": json.loads(row["team_b_events_json"] or "[]"),
+            "updated_at": row["updated_at"]
+        }
+    except Exception as e:
+        logger.warning("Error reading cached match details for %s: %s", match_url, e)
         return None
     finally:
         conn.close()

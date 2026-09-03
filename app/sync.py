@@ -7,12 +7,14 @@ from typing import Dict, Any, List, Set, Tuple
 
 from app.db import (
     init_db, save_team_data, save_matches_cache,
-    set_sync_status, get_sync_status, get_cached_team_data
+    set_sync_status, get_sync_status, get_cached_team_data,
+    save_cached_match_details
 )
 from app.scraper.vlr import (
     get_matches, get_team_events, get_team_maps_stats,
     get_team_form, get_team_roster, get_player_stats,
-    get_team_advanced_metrics, get_match_details
+    get_team_advanced_metrics, get_match_details,
+    get_event_map_pool
 )
 from app.scraper.metrics import find_ace_player_from_stats
 
@@ -115,13 +117,23 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
                 total_matches += len(matches)
 
                 for m in matches:
-                    if m.get("match_url"):
+                    m_url = m.get("url") or m.get("match_url")
+                    if m_url:
                         try:
-                            details = get_match_details(m["match_url"])
+                            details = get_match_details(m_url)
                             if details.get("team_a_id"):
                                 discovered_teams[str(details["team_a_id"])] = details.get("team_a_name", m.get("team_a", ""))
                             if details.get("team_b_id"):
                                 discovered_teams[str(details["team_b_id"])] = details.get("team_b_name", m.get("team_b", ""))
+                            
+                            # Pre-cache match details and map pool in SQLite for instant 0-latency loading
+                            event_id = details.get("event_id")
+                            map_pool = get_event_map_pool(event_id) if event_id else []
+                            save_cached_match_details(
+                                match_url=m_url,
+                                details=details,
+                                map_pool=map_pool
+                            )
                         except Exception:
                             pass
             except Exception as me:
@@ -154,10 +166,10 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
             status = "completed"
 
         set_sync_status(status, details)
-        logger.info(">>> [DAILY SYNC %s]: %d teams synced into SQLite DB.", status.upper(), synced_count)
+        logger.info(">>> [HOURLY S-TIER SYNC %s]: %d teams synced into SQLite DB.", status.upper(), synced_count)
         return {"status": status, "details": details}
     except Exception as e:
-        logger.error("Daily sync encountered an error: %s", e, exc_info=True)
+        logger.error("Hourly S-Tier sync encountered an error: %s", e, exc_info=True)
         set_sync_status("error", {"error": str(e), "failed_at": datetime.now(timezone.utc).isoformat()})
         return {"status": "error", "error": str(e)}
     finally:
@@ -165,8 +177,9 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
 
 
 def _daily_scheduler_loop():
-    """Background daemon loop that triggers sync daily."""
-    logger.info("Daily sync background scheduler started.")
+    """Background daemon loop that triggers S-Tier sync hourly (every 1 hour)."""
+    logger.info("Hourly S-Tier sync background scheduler started.")
+    time.sleep(5)  # Quick initial check
     while True:
         try:
             status = get_sync_status()
@@ -178,27 +191,27 @@ def _daily_scheduler_loop():
             else:
                 try:
                     last_dt = datetime.fromisoformat(last_synced)
-                    # Run if more than 24 hours have passed
-                    if datetime.now(timezone.utc) - last_dt > timedelta(hours=24):
+                    # Run if more than 1 hour (3600s) has passed
+                    if datetime.now(timezone.utc) - last_dt > timedelta(hours=1):
                         needs_sync = True
                 except Exception:
                     needs_sync = True
 
             if needs_sync and status.get("status") != "running":
-                logger.info("24 hours elapsed since last sync. Triggering automatic daily sync.")
+                logger.info("1 hour elapsed since last sync. Triggering automatic hourly S-Tier sync.")
                 run_daily_sync()
 
         except Exception as e:
-            logger.warning("Error in daily sync scheduler loop: %s", e)
+            logger.warning("Error in hourly sync scheduler loop: %s", e)
 
-        # Check every 30 minutes
-        time.sleep(1800)
+        # Check every 5 minutes (300 seconds)
+        time.sleep(300)
 
 
 def start_sync_scheduler():
-    """Starts the daily sync background thread."""
+    """Starts the hourly S-Tier sync background thread."""
     global _sync_thread
     if _sync_thread is None or not _sync_thread.is_alive():
-        _sync_thread = threading.Thread(target=_daily_scheduler_loop, daemon=True, name="VLRDailySyncScheduler")
+        _sync_thread = threading.Thread(target=_daily_scheduler_loop, daemon=True, name="VLRHourlySyncScheduler")
         _sync_thread.start()
-        logger.info("Daily sync background worker thread spawned.")
+        logger.info("Hourly S-Tier sync background worker thread spawned.")
