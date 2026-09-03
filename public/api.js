@@ -22,6 +22,12 @@ async function fetchMatches() {
 
 // 4. Handle Match Selection (Fetch Team IDs and Recent Tournaments list)
 async function handleMatchSelection() {
+    if (!matchSelect.value || matchSelect.value === '') {
+        analyzeBtn.disabled = true;
+        selectedMatch = null;
+        clearDashboard();
+        return;
+    }
     const idx = parseInt(matchSelect.value, 10);
     if (isNaN(idx)) return;
     

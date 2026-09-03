@@ -91,12 +91,20 @@ function populateMatchesDropdown() {
     matchSelect.innerHTML = '';
     
     if (filteredMatches.length === 0) {
-        matchSelect.innerHTML = '<option>매치가 없습니다.</option>';
+        matchSelect.innerHTML = '<option value="">매치가 없습니다.</option>';
         matchSelect.disabled = true;
         analyzeBtn.disabled = true;
+        selectedMatch = null;
         clearDashboard();
         return;
     }
+    
+    // Default placeholder option: requires explicit user selection
+    const placeholderOpt = document.createElement('option');
+    placeholderOpt.value = '';
+    placeholderOpt.textContent = '-- 분석할 매치를 선택해주세요 --';
+    placeholderOpt.selected = true;
+    matchSelect.appendChild(placeholderOpt);
     
     // Group filteredMatches by Stage
     const stageGroups = {};
@@ -154,10 +162,10 @@ function populateMatchesDropdown() {
     });
     
     matchSelect.disabled = false;
-    analyzeBtn.disabled = false;
-    
-    // Trigger initial match detail fetch
-    handleMatchSelection();
+    analyzeBtn.disabled = true;
+    selectedMatch = null;
+    clearDashboard();
+    updateStatus('info', '경기 준비 완료.', '분석을 진행할 매치를 선택해주세요.', 0);
 }
 
 function categorizeTournament(name) {
