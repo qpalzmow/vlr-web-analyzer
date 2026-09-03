@@ -477,17 +477,20 @@ def get_team_advanced_metrics(team_id, event_ids=None):
 
     try:
         roster = get_team_roster(team_id)
-        for player in roster:
-            try:
-                pstats = get_player_stats(player.get('id', ''), event_ids)
-                p_rounds = pstats.get('rounds', 0)
-                if p_rounds > 0:
-                    total_fk += pstats.get('fk', 0)
-                    total_fd += pstats.get('fd', 0)
-                    max_player_rounds = max(max_player_rounds, p_rounds)
-            except Exception as e:
-                logger.warning('get_team_advanced_metrics player stats failed: %s', e)
-                continue
+        if roster:
+            with ThreadPoolExecutor(max_workers=5) as p_exec:
+                futures = [p_exec.submit(get_player_stats, p.get('id', ''), event_ids) for p in roster]
+                for f in futures:
+                    try:
+                        pstats = f.result(timeout=10)
+                        p_rounds = pstats.get('rounds', 0)
+                        if p_rounds > 0:
+                            total_fk += pstats.get('fk', 0)
+                            total_fd += pstats.get('fd', 0)
+                            max_player_rounds = max(max_player_rounds, p_rounds)
+                    except Exception as e:
+                        logger.warning('get_team_advanced_metrics player stats failed: %s', e)
+                        continue
     except Exception as e:
         logger.warning('get_team_advanced_metrics roster fetch failed: %s', e)
         pass
