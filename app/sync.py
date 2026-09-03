@@ -8,7 +8,7 @@ from typing import Dict, Any, List, Set, Tuple
 from app.db import (
     init_db, save_team_data, save_matches_cache,
     set_sync_status, get_sync_status, get_cached_team_data,
-    save_cached_match_details
+    save_cached_match_details, get_cached_match_details
 )
 from app.scraper.vlr import (
     get_matches, get_team_events, get_team_maps_stats,
@@ -104,6 +104,7 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
             all_matches = []
             failures.append({"step": "get_matches", "error": str(e)})
 
+        # Save region caches in SQLite
         for reg in regions:
             try:
                 if reg == "all":
@@ -115,36 +116,70 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
                     ]
                 save_matches_cache(tier="s_tier", region=reg, matches=matches)
                 total_matches += len(matches)
-
-                for m in matches:
-                    m_url = m.get("url") or m.get("match_url")
-                    if m_url:
-                        try:
-                            details = get_match_details(m_url)
-                            if details.get("team_a_id"):
-                                discovered_teams[str(details["team_a_id"])] = details.get("team_a_name", m.get("team_a", ""))
-                            if details.get("team_b_id"):
-                                discovered_teams[str(details["team_b_id"])] = details.get("team_b_name", m.get("team_b", ""))
-                            
-                            # Pre-cache match details and map pool in SQLite for instant 0-latency loading
-                            event_id = details.get("event_id")
-                            map_pool = get_event_map_pool(event_id) if event_id else []
-                            save_cached_match_details(
-                                match_url=m_url,
-                                details=details,
-                                map_pool=map_pool
-                            )
-                        except Exception:
-                            pass
             except Exception as me:
-                logger.warning("Failed to sync matches for region %s: %s", reg, me)
+                logger.warning("Failed to save matches cache for region %s: %s", reg, me)
                 failures.append({"region": reg, "error": str(me)})
+
+        # 2. Extract unique matches and pre-cache details in parallel
+        unique_matches_map: Dict[str, Dict[str, Any]] = {}
+        for m in all_matches:
+            m_url = m.get("url") or m.get("match_url")
+            if m_url and m_url not in unique_matches_map:
+                unique_matches_map[m_url] = m
+
+        def process_match_details(m_url: str, m_info: Dict[str, Any]):
+            try:
+                # Check DB cache first to avoid re-scraping
+                cached = get_cached_match_details(m_url, max_age_seconds=3600)
+                if cached and cached.get("details"):
+                    det = cached["details"]
+                    return (
+                        det.get("team_a_id"),
+                        det.get("team_a_name", m_info.get("team_a", "")),
+                        det.get("team_b_id"),
+                        det.get("team_b_name", m_info.get("team_b", ""))
+                    )
+
+                details = get_match_details(m_url)
+                if details:
+                    event_id = details.get("event_id")
+                    map_pool = get_event_map_pool(event_id) if event_id else []
+                    save_cached_match_details(
+                        match_url=m_url,
+                        details=details,
+                        map_pool=map_pool
+                    )
+                    return (
+                        details.get("team_a_id"),
+                        details.get("team_a_name", m_info.get("team_a", "")),
+                        details.get("team_b_id"),
+                        details.get("team_b_name", m_info.get("team_b", ""))
+                    )
+            except Exception:
+                pass
+            return None, None, None, None
+
+        # Pre-cache details for matches with up to 5 workers
+        with ThreadPoolExecutor(max_workers=5) as m_exec:
+            match_futures = [
+                m_exec.submit(process_match_details, u, info)
+                for u, info in list(unique_matches_map.items())[:45]
+            ]
+            for f in as_completed(match_futures):
+                try:
+                    ta_id, ta_name, tb_id, tb_name = f.result()
+                    if ta_id:
+                        discovered_teams[str(ta_id)] = ta_name
+                    if tb_id:
+                        discovered_teams[str(tb_id)] = tb_name
+                except Exception:
+                    pass
 
         logger.info("Discovered %d unique teams across %d matches.", len(discovered_teams), total_matches)
 
-        # 2. Sync all discovered teams in parallel (max 6 workers to stay polite to VLR)
+        # 3. Sync all discovered teams in parallel (max 4 workers to stay polite to VLR)
         synced_count = 0
-        with ThreadPoolExecutor(max_workers=6) as executor:
+        with ThreadPoolExecutor(max_workers=4) as executor:
             futures = [
                 executor.submit(sync_single_team, tid, tname)
                 for tid, tname in discovered_teams.items()
@@ -179,7 +214,7 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
 def _daily_scheduler_loop():
     """Background daemon loop that triggers S-Tier sync hourly (every 1 hour)."""
     logger.info("Hourly S-Tier sync background scheduler started.")
-    time.sleep(5)  # Quick initial check
+    time.sleep(25)  # Let server boot and serve incoming HTTP traffic first
     while True:
         try:
             status = get_sync_status()
