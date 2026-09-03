@@ -1,0 +1,300 @@
+{
+  "form": {
+    "form_a": [
+      "W (2-1) vs Gen.G",
+      "W (2-0) vs Paper Rex",
+      "W (2-0) vs T1",
+      "W (2-0) vs Team Secret",
+      "L (1-2) vs Rex Regum Qeon",
+      "L (1-2) vs Rex Regum Qeon",
+      "L (1-2) vs KIWOOM DRX",
+      "W (2-1) vs Team Secret",
+      "L (0-1) vs BOOM Esports",
+      "W (1-0) vs KIWOOM DRX"
+    ],
+    "form_b": [
+      "W (2-0) vs VARREL",
+      "W (2-1) vs KIWOOM DRX",
+      "W (2-0) vs ZETA DIVISION",
+      "L (1-2) vs Gen.G",
+      "L (1-2) vs Nongshim RedForce",
+      "W (2-0) vs All Gamers",
+      "L (1-2) vs BOOM Esports",
+      "W (2-0) vs Rare Atom",
+      "L (1-2) vs NAOS",
+      "W (2-0) vs Orangutan"
+    ]
+  },
+  "maps": {
+    "maps_a": {
+      "Bind": {
+        "played": 28,
+        "w": 21,
+        "l": 7,
+        "atk_won": 164,
+        "atk_total": 257,
+        "def_won": 161,
+        "def_total": 296
+      },
+      "Haven": {
+        "played": 46,
+        "w": 28,
+        "l": 18,
+        "atk_won": 297,
+        "atk_total": 509,
+        "def_won": 232,
+        "def_total": 462
+      },
+      "Split": {
+        "played": 36,
+        "w": 22,
+        "l": 14,
+        "atk_won": 201,
+        "atk_total": 389,
+        "def_won": 216,
+        "def_total": 396
+      },
+      "Ascent": {
+        "played": 44,
+        "w": 26,
+        "l": 18,
+        "atk_won": 232,
+        "atk_total": 472,
+        "def_won": 262,
+        "def_total": 475
+      },
+      "Icebox": {
+        "played": 8,
+        "w": 1,
+        "l": 7,
+        "atk_won": 33,
+        "atk_total": 75,
+        "def_won": 21,
+        "def_total": 80
+      },
+      "Breeze": {
+        "played": 18,
+        "w": 12,
+        "l": 6,
+        "atk_won": 106,
+        "atk_total": 186,
+        "def_won": 101,
+        "def_total": 188
+      },
+      "Fracture": {
+        "played": 10,
+        "w": 2,
+        "l": 8,
+        "atk_won": 52,
+        "atk_total": 118,
+        "def_won": 43,
+        "def_total": 110
+      },
+      "Pearl": {
+        "played": 22,
+        "w": 14,
+        "l": 8,
+        "atk_won": 113,
+        "atk_total": 231,
+        "def_won": 128,
+        "def_total": 227
+      },
+      "Lotus": {
+        "played": 45,
+        "w": 26,
+        "l": 19,
+        "atk_won": 261,
+        "atk_total": 495,
+        "def_won": 259,
+        "def_total": 502
+      },
+      "Sunset": {
+        "played": 26,
+        "w": 17,
+        "l": 9,
+        "atk_won": 140,
+        "atk_total": 275,
+        "def_won": 164,
+        "def_total": 297
+      },
+      "Abyss": {
+        "played": 13,
+        "w": 6,
+        "l": 7,
+        "atk_won": 69,
+        "atk_total": 128,
+        "def_won": 73,
+        "def_total": 147
+      },
+      "Corrode": {
+        "played": 9,
+        "w": 7,
+        "l": 2,
+        "atk_won": 64,
+        "atk_total": 112,
+        "def_won": 54,
+        "def_total": 103
+      },
+      "Summit": {
+        "played": 2,
+        "w": 1,
+        "l": 1,
+        "atk_won": 9,
+        "atk_total": 20,
+        "def_won": 13,
+        "def_total": 24
+      }
+    },
+    "maps_b": {
+      "Bind": {
+        "played": 86,
+        "w": 53,
+        "l": 33,
+        "atk_won": 508,
+        "atk_total": 922,
+        "def_won": 490,
+        "def_total": 909
+      },
+      "Haven": {
+        "played": 107,
+        "w": 64,
+        "l": 43,
+        "atk_won": 574,
+        "atk_total": 1039,
+        "def_won": 592,
+        "def_total": 1113
+      },
+      "Split": {
+        "played": 82,
+        "w": 49,
+        "l": 33,
+        "atk_won": 467,
+        "atk_total": 911,
+        "def_won": 473,
+        "def_total": 841
+      },
+      "Ascent": {
+        "played": 97,
+        "w": 66,
+        "l": 31,
+        "atk_won": 515,
+        "atk_total": 968,
+        "def_won": 645,
+        "def_total": 1082
+      },
+      "Icebox": {
+        "played": 68,
+        "w": 42,
+        "l": 26,
+        "atk_won": 442,
+        "atk_total": 737,
+        "def_won": 312,
+        "def_total": 614
+      },
+      "Breeze": {
+        "played": 42,
+        "w": 24,
+        "l": 18,
+        "atk_won": 237,
+        "atk_total": 448,
+        "def_won": 258,
+        "def_total": 466
+      },
+      "Fracture": {
+        "played": 18,
+        "w": 10,
+        "l": 8,
+        "atk_won": 119,
+        "atk_total": 194,
+        "def_won": 80,
+        "def_total": 159
+      },
+      "Pearl": {
+        "played": 26,
+        "w": 18,
+        "l": 8,
+        "atk_won": 157,
+        "atk_total": 283,
+        "def_won": 155,
+        "def_total": 277
+      },
+      "Lotus": {
+        "played": 25,
+        "w": 8,
+        "l": 17,
+        "atk_won": 123,
+        "atk_total": 271,
+        "def_won": 88,
+        "def_total": 224
+      },
+      "Sunset": {
+        "played": 13,
+        "w": 4,
+        "l": 9,
+        "atk_won": 63,
+        "atk_total": 141,
+        "def_won": 55,
+        "def_total": 128
+      },
+      "Abyss": {
+        "played": 8,
+        "w": 4,
+        "l": 4,
+        "atk_won": 35,
+        "atk_total": 75,
+        "def_won": 41,
+        "def_total": 89
+      },
+      "Corrode": {
+        "played": 6,
+        "w": 2,
+        "l": 4,
+        "atk_won": 25,
+        "atk_total": 57,
+        "def_won": 37,
+        "def_total": 73
+      },
+      "Summit": {
+        "played": 4,
+        "w": 3,
+        "l": 1,
+        "atk_won": 21,
+        "atk_total": 43,
+        "def_won": 32,
+        "def_total": 45
+      }
+    }
+  },
+  "ace": {
+    "detail": "Method Not Allowed"
+  },
+  "adv": {
+    "adv_a": {
+      "map_win_rate": 59.6,
+      "pistol_win_rate": null,
+      "fk_fd_margin": -0.0,
+      "fk_fd_diff": -18,
+      "fk_fd_per_round": -0.0027,
+      "total_played": 307,
+      "total_wins": 183,
+      "total_fk": 401,
+      "total_fd": 419,
+      "top_compositions": []
+    },
+    "adv_b": {
+      "map_win_rate": 59.6,
+      "pistol_win_rate": null,
+      "fk_fd_margin": 0.0,
+      "fk_fd_diff": 7,
+      "fk_fd_per_round": 0.0006,
+      "total_played": 582,
+      "total_wins": 347,
+      "total_fk": 215,
+      "total_fd": 208,
+      "top_compositions": []
+    }
+  },
+  "banpick": {
+    "detail": "Method Not Allowed"
+  }
+}
