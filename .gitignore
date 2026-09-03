@@ -1,9 +1,11 @@
 __pycache__/
 *.pyc
 .tempmediaStorage/
-test_*.py
-debug_*.py
-inspect_*.py
+/test_*.py
+/debug_*.py
+/inspect_*.py
+!tests/**
+tests/**/__pycache__/
 liquipedia_test.py
 auto_push.ps1
 run_auto_push.bat
