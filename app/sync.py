@@ -45,7 +45,7 @@ def sync_single_team(team_id: str, team_name: str = "") -> bool:
         roster = get_team_roster(team_id)
         players_stats = []
         if roster:
-            with ThreadPoolExecutor(max_workers=5) as p_exec:
+            with ThreadPoolExecutor(max_workers=3) as p_exec:
                 futures = {p_exec.submit(get_player_stats, p["id"], default_event_ids): p for p in roster}
                 for f in as_completed(futures):
                     p_info = futures[f]
@@ -166,34 +166,48 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
                 pass
             return None, None, None, None
 
-        # Pre-cache details for matches with up to 6 workers
-        with ThreadPoolExecutor(max_workers=6) as m_exec:
-            match_futures = [
-                m_exec.submit(process_match_details, u, info)
-                for u, info in unique_matches_map.items()
-            ]
-            for f in as_completed(match_futures):
-                try:
-                    ta_id, ta_name, tb_id, tb_name = f.result()
-                    if ta_id:
-                        discovered_teams[str(ta_id)] = ta_name
-                    if tb_id:
-                        discovered_teams[str(tb_id)] = tb_name
-                except Exception:
-                    pass
+        # Pre-cache details for matches with 2 workers (conservative for Render free tier)
+        with ThreadPoolExecutor(max_workers=2) as m_exec:
+            match_items = list(unique_matches_map.items())
+            batch_size = 4
+            for i in range(0, len(match_items), batch_size):
+                batch = match_items[i:i+batch_size]
+                match_futures = [
+                    m_exec.submit(process_match_details, u, info)
+                    for u, info in batch
+                ]
+                for f in as_completed(match_futures):
+                    try:
+                        ta_id, ta_name, tb_id, tb_name = f.result()
+                        if ta_id:
+                            discovered_teams[str(ta_id)] = ta_name
+                        if tb_id:
+                            discovered_teams[str(tb_id)] = tb_name
+                    except Exception:
+                        pass
+                # Brief pause between batches to let API requests through
+                if i + batch_size < len(match_items):
+                    time.sleep(1.0)
 
         logger.info("Discovered %d unique teams across %d matches.", len(discovered_teams), total_matches)
 
-        # 3. Sync all discovered teams in parallel (max 4 workers to stay polite to VLR)
+        # 3. Sync all discovered teams in parallel (max 2 workers to stay polite on Render free tier)
         synced_count = 0
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            futures = [
-                executor.submit(sync_single_team, tid, tname)
-                for tid, tname in discovered_teams.items()
-            ]
-            for f in as_completed(futures):
-                if f.result():
-                    synced_count += 1
+        team_list = list(discovered_teams.items())
+        team_batch_size = 4
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            for i in range(0, len(team_list), team_batch_size):
+                batch = team_list[i:i+team_batch_size]
+                futures = [
+                    executor.submit(sync_single_team, tid, tname)
+                    for tid, tname in batch
+                ]
+                for f in as_completed(futures):
+                    if f.result():
+                        synced_count += 1
+                # Brief pause between team batches to let API requests through
+                if i + team_batch_size < len(team_list):
+                    time.sleep(2.0)
 
         details = {
             "completed_at": datetime.now(timezone.utc).isoformat(),

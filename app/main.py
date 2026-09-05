@@ -217,6 +217,13 @@ def api_get_matches():
 
         # Enrich matches with team IDs from single fast query
         details_map = get_all_cached_match_details_map()
+
+        # Build reverse name→id lookup from CORE_S_TIER_TEAMS for instant fallback
+        from app.config import CORE_S_TIER_TEAMS
+        name_to_id = {}
+        for tid, tname in CORE_S_TIER_TEAMS.items():
+            name_to_id[tname.lower().strip()] = tid
+
         for m in matches:
             m_url = m.get('url') or m.get('match_url') or ""
             m_id = m.get('id') or ""
@@ -225,6 +232,14 @@ def api_get_matches():
                 m["team_a_id"] = det.get("team_a_id")
                 m["team_b_id"] = det.get("team_b_id")
                 m["event_id"] = det.get("event_id")
+            else:
+                # Fallback: resolve team IDs from CORE_S_TIER_TEAMS by name matching
+                ta_name = (m.get("team_a") or "").lower().strip()
+                tb_name = (m.get("team_b") or "").lower().strip()
+                if ta_name in name_to_id:
+                    m["team_a_id"] = name_to_id[ta_name]
+                if tb_name in name_to_id:
+                    m["team_b_id"] = name_to_id[tb_name]
 
         return JSONResponse(content=matches)
     except Exception as e:
