@@ -16,7 +16,7 @@ def get_httpx_client() -> httpx.Client:
                 _shared_client = httpx.Client(
                     follow_redirects=False,
                     timeout=httpx.Timeout(15.0, connect=5.0),
-                    limits=httpx.Limits(max_keepalive_connections=10, max_connections=20)
+                    limits=httpx.Limits(max_keepalive_connections=15, max_connections=30)
                 )
     return _shared_client
 
