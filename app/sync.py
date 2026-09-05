@@ -17,6 +17,7 @@ from app.scraper.vlr import (
     get_event_map_pool
 )
 from app.scraper.metrics import find_ace_player_from_stats
+from app.config import CORE_S_TIER_TEAMS
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +94,7 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
 
         # 1. Collect matches for all major leagues
         regions = ["pacific", "americas", "emea", "china", "all"]
-        discovered_teams: Dict[str, str] = {}  # team_id -> team_name
+        discovered_teams: Dict[str, str] = CORE_S_TIER_TEAMS.copy()  # Pre-seed with all core VCT partner teams
         total_matches = 0
         failures: List[Dict[str, str]] = []
 
@@ -130,7 +131,7 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
         def process_match_details(m_url: str, m_info: Dict[str, Any]):
             try:
                 # Check DB cache first to avoid re-scraping
-                cached = get_cached_match_details(m_url, max_age_seconds=3600)
+                cached = get_cached_match_details(m_url, max_age_seconds=86400)
                 if cached and cached.get("details"):
                     det = cached["details"]
                     return (
@@ -165,11 +166,11 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
                 pass
             return None, None, None, None
 
-        # Pre-cache details for matches with up to 5 workers
-        with ThreadPoolExecutor(max_workers=5) as m_exec:
+        # Pre-cache details for matches with up to 6 workers
+        with ThreadPoolExecutor(max_workers=6) as m_exec:
             match_futures = [
                 m_exec.submit(process_match_details, u, info)
-                for u, info in list(unique_matches_map.items())[:45]
+                for u, info in unique_matches_map.items()
             ]
             for f in as_completed(match_futures):
                 try:
