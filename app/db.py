@@ -258,6 +258,30 @@ def get_cached_match_details(match_url: str, max_age_seconds: int = 3600) -> Opt
         conn.close()
 
 
+def get_all_cached_match_details_map() -> Dict[str, Dict[str, Any]]:
+    """Returns all cached match details mapped by match_url and match_id in a single ultra-fast query."""
+    conn = get_db_connection()
+    res = {}
+    try:
+        cursor = conn.execute("SELECT match_url, details_json FROM match_details_cache")
+        for row in cursor.fetchall():
+            try:
+                det = json.loads(row["details_json"])
+                u = row["match_url"]
+                res[u] = det
+                m_id = re.search(r'/(\d+)', u)
+                if m_id:
+                    res[m_id.group(1)] = det
+            except Exception:
+                pass
+        return res
+    except Exception as e:
+        logger.warning("Error getting all cached match details map: %s", e)
+        return {}
+    finally:
+        conn.close()
+
+
 def set_sync_status(status: str, details: Optional[Dict[str, Any]] = None):
     """Updates global daily sync status metadata."""
     now_iso = datetime.now(timezone.utc).isoformat()

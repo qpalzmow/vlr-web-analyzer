@@ -34,7 +34,8 @@ from app.cache_warmer import start_cache_warmer, stop_cache_warmer, warm_cache_c
 from app.db import (
     init_db, get_cached_team_data, save_team_data,
     get_sync_status, get_cached_matches, save_matches_cache,
-    get_cached_match_details, save_cached_match_details
+    get_cached_match_details, save_cached_match_details,
+    get_all_cached_match_details_map
 )
 from app.sync import start_sync_scheduler, run_daily_sync
 
@@ -50,10 +51,8 @@ _global_executor = ThreadPoolExecutor(max_workers=12, thread_name_prefix="vlr-ap
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
-    start_cache_warmer()
     start_sync_scheduler()
     yield
-    stop_cache_warmer()
     _global_executor.shutdown(wait=True)
     close_httpx_client()
 
@@ -216,15 +215,16 @@ def api_get_matches():
             matches = get_cached_data('matches', 'matches_list', get_matches)
             save_matches_cache('s_tier', 'all', matches)
 
-        # Enrich matches with team IDs and details from SQLite cache
+        # Enrich matches with team IDs from single fast query
+        details_map = get_all_cached_match_details_map()
         for m in matches:
-            m_url = m.get('url') or m.get('match_url')
-            if m_url and (not m.get('team_a_id') or not m.get('team_b_id')):
-                cd = get_cached_match_details(m_url, max_age_seconds=86400)
-                if cd and cd.get("details"):
-                    m["team_a_id"] = cd["details"].get("team_a_id")
-                    m["team_b_id"] = cd["details"].get("team_b_id")
-                    m["event_id"] = cd["details"].get("event_id")
+            m_url = m.get('url') or m.get('match_url') or ""
+            m_id = m.get('id') or ""
+            det = details_map.get(m_url) or details_map.get(m_id)
+            if det:
+                m["team_a_id"] = det.get("team_a_id")
+                m["team_b_id"] = det.get("team_b_id")
+                m["event_id"] = det.get("event_id")
 
         return JSONResponse(content=matches)
     except Exception as e:
