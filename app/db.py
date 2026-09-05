@@ -2,6 +2,7 @@ import os
 import json
 import sqlite3
 import logging
+import re
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 
@@ -224,6 +225,15 @@ def get_cached_match_details(match_url: str, max_age_seconds: int = 3600) -> Opt
     try:
         cursor = conn.execute("SELECT * FROM match_details_cache WHERE match_url = ?", (match_url,))
         row = cursor.fetchone()
+        if not row:
+            m_id = re.search(r'/(\d+)', match_url)
+            if m_id:
+                mid = m_id.group(1)
+                cursor = conn.execute(
+                    "SELECT * FROM match_details_cache WHERE match_url LIKE ? OR match_url LIKE ? LIMIT 1",
+                    (f"%/{mid}/%", f"%/{mid}")
+                )
+                row = cursor.fetchone()
         if not row or not row["details_json"]:
             return None
         if row["updated_at"]:
