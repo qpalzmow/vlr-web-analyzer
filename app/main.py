@@ -4,6 +4,7 @@ import json
 import logging
 import traceback
 import threading
+import time
 from contextlib import asynccontextmanager
 from typing import Optional
 from concurrent.futures import ThreadPoolExecutor
@@ -19,7 +20,7 @@ from app.schemas import (
     AdvancedMetricsResponse, BanPickResponse, HealthResponse,
     UpstreamHealthResponse
 )
-from app.cache import get_cached_data, get_cached_live_score, make_cache_key
+from app.cache import get_cached_data, get_cached_live_score, make_cache_key, LIVE_SCORE_CACHE, CACHE_TTL
 from app.scraper.http import close_httpx_client, request_with_retry, validate_vlr_url
 from app.scraper.vlr import (
     get_matches, get_match_details, get_event_map_pool,
@@ -210,10 +211,21 @@ def api_get_matches():
             not any(m.get('url') in ('/1001', '/1002') or m.get('id') in ('1001', '1002') for m in cached_matches)
         )
         if is_valid_cache:
-            return JSONResponse(content=cached_matches)
-            
-        matches = get_cached_data('matches', 'matches_list', get_matches)
-        save_matches_cache('s_tier', 'all', matches)
+            matches = cached_matches
+        else:
+            matches = get_cached_data('matches', 'matches_list', get_matches)
+            save_matches_cache('s_tier', 'all', matches)
+
+        # Enrich matches with team IDs and details from SQLite cache
+        for m in matches:
+            m_url = m.get('url') or m.get('match_url')
+            if m_url and (not m.get('team_a_id') or not m.get('team_b_id')):
+                cd = get_cached_match_details(m_url, max_age_seconds=86400)
+                if cd and cd.get("details"):
+                    m["team_a_id"] = cd["details"].get("team_a_id")
+                    m["team_b_id"] = cd["details"].get("team_b_id")
+                    m["event_id"] = cd["details"].get("event_id")
+
         return JSONResponse(content=matches)
     except Exception as e:
         logger.error("api_get_matches failed: %s", e, exc_info=True)
@@ -224,10 +236,15 @@ def api_get_match_details(url: str = Query(...)):
     try:
         clean_url = validate_vlr_url(url)
 
-        # 1. Fast-path: Check SQLite persistent cache first (instant response)
-        cached_match = get_cached_match_details(clean_url, max_age_seconds=3600)
+        # 1. Fast-path: Check SQLite persistent cache first (instant response < 3ms, non-blocking)
+        cached_match = get_cached_match_details(clean_url, max_age_seconds=86400)
         if cached_match and cached_match.get("details"):
-            live_score = get_cached_live_score(clean_url, get_live_score)
+            now = time.time()
+            in_mem_score = LIVE_SCORE_CACHE.get(clean_url)
+            if in_mem_score and (now - in_mem_score[0] < CACHE_TTL):
+                live_score = in_mem_score[1]
+            else:
+                live_score = {"series_score_a": "0", "series_score_b": "0", "status": "upcoming", "maps": []}
             return JSONResponse(content={
                 "details": cached_match["details"],
                 "team_a_events": cached_match.get("team_a_events", [])[:12],

@@ -65,7 +65,15 @@ async function handleMatchSelection() {
     analyzeBtn.disabled = true;
     matchSelect.disabled = true;
     const isSTier = requestMatch.tier === 'S-Tier';
-    updateStatus('info', isSTier ? '⚡ S-Tier DB 고속 모드...' : '매치 세부 정보 수집 중...', isSTier ? '1시간 단위로 사전 동기화된 SQLite 데이터베이스에서 즉시 불러옵니다.' : '선수 및 대회 정보를 실시간으로 수집 중입니다 (약 5~10초 소요). 잠시만 기다려주세요.', 0);
+    const hasPreloadedTeams = Boolean(requestMatch.team_a_id && requestMatch.team_b_id);
+    
+    if (hasPreloadedTeams) {
+        updateStatus('info', '⚡ S-Tier DB 즉시 분석...', '사전 동기화된 SQLite 데이터베이스에서 전력을 0초 지연으로 로드합니다.', 50);
+        // Kick off instant parallel analysis immediately!
+        runAnalysis();
+    } else {
+        updateStatus('info', isSTier ? '⚡ S-Tier DB 고속 모드...' : '매치 세부 정보 수집 중...', isSTier ? '1시간 단위로 사전 동기화된 SQLite 데이터베이스에서 즉시 불러옵니다.' : '선수 및 대회 정보를 실시간으로 수집 중입니다. 잠시만 기다려주세요.', 10);
+    }
     progressBarContainer.classList.remove('hidden');
     
     try {
@@ -94,18 +102,16 @@ async function handleMatchSelection() {
         teamAEvents = data.team_a_events;
         teamBEvents = data.team_b_events;
         
-        const successTitle = data.cached ? '⚡ S-Tier DB 즉시 로드 완료.' : '매치 정보 로드 완료.';
-        const successMsg = data.cached ? '사전 캐싱된 데이터로 0초 지연 분석을 즉시 실행합니다.' : '대회 필터를 선택하고 전력 분석 시작을 클릭하세요.';
-        updateStatus('success', successTitle, successMsg, 40);
-        
         // Draw checklists
         drawTournamentChecklist();
         
         // Start Live Scoreboard Polling / Display
         startLiveScorePolling();
         
-        // Auto trigger full analysis
-        runAnalysis();
+        // If analysis was not triggered yet (cold match), trigger now!
+        if (!hasPreloadedTeams) {
+            runAnalysis();
+        }
     } catch (err) {
         if (err.name === 'AbortError') {
             console.log('Match details request aborted.');
