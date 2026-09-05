@@ -71,7 +71,8 @@ def request_with_retry(url: str, max_retries: int = 3) -> httpx.Response:
                 if location:
                     redirect_url = urlparse.urljoin(url, location)
                     validate_vlr_url(redirect_url)
-                    return client.get(redirect_url, headers=_get_headers())
+                    url = redirect_url
+                    continue
                 return res
             if res.status_code == 404:
                 raise httpx.HTTPStatusError(f"404 Not Found: {url}", request=res.request, response=res)

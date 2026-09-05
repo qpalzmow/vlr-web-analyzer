@@ -86,6 +86,8 @@ class AceAnalysisResponse(BaseModel):
 
 class AdvancedMetrics(BaseModel):
     map_win_rate: Optional[float] = 50.0
+    atk_win_rate: Optional[float] = None
+    def_win_rate: Optional[float] = None
     pistol_win_rate: Optional[float] = None
     fk_fd_margin: Optional[float] = 0.0
     fk_fd_diff: int = 0

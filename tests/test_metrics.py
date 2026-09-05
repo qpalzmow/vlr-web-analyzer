@@ -33,9 +33,14 @@ def test_calculate_advanced_metrics():
     assert metrics["total_fk"] == 120
     assert metrics["total_fd"] == 100
 
-    # With actual pistol data
-    metrics_with_pistol = calculate_advanced_metrics(maps_data, 10, 10, 50, pistol_wins=8, pistol_total=10)
-    assert metrics_with_pistol["pistol_win_rate"] == 80.0
+    # With actual pistol and round data
+    maps_with_rounds = {
+        "Ascent": {"played": 10, "w": 6, "l": 4, "atk_won": 60, "atk_total": 100, "def_won": 50, "def_total": 100}
+    }
+    metrics_with_rounds = calculate_advanced_metrics(maps_with_rounds, 10, 10, 50, pistol_wins=8, pistol_total=10)
+    assert metrics_with_rounds["pistol_win_rate"] == 80.0
+    assert metrics_with_rounds["atk_win_rate"] == 60.0
+    assert metrics_with_rounds["def_win_rate"] == 50.0
 
 def test_find_ace_player_from_stats():
     players = [

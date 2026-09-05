@@ -37,6 +37,13 @@ def calculate_advanced_metrics(maps_data: dict, total_fk: int, total_fd: int, to
     total_wins = sum(s.get("w", 0) for s in maps_data.values())
     map_win_rate = round((total_wins / total_played * 100), 1) if total_played > 0 else 50.0
 
+    total_atk_won = sum(s.get("atk_won", 0) for s in maps_data.values())
+    total_atk = sum(s.get("atk_total", 0) for s in maps_data.values())
+    total_def_won = sum(s.get("def_won", 0) for s in maps_data.values())
+    total_def = sum(s.get("def_total", 0) for s in maps_data.values())
+    atk_win_rate = round((total_atk_won / total_atk * 100), 1) if total_atk > 0 else None
+    def_win_rate = round((total_def_won / total_def * 100), 1) if total_def > 0 else None
+
     pistol_win_rate = round((pistol_wins / pistol_total * 100), 1) if pistol_total > 0 else None
     fk_fd_diff = total_fk - total_fd
     fk_fd_per_round = round(fk_fd_diff / max(total_rounds, 1), 4) if total_rounds > 0 else 0.0
@@ -44,6 +51,8 @@ def calculate_advanced_metrics(maps_data: dict, total_fk: int, total_fd: int, to
 
     return {
         "map_win_rate": map_win_rate,
+        "atk_win_rate": atk_win_rate,
+        "def_win_rate": def_win_rate,
         "pistol_win_rate": pistol_win_rate,
         "fk_fd_margin": fk_fd_margin,
         "fk_fd_diff": fk_fd_diff,
@@ -85,6 +94,12 @@ def simulate_banpick(maps_a: dict, maps_b: dict, map_pool: list) -> dict:
         played = stats.get('played', 0)
         wins = stats.get('w', 0)
         return (wins / played * 100) if played > 0 else 50.0
+
+    def get_smoothed_win_pct(maps_data, map_name):
+        stats = maps_data.get(map_name, {})
+        played = stats.get('played', 0)
+        wins = stats.get('w', 0)
+        return ((wins + 1) / (played + 2) * 100) if played > 0 else 50.0
     
     # Order-preserving deduplication of map pool
     available = list(dict.fromkeys(map_pool))
@@ -97,8 +112,8 @@ def simulate_banpick(maps_a: dict, maps_b: dict, map_pool: list) -> dict:
         worst_map = None
         worst_diff = float('inf')
         for m in available:
-            own_pct = get_win_pct(own_maps, m)
-            opp_pct = get_win_pct(opp_maps, m)
+            own_pct = get_smoothed_win_pct(own_maps, m)
+            opp_pct = get_smoothed_win_pct(opp_maps, m)
             diff = own_pct - opp_pct
             if diff < worst_diff:
                 worst_diff = diff
@@ -110,7 +125,7 @@ def simulate_banpick(maps_a: dict, maps_b: dict, map_pool: list) -> dict:
     for team_label, own_maps in [('Team A', maps_a), ('Team B', maps_b)]:
         if not available:
             break
-        best_map = max(available, key=lambda m: get_win_pct(own_maps, m))
+        best_map = max(available, key=lambda m: get_smoothed_win_pct(own_maps, m))
         pct = get_win_pct(own_maps, best_map)
         picks.append({"map": best_map, "team": team_label, "win_pct": round(pct, 1)})
         available.remove(best_map)
