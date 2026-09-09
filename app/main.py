@@ -200,6 +200,35 @@ def _get_advanced_for_team(team_id: str, event_ids: Optional[list] = None) -> di
     return adv or default_adv
 
 _maintenance_lock = threading.Lock()
+_maintenance_last_started = None
+MAINTENANCE_INTERVAL_SECONDS = 300
+
+
+def _authorize_maintenance(request: Request):
+    token = os.environ.get("VLR_MAINTENANCE_TOKEN", "")
+    if not token:
+        raise HTTPException(status_code=503, detail="Manual maintenance is disabled")
+    provided = request.headers.get("authorization", "")
+    if not secrets.compare_digest(provided.encode(), f"Bearer {token}".encode()):
+        raise HTTPException(status_code=401, detail="Maintenance authentication required")
+
+
+def _submit_maintenance(request: Request, job, *args):
+    global _maintenance_last_started
+    _authorize_maintenance(request)
+    if not _maintenance_lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="Maintenance task already running or queued")
+    try:
+        now = time.monotonic()
+        if (_maintenance_last_started is not None
+                and now - _maintenance_last_started < MAINTENANCE_INTERVAL_SECONDS):
+            raise HTTPException(status_code=429, detail="Wait five minutes between maintenance requests")
+        future = _global_executor.submit(job, *args)
+        _maintenance_last_started = now
+    except BaseException:
+        _maintenance_lock.release()
+        raise
+    future.add_done_callback(lambda _: _maintenance_lock.release())
 
 @app.get("/api/matches")
 def api_get_matches():
@@ -384,17 +413,9 @@ def api_get_sync_status_endpoint():
     return JSONResponse(content=get_sync_status())
 
 @app.post("/api/sync/trigger")
-def api_trigger_sync_endpoint():
-    if not _maintenance_lock.acquire(blocking=False):
-        raise HTTPException(status_code=409, detail="Maintenance task already running or queued")
-    try:
-        future = _global_executor.submit(run_daily_sync, True)
-        future.add_done_callback(lambda _: _maintenance_lock.release())
-        return JSONResponse(content={"status": "sync_triggered"})
-    except Exception as e:
-        _maintenance_lock.release()
-        logger.error("api_trigger_sync failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+def api_trigger_sync_endpoint(request: Request):
+    _submit_maintenance(request, run_daily_sync, True)
+    return JSONResponse(content={"status": "sync_triggered"})
 
 @app.post("/api/simulate/banpick")
 def api_simulate_banpick(payload: BanPickPayload):
@@ -406,17 +427,9 @@ def api_simulate_banpick(payload: BanPickPayload):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/api/cache/warm")
-def api_trigger_cache_warm():
-    if not _maintenance_lock.acquire(blocking=False):
-        raise HTTPException(status_code=409, detail="Maintenance task already running or queued")
-    try:
-        future = _global_executor.submit(warm_cache_cycle)
-        future.add_done_callback(lambda _: _maintenance_lock.release())
-        return JSONResponse(content={"status": "warming_triggered"})
-    except Exception as e:
-        _maintenance_lock.release()
-        logger.error("api_trigger_cache_warm failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+def api_trigger_cache_warm(request: Request):
+    _submit_maintenance(request, warm_cache_cycle)
+    return JSONResponse(content={"status": "warming_triggered"})
 
 @app.post("/api/log-error")
 async def api_log_error(request: Request):

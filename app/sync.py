@@ -18,6 +18,7 @@ from app.scraper.vlr import (
 )
 from app.scraper.metrics import find_ace_player_from_stats
 from app.config import CORE_S_TIER_TEAMS
+from app.sync_lease import sync_lease
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +32,9 @@ def sync_single_team(team_id: str, team_name: str = "") -> bool:
     if not team_id:
         return False
     try:
-        # 1. Events list (top 3 events used as default active scope)
+        # The persistent team cache always represents all events.
         events = get_team_events(team_id)
-        default_event_ids = [e["id"] for e in events[:3]] if events else None
+        default_event_ids = None
 
         # 2. Form (Recent matches)
         form = get_team_form(team_id, max_results=10)
@@ -43,6 +44,8 @@ def sync_single_team(team_id: str, team_name: str = "") -> bool:
 
         # 4. Roster & Player Stats & Ace Player
         roster = get_team_roster(team_id)
+        if not any((events, form, maps_data, roster)):
+            raise ValueError("No team data collected; preserving the previous cache")
         players_stats = []
         if roster:
             with ThreadPoolExecutor(max_workers=3) as p_exec:
@@ -81,12 +84,23 @@ def sync_single_team(team_id: str, team_name: str = "") -> bool:
 
 
 def run_daily_sync(force: bool = False) -> Dict[str, Any]:
-    """Runs the full daily sync across all 4 major leagues."""
+    """Run one sync, recovering expired leases after a process exits."""
     global _sync_lock
     if not _sync_lock.acquire(blocking=False):
         logger.info("Daily sync already running. Skipping duplicate trigger.")
         return {"status": "already_running"}
 
+    try:
+        init_db()
+        with sync_lease() as acquired:
+            if not acquired:
+                return {"status": "already_running"}
+            return _run_sync()
+    finally:
+        _sync_lock.release()
+
+
+def _run_sync() -> Dict[str, Any]:
     try:
         set_sync_status("running", {"started_at": datetime.now(timezone.utc).isoformat()})
         logger.info(">>> [DAILY SYNC STARTED]: Syncing 4 Major League tournaments and team profiles...")
@@ -116,7 +130,8 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
                         if m.get("region", "").lower() == reg.lower()
                     ]
                 save_matches_cache(tier="s_tier", region=reg, matches=matches)
-                total_matches += len(matches)
+                if reg == "all":
+                    total_matches = len(matches)
             except Exception as me:
                 logger.warning("Failed to save matches cache for region %s: %s", reg, me)
                 failures.append({"region": reg, "error": str(me)})
@@ -198,13 +213,21 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
         with ThreadPoolExecutor(max_workers=2) as executor:
             for i in range(0, len(team_list), team_batch_size):
                 batch = team_list[i:i+team_batch_size]
-                futures = [
-                    executor.submit(sync_single_team, tid, tname)
+                futures = {
+                    executor.submit(sync_single_team, tid, tname): tid
                     for tid, tname in batch
-                ]
+                }
                 for f in as_completed(futures):
-                    if f.result():
+                    try:
+                        success = f.result()
+                        error = "Team analytics could not be collected"
+                    except Exception as exc:
+                        success = False
+                        error = str(exc)
+                    if success:
                         synced_count += 1
+                    else:
+                        failures.append({"team_id": futures[f], "error": error})
                 # Brief pause between team batches to let API requests through
                 if i + team_batch_size < len(team_list):
                     time.sleep(2.0)
@@ -228,8 +251,6 @@ def run_daily_sync(force: bool = False) -> Dict[str, Any]:
         logger.error("Hourly S-Tier sync encountered an error: %s", e, exc_info=True)
         set_sync_status("error", {"error": str(e), "failed_at": datetime.now(timezone.utc).isoformat()})
         return {"status": "error", "error": str(e)}
-    finally:
-        _sync_lock.release()
 
 
 def _daily_scheduler_loop():
@@ -253,7 +274,9 @@ def _daily_scheduler_loop():
                 except Exception:
                     needs_sync = True
 
-            if needs_sync and status.get("status") != "running":
+            # A crashed process can leave status='running'. The renewable DB
+            # lease, rather than that display status, decides who may execute.
+            if needs_sync or status.get("status") == "running":
                 logger.info("1 hour elapsed since last sync. Triggering automatic hourly S-Tier sync.")
                 run_daily_sync()
 

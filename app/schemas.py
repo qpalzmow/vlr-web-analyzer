@@ -55,7 +55,7 @@ class MatchDetailsResponse(BaseModel):
     team_a_events: List[Dict[str, str]] = Field(default_factory=list)
     team_b_events: List[Dict[str, str]] = Field(default_factory=list)
     map_pool: List[str] = Field(default_factory=list)
-    live_score: LiveScoreResponse
+    live_score: Optional[LiveScoreResponse] = None
 
 class TeamFormResponse(BaseModel):
     form_a: List[str] = Field(default_factory=list)
