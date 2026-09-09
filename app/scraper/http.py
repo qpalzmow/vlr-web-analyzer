@@ -57,7 +57,7 @@ def _get_headers():
 
 def request_with_retry(url: str, max_retries: int = 3) -> httpx.Response:
     """HTTP GET via shared httpx client with SSRF validation, retry, and exponential backoff."""
-    validate_vlr_url(url)
+    url = validate_vlr_url(url)
     client = get_httpx_client()
     last_err = None
 

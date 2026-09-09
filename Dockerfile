@@ -4,7 +4,7 @@ RUN useradd -m -u 1000 user
 WORKDIR /home/user/app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY --chown=user:user . .
 USER user

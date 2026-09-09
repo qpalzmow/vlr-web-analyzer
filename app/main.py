@@ -5,6 +5,7 @@ import logging
 import traceback
 import threading
 import time
+import secrets
 from contextlib import asynccontextmanager
 from typing import Optional
 from concurrent.futures import ThreadPoolExecutor
@@ -136,7 +137,7 @@ def _get_form_for_team(team_id: str) -> list:
 def _get_maps_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
     if not team_id:
         return {}
-    cached = get_cached_team_data(team_id)
+    cached = get_cached_team_data(team_id) if not event_ids else None
     cached_maps = (cached.get("maps") or {}) if cached else {}
     if not event_ids and cached_maps:
         return cached_maps
@@ -150,13 +151,13 @@ def _get_maps_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
 
     if maps and not event_ids:
         save_team_data(team_id, maps_data=maps)
-    return maps if maps else cached_maps
+    return maps
 
 def _get_ace_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
     fallback_ace = {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}
     if not team_id:
         return fallback_ace
-    cached = get_cached_team_data(team_id)
+    cached = get_cached_team_data(team_id) if not event_ids else None
     cached_ace = cached.get("ace") if cached else None
     if cached_ace and cached_ace.get("nickname") != "N/A":
         fallback_ace = cached_ace
@@ -180,7 +181,7 @@ def _get_advanced_for_team(team_id: str, event_ids: Optional[list] = None) -> di
     default_adv = get_team_advanced_metrics("")
     if not team_id:
         return default_adv
-    cached = get_cached_team_data(team_id)
+    cached = get_cached_team_data(team_id) if not event_ids else None
     cached_adv = cached.get("advanced") if cached else None
     if cached_adv and cached_adv.get("total_played", 0) > 0:
         default_adv = cached_adv
@@ -259,7 +260,7 @@ def api_get_match_details(url: str = Query(...)):
             if in_mem_score and (now - in_mem_score[0] < CACHE_TTL):
                 live_score = in_mem_score[1]
             else:
-                live_score = {"series_score_a": "0", "series_score_b": "0", "status": "upcoming", "maps": []}
+                live_score = None  # Score is fetched independently by the browser.
             return JSONResponse(content={
                 "details": cached_match["details"],
                 "team_a_events": cached_match.get("team_a_events", [])[:12],
@@ -285,7 +286,7 @@ def api_get_match_details(url: str = Query(...)):
         team_a_events = _safe_future_result(future_a, [])[:12]
         team_b_events = _safe_future_result(future_b, [])[:12]
         map_pool = _safe_future_result(future_pool, [])
-        live_score = get_cached_live_score(clean_url, get_live_score)
+        live_score = None
 
         save_cached_match_details(
             match_url=clean_url,
@@ -312,8 +313,8 @@ def api_get_match_details(url: str = Query(...)):
 @app.get("/api/live-score")
 def api_get_live_score(url: str = Query(...)):
     try:
-        validate_vlr_url(url)
-        live_score = get_cached_live_score(url, get_live_score)
+        clean_url = validate_vlr_url(url)
+        live_score = get_cached_live_score(clean_url, get_live_score)
         return JSONResponse(content=live_score)
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))

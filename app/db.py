@@ -28,6 +28,8 @@ def init_db():
     conn = get_db_connection()
     try:
         with conn:
+            # Serialize additive migrations across server workers.
+            conn.execute("BEGIN IMMEDIATE")
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS team_data (
                     team_id TEXT PRIMARY KEY,
@@ -65,6 +67,18 @@ def init_db():
                     details_json TEXT
                 );
             """)
+            columns = {row[1] for row in conn.execute("PRAGMA table_info(team_data)")}
+            for field in ("maps", "form", "ace", "advanced", "events"):
+                column = f"{field}_updated_at"
+                if column not in columns:
+                    conn.execute(f"ALTER TABLE team_data ADD COLUMN {column} TEXT")
+            # Legacy analytics have no per-field timestamps and are intentionally
+            # expired: older versions stored a three-event scope as all-time data.
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS sync_lease (
+                    key TEXT PRIMARY KEY, owner TEXT NOT NULL, expires_at REAL NOT NULL
+                )
+            """)
             conn.execute("CREATE INDEX IF NOT EXISTS idx_team_updated ON team_data(updated_at);")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_match_details_updated ON match_details_cache(updated_at);")
         logger.info("SQLite database initialized at %s", DB_PATH)
@@ -81,37 +95,40 @@ def save_team_data(
     advanced_data: Optional[Dict[str, Any]] = None,
     events_data: Optional[List[Dict[str, Any]]] = None
 ):
-    """Saves or updates a team's analytics record atomically using COALESCE."""
+    """Save all-time analytics, refreshing only the supplied fields."""
     if not team_id:
         return
     now_iso = datetime.now(timezone.utc).isoformat()
-    maps_json = json.dumps(maps_data, ensure_ascii=False) if maps_data is not None else None
-    form_json = json.dumps(form_data, ensure_ascii=False) if form_data is not None else None
-    ace_json = json.dumps(ace_data, ensure_ascii=False) if ace_data is not None else None
-    adv_json = json.dumps(advanced_data, ensure_ascii=False) if advanced_data is not None else None
-    ev_json = json.dumps(events_data, ensure_ascii=False) if events_data is not None else None
+    fields = {"maps": maps_data, "form": form_data, "ace": ace_data,
+              "advanced": advanced_data, "events": events_data}
+    columns = ["team_id", "team_name", "updated_at"]
+    values = [str(team_id), team_name or "", now_iso]
+    updates = [
+        "team_name = CASE WHEN excluded.team_name <> '' THEN excluded.team_name ELSE team_data.team_name END",
+        "updated_at = excluded.updated_at",
+    ]
+    for field, value in fields.items():
+        if value is not None:
+            columns.extend([f"{field}_json", f"{field}_updated_at"])
+            values.extend([json.dumps(value, ensure_ascii=False), now_iso])
+            updates.extend([f"{field}_json = excluded.{field}_json",
+                            f"{field}_updated_at = excluded.{field}_updated_at"])
 
     conn = get_db_connection()
     try:
         with conn:
-            conn.execute("""
-                INSERT INTO team_data (team_id, team_name, maps_json, form_json, ace_json, advanced_json, events_json, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(team_id) DO UPDATE SET
-                    team_name = CASE WHEN excluded.team_name <> '' THEN excluded.team_name ELSE team_data.team_name END,
-                    maps_json = COALESCE(excluded.maps_json, team_data.maps_json),
-                    form_json = COALESCE(excluded.form_json, team_data.form_json),
-                    ace_json = COALESCE(excluded.ace_json, team_data.ace_json),
-                    advanced_json = COALESCE(excluded.advanced_json, team_data.advanced_json),
-                    events_json = COALESCE(excluded.events_json, team_data.events_json),
-                    updated_at = excluded.updated_at;
-            """, (str(team_id), team_name or "", maps_json, form_json, ace_json, adv_json, ev_json, now_iso))
+            conn.execute(
+                f"INSERT INTO team_data ({', '.join(columns)}) "
+                f"VALUES ({', '.join('?' for _ in values)}) "
+                f"ON CONFLICT(team_id) DO UPDATE SET {', '.join(updates)}",
+                values,
+            )
     finally:
         conn.close()
 
 
-def get_cached_team_data(team_id: str) -> Optional[Dict[str, Any]]:
-    """Retrieves cached analytics for a team. Returns None if not found."""
+def get_cached_team_data(team_id: str, max_age_seconds: int = 3600) -> Optional[Dict[str, Any]]:
+    """Return only fresh fields; missing/legacy timestamps are expired."""
     if not team_id:
         return None
     conn = get_db_connection()
@@ -120,16 +137,22 @@ def get_cached_team_data(team_id: str) -> Optional[Dict[str, Any]]:
         row = cursor.fetchone()
         if not row:
             return None
-        return {
+        result = {
             "team_id": row["team_id"],
             "team_name": row["team_name"],
-            "maps": json.loads(row["maps_json"] or "{}"),
-            "form": json.loads(row["form_json"] or "[]"),
-            "ace": json.loads(row["ace_json"] or "{}"),
-            "advanced": json.loads(row["advanced_json"] or "{}"),
-            "events": json.loads(row["events_json"] or "[]"),
             "updated_at": row["updated_at"]
         }
+        now = datetime.now(timezone.utc)
+        for field in ("maps", "form", "ace", "advanced", "events"):
+            fresh = False
+            try:
+                age = (now - datetime.fromisoformat(row[f"{field}_updated_at"])).total_seconds()
+                fresh = 0 <= age < max_age_seconds
+            except (TypeError, ValueError):
+                pass
+            empty = [] if field in ("form", "events") else {}
+            result[field] = json.loads(row[f"{field}_json"]) if fresh and row[f"{field}_json"] else empty
+        return result
     except Exception as e:
         logger.warning("Error fetching cached team data for %s: %s", team_id, e)
         return None
