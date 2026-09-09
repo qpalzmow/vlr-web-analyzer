@@ -9,6 +9,8 @@ let analysisRunning = false;
 let matchDetailsAbortController = null;
 let analysisAbortController = null;
 let liveScoreTimeout = null;
+let liveScoreAbortController = null;
+const MAX_SELECTED_EVENTS = 24;
 
 // Agent badge Tailwind colors mapping
 const agentColors = {

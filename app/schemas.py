@@ -8,7 +8,7 @@ class TeamAnalysisPayload(BaseModel):
     model_config = ConfigDict(extra="ignore")
     team_a_id: NumericId = Field(default="", description="Team A ID")
     team_b_id: NumericId = Field(default="", description="Team B ID")
-    event_ids: Optional[List[NumericId]] = Field(default=None, max_length=12, description="Event ID filters")
+    event_ids: Optional[List[NumericId]] = Field(default=None, max_length=24, description="Event ID filters (12 per team)")
 
 class BanPickPayload(BaseModel):
     model_config = ConfigDict(extra="ignore")

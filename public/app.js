@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             stopLiveScorePolling();
-        } else if (selectedMatch && selectedMatch.live_score && selectedMatch.live_score.status === 'live') {
+        } else if (selectedMatch && selectedMatch.details_ready) {
             startLiveScorePolling();
         }
     });
 });
-
+

@@ -285,6 +285,11 @@ function drawTournamentChecklist() {
         
         cb.addEventListener('change', () => {
             if (cb.checked) {
+                if (selectedEvents.size >= MAX_SELECTED_EVENTS) {
+                    cb.checked = false;
+                    showToast('대회는 최대 ' + MAX_SELECTED_EVENTS + '개까지 선택할 수 있습니다.', 'error');
+                    return;
+                }
                 selectedEvents.add(evId);
             } else {
                 selectedEvents.delete(evId);
@@ -305,50 +310,39 @@ function drawTournamentChecklist() {
 
     if (btnAll) {
         btnAll.onclick = () => {
-            selectedEvents.clear();
-            checkboxes.forEach(cb => {
-                cb.checked = true;
-                selectedEvents.add(cb.value);
-            });
+            setTournamentSelection(checkboxes.map(cb => cb.value));
         };
     }
     if (btnVct) {
         btnVct.onclick = () => {
-            selectedEvents.clear();
-            checkboxes.forEach(cb => {
-                const isVct = cb.dataset.eventType === 'vct';
-                cb.checked = isVct;
-                if (isVct) selectedEvents.add(cb.value);
-            });
+            setTournamentSelection(checkboxes.filter(cb => cb.dataset.eventType === 'vct').map(cb => cb.value));
         };
     }
     if (btnGlobal) {
         btnGlobal.onclick = () => {
-            selectedEvents.clear();
-            checkboxes.forEach(cb => {
-                const isGlobal = cb.dataset.eventType === 'global';
-                cb.checked = isGlobal;
-                if (isGlobal) selectedEvents.add(cb.value);
-            });
+            setTournamentSelection(checkboxes.filter(cb => cb.dataset.eventType === 'global').map(cb => cb.value));
         };
     }
     if (btnOffseason) {
         btnOffseason.onclick = () => {
-            selectedEvents.clear();
-            checkboxes.forEach(cb => {
-                const isOff = cb.dataset.eventType === 'offseason';
-                cb.checked = isOff;
-                if (isOff) selectedEvents.add(cb.value);
-            });
+            setTournamentSelection(checkboxes.filter(cb => cb.dataset.eventType === 'offseason').map(cb => cb.value));
         };
     }
     if (btnClear) {
         btnClear.onclick = () => {
-            selectedEvents.clear();
-            checkboxes.forEach(cb => {
-                cb.checked = false;
-            });
+            setTournamentSelection([]);
         };
+    }
+}
+
+function setTournamentSelection(ids) {
+    const uniqueIds = [...new Set(ids)];
+    selectedEvents = new Set(uniqueIds.slice(0, MAX_SELECTED_EVENTS));
+    tournamentChecklist.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = selectedEvents.has(cb.value);
+    });
+    if (uniqueIds.length > MAX_SELECTED_EVENTS) {
+        showToast('대회는 최대 ' + MAX_SELECTED_EVENTS + '개까지 선택할 수 있습니다.', 'error');
     }
 }
 
@@ -417,6 +411,8 @@ function generateShareableLink() {
     url.searchParams.set('url', selectedMatch.url);
     if (selectedEvents.size > 0) {
         url.searchParams.set('events', Array.from(selectedEvents).join(','));
+    } else {
+        url.searchParams.delete('events');
     }
     
     const link = url.toString();
@@ -648,6 +644,8 @@ function clearAceCompare() {
 
 // Helper: Render Empty Table row
 function clearDashboard() {
+    analysisRunning = false;
+    selectedEvents.clear();
     document.getElementById('team-a-name').textContent = 'Team A';
     document.getElementById('team-b-name').textContent = 'Team B';
     document.getElementById('team-a-form').innerHTML = '<span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>';

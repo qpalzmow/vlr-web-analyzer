@@ -10,18 +10,20 @@ async function fetchMatches() {
         
         if (allMatches.length === 0) {
             updateStatus('alert', '진행 중이거나 예정된 경기가 없습니다.', 'vlr.gg 페이지를 확인해보세요.', 0);
+            await restoreSharedSelection();
             return;
         }
         
         updateStatus('success', '경기 일정 로드 성공.', `${allMatches.length}개의 일정을 성공적으로 확인했습니다.`, 0);
         populateEventsDropdown();
+        await restoreSharedSelection();
     } catch (err) {
         updateStatus('error', '경기 일정을 불러오는 데 실패했습니다.', err.message, 0);
     }
 }
 
 // 4. Handle Match Selection (Fetch Team IDs and Recent Tournaments list)
-async function handleMatchSelection() {
+async function handleMatchSelection(restoredEventIds = []) {
     if (!matchSelect.value || matchSelect.value === '') {
         analyzeBtn.disabled = true;
         selectedMatch = null;
@@ -33,7 +35,12 @@ async function handleMatchSelection() {
     
     const requestMatch = filteredMatches[idx];
     if (!requestMatch) return;
+    clearDashboard();
+    selectedEvents.clear();
+    teamAEvents = [];
+    teamBEvents = [];
     selectedMatch = requestMatch;
+    requestMatch.details_ready = false;
     
     // Stop any active live polling
     stopLiveScorePolling();
@@ -65,15 +72,7 @@ async function handleMatchSelection() {
     analyzeBtn.disabled = true;
     matchSelect.disabled = true;
     const isSTier = requestMatch.tier === 'S-Tier';
-    const hasPreloadedTeams = Boolean(requestMatch.team_a_id && requestMatch.team_b_id);
-    
-    if (hasPreloadedTeams) {
-        updateStatus('info', '⚡ S-Tier DB 즉시 분석...', '사전 동기화된 SQLite 데이터베이스에서 전력을 0초 지연으로 로드합니다.', 50);
-        // Kick off instant parallel analysis immediately!
-        runAnalysis();
-    } else {
-        updateStatus('info', isSTier ? '⚡ S-Tier DB 고속 모드...' : '매치 세부 정보 수집 중...', isSTier ? '1시간 단위로 사전 동기화된 SQLite 데이터베이스에서 즉시 불러옵니다.' : '선수 및 대회 정보를 실시간으로 수집 중입니다. 잠시만 기다려주세요.', 10);
-    }
+    updateStatus('info', isSTier ? '경기 정보 불러오는 중...' : '매치 세부 정보 수집 중...', '대회와 맵 정보를 확인하고 있습니다.', 10);
     progressBarContainer.classList.remove('hidden');
     
     try {
@@ -98,20 +97,30 @@ async function handleMatchSelection() {
         requestMatch.team_b_name = data.details.team_b_name;
         requestMatch.map_pool = data.map_pool || [];
         requestMatch.live_score = data.live_score || null;
+        requestMatch.url = matchUrl;
+        requestMatch.team_a = data.details.team_a_name || requestMatch.team_a;
+        requestMatch.team_b = data.details.team_b_name || requestMatch.team_b;
+        document.getElementById('team-a-name').textContent = requestMatch.team_a;
+        document.getElementById('team-b-name').textContent = requestMatch.team_b;
         
-        teamAEvents = data.team_a_events;
-        teamBEvents = data.team_b_events;
+        teamAEvents = data.team_a_events || [];
+        teamBEvents = data.team_b_events || [];
+        // Shared filters may refer to events older than the recent dropdown.
+        const availableIds = new Set([...teamAEvents, ...teamBEvents].map(e => e.id));
+        restoredEventIds.forEach(id => {
+            if (!availableIds.has(id)) teamAEvents.push({ id, name: '공유된 대회 #' + id });
+        });
         
         // Draw checklists
         drawTournamentChecklist();
+        setTournamentSelection(restoredEventIds);
+        requestMatch.details_ready = true;
+        matchSelect.disabled = false;
         
         // Start Live Scoreboard Polling / Display
         startLiveScorePolling();
         
-        // If analysis was not triggered yet (cold match), trigger now!
-        if (!hasPreloadedTeams) {
-            runAnalysis();
-        }
+        await runAnalysis();
     } catch (err) {
         if (err.name === 'AbortError') {
             console.log('Match details request aborted.');
@@ -123,7 +132,7 @@ async function handleMatchSelection() {
     } finally {
         // Unlock UI only if this request wasn't aborted and is still active
         if (!signal.aborted && selectedMatch === requestMatch) {
-            analyzeBtn.disabled = false;
+            analyzeBtn.disabled = !requestMatch.details_ready || !requestMatch.team_a_id || !requestMatch.team_b_id || analysisRunning;
             matchSelect.disabled = false;
         }
     }
@@ -135,7 +144,7 @@ async function runAnalysis() {
     if (!analysisMatch) return;
     
     // Prevent analysis if match details (team IDs) are not fully loaded yet
-    if (!analysisMatch.team_a_id || !analysisMatch.team_b_id) {
+    if (!analysisMatch.details_ready || !analysisMatch.team_a_id || !analysisMatch.team_b_id) {
         updateStatus('error', '매치 상세 정보 미로딩', '매치 세부 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도하세요.', 0);
         return;
     }
@@ -439,4 +448,4 @@ function stopLiveScorePolling() {
         console.log("Live score polling stopped.");
     }
 }
-
+

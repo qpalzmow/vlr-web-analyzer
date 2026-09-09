@@ -114,10 +114,12 @@ function renderAcsTrendChart(formA, formB) {
     const nameB = selectedMatch ? selectedMatch.team_b : 'Team B';
     
     // Deterministic Form Rating without Math.random()
-    const trendA = (formA && formA.length > 0) ? formA.map(parseFormScore) : [50, 50, 50, 50, 50];
-    const trendB = (formB && formB.length > 0) ? formB.map(parseFormScore) : [50, 50, 50, 50, 50];
+    const trendA = (formA || []).map(parseFormScore).reverse();
+    const trendB = (formB || []).map(parseFormScore).reverse();
     
     const maxLen = Math.max(trendA.length, trendB.length);
+    trendA.unshift(...Array(maxLen - trendA.length).fill(null));
+    trendB.unshift(...Array(maxLen - trendB.length).fill(null));
     const labels = Array.from({ length: maxLen }, (_, i) => `${maxLen - i}경기 전`);
     
     acsTrendChartInstance = new Chart(canvas, {
@@ -161,4 +163,4 @@ function renderAcsTrendChart(formA, formB) {
         }
     });
 }
-
+
