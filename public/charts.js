@@ -16,22 +16,22 @@ function destroyCharts() {
 function renderAceRadarChart(aceA, aceB) {
     const canvas = document.getElementById('ace-radar-chart');
     if (!canvas || typeof Chart === 'undefined') return;
-    
+
     if (aceRadarChartInstance) {
         aceRadarChartInstance.destroy();
         aceRadarChartInstance = null;
     }
-    
+
     const nickA = (aceA && aceA.nickname !== 'N/A') ? aceA.nickname : (selectedMatch ? selectedMatch.team_a + ' Ace' : 'Team A Ace');
     const nickB = (aceB && aceB.nickname !== 'N/A') ? aceB.nickname : (selectedMatch ? selectedMatch.team_b + ' Ace' : 'Team B Ace');
-    
+
     const acsA = aceA ? (aceA.acs || 0) : 0;
     const acsB = aceB ? (aceB.acs || 0) : 0;
     const kdMarginA = aceA ? (aceA.kd_margin || 0) : 0;
     const kdMarginB = aceB ? (aceB.kd_margin || 0) : 0;
     const agentsCountA = (aceA && Array.isArray(aceA.agents)) ? aceA.agents.filter(a => a !== 'N/A').length : 1;
     const agentsCountB = (aceB && Array.isArray(aceB.agents)) ? aceB.agents.filter(a => a !== 'N/A').length : 1;
-    
+
     // Normalized 0-100 real metrics without hardcoded constants
     const metricsA = [
         Math.min(100, Math.round(acsA / 3.0)),                         // ACS Score (300 ACS = 100)
@@ -45,7 +45,7 @@ function renderAceRadarChart(aceA, aceB) {
         Math.min(100, agentsCountB * 33),
         Math.max(0, Math.min(100, Math.round(acsB / 2.5)))
     ];
-    
+
     aceRadarChartInstance = new Chart(canvas, {
         type: 'radar',
         data: {
@@ -104,24 +104,24 @@ function parseFormScore(formItem) {
 function renderAcsTrendChart(formA, formB) {
     const canvas = document.getElementById('acs-trend-chart');
     if (!canvas || typeof Chart === 'undefined') return;
-    
+
     if (acsTrendChartInstance) {
         acsTrendChartInstance.destroy();
         acsTrendChartInstance = null;
     }
-    
+
     const nameA = selectedMatch ? selectedMatch.team_a : 'Team A';
     const nameB = selectedMatch ? selectedMatch.team_b : 'Team B';
-    
+
     // Deterministic Form Rating without Math.random()
     const trendA = (formA || []).map(parseFormScore).reverse();
     const trendB = (formB || []).map(parseFormScore).reverse();
-    
+
     const maxLen = Math.max(trendA.length, trendB.length);
     trendA.unshift(...Array(maxLen - trendA.length).fill(null));
     trendB.unshift(...Array(maxLen - trendB.length).fill(null));
     const labels = Array.from({ length: maxLen }, (_, i) => `${maxLen - i}경기 전`);
-    
+
     acsTrendChartInstance = new Chart(canvas, {
         type: 'line',
         data: {
@@ -153,8 +153,8 @@ function renderAcsTrendChart(formA, formB) {
             },
             scales: {
                 x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                y: { 
-                    ticks: { color: '#64748b', stepSize: 25 }, 
+                y: {
+                    ticks: { color: '#64748b', stepSize: 25 },
                     grid: { color: 'rgba(255,255,255,0.05)' },
                     min: 0,
                     max: 100
@@ -163,4 +163,3 @@ function renderAcsTrendChart(formA, formB) {
         }
     });
 }
-

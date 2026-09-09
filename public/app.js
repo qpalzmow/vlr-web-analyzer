@@ -3,24 +3,24 @@ document.addEventListener('DOMContentLoaded', () => {
     initUITheme();
     fetchMatches();
     checkSyncStatus();
-    
+
     // Wire up events
     tierSelect.addEventListener('change', () => {
         populateEventsDropdown();
     });
-    
+
     regionSelect.addEventListener('change', () => {
         populateEventsDropdown();
     });
-    
+
     eventSelect.addEventListener('change', () => {
         populateMatchesDropdown();
     });
-    
+
     matchSelect.addEventListener('change', () => {
         handleMatchSelection();
     });
-    
+
     analyzeBtn.addEventListener('click', () => {
         runAnalysis();
     });
@@ -34,4 +34,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-

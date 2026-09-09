@@ -33,6 +33,8 @@ def test_sync_contract_and_region_filtering(monkeypatch):
         "team_b_id": "222", "team_b_name": "PRX"
     })
     monkeypatch.setattr(sync_module, "sync_single_team", lambda tid, tname: True)
+    monkeypatch.setattr(sync_module, "CORE_S_TIER_TEAMS", {})
+    monkeypatch.setattr(sync_module, "get_team_events", lambda tid: [])
 
     result = sync_module.run_daily_sync(force=True)
     assert result["status"] == "completed"
@@ -100,7 +102,7 @@ def test_schema_validation_limits():
     assert res.status_code == 422
 
     # Exceeding max event_ids
-    oversized_events = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"]
+    oversized_events = [str(i) for i in range(1, 26)]
     res = client.post("/api/analyze/maps", json={"team_a_id": "123", "team_b_id": "456", "event_ids": oversized_events})
     assert res.status_code == 422
 

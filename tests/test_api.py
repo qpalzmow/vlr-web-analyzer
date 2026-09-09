@@ -46,8 +46,8 @@ def test_simulate_banpick_api(client):
 
 def test_cache_warmer_endpoint(client):
     res = client.post("/api/cache/warm")
-    assert res.status_code == 200
-    assert res.json() == {"status": "warming_triggered"}
+    assert res.status_code == 503
+    assert res.json()["detail"] == "Manual maintenance is disabled"
 
 def test_api_404_protection(client):
     res = client.get("/api/nonexistent-endpoint")
