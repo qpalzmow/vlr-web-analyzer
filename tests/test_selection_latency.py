@@ -87,3 +87,38 @@ def test_expired_embedded_menus_are_removed_from_memory_cached_matches(client, m
     finally:
         conn.close()
     assert "team_a_events" not in client.get("/api/matches").json()[0]
+
+
+def test_catalog_uses_match_cache_before_team_analytics_have_synced(client, monkeypatch):
+    url = "https://www.vlr.gg/999997/test"
+    events = [{"id": "20", "name": "VCT test"}]
+    details = {"team_a_id": "1", "team_b_id": "2", "event_id": "20"}
+    db.save_cached_match_details(url, details, map_pool=["Bind"],
+                                team_a_events=events, team_b_events=events)
+    assert db.get_cached_team_data("1") is None
+    monkeypatch.setattr(main, "get_matches", lambda: [{"id": "999997", "url": url}])
+    match = client.get("/api/matches").json()[0]
+    assert match["team_a_events"] == events
+    assert match["selection_data"]["details"] == details
+    assert match["selection_data"]["map_pool"] == ["Bind"]
+
+
+def test_expired_match_cache_is_not_used_for_instant_selection(client, monkeypatch):
+    url = "https://www.vlr.gg/999998/test"
+    db.save_cached_match_details(url, {"team_a_id": "1", "team_b_id": "2"},
+                                team_a_events=[], team_b_events=[])
+    conn = db.get_db_connection()
+    try:
+        with conn:
+            conn.execute("UPDATE match_details_cache SET updated_at = ?",
+                         ((datetime.now(timezone.utc) - timedelta(days=2)).isoformat(),))
+    finally:
+        conn.close()
+    monkeypatch.setattr(main, "get_matches", lambda: [{"id": "999998", "url": url}])
+    assert "selection_data" not in client.get("/api/matches").json()[0]
+
+
+def test_static_assets_revalidate_after_deployment(client):
+    assert client.get("/").headers["cache-control"] == "no-cache"
+    assert client.get("/api.js").headers["cache-control"] == "no-cache"
+    assert 'api.js?v=20260912.2' in client.get("/").text

@@ -151,7 +151,8 @@ async function handleMatchSelection(restoredEventIds = [], autoAnalyze = false) 
         }
         let data = requestMatch.selection_data;
         const selectionAge = Date.now() - (requestMatch.selection_cached_at || 0);
-        if (!data || selectionAge < 0 || selectionAge >= 600000) {
+        const selectionWasCached = Boolean(data && selectionAge >= 0 && selectionAge < 600000);
+        if (!selectionWasCached) {
             const response = await fetch(`/api/match-details?url=${encodeURIComponent(matchUrl)}&include_map_pool=false`, { signal });
             if (!response.ok) {
                 throw new Error(`상세 로드 실패: ${response.status}`);
@@ -162,7 +163,7 @@ async function handleMatchSelection(restoredEventIds = [], autoAnalyze = false) 
         // Guard against race condition: ignore response if user switched match or aborted
         if (signal.aborted || selectedMatch !== requestMatch) return;
         requestMatch.selection_data = data;
-        requestMatch.selection_cached_at = Date.now();
+        if (!selectionWasCached) requestMatch.selection_cached_at = Date.now();
 
         // Save details inside requestMatch object
         requestMatch.team_a_id = data.details.team_a_id;

@@ -106,6 +106,42 @@ test('failed details keep analysis disabled even when IDs were preloaded', async
     assert.equal(h.read('matchSelect.disabled'), false);
 });
 
+test('catalog selection data opens filters without a details request or extending cache age', async () => {
+    const h = setup();
+    h.run(`
+        globalThis.cachedAt=Date.now()-1000;
+        filteredMatches=[{id:'1',url:'/1',selection_cached_at:cachedAt,
+            selection_data:{details:{team_a_id:'1',team_b_id:'2',event_id:'20'},
+                team_a_events:[{id:'8',name:'Event Eight'}],team_b_events:[],map_pool:['Bind']}}];
+        matchSelect.value='0';startLiveScorePolling=()=>{};
+    `);
+    let calls = 0;
+    h.context.fetch = async () => { calls++; throw new Error('Unexpected network request'); };
+    await h.run('handleMatchSelection()');
+    assert.equal(calls, 0);
+    assert.equal(h.read('selectedMatch.details_ready'), true);
+    assert.equal(h.read('analyzeBtn.disabled'), false);
+    assert.equal(h.elements.get('tournament-checklist').querySelectorAll().length, 1);
+    assert.equal(h.read('selectedMatch.selection_cached_at'), h.read('cachedAt'));
+});
+
+test('old catalog selection data is revalidated', async () => {
+    const h = setup();
+    h.run(`
+        filteredMatches=[{id:'1',url:'/1',selection_cached_at:Date.now()-600001,
+            selection_data:{details:{team_a_id:'old'},team_a_events:[],team_b_events:[]}}];
+        matchSelect.value='0';startLiveScorePolling=()=>{};
+    `);
+    let calls = 0;
+    h.context.fetch = async () => {
+        calls++;
+        return response({details:{team_a_id:'1',team_b_id:'2'},team_a_events:[],team_b_events:[]});
+    };
+    await h.run('handleMatchSelection()');
+    assert.equal(calls, 1);
+    assert.equal(h.read('selectedMatch.team_a_id'), '1');
+});
+
 test('cached tournament menus appear before details and keep user selection after details arrive', async () => {
     const h = setup();
     let finish;
