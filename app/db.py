@@ -304,10 +304,28 @@ def get_all_cached_match_details_map() -> Dict[str, Dict[str, Any]]:
     conn = get_db_connection()
     res = {}
     try:
-        cursor = conn.execute("SELECT match_url, details_json FROM match_details_cache")
+        cursor = conn.execute("SELECT * FROM match_details_cache")
         for row in cursor.fetchall():
             try:
                 det = json.loads(row["details_json"])
+                # The hourly sync prepares menus here before full team analytics.
+                # Carry fresh selection data with the catalog so a user need not
+                # make another request just to open the tournament chooser.
+                try:
+                    age = (datetime.now(timezone.utc) - datetime.fromisoformat(row["updated_at"])).total_seconds()
+                    events_a = json.loads(row["team_a_events_json"])
+                    events_b = json.loads(row["team_b_events_json"])
+                    if (0 <= age < 86400 and det.get("team_a_id") and det.get("team_b_id")
+                            and isinstance(events_a, list) and isinstance(events_b, list)):
+                        selection = {
+                            "details": dict(det),
+                            "team_a_events": events_a[:12], "team_b_events": events_b[:12],
+                            "map_pool": json.loads(row["map_pool_json"] or "[]"),
+                            "live_score": None, "cached": True,
+                        }
+                        det["selection_data"] = selection
+                except (TypeError, ValueError):
+                    pass
                 u = row["match_url"]
                 res[u] = det
                 m_id = re.search(r'/(\d+)', u)

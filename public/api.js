@@ -7,6 +7,10 @@ async function fetchMatches() {
             throw new Error(`서버 에러: ${response.status}`);
         }
         allMatches = await response.json();
+        const loadedAt = Date.now();
+        allMatches.forEach(match => {
+            if (match.selection_data) match.selection_cached_at = loadedAt;
+        });
 
         if (allMatches.length === 0) {
             updateStatus('alert', '진행 중이거나 예정된 경기가 없습니다.', 'vlr.gg 페이지를 확인해보세요.', 0);
@@ -145,15 +149,20 @@ async function handleMatchSelection(restoredEventIds = [], autoAnalyze = false) 
         if (!matchUrl) {
             throw new Error('매치 URL 정보를 찾을 수 없습니다.');
         }
-        const response = await fetch(`/api/match-details?url=${encodeURIComponent(matchUrl)}&include_map_pool=false`, { signal });
-        if (!response.ok) {
-            throw new Error(`상세 로드 실패: ${response.status}`);
+        let data = requestMatch.selection_data;
+        const selectionAge = Date.now() - (requestMatch.selection_cached_at || 0);
+        if (!data || selectionAge < 0 || selectionAge >= 600000) {
+            const response = await fetch(`/api/match-details?url=${encodeURIComponent(matchUrl)}&include_map_pool=false`, { signal });
+            if (!response.ok) {
+                throw new Error(`상세 로드 실패: ${response.status}`);
+            }
+            data = await response.json();
         }
-
-        const data = await response.json();
 
         // Guard against race condition: ignore response if user switched match or aborted
         if (signal.aborted || selectedMatch !== requestMatch) return;
+        requestMatch.selection_data = data;
+        requestMatch.selection_cached_at = Date.now();
 
         // Save details inside requestMatch object
         requestMatch.team_a_id = data.details.team_a_id;
@@ -169,8 +178,8 @@ async function handleMatchSelection(restoredEventIds = [], autoAnalyze = false) 
         document.getElementById('team-a-name').textContent = requestMatch.team_a;
         document.getElementById('team-b-name').textContent = requestMatch.team_b;
 
-        teamAEvents = data.team_a_events || [];
-        teamBEvents = data.team_b_events || [];
+        teamAEvents = [...(data.team_a_events || [])];
+        teamBEvents = [...(data.team_b_events || [])];
         requestMatch.team_a_events = teamAEvents;
         requestMatch.team_b_events = teamBEvents;
         const eventIdsToKeep = menusPreloaded ? Array.from(selectedEvents) : restoredEventIds;

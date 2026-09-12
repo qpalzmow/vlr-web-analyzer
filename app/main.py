@@ -269,6 +269,7 @@ def api_get_matches():
         for m in matches:
             m.pop("team_a_events", None)
             m.pop("team_b_events", None)
+            m.pop("selection_data", None)
             m_url = m.get('url') or m.get('match_url') or ""
             m_id = m.get('id') or ""
             det = details_map.get(m_url) or details_map.get(m_id)
@@ -276,6 +277,15 @@ def api_get_matches():
                 m["team_a_id"] = det.get("team_a_id")
                 m["team_b_id"] = det.get("team_b_id")
                 m["event_id"] = det.get("event_id")
+                selection = det.get("selection_data")
+                if selection:
+                    m["selection_data"] = {
+                        **selection,
+                        "team_a_events": team_events_map.get(m["team_a_id"], selection["team_a_events"]),
+                        "team_b_events": team_events_map.get(m["team_b_id"], selection["team_b_events"]),
+                    }
+                    m["team_a_events"] = m["selection_data"]["team_a_events"]
+                    m["team_b_events"] = m["selection_data"]["team_b_events"]
                 if m["team_a_id"] in team_events_map and m["team_b_id"] in team_events_map:
                     m["team_a_events"] = team_events_map[m["team_a_id"]]
                     m["team_b_events"] = team_events_map[m["team_b_id"]]
@@ -511,9 +521,9 @@ def serve_static(file_path: str):
             raise HTTPException(status_code=404, detail="Not Found")
 
     if os.path.exists(target) and os.path.isfile(target):
-        return FileResponse(target)
+        return FileResponse(target, headers={"Cache-Control": "no-cache"})
 
     index_path = os.path.join(PUBLIC_DIR, "index.html")
     if os.path.exists(index_path):
-        return FileResponse(index_path)
+        return FileResponse(index_path, headers={"Cache-Control": "no-cache"})
     raise HTTPException(status_code=404, detail="Not Found")
