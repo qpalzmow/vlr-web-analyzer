@@ -70,3 +70,20 @@ def test_old_menus_are_not_embedded():
     finally:
         conn.close()
     assert db.get_cached_team_events_map() == {}
+
+
+def test_expired_embedded_menus_are_removed_from_memory_cached_matches(client, monkeypatch):
+    events = [{"id": "20", "name": "VCT test"}]
+    for team_id in ("1", "2"):
+        db.save_team_data(team_id, events_data=events)
+    url = "https://www.vlr.gg/999996/test"
+    db.save_cached_match_details(url, {"team_a_id": "1", "team_b_id": "2"})
+    monkeypatch.setattr(main, "get_matches", lambda: [{"id": "999996", "url": url}])
+    assert client.get("/api/matches").json()[0]["team_a_events"] == events
+    conn = db.get_db_connection()
+    try:
+        with conn:
+            conn.execute("UPDATE team_data SET events_updated_at = NULL")
+    finally:
+        conn.close()
+    assert "team_a_events" not in client.get("/api/matches").json()[0]

@@ -157,7 +157,7 @@ test('manual selection becomes ready without waiting for a slow map pool request
     assert.deepEqual(h.read('selectedMatch.map_pool'), ['Bind']);
 });
 
-test('map pool timeout releases the analysis wait and a stopped selection cannot receive old maps', async () => {
+test('map pool timeout releases the analysis wait', async () => {
     const h = setup();
     h.context.fetch = (_url, options) => new Promise((_resolve, reject) => {
         options.signal.addEventListener('abort', () => {
