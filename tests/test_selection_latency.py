@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import app.main as main
 import app.db as db
+import app.sync as sync
 
 
 def test_selection_reuses_team_menus_and_skips_map_pool(client, monkeypatch):
@@ -121,4 +122,33 @@ def test_expired_match_cache_is_not_used_for_instant_selection(client, monkeypat
 def test_static_assets_revalidate_after_deployment(client):
     assert client.get("/").headers["cache-control"] == "no-cache"
     assert client.get("/api.js").headers["cache-control"] == "no-cache"
-    assert 'api.js?v=20260912.2' in client.get("/").text
+    assert 'api.js?v=20260912.3' in client.get("/").text
+
+
+def test_sync_prepares_all_menus_before_maps_and_reuses_team_requests(monkeypatch):
+    urls = [f"https://www.vlr.gg/{990000 + i}/test" for i in range(3)]
+    events = [{"id": "20", "name": "VCT test"}]
+    monkeypatch.setattr(sync, "CORE_S_TIER_TEAMS", {})
+    monkeypatch.setattr(sync, "get_matches", lambda: [{"url": url} for url in urls])
+    monkeypatch.setattr(sync, "get_match_details", lambda _: {
+        "team_a_id": "1", "team_b_id": "2", "event_id": "20"})
+    events_fetch = Mock(return_value=events)
+    monkeypatch.setattr(sync, "get_team_events", events_fetch)
+
+    def fetch_pool(event_id):
+        # A slow map service cannot hold back any tournament filter menus.
+        for url in urls:
+            cached = db.get_cached_match_details(url)
+            assert cached["team_a_events"] == events
+            assert cached["team_b_events"] == events
+        return ["Bind", "Haven"]
+
+    pool_fetch = Mock(side_effect=fetch_pool)
+    monkeypatch.setattr(sync, "get_event_map_pool", pool_fetch)
+    monkeypatch.setattr(sync, "sync_single_team", lambda *_: True)
+    result = sync.run_daily_sync()
+    assert result["status"] == "completed"
+    assert sorted(call.args[0] for call in events_fetch.call_args_list) == ["1", "2"]
+    pool_fetch.assert_called_once_with("20")
+    for url in urls:
+        assert db.get_cached_match_details(url)["map_pool"] == ["Bind", "Haven"]
