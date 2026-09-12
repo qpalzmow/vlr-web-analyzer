@@ -36,7 +36,7 @@ from app.db import (
     init_db, get_cached_team_data, save_team_data,
     get_sync_status, get_cached_matches, save_matches_cache,
     get_cached_match_details, save_cached_match_details,
-    get_all_cached_match_details_map
+    get_all_cached_match_details_map, get_cached_team_events_map
 )
 from app.sync import start_sync_scheduler, run_daily_sync
 
@@ -133,6 +133,17 @@ def _get_form_for_team(team_id: str) -> list:
     if form:
         save_team_data(team_id, form_data=form)
     return form
+
+def _get_events_for_team(team_id: str) -> list:
+    if not team_id:
+        return []
+    cached = get_cached_team_data(team_id, max_age_seconds=86400)
+    if cached and cached.get("events"):
+        return cached["events"][:12]
+    events = get_cached_data('team_events', team_id, get_team_events, team_id)
+    if events:
+        save_team_data(team_id, events_data=events)
+    return events[:12]
 
 def _get_maps_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
     if not team_id:
@@ -247,6 +258,7 @@ def api_get_matches():
 
         # Enrich matches with team IDs from single fast query
         details_map = get_all_cached_match_details_map()
+        team_events_map = get_cached_team_events_map()
 
         # Build reverse name→id lookup from CORE_S_TIER_TEAMS for instant fallback
         from app.config import CORE_S_TIER_TEAMS
@@ -262,6 +274,9 @@ def api_get_matches():
                 m["team_a_id"] = det.get("team_a_id")
                 m["team_b_id"] = det.get("team_b_id")
                 m["event_id"] = det.get("event_id")
+                if m["team_a_id"] in team_events_map and m["team_b_id"] in team_events_map:
+                    m["team_a_events"] = team_events_map[m["team_a_id"]]
+                    m["team_b_events"] = team_events_map[m["team_b_id"]]
             else:
                 # Fallback: resolve team IDs from CORE_S_TIER_TEAMS by name matching
                 ta_name = (m.get("team_a") or "").lower().strip()
@@ -277,7 +292,7 @@ def api_get_matches():
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.get("/api/match-details")
-def api_get_match_details(url: str = Query(...)):
+def api_get_match_details(url: str = Query(...), include_map_pool: bool = True):
     try:
         clean_url = validate_vlr_url(url)
 
@@ -303,14 +318,14 @@ def api_get_match_details(url: str = Query(...)):
         details = get_cached_data('match_details', clean_url, get_match_details, clean_url)
 
         future_a = _global_executor.submit(
-            get_cached_data, 'team_events', details["team_a_id"], get_team_events, details["team_a_id"]
+            _get_events_for_team, details["team_a_id"]
         ) if details.get("team_a_id") else None
         future_b = _global_executor.submit(
-            get_cached_data, 'team_events', details["team_b_id"], get_team_events, details["team_b_id"]
+            _get_events_for_team, details["team_b_id"]
         ) if details.get("team_b_id") else None
         future_pool = _global_executor.submit(
             get_cached_data, 'event_map_pool', details.get("event_id"), get_event_map_pool, details.get("event_id")
-        ) if details.get("event_id") else None
+        ) if include_map_pool and details.get("event_id") else None
 
         team_a_events = _safe_future_result(future_a, [])[:12]
         team_b_events = _safe_future_result(future_b, [])[:12]
@@ -320,7 +335,7 @@ def api_get_match_details(url: str = Query(...)):
         save_cached_match_details(
             match_url=clean_url,
             details=details,
-            map_pool=map_pool,
+            map_pool=map_pool if include_map_pool else None,
             team_a_events=team_a_events,
             team_b_events=team_b_events
         )
@@ -338,6 +353,28 @@ def api_get_match_details(url: str = Query(...)):
     except Exception as e:
         logger.error("api_get_match_details failed: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/api/match-map-pool")
+def api_get_match_map_pool(url: str = Query(...)):
+    try:
+        clean_url = validate_vlr_url(url)
+        cached = get_cached_match_details(clean_url, max_age_seconds=86400)
+        if cached and cached.get("map_pool"):
+            return {"map_pool": cached["map_pool"]}
+        details = (cached or {}).get("details") or get_cached_data(
+            'match_details', clean_url, get_match_details, clean_url)
+        event_id = details.get("event_id")
+        pool = get_cached_data('event_map_pool', event_id, get_event_map_pool, event_id) if event_id else []
+        if pool:
+            # Partial update preserves the event menus saved by selection.
+            save_cached_match_details(clean_url, details, map_pool=pool)
+        return {"map_pool": pool}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception:
+        logger.exception("api_get_match_map_pool failed")
+        raise HTTPException(status_code=502, detail="Map pool temporarily unavailable")
+
 
 @app.get("/api/live-score")
 def api_get_live_score(url: str = Query(...)):

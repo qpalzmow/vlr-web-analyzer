@@ -177,6 +177,24 @@ def save_matches_cache(tier: str, region: str, matches: List[Dict[str, Any]]):
     finally:
         conn.close()
 
+def get_cached_team_events_map(max_age_seconds: int = 86400) -> Dict[str, list]:
+    """Load fresh event menus in one query for the match selector."""
+    conn = get_db_connection()
+    try:
+        now = datetime.now(timezone.utc)
+        result = {}
+        for row in conn.execute("SELECT team_id, events_json, events_updated_at FROM team_data"):
+            try:
+                age = (now - datetime.fromisoformat(row["events_updated_at"])).total_seconds()
+                events = json.loads(row["events_json"])
+                if 0 <= age < max_age_seconds and isinstance(events, list):
+                    result[row["team_id"]] = events[:12]
+            except (TypeError, ValueError):
+                continue
+        return result
+    finally:
+        conn.close()
+
 
 def get_cached_matches(tier: str, region: str, max_age_seconds: int = 600) -> Optional[List[Dict[str, Any]]]:
     """Retrieves cached matches list for tier and region with TTL verification."""
@@ -229,9 +247,9 @@ def save_cached_match_details(
             """, (
                 match_url,
                 json.dumps(details, ensure_ascii=False),
-                json.dumps(map_pool or [], ensure_ascii=False),
-                json.dumps(team_a_events or [], ensure_ascii=False),
-                json.dumps(team_b_events or [], ensure_ascii=False),
+                json.dumps(map_pool, ensure_ascii=False) if map_pool is not None else None,
+                json.dumps(team_a_events, ensure_ascii=False) if team_a_events is not None else None,
+                json.dumps(team_b_events, ensure_ascii=False) if team_b_events is not None else None,
                 now_iso
             ))
     except Exception as e:

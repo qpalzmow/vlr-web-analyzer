@@ -84,7 +84,7 @@ test('preloaded teams wait for details and use new pool and restored filters exa
         runAnalysis=async()=>analyses.push({events:[...selectedEvents],pool:selectedMatch.map_pool});
         startLiveScorePolling=()=>{};
     `);
-    const pending = h.run("handleMatchSelection(['8'])");
+    const pending = h.run("handleMatchSelection(['8'], true)");
     assert.deepEqual(h.read('[...selectedEvents]'), []);
     assert.equal(h.read('analyses.length'), 0);
     resolveDetails(response({
@@ -126,7 +126,7 @@ test('full selection pipeline sends the restored scope and actual map pool to an
         throw new Error('Unexpected request ' + url);
     };
     h.run("selectedEvents.add('old');filteredMatches=[{id:'1',url:'/1',team_a_id:'1',team_b_id:'2'}];matchSelect.value='0'");
-    await h.run("handleMatchSelection(['8'])");
+    await h.run("handleMatchSelection(['8'], true)");
     const analysis = calls.filter(call => call.url.startsWith('/api/analyze/'));
     assert.equal(analysis.length, 4);
     for (const call of analysis) assert.deepEqual(call.body.event_ids, ['8']);

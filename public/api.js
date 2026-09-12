@@ -54,11 +54,34 @@ async function restoreSharedSelection() {
     eventSelect.value = match.tournament || match.event || '기타 대회';
     populateMatchesDropdown();
     matchSelect.value = String(filteredMatches.indexOf(match));
-    await handleMatchSelection(eventIds);
+    await handleMatchSelection(eventIds, true);
+}
+
+async function loadMatchMapPool(match, signal) {
+    if (match.map_pool?.length || !match.event_id) return match.map_pool || [];
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    signal.addEventListener('abort', abort, { once: true });
+    if (signal.aborted) abort();
+    const timeout = setTimeout(abort, 8000);
+    try {
+        const response = await fetch('/api/match-map-pool?url=' + encodeURIComponent(match.url), { signal: controller.signal });
+        if (!response.ok) throw new Error('Map pool unavailable');
+        const data = await response.json();
+        if (!signal.aborted && selectedMatch === match) {
+            match.map_pool = data.map_pool || [];
+        }
+    } catch (err) {
+        if (err.name !== 'AbortError') console.error('Map pool fetch failed:', err);
+    } finally {
+        clearTimeout(timeout);
+        signal.removeEventListener('abort', abort);
+    }
+    return match.map_pool || [];
 }
 
 // 4. Handle Match Selection (Fetch Team IDs and Recent Tournaments list)
-async function handleMatchSelection(restoredEventIds = []) {
+async function handleMatchSelection(restoredEventIds = [], autoAnalyze = false) {
     if (!matchSelect.value || matchSelect.value === '') {
         analyzeBtn.disabled = true;
         selectedMatch = null;
@@ -76,6 +99,13 @@ async function handleMatchSelection(restoredEventIds = []) {
     teamBEvents = [];
     selectedMatch = requestMatch;
     requestMatch.details_ready = false;
+    const menusPreloaded = Array.isArray(requestMatch.team_a_events) && Array.isArray(requestMatch.team_b_events);
+    if (menusPreloaded) {
+        teamAEvents = requestMatch.team_a_events;
+        teamBEvents = requestMatch.team_b_events;
+        drawTournamentChecklist();
+        setTournamentSelection(restoredEventIds);
+    }
 
     // Stop any active live polling
     stopLiveScorePolling();
@@ -105,7 +135,7 @@ async function handleMatchSelection(restoredEventIds = []) {
 
     // Lock UI to prevent premature clicks
     analyzeBtn.disabled = true;
-    matchSelect.disabled = true;
+    matchSelect.disabled = false;
     const isSTier = requestMatch.tier === 'S-Tier';
     updateStatus('info', isSTier ? '경기 정보 불러오는 중...' : '매치 세부 정보 수집 중...', '대회와 맵 정보를 확인하고 있습니다.', 10);
     progressBarContainer.classList.remove('hidden');
@@ -115,7 +145,7 @@ async function handleMatchSelection(restoredEventIds = []) {
         if (!matchUrl) {
             throw new Error('매치 URL 정보를 찾을 수 없습니다.');
         }
-        const response = await fetch(`/api/match-details?url=${encodeURIComponent(matchUrl)}`, { signal });
+        const response = await fetch(`/api/match-details?url=${encodeURIComponent(matchUrl)}&include_map_pool=false`, { signal });
         if (!response.ok) {
             throw new Error(`상세 로드 실패: ${response.status}`);
         }
@@ -130,6 +160,7 @@ async function handleMatchSelection(restoredEventIds = []) {
         requestMatch.team_a_name = data.details.team_a_name;
         requestMatch.team_b_id = data.details.team_b_id;
         requestMatch.team_b_name = data.details.team_b_name;
+        requestMatch.event_id = data.details.event_id;
         requestMatch.map_pool = data.map_pool || [];
         requestMatch.live_score = data.live_score || null;
         requestMatch.url = matchUrl;
@@ -140,22 +171,31 @@ async function handleMatchSelection(restoredEventIds = []) {
 
         teamAEvents = data.team_a_events || [];
         teamBEvents = data.team_b_events || [];
+        requestMatch.team_a_events = teamAEvents;
+        requestMatch.team_b_events = teamBEvents;
+        const eventIdsToKeep = menusPreloaded ? Array.from(selectedEvents) : restoredEventIds;
         // Shared filters may refer to events older than the recent dropdown.
         const availableIds = new Set([...teamAEvents, ...teamBEvents].map(e => e.id));
-        restoredEventIds.forEach(id => {
-            if (!availableIds.has(id)) teamAEvents.push({ id, name: '공유된 대회 #' + id });
+        eventIdsToKeep.forEach(id => {
+            if (!availableIds.has(id)) teamAEvents.push({ id, name: '선택한 대회 #' + id });
         });
 
         // Draw checklists
         drawTournamentChecklist();
-        setTournamentSelection(restoredEventIds);
+        setTournamentSelection(eventIdsToKeep);
         requestMatch.details_ready = true;
         matchSelect.disabled = false;
 
         // Start Live Scoreboard Polling / Display
         startLiveScorePolling();
+        requestMatch.map_pool_promise = loadMatchMapPool(requestMatch, signal);
 
-        await runAnalysis();
+        if (autoAnalyze) {
+            await runAnalysis();
+        } else {
+            updateStatus('success', '대회 선택 준비 완료.', '필터를 선택한 뒤 전력 분석 버튼을 눌러주세요.', 0);
+            progressBarContainer.classList.add('hidden');
+        }
     } catch (err) {
         if (err.name === 'AbortError') {
             console.log('Match details request aborted.');
@@ -272,6 +312,9 @@ async function runAnalysis() {
     }).then(async res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        if (signal.aborted || selectedMatch !== analysisMatch) return;
+        // Only the map analysis needs the pool; the tournament chooser never waits.
+        await analysisMatch.map_pool_promise;
         if (signal.aborted || selectedMatch !== analysisMatch) return;
         renderMapsTable('team-a-maps-table', data.maps_a);
         renderMapsTable('team-b-maps-table', data.maps_b);
