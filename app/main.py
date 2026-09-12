@@ -299,6 +299,7 @@ def api_get_match_details(url: str = Query(...), include_map_pool: bool = True):
         # 1. Fast-path: Check SQLite persistent cache first (instant response < 3ms, non-blocking)
         cached_match = get_cached_match_details(clean_url, max_age_seconds=86400)
         if cached_match and cached_match.get("details"):
+            menus = get_cached_team_events_map()
             now = time.time()
             in_mem_score = LIVE_SCORE_CACHE.get(clean_url)
             if in_mem_score and (now - in_mem_score[0] < CACHE_TTL):
@@ -307,8 +308,8 @@ def api_get_match_details(url: str = Query(...), include_map_pool: bool = True):
                 live_score = None  # Score is fetched independently by the browser.
             return JSONResponse(content={
                 "details": cached_match["details"],
-                "team_a_events": cached_match.get("team_a_events", [])[:12],
-                "team_b_events": cached_match.get("team_b_events", [])[:12],
+                "team_a_events": menus.get(cached_match["details"].get("team_a_id"), cached_match.get("team_a_events", []))[:12],
+                "team_b_events": menus.get(cached_match["details"].get("team_b_id"), cached_match.get("team_b_events", []))[:12],
                 "map_pool": cached_match.get("map_pool", []),
                 "live_score": live_score,
                 "cached": True
