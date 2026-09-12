@@ -106,6 +106,73 @@ test('failed details keep analysis disabled even when IDs were preloaded', async
     assert.equal(h.read('matchSelect.disabled'), false);
 });
 
+test('cached tournament menus appear before details and keep user selection after details arrive', async () => {
+    const h = setup();
+    let finish;
+    h.context.fetch = () => new Promise(resolve => { finish = resolve; });
+    h.run(`
+        globalThis.analyses=0;runAnalysis=async()=>analyses++;startLiveScorePolling=()=>{};
+        filteredMatches=[{id:'1',url:'/1',team_a_id:'1',team_b_id:'2',
+            team_a_events:[{id:'8',name:'Event Eight'}],team_b_events:[{id:'9',name:'Event Nine'}]}];
+        matchSelect.value='0';
+    `);
+    const pending = h.run('handleMatchSelection()');
+    assert.equal(h.elements.get('tournament-checklist').querySelectorAll().length, 2);
+    assert.equal(h.read('selectedMatch.details_ready'), false);
+    assert.equal(h.read('matchSelect.disabled'), false);
+    h.run("setTournamentSelection(['9'])");
+    finish(response({
+        details: { team_a_id: '1', team_b_id: '2' },
+        team_a_events: [{ id: '8', name: 'Event Eight' }], team_b_events: [{ id: '9', name: 'Event Nine' }],
+    }));
+    await pending;
+    assert.deepEqual(h.read('[...selectedEvents]'), ['9']);
+    assert.equal(h.read('analyses'), 0);
+    assert.equal(h.read('analyzeBtn.disabled'), false);
+});
+
+test('manual selection becomes ready without waiting for a slow map pool request', async () => {
+    const h = setup();
+    let finishPool;
+    h.run("filteredMatches=[{id:'1',url:'/1'}];matchSelect.value='0';startLiveScorePolling=()=>{};globalThis.analyses=0;runAnalysis=async()=>analyses++");
+    h.context.fetch = async url => {
+        if (url.startsWith('/api/match-details')) {
+            assert.match(url, /include_map_pool=false/);
+            return response({
+                details: { team_a_id: '1', team_b_id: '2', event_id: '20' },
+                team_a_events: [{ id: '8', name: 'Event Eight' }], team_b_events: [], map_pool: [],
+            });
+        }
+        if (url.startsWith('/api/match-map-pool')) return new Promise(resolve => { finishPool = resolve; });
+        throw new Error('Unexpected request');
+    };
+    await h.run('handleMatchSelection()');
+    assert.ok(finishPool);
+    assert.equal(h.read('selectedMatch.details_ready'), true);
+    assert.equal(h.read('analyzeBtn.disabled'), false);
+    assert.equal(h.read('analyses'), 0);
+    assert.equal(h.elements.get('tournament-checklist').querySelectorAll().length, 1);
+    finishPool(response({ map_pool: ['Bind'] }));
+    await h.run('selectedMatch.map_pool_promise');
+    assert.deepEqual(h.read('selectedMatch.map_pool'), ['Bind']);
+});
+
+test('map pool timeout releases the analysis wait and a stopped selection cannot receive old maps', async () => {
+    const h = setup();
+    h.context.fetch = (_url, options) => new Promise((_resolve, reject) => {
+        options.signal.addEventListener('abort', () => {
+            const error = new Error('aborted'); error.name = 'AbortError'; reject(error);
+        });
+    });
+    h.run("selectedMatch={url:'/1',event_id:'20',map_pool:[]};globalThis.poolTask=loadMatchMapPool(selectedMatch,new AbortController().signal)");
+    const [id, timer] = [...h.timers][0];
+    assert.equal(timer.delay, 8000);
+    h.timers.delete(id);
+    timer.callback();
+    assert.deepEqual(JSON.parse(JSON.stringify(await h.run('poolTask'))), []);
+    assert.equal(h.timers.size, 0);
+});
+
 test('full selection pipeline sends the restored scope and actual map pool to analysis endpoints', async () => {
     const h = setup();
     const calls = [];

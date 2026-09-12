@@ -267,6 +267,8 @@ def api_get_matches():
             name_to_id[tname.lower().strip()] = tid
 
         for m in matches:
+            m.pop("team_a_events", None)
+            m.pop("team_b_events", None)
             m_url = m.get('url') or m.get('match_url') or ""
             m_id = m.get('id') or ""
             det = details_map.get(m_url) or details_map.get(m_id)
