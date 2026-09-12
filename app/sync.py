@@ -18,6 +18,7 @@ from app.scraper.vlr import (
 )
 from app.scraper.metrics import find_ace_player_from_stats
 from app.config import CORE_S_TIER_TEAMS
+from app.cache import get_cached_data
 from app.sync_lease import sync_lease
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,19 @@ logger = logging.getLogger(__name__)
 # Global lock to prevent overlapping sync runs
 _sync_lock = threading.Lock()
 _sync_thread = None
+
+
+def _get_selection_events(team_id: str) -> list:
+    if not team_id:
+        return []
+    cached = get_cached_team_data(team_id, max_age_seconds=86400)
+    if cached and cached.get("events"):
+        return cached["events"][:12]
+    # Share both completed and in-flight requests with interactive selection.
+    events = get_cached_data('team_events', team_id, get_team_events, team_id)
+    if events:
+        save_team_data(team_id, events_data=events)
+    return events[:12]
 
 
 def sync_single_team(team_id: str, team_name: str = "") -> bool:
@@ -156,18 +170,15 @@ def _run_sync() -> Dict[str, Any]:
                         det.get("team_b_name", m_info.get("team_b", ""))
                     )
 
-                details = get_match_details(m_url)
+                details = get_cached_data('match_details', m_url, get_match_details, m_url)
                 if details:
-                    event_id = details.get("event_id")
-                    map_pool = get_event_map_pool(event_id) if event_id else []
                     ta_id = details.get("team_a_id")
                     tb_id = details.get("team_b_id")
-                    ev_a = get_team_events(ta_id) if ta_id else []
-                    ev_b = get_team_events(tb_id) if tb_id else []
+                    ev_a = _get_selection_events(ta_id)
+                    ev_b = _get_selection_events(tb_id)
                     save_cached_match_details(
                         match_url=m_url,
                         details=details,
-                        map_pool=map_pool,
                         team_a_events=ev_a,
                         team_b_events=ev_b
                     )
@@ -205,6 +216,24 @@ def _run_sync() -> Dict[str, Any]:
                     time.sleep(1.0)
 
         logger.info("Discovered %d unique teams across %d matches.", len(discovered_teams), total_matches)
+
+        # Prepare every selection menu before scraping optional map pools.
+        # One tournament may have dozens of matches; fetch its pool only once.
+        event_matches = {}
+        for m_url in unique_matches_map:
+            cached = get_cached_match_details(m_url, max_age_seconds=86400)
+            details = (cached or {}).get("details", {})
+            event_id = details.get("event_id")
+            if event_id and not cached.get("map_pool"):
+                event_matches.setdefault(event_id, []).append((m_url, details))
+        for event_id, entries in event_matches.items():
+            try:
+                pool = get_cached_data('event_map_pool', event_id, get_event_map_pool, event_id)
+                if pool:
+                    for m_url, details in entries:
+                        save_cached_match_details(m_url, details, map_pool=pool)
+            except Exception as exc:
+                logger.warning("Failed to warm map pool for %s: %s", event_id, exc)
 
         # 3. Sync all discovered teams in parallel (max 2 workers to stay polite on Render free tier)
         synced_count = 0
