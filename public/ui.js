@@ -32,7 +32,8 @@ function initUITheme() {
 }
 
 // 2. Populate Events Dropdown (filtered by selected Tier and Region, grouped by Tournament)
-function populateEventsDropdown() {
+function populateEventsDropdown(preserveSelection = false) {
+    const previousTournament = eventSelect.value;
     const tier = tierSelect.value;
     const region = regionSelect.value;
     
@@ -71,11 +72,13 @@ function populateEventsDropdown() {
     });
     
     eventSelect.disabled = false;
-    populateMatchesDropdown();
+    if (preserveSelection && uniqueTournaments.includes(previousTournament)) eventSelect.value = previousTournament;
+    populateMatchesDropdown(preserveSelection);
 }
 
 // 3. Populate Matches Dropdown (grouped by Stage optgroups: Playoffs, Play-Ins, Group Stage)
-function populateMatchesDropdown() {
+function populateMatchesDropdown(preserveSelection = false) {
+    const activeMatch = preserveSelection ? selectedMatch : null;
     const tier = tierSelect.value;
     const region = regionSelect.value;
     const selectedTournament = eventSelect.value;
@@ -87,6 +90,8 @@ function populateMatchesDropdown() {
         const eventMatch = (tourney === selectedTournament);
         return tierMatch && regionMatch && eventMatch;
     });
+    const activeIndex = activeMatch ? filteredMatches.findIndex(m => m.id === activeMatch.id) : -1;
+    if (activeIndex >= 0) filteredMatches[activeIndex] = activeMatch;
     
     matchSelect.innerHTML = '';
     
@@ -135,6 +140,8 @@ function populateMatchesDropdown() {
                 const roundTag = m.round_name ? `[${m.round_name}] ` : '';
                 const timeDate = m.time || m.date ? ` (${[m.time, m.date].filter(Boolean).join(' | ')})` : '';
                 opt.textContent = `${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
+                opt.disabled = !m.selection_data;
+                if (opt.disabled) opt.textContent += m.selection_status === 'unassigned' ? ' · 대진 미정' : ' · 업데이트 대기';
                 optgroup.appendChild(opt);
             });
             
@@ -154,6 +161,8 @@ function populateMatchesDropdown() {
                 const roundTag = m.round_name ? `[${m.round_name}] ` : '';
                 const timeDate = m.time || m.date ? ` (${[m.time, m.date].filter(Boolean).join(' | ')})` : '';
                 opt.textContent = `${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
+                opt.disabled = !m.selection_data;
+                if (opt.disabled) opt.textContent += m.selection_status === 'unassigned' ? ' · 대진 미정' : ' · 업데이트 대기';
                 optgroup.appendChild(opt);
             });
             
@@ -162,6 +171,10 @@ function populateMatchesDropdown() {
     });
     
     matchSelect.disabled = false;
+    if (activeIndex >= 0) {
+        matchSelect.value = String(activeIndex);
+        return;
+    }
     analyzeBtn.disabled = true;
     selectedMatch = null;
     clearDashboard();
@@ -661,9 +674,6 @@ function clearDashboard() {
     
     clearAceCompare();
     
-    if (typeof matchDetailsAbortController !== 'undefined' && matchDetailsAbortController) {
-        matchDetailsAbortController.abort();
-    }
     if (typeof analysisAbortController !== 'undefined' && analysisAbortController) {
         analysisAbortController.abort();
     }
@@ -939,17 +949,4 @@ function updateLiveScoreboard() {
     
     // Refresh icons inside the panel if any
     lucide.createIcons();
-}
-
-// 12. Check SQLite DB sync status on startup
-function checkSyncStatus() {
-    fetch('/api/sync/status')
-        .then(r => r.json())
-        .then(data => {
-            const badgeText = document.getElementById('sync-badge-text');
-            if (badgeText && data && data.synced_teams_count > 0) {
-                badgeText.textContent = `⚡ DB 고속 모드 (${data.synced_teams_count}개 팀 동기화)`;
-            }
-        })
-        .catch(() => {});
 }

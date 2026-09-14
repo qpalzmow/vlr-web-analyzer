@@ -31,14 +31,14 @@ from app.scraper.vlr import (
 )
 from app.scraper.metrics import find_ace_player_from_stats, simulate_banpick
 
-from app.cache_warmer import start_cache_warmer, stop_cache_warmer, warm_cache_cycle
 from app.db import (
     init_db, get_cached_team_data, save_team_data,
     get_sync_status, get_cached_matches, save_matches_cache,
     get_cached_match_details, save_cached_match_details,
     get_all_cached_match_details_map, get_cached_team_events_map
 )
-from app.sync import start_sync_scheduler, run_daily_sync
+from app.catalog import (start_catalog_scheduler, stop_catalog_scheduler, refresh_catalog,
+                         read_catalog, read_selection)
 
 if hasattr(sys.stdout, 'reconfigure'):
     try:
@@ -52,14 +52,15 @@ _global_executor = ThreadPoolExecutor(max_workers=12, thread_name_prefix="vlr-ap
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
-    start_sync_scheduler()
+    start_catalog_scheduler()
     yield
+    stop_catalog_scheduler()
     _global_executor.shutdown(wait=True)
     close_httpx_client()
 
 app = FastAPI(
     title="VLR Web Analyzer API",
-    version="2.1.0",
+    version="3.0.0",
     lifespan=lifespan
 )
 
@@ -133,17 +134,6 @@ def _get_form_for_team(team_id: str) -> list:
     if form:
         save_team_data(team_id, form_data=form)
     return form
-
-def _get_events_for_team(team_id: str) -> list:
-    if not team_id:
-        return []
-    cached = get_cached_team_data(team_id, max_age_seconds=86400)
-    if cached and cached.get("events"):
-        return cached["events"][:12]
-    events = get_cached_data('team_events', team_id, get_team_events, team_id)
-    if events:
-        save_team_data(team_id, events_data=events)
-    return events[:12]
 
 def _get_maps_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
     if not team_id:
@@ -241,152 +231,37 @@ def _submit_maintenance(request: Request, job, *args):
         raise
     future.add_done_callback(lambda _: _maintenance_lock.release())
 
+@app.get("/api/catalog")
+def api_get_catalog():
+    return JSONResponse(content=read_catalog(), headers={"Cache-Control": "no-store"})
+
+
 @app.get("/api/matches")
 def api_get_matches():
-    try:
-        cached_matches = get_cached_matches('s_tier', 'all', max_age_seconds=600)
-        is_valid_cache = (
-            cached_matches and 
-            len(cached_matches) > 2 and 
-            not any(m.get('url') in ('/1001', '/1002') or m.get('id') in ('1001', '1002') for m in cached_matches)
-        )
-        if is_valid_cache:
-            matches = cached_matches
-        else:
-            matches = get_cached_data('matches', 'matches_list', get_matches)
-            save_matches_cache('s_tier', 'all', matches)
+    return JSONResponse(content=read_catalog()["matches"], headers={"Cache-Control": "no-store"})
 
-        # Enrich matches with team IDs from single fast query
-        details_map = get_all_cached_match_details_map()
-        team_events_map = get_cached_team_events_map()
-
-        # Build reverse name→id lookup from CORE_S_TIER_TEAMS for instant fallback
-        from app.config import CORE_S_TIER_TEAMS
-        name_to_id = {}
-        for tid, tname in CORE_S_TIER_TEAMS.items():
-            name_to_id[tname.lower().strip()] = tid
-
-        for m in matches:
-            m.pop("team_a_events", None)
-            m.pop("team_b_events", None)
-            m.pop("selection_data", None)
-            m_url = m.get('url') or m.get('match_url') or ""
-            m_id = m.get('id') or ""
-            det = details_map.get(m_url) or details_map.get(m_id)
-            if det:
-                m["team_a_id"] = det.get("team_a_id")
-                m["team_b_id"] = det.get("team_b_id")
-                m["event_id"] = det.get("event_id")
-                selection = det.get("selection_data")
-                if selection:
-                    m["selection_data"] = {
-                        **selection,
-                        "team_a_events": team_events_map.get(m["team_a_id"], selection["team_a_events"]),
-                        "team_b_events": team_events_map.get(m["team_b_id"], selection["team_b_events"]),
-                    }
-                    m["team_a_events"] = m["selection_data"]["team_a_events"]
-                    m["team_b_events"] = m["selection_data"]["team_b_events"]
-                if m["team_a_id"] in team_events_map and m["team_b_id"] in team_events_map:
-                    m["team_a_events"] = team_events_map[m["team_a_id"]]
-                    m["team_b_events"] = team_events_map[m["team_b_id"]]
-            else:
-                # Fallback: resolve team IDs from CORE_S_TIER_TEAMS by name matching
-                ta_name = (m.get("team_a") or "").lower().strip()
-                tb_name = (m.get("team_b") or "").lower().strip()
-                if ta_name in name_to_id:
-                    m["team_a_id"] = name_to_id[ta_name]
-                if tb_name in name_to_id:
-                    m["team_b_id"] = name_to_id[tb_name]
-
-        return JSONResponse(content=matches)
-    except Exception as e:
-        logger.error("api_get_matches failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.get("/api/match-details")
 def api_get_match_details(url: str = Query(...), include_map_pool: bool = True):
+    # Compatibility endpoint for existing clients; never triggers a scrape.
     try:
-        clean_url = validate_vlr_url(url)
+        selection = read_selection(url)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    if not selection:
+        raise HTTPException(status_code=409, detail="Match is awaiting the next hourly update")
+    return JSONResponse(content=selection)
 
-        # 1. Fast-path: Check SQLite persistent cache first (instant response < 3ms, non-blocking)
-        cached_match = get_cached_match_details(clean_url, max_age_seconds=86400)
-        if cached_match and cached_match.get("details"):
-            menus = get_cached_team_events_map()
-            now = time.time()
-            in_mem_score = LIVE_SCORE_CACHE.get(clean_url)
-            if in_mem_score and (now - in_mem_score[0] < CACHE_TTL):
-                live_score = in_mem_score[1]
-            else:
-                live_score = None  # Score is fetched independently by the browser.
-            return JSONResponse(content={
-                "details": cached_match["details"],
-                "team_a_events": menus.get(cached_match["details"].get("team_a_id"), cached_match.get("team_a_events", []))[:12],
-                "team_b_events": menus.get(cached_match["details"].get("team_b_id"), cached_match.get("team_b_events", []))[:12],
-                "map_pool": cached_match.get("map_pool", []),
-                "live_score": live_score,
-                "cached": True
-            })
-
-        # 2. Fallback: On-demand fetch and save to SQLite cache
-        details = get_cached_data('match_details', clean_url, get_match_details, clean_url)
-
-        future_a = _global_executor.submit(
-            _get_events_for_team, details["team_a_id"]
-        ) if details.get("team_a_id") else None
-        future_b = _global_executor.submit(
-            _get_events_for_team, details["team_b_id"]
-        ) if details.get("team_b_id") else None
-        future_pool = _global_executor.submit(
-            get_cached_data, 'event_map_pool', details.get("event_id"), get_event_map_pool, details.get("event_id")
-        ) if include_map_pool and details.get("event_id") else None
-
-        team_a_events = _safe_future_result(future_a, [])[:12]
-        team_b_events = _safe_future_result(future_b, [])[:12]
-        map_pool = _safe_future_result(future_pool, [])
-        live_score = None
-
-        save_cached_match_details(
-            match_url=clean_url,
-            details=details,
-            map_pool=map_pool if include_map_pool else None,
-            team_a_events=team_a_events,
-            team_b_events=team_b_events
-        )
-
-        return JSONResponse(content={
-            "details": details,
-            "team_a_events": team_a_events,
-            "team_b_events": team_b_events,
-            "map_pool": map_pool,
-            "live_score": live_score,
-            "cached": False
-        })
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
-    except Exception as e:
-        logger.error("api_get_match_details failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.get("/api/match-map-pool")
 def api_get_match_map_pool(url: str = Query(...)):
     try:
-        clean_url = validate_vlr_url(url)
-        cached = get_cached_match_details(clean_url, max_age_seconds=86400)
-        if cached and cached.get("map_pool"):
-            return {"map_pool": cached["map_pool"]}
-        details = (cached or {}).get("details") or get_cached_data(
-            'match_details', clean_url, get_match_details, clean_url)
-        event_id = details.get("event_id")
-        pool = get_cached_data('event_map_pool', event_id, get_event_map_pool, event_id) if event_id else []
-        if pool:
-            # Partial update preserves the event menus saved by selection.
-            save_cached_match_details(clean_url, details, map_pool=pool)
-        return {"map_pool": pool}
+        selection = read_selection(url)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
-    except Exception:
-        logger.exception("api_get_match_map_pool failed")
-        raise HTTPException(status_code=502, detail="Map pool temporarily unavailable")
+    if not selection:
+        raise HTTPException(status_code=409, detail="Match is awaiting the next hourly update")
+    return {"map_pool": selection.get("map_pool", [])}
 
 
 @app.get("/api/live-score")
@@ -464,7 +339,7 @@ def api_get_sync_status_endpoint():
 
 @app.post("/api/sync/trigger")
 def api_trigger_sync_endpoint(request: Request):
-    _submit_maintenance(request, run_daily_sync, True)
+    _submit_maintenance(request, refresh_catalog)
     return JSONResponse(content={"status": "sync_triggered"})
 
 @app.post("/api/simulate/banpick")
@@ -478,7 +353,7 @@ def api_simulate_banpick(payload: BanPickPayload):
 
 @app.post("/api/cache/warm")
 def api_trigger_cache_warm(request: Request):
-    _submit_maintenance(request, warm_cache_cycle)
+    _submit_maintenance(request, refresh_catalog)
     return JSONResponse(content={"status": "warming_triggered"})
 
 @app.post("/api/log-error")

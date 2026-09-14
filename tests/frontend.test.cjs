@@ -72,141 +72,85 @@ function setup(search = '') {
 const flush = () => new Promise(resolve => setImmediate(resolve));
 const response = data => ({ ok: true, json: async () => data });
 
-test('preloaded teams wait for details and use new pool and restored filters exactly once', async () => {
-    const h = setup();
-    let resolveDetails;
-    h.context.fetch = () => new Promise(resolve => { resolveDetails = resolve; });
-    h.run(`
-        selectedEvents.add('old');
-        filteredMatches = [{id:'1',url:'/1',team_a:'A',team_b:'B',team_a_id:'1',team_b_id:'2'}];
-        matchSelect.value='0';
-        globalThis.analyses=[];
-        runAnalysis=async()=>analyses.push({events:[...selectedEvents],pool:selectedMatch.map_pool});
-        startLiveScorePolling=()=>{};
-    `);
-    const pending = h.run("handleMatchSelection(['8'], true)");
-    assert.deepEqual(h.read('[...selectedEvents]'), []);
-    assert.equal(h.read('analyses.length'), 0);
-    resolveDetails(response({
-        details: { team_a_id: '1', team_b_id: '2', team_a_name: 'A', team_b_name: 'B' },
-        map_pool: ['Bind', 'Icebox'], team_a_events: [], team_b_events: [],
-    }));
-    await pending;
-    assert.deepEqual(h.read('analyses'), [{ events: ['8'], pool: ['Bind', 'Icebox'] }]);
-    assert.equal(h.read('selectedMatch.details_ready'), true);
-    assert.equal(h.elements.get('tournament-checklist').querySelectorAll()[0].checked, true);
-});
+const readyMatch = (id = '1') => ({id, url: '/' + id, team_a: 'One', team_b: 'Two',
+    tier: 'S-Tier', region: 'Global', tournament: 'Event',
+    selection_data: {details: {team_a_id: '1', team_b_id: '2', event_id: '20'},
+        team_a_events: [{id:'8',name:'Event Eight'}], team_b_events: [], map_pool: ['Bind','Icebox']}});
 
-test('failed details keep analysis disabled even when IDs were preloaded', async () => {
+test('selection renders synchronously with zero network requests even with an old snapshot or missing pool', async () => {
     const h = setup();
-    h.context.fetch = async () => ({ ok: false, status: 500 });
-    h.run("filteredMatches=[{id:'1',url:'/1',team_a_id:'1',team_b_id:'2'}];matchSelect.value='0'");
-    await h.run('handleMatchSelection()');
-    assert.equal(h.read('analyzeBtn.disabled'), true);
-    assert.equal(h.read('matchSelect.disabled'), false);
-});
-
-test('catalog selection data opens filters without a details request or extending cache age', async () => {
-    const h = setup();
-    h.run(`
-        globalThis.cachedAt=Date.now()-1000;
-        filteredMatches=[{id:'1',url:'/1',selection_cached_at:cachedAt,
-            selection_data:{details:{team_a_id:'1',team_b_id:'2',event_id:'20'},
-                team_a_events:[{id:'8',name:'Event Eight'}],team_b_events:[],map_pool:['Bind']}}];
-        matchSelect.value='0';startLiveScorePolling=()=>{};
-    `);
-    let calls = 0;
-    h.context.fetch = async () => { calls++; throw new Error('Unexpected network request'); };
-    await h.run('handleMatchSelection()');
-    assert.equal(calls, 0);
+    const match = readyMatch();
+    match.selection_data.collected_at = '2020-01-01T00:00:00Z';
+    match.selection_data.map_pool = [];
+    h.context.match = match;
+    h.run("filteredMatches=[match];matchSelect.value='0'");
+    let requests = 0;
+    h.context.fetch = async () => { requests++; throw new Error('Network forbidden'); };
+    const task = h.run('handleMatchSelection()');
     assert.equal(h.read('selectedMatch.details_ready'), true);
     assert.equal(h.read('analyzeBtn.disabled'), false);
     assert.equal(h.elements.get('tournament-checklist').querySelectorAll().length, 1);
-    assert.equal(h.read('selectedMatch.selection_cached_at'), h.read('cachedAt'));
-});
-
-test('old catalog selection data is revalidated', async () => {
-    const h = setup();
-    h.run(`
-        filteredMatches=[{id:'1',url:'/1',selection_cached_at:Date.now()-600001,
-            selection_data:{details:{team_a_id:'old'},team_a_events:[],team_b_events:[]}}];
-        matchSelect.value='0';startLiveScorePolling=()=>{};
-    `);
-    let calls = 0;
-    h.context.fetch = async () => {
-        calls++;
-        return response({details:{team_a_id:'1',team_b_id:'2'},team_a_events:[],team_b_events:[]});
-    };
-    await h.run('handleMatchSelection()');
-    assert.equal(calls, 1);
-    assert.equal(h.read('selectedMatch.team_a_id'), '1');
-});
-
-test('cached tournament menus appear before details and keep user selection after details arrive', async () => {
-    const h = setup();
-    let finish;
-    h.context.fetch = () => new Promise(resolve => { finish = resolve; });
-    h.run(`
-        globalThis.analyses=0;runAnalysis=async()=>analyses++;startLiveScorePolling=()=>{};
-        filteredMatches=[{id:'1',url:'/1',team_a_id:'1',team_b_id:'2',
-            team_a_events:[{id:'8',name:'Event Eight'}],team_b_events:[{id:'9',name:'Event Nine'}]}];
-        matchSelect.value='0';
-    `);
-    const pending = h.run('handleMatchSelection()');
-    assert.equal(h.elements.get('tournament-checklist').querySelectorAll().length, 2);
-    assert.equal(h.read('selectedMatch.details_ready'), false);
-    assert.equal(h.read('matchSelect.disabled'), false);
-    h.run("setTournamentSelection(['9'])");
-    finish(response({
-        details: { team_a_id: '1', team_b_id: '2' },
-        team_a_events: [{ id: '8', name: 'Event Eight' }], team_b_events: [{ id: '9', name: 'Event Nine' }],
-    }));
-    await pending;
-    assert.deepEqual(h.read('[...selectedEvents]'), ['9']);
-    assert.equal(h.read('analyses'), 0);
-    assert.equal(h.read('analyzeBtn.disabled'), false);
-});
-
-test('manual selection becomes ready without waiting for a slow map pool request', async () => {
-    const h = setup();
-    let finishPool;
-    h.run("filteredMatches=[{id:'1',url:'/1'}];matchSelect.value='0';startLiveScorePolling=()=>{};globalThis.analyses=0;runAnalysis=async()=>analyses++");
-    h.context.fetch = async url => {
-        if (url.startsWith('/api/match-details')) {
-            assert.match(url, /include_map_pool=false/);
-            return response({
-                details: { team_a_id: '1', team_b_id: '2', event_id: '20' },
-                team_a_events: [{ id: '8', name: 'Event Eight' }], team_b_events: [], map_pool: [],
-            });
-        }
-        if (url.startsWith('/api/match-map-pool')) return new Promise(resolve => { finishPool = resolve; });
-        throw new Error('Unexpected request');
-    };
-    await h.run('handleMatchSelection()');
-    assert.ok(finishPool);
-    assert.equal(h.read('selectedMatch.details_ready'), true);
-    assert.equal(h.read('analyzeBtn.disabled'), false);
-    assert.equal(h.read('analyses'), 0);
-    assert.equal(h.elements.get('tournament-checklist').querySelectorAll().length, 1);
-    finishPool(response({ map_pool: ['Bind'] }));
-    await h.run('selectedMatch.map_pool_promise');
-    assert.deepEqual(h.read('selectedMatch.map_pool'), ['Bind']);
-});
-
-test('map pool timeout releases the analysis wait', async () => {
-    const h = setup();
-    h.context.fetch = (_url, options) => new Promise((_resolve, reject) => {
-        options.signal.addEventListener('abort', () => {
-            const error = new Error('aborted'); error.name = 'AbortError'; reject(error);
-        });
-    });
-    h.run("selectedMatch={url:'/1',event_id:'20',map_pool:[]};globalThis.poolTask=loadMatchMapPool(selectedMatch,new AbortController().signal)");
-    const [id, timer] = [...h.timers][0];
-    assert.equal(timer.delay, 8000);
-    h.timers.delete(id);
-    timer.callback();
-    assert.deepEqual(JSON.parse(JSON.stringify(await h.run('poolTask'))), []);
+    await task;
+    assert.equal(requests, 0);
     assert.equal(h.timers.size, 0);
+});
+
+test('a pending match never falls back to scraping even if legacy team IDs exist', async () => {
+    const h = setup();
+    h.run("filteredMatches=[{id:'1',url:'/1',team_a_id:'1',team_b_id:'2'}];matchSelect.value='0'");
+    let requests = 0;
+    h.context.fetch = async () => { requests++; throw new Error('Network forbidden'); };
+    await h.run('handleMatchSelection()');
+    assert.equal(requests, 0);
+    assert.equal(h.read('analyzeBtn.disabled'), true);
+    assert.match(h.elements.get('status-text').textContent, /업데이트 대기/);
+});
+
+test('manual selection does not analyze and switching matches clears old filters', async () => {
+    const h = setup();
+    h.context.matches = [readyMatch(),readyMatch('2')];
+    h.run("filteredMatches=matches;matchSelect.value='0';globalThis.calls=0;runAnalysis=async()=>calls++");
+    await h.run("handleMatchSelection(['8'])");
+    assert.deepEqual(h.read('[...selectedEvents]'), ['8']);
+    h.run("matchSelect.value='1'");
+    await h.run('handleMatchSelection()');
+    assert.deepEqual(h.read('[...selectedEvents]'), []);
+    assert.equal(h.read('calls'), 0);
+});
+
+test('hourly snapshot refresh preserves active analysis and filters, updates other matches', async () => {
+    const h = setup();
+    h.run("tierSelect.value='All';regionSelect.value='All'");
+    h.context.fetch = async () => response({generation:'one',updated_at:'2026-09-14T00:00:00Z',matches:[readyMatch(),readyMatch('2')]});
+    await h.run('fetchMatches()');
+    h.run("matchSelect.value='0'");
+    await h.run("handleMatchSelection(['8'])");
+    h.run('analysisRunning=true;analyzeBtn.disabled=true;globalThis.active=selectedMatch');
+    const newer = readyMatch('2');
+    newer.selection_data.team_a_events = [{id:'9',name:'New Event'}];
+    h.context.fetch = async () => response({generation:'two',updated_at:'2026-09-14T01:00:00Z',matches:[readyMatch(),newer]});
+    await h.run('fetchMatches(true)');
+    assert.equal(h.read('selectedMatch===active'), true);
+    assert.deepEqual(h.read('[...selectedEvents]'), ['8']);
+    assert.equal(h.read('analysisRunning'), true);
+    assert.equal(h.read('analyzeBtn.disabled'), true);
+    h.run("matchSelect.value='1'");
+    await h.run('handleMatchSelection()');
+    assert.equal(h.read('teamAEvents[0].id'), '9');
+});
+
+test('first startup polls only the stored catalog until a generation is published', async () => {
+    const h = setup();
+    h.run("tierSelect.value='All';regionSelect.value='All'");
+    const requests = [];
+    h.context.fetch = async url => { requests.push(url); return response({generation:null,matches:[]}); };
+    await h.run('fetchMatches()');
+    assert.match(h.elements.get('status-text').textContent,/첫 경기 목록/);
+    h.context.fetch = async url => { requests.push(url); return response({generation:'ready',matches:[readyMatch()]}); };
+    const timer = [...h.timers.values()].find(t=>t.delay===60000);
+    await timer.callback();
+    assert.deepEqual(requests,['/api/catalog','/api/catalog']);
+    assert.equal(h.read('allMatches.length'),1);
 });
 
 test('full selection pipeline sends the restored scope and actual map pool to analysis endpoints', async () => {
@@ -228,7 +172,8 @@ test('full selection pipeline sends the restored scope and actual map pool to an
         if (url === '/api/simulate/banpick') return response({ bans: [], picks: [] });
         throw new Error('Unexpected request ' + url);
     };
-    h.run("selectedEvents.add('old');filteredMatches=[{id:'1',url:'/1',team_a_id:'1',team_b_id:'2'}];matchSelect.value='0'");
+    h.context.match = readyMatch();
+    h.run("selectedEvents.add('old');filteredMatches=[match];matchSelect.value='0'");
     await h.run("handleMatchSelection(['8'], true)");
     const analysis = calls.filter(call => call.url.startsWith('/api/analyze/'));
     assert.equal(analysis.length, 4);
@@ -296,12 +241,16 @@ test('all-selection supports two disjoint twelve-event lists and caps longer sha
     assert.equal(h.read('selectedEvents.size'), 24);
 });
 
-test('shared match missing from current catalog is selected with its event filters', async () => {
+test('missing shared match waits for a published generation without a one-off scrape', async () => {
     const h = setup('?match=123456&events=8,9');
     h.run("globalThis.restored=null;handleMatchSelection=async ids=>{restored={id:filteredMatches[matchSelect.value].id,ids};}");
     await h.run('restoreSharedSelection()');
-    assert.deepEqual(h.read('restored'), { id: '123456', ids: ['8', '9'] });
-    assert.equal(h.read('allMatches[0].url'), 'https://www.vlr.gg/123456');
+    assert.equal(h.read('restored'),null);
+    assert.equal(h.read('allMatches.length'),0);
+    h.context.match = readyMatch('123456');
+    h.run('allMatches=[match]');
+    await h.run('restoreSharedSelection()');
+    assert.deepEqual(h.read('restored'), {id:'123456',ids:['8','9']});
 });
 
 test('invalid shared filters do not launch an analysis', async () => {

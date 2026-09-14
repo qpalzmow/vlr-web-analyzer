@@ -73,6 +73,9 @@ def test_api_match_details_fast_path(client):
         map_pool=map_pool
     )
 
+    from app.db import save_catalog_snapshot
+    save_catalog_snapshot({"matches": [{"id": "777777", "selection_data": {
+        "details": details, "map_pool": map_pool, "cached": True}}]})
     res = client.get(f"/api/match-details?url={match_url}")
     assert res.status_code == 200
     data = res.json()

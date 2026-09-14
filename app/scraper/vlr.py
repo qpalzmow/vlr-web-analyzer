@@ -17,7 +17,7 @@ from app.scraper.metrics import (
     find_ace_player_from_stats
 )
 
-def get_matches():
+def get_matches(strict=False):
     s_keywords, a_keywords = load_tier_config()
     seen_ids = set()
     combined = []
@@ -25,28 +25,38 @@ def get_matches():
     # 1. Upcoming & Live matches
     try:
         res_live = request_with_retry("https://www.vlr.gg/matches")
+        if strict:
+            res_live.raise_for_status()
         for m in parse_matches_list(res_live.text, s_keywords, a_keywords):
             if m['id'] not in seen_ids:
                 seen_ids.add(m['id'])
                 combined.append(m)
     except Exception as e:
         logger.warning('get_matches live request failed: %s', e)
+        if strict:
+            raise
 
     # 2. Recent results (pages 1 to 2)
     for page in range(1, 3):
         url = f"https://www.vlr.gg/matches/results/?page={page}" if page > 1 else "https://www.vlr.gg/matches/results"
         try:
             res_results = request_with_retry(url)
+            if strict:
+                res_results.raise_for_status()
             for m in parse_matches_list(res_results.text, s_keywords, a_keywords):
                 if m['id'] not in seen_ids:
                     seen_ids.add(m['id'])
                     combined.append(m)
         except Exception as e:
             logger.warning('get_matches results page %d failed: %s', page, e)
+            if strict:
+                raise
 
     # 3. Dynamic Ongoing Major VCT Tournaments (Pacific, Americas, EMEA, China, Masters, Champions)
     try:
         res_events = request_with_retry("https://www.vlr.gg/events")
+        if strict:
+            res_events.raise_for_status()
         soup_events = BeautifulSoup(res_events.text, "html.parser")
         major_events = []
         for card in soup_events.find_all(class_="event-item"):
@@ -65,6 +75,8 @@ def get_matches():
         for ev in major_events:
             try:
                 ev_res = request_with_retry(f"https://www.vlr.gg/event/matches/{ev['id']}/?series_id=all")
+                if strict:
+                    ev_res.raise_for_status()
                 ev_matches = parse_matches_list(ev_res.text, s_keywords, a_keywords)
                 
                 region = "Other"
@@ -93,9 +105,13 @@ def get_matches():
                         combined.append(m)
             except Exception as e:
                 logger.warning('Failed to scrape event matches for %s: %s', ev['id'], e)
+                if strict:
+                    raise
 
     except Exception as e:
         logger.warning('Failed to discover ongoing major VCT events: %s', e)
+        if strict:
+            raise
 
     return combined
 
@@ -136,7 +152,7 @@ def get_event_map_pool(event_id):
 
     return sorted(detected)
 
-def get_team_events(team_id):
+def get_team_events(team_id, strict=False):
     if not team_id:
         return []
     url = f"https://www.vlr.gg/team/stats/{team_id}"
@@ -144,15 +160,19 @@ def get_team_events(team_id):
         res = request_with_retry(url)
     except Exception as e:
         logger.warning('get_team_events request failed: %s', e)
+        if strict:
+            raise
         return []
     if res.status_code != 200:
+        if strict:
+            raise ValueError(f"Team events returned HTTP {res.status_code}")
         return []
 
     soup = BeautifulSoup(res.text, 'html.parser')
     events = []
     # Target strictly the tournament event selector, NOT the sub-stage selectors (filter-series, filter-subseries)
     event_select = soup.find('select', attrs={'name': 'event_id'}) or soup.find('select', class_='filter-event')
-    if not event_select:
+    if not event_select and not strict:
         selects = soup.find_all('select')
         event_select = selects[0] if selects else None
 
@@ -164,6 +184,8 @@ def get_team_events(team_id):
                 if text.lower() in ('playoffs', 'group stage', 'play-ins', 'main event', 'quarterfinals', 'semifinals', 'grand final', 'tournament'):
                     continue
                 events.append({"id": val, "name": text})
+    elif strict:
+        raise ValueError("Team event selector missing")
     return events
 
 def get_live_score(match_url):

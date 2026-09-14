@@ -2,7 +2,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     initUITheme();
     fetchMatches();
-    checkSyncStatus();
 
     // Wire up events
     tierSelect.addEventListener('change', () => {
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             stopLiveScorePolling();
-        } else if (selectedMatch && selectedMatch.details_ready) {
+        } else if (selectedMatch && selectedMatch.live_updates_started) {
             startLiveScorePolling();
         }
     });

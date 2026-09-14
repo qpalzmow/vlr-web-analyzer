@@ -8,7 +8,7 @@ from typing import Optional, Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
-DB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+DB_DIR = os.environ.get("VLR_DATA_DIR") or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 DB_PATH = os.path.join(DB_DIR, "vlr_analyzer.db")
 
 
@@ -60,6 +60,11 @@ def init_db():
                 );
             """)
             conn.execute("""
+                CREATE TABLE IF NOT EXISTS catalog_snapshot (
+                    id INTEGER PRIMARY KEY CHECK (id = 1), payload_json TEXT NOT NULL
+                );
+            """)
+            conn.execute("""
                 CREATE TABLE IF NOT EXISTS sync_meta (
                     key TEXT PRIMARY KEY,
                     last_synced_at TEXT,
@@ -82,6 +87,27 @@ def init_db():
             conn.execute("CREATE INDEX IF NOT EXISTS idx_team_updated ON team_data(updated_at);")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_match_details_updated ON match_details_cache(updated_at);")
         logger.info("SQLite database initialized at %s", DB_PATH)
+    finally:
+        conn.close()
+
+
+def get_catalog_snapshot():
+    conn = get_db_connection()
+    try:
+        row = conn.execute("SELECT payload_json FROM catalog_snapshot WHERE id = 1").fetchone()
+        return json.loads(row[0]) if row else None
+    finally:
+        conn.close()
+
+
+def save_catalog_snapshot(payload):
+    # Readers see either the entire previous generation or the entire new one.
+    encoded = json.dumps(payload, ensure_ascii=False)
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute("INSERT INTO catalog_snapshot (id, payload_json) VALUES (1, ?) "
+                         "ON CONFLICT(id) DO UPDATE SET payload_json = excluded.payload_json", (encoded,))
     finally:
         conn.close()
 

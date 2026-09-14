@@ -15,7 +15,8 @@ from app.schemas import TeamAnalysisPayload
 
 def test_cached_match_has_unknown_score_until_explicit_score_request(client, monkeypatch):
     url = "https://www.vlr.gg/999999/test"
-    db.save_cached_match_details(url, {"team_a_id": "1", "team_b_id": "2"})
+    db.save_catalog_snapshot({"matches": [{"id": "999999", "url": url, "selection_data": {
+        "details": {"team_a_id": "1", "team_b_id": "2"}, "live_score": None}}]})
     fetch = Mock(return_value={"status": "live", "series_score_a": "1", "series_score_b": "0", "maps": []})
     monkeypatch.setattr(main, "get_live_score", fetch)
     response = client.get("/api/match-details", params={"url": url})
