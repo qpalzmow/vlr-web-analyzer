@@ -64,6 +64,8 @@ def init_db():
                     id INTEGER PRIMARY KEY CHECK (id = 1), payload_json TEXT NOT NULL
                 );
             """)
+            conn.execute("CREATE TABLE IF NOT EXISTS analysis_teams (team_id TEXT PRIMARY KEY, payload_json TEXT NOT NULL)")
+            conn.execute("CREATE TABLE IF NOT EXISTS analysis_sources (source_key TEXT PRIMARY KEY, updated_at TEXT NOT NULL, payload_json TEXT NOT NULL)")
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS sync_meta (
                     key TEXT PRIMARY KEY,
@@ -108,6 +110,54 @@ def save_catalog_snapshot(payload):
         with conn:
             conn.execute("INSERT INTO catalog_snapshot (id, payload_json) VALUES (1, ?) "
                          "ON CONFLICT(id) DO UPDATE SET payload_json = excluded.payload_json", (encoded,))
+    finally:
+        conn.close()
+
+
+def get_analysis_teams(team_ids=None):
+    conn = get_db_connection()
+    try:
+        if team_ids is None:
+            rows = conn.execute("SELECT team_id, payload_json FROM analysis_teams").fetchall()
+        else:
+            ids = list(dict.fromkeys(str(t) for t in team_ids))
+            if not ids:
+                return {}
+            rows = conn.execute("SELECT team_id, payload_json FROM analysis_teams WHERE team_id IN (" +
+                                ','.join('?' for _ in ids) + ')', ids).fetchall()
+        return {row[0]: json.loads(row[1]) for row in rows}
+    finally:
+        conn.close()
+
+
+def save_analysis_team(team_id, payload):
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute("INSERT INTO analysis_teams VALUES (?, ?) ON CONFLICT(team_id) DO UPDATE SET payload_json=excluded.payload_json",
+                         (str(team_id), json.dumps(payload, ensure_ascii=False)))
+    finally:
+        conn.close()
+
+
+def get_analysis_source(key, max_age_seconds=3600, not_before=None):
+    conn = get_db_connection()
+    try:
+        row = conn.execute("SELECT updated_at,payload_json FROM analysis_sources WHERE source_key=?", (key,)).fetchone()
+        if (row and (not_before is None or datetime.fromisoformat(row[0]) >= not_before)
+                and 0 <= (datetime.now(timezone.utc) - datetime.fromisoformat(row[0])).total_seconds() < max_age_seconds):
+            return json.loads(row[1])
+        return None
+    finally:
+        conn.close()
+
+
+def save_analysis_source(key, payload):
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute("INSERT INTO analysis_sources VALUES (?, ?, ?) ON CONFLICT(source_key) DO UPDATE SET updated_at=excluded.updated_at,payload_json=excluded.payload_json",
+                         (key, datetime.now(timezone.utc).isoformat(), json.dumps(payload, ensure_ascii=False)))
     finally:
         conn.close()
 

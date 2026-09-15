@@ -140,7 +140,7 @@ def test_strict_events_distinguish_failed_scrape_from_empty_menu(monkeypatch):
 def test_static_assets_revalidate_after_deployment(client):
     assert client.get("/").headers["cache-control"] == "no-cache"
     assert client.get("/api/catalog").headers["cache-control"] == "no-store"
-    assert 'api.js?v=20260914.1' in client.get("/").text
+    assert 'api.js?v=20260915.1' in client.get("/").text
 
 
 def test_catalog_source_failure_is_not_a_successful_empty_or_partial_result(monkeypatch):

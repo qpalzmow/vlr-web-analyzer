@@ -153,35 +153,56 @@ test('first startup polls only the stored catalog until a generation is publishe
     assert.equal(h.read('allMatches.length'),1);
 });
 
-test('full selection pipeline sends the restored scope and actual map pool to analysis endpoints', async () => {
-    const h = setup();
-    const calls = [];
-    const ace = { nickname: 'Player', acs: 200, kd_margin: 5, agents: ['Jett'] };
-    h.context.fetch = async (url, options = {}) => {
-        const body = options.body ? JSON.parse(options.body) : null;
-        calls.push({ url, body });
-        if (url.startsWith('/api/match-details')) return response({
-            details: { team_a_id: '1', team_b_id: '2', team_a_name: 'One', team_b_name: 'Two' },
-            map_pool: ['Bind', 'Icebox'], team_a_events: [{ id: '8', name: 'Event 8' }], team_b_events: [],
-        });
-        if (url.startsWith('/api/live-score')) return response({ status: 'final', series_score_a: '2', series_score_b: '1' });
-        if (url === '/api/analyze/form') return response({ form_a: ['W (2-0)'], form_b: ['L (0-2)'] });
-        if (url === '/api/analyze/maps') return response({ maps_a: {}, maps_b: {} });
-        if (url === '/api/analyze/aces') return response({ ace_a: ace, ace_b: ace });
-        if (url === '/api/analyze/advanced') return response({ adv_a: {}, adv_b: {} });
-        if (url === '/api/simulate/banpick') return response({ bans: [], picks: [] });
-        throw new Error('Unexpected request ' + url);
-    };
-    h.context.match = readyMatch();
-    h.run("selectedEvents.add('old');filteredMatches=[match];matchSelect.value='0'");
-    await h.run("handleMatchSelection(['8'], true)");
-    const analysis = calls.filter(call => call.url.startsWith('/api/analyze/'));
-    assert.equal(analysis.length, 4);
-    for (const call of analysis) assert.deepEqual(call.body.event_ids, ['8']);
-    assert.deepEqual(calls.find(call => call.url === '/api/simulate/banpick').body.map_pool, ['Bind', 'Icebox']);
-    assert.equal(h.read('analysisRunning'), false);
-    assert.equal(h.read('analyzeBtn.disabled'), false);
-    assert.equal(h.elements.get('status-text').textContent, '전력 분석 완료.');
+const analysisResult = () => ({
+    form_a:['W (2-0)'],form_b:['L (0-2)'],maps_a:{},maps_b:{},
+    ace_a:{nickname:'Player A',acs:220,kd_margin:5,agents:['Jett']},
+    ace_b:{nickname:'Player B',acs:200,kd_margin:1,agents:['Raze']},
+    adv_a:{},adv_b:{},simulation:{bans:[],picks:[]},probability:{a:55,b:45},
+    updated_at:'2026-09-15T00:00:00Z',stale:false,players_available:true
+});
+
+test('one analysis request sends filters and pool and paints every panel together', async () => {
+    const h=setup();
+    const calls=[];
+    h.context.match=readyMatch();
+    h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
+    h.context.fetch=async (url,options)=>{calls.push({url,body:JSON.parse(options.body)});return response(analysisResult());};
+    await h.run("handleMatchSelection(['8'],true)");
+    assert.equal(calls.length,1);
+    assert.equal(calls[0].url,'/api/analyze');
+    assert.deepEqual(calls[0].body.event_ids,['8']);
+    assert.deepEqual(calls[0].body.map_pool,['Bind','Icebox']);
+    assert.equal(h.elements.get('ace-a-nickname').textContent,'Player A');
+    assert.equal(h.elements.get('ace-b-nickname').textContent,'Player B');
+    assert.equal(h.elements.get('status-text').textContent,'전력 분석 완료.');
+    assert.equal(h.read('analysisRunning'),false);
+    assert.equal(h.read('analyzeBtn.disabled'),false);
+});
+
+test('switching matches before analysis resolves cannot paint stale results', async () => {
+    const h=setup();let finish;
+    h.context.matches=[readyMatch(),readyMatch('2')];
+    h.run("filteredMatches=matches;matchSelect.value='0';startLiveScorePolling=()=>{}");
+    await h.run('handleMatchSelection()');
+    h.context.fetch=()=>new Promise(resolve=>{finish=resolve;});
+    const pending=h.run('runAnalysis()');
+    h.run("matchSelect.value='1'");await h.run('handleMatchSelection()');
+    finish(response(analysisResult()));await pending;
+    assert.equal(h.elements.get('ace-a-nickname').textContent,'N/A');
+    assert.equal(h.elements.get('status-text').textContent,'대회 선택 준비 완료.');
+    assert.equal(h.read('selectedMatch.id'),'2');
+});
+
+test('unprepared scope reports the reason without per-panel fallback requests', async () => {
+    const h=setup();let calls=0;
+    h.context.match=readyMatch();h.run("filteredMatches=[match];matchSelect.value='0'");
+    await h.run('handleMatchSelection()');
+    h.context.fetch=async()=>{calls++;return {ok:false,status:409,json:async()=>({detail:'선택한 대회 통계를 준비 중입니다.'})};};
+    await h.run('runAnalysis()');
+    assert.equal(calls,1);
+    assert.match(h.elements.get('sub-status-text').textContent,/선택한 대회 통계/);
+    assert.equal(h.read('analyzeBtn.disabled'),false);
+    assert.equal(h.elements.get('ace-a-nickname').textContent,'N/A');
 });
 
 test('cache without score is fetched immediately and final score stops polling', async () => {

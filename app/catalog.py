@@ -149,20 +149,8 @@ def queue_analytics(matches):
         if _analytics_worker and _analytics_worker.is_alive():
             return
         def work():
-            from app.sync import sync_single_team
-            teams = {}
-            for m in matches:
-                d = m.get("selection_data", {}).get("details", {})
-                for side in ("a", "b"):
-                    if d.get(f"team_{side}_id"):
-                        teams[str(d[f"team_{side}_id"])] = d.get(f"team_{side}_name", "")
-            with ThreadPoolExecutor(max_workers=2, thread_name_prefix="vlr-analytics") as pool:
-                # Small batches allow shutdown between teams; analytics never hold the catalog lease.
-                entries = list(teams.items())
-                for i in range(0, len(entries), 2):
-                    if _stop.is_set():
-                        return
-                    list(pool.map(lambda item: sync_single_team(*item), entries[i:i + 2]))
+            from app.analysis import refresh_analysis
+            refresh_analysis(matches, stop=_stop, force=True)
         _analytics_worker = threading.Thread(target=work, daemon=True, name="VLRAnalyticsWarmup")
         _analytics_worker.start()
 

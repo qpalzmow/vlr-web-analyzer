@@ -141,8 +141,6 @@ async function runAnalysis() {
     analysisAbortController = new AbortController();
     const signal = analysisAbortController.signal;
 
-    analysisMatch.live_updates_started = true;
-    startLiveScorePolling();
     analysisRunning = true;
     analyzeBtn.disabled = true;
     progressBarContainer.classList.remove('hidden');
@@ -172,7 +170,7 @@ async function runAnalysis() {
     document.getElementById('ace-b-kd').textContent = '0';
     document.getElementById('ace-b-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
 
-    updateStatus('info', '전력 분석을 시작합니다...', '경기 흐름, 맵 전적, 에이스 데이터를 요청 중입니다.', 10);
+    updateStatus('info', '전력 분석을 시작합니다...', '미리 수집한 통계를 한 번에 불러오고 있습니다.', 10);
 
     const payload = {
         team_a_id: analysisMatch.team_a_id,
@@ -180,180 +178,61 @@ async function runAnalysis() {
         event_ids: selectedEvents.size > 0 ? Array.from(selectedEvents) : null
     };
 
-    let completedSteps = 0;
-    const totalSteps = 4;
-    let failedSteps = 0;
-
-    function updateProgress(stepName) {
-        completedSteps++;
-        const progressPercent = 10 + Math.floor((completedSteps / totalSteps) * 90);
-        updateStatus('info', `데이터 수집 및 매핑 중... [${progressPercent}%]`, `${stepName} 데이터를 성공적으로 로드했습니다.`, progressPercent);
-    }
-
-    // 1. Fetch Form (W/L Flow)
-    const formPromise = fetch('/api/analyze/form', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal
-    }).then(async res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+    payload.map_pool = analysisMatch.map_pool?.length ? analysisMatch.map_pool : FALLBACK_MAP_POOL;
+    try {
+        const response = await fetch('/api/analyze', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload), signal
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || `분석 조회 실패: ${response.status}`);
         if (signal.aborted || selectedMatch !== analysisMatch) return;
+        // Paint one consistent response in the same task; no per-panel requests.
         renderFormBadges('team-a-form', data.form_a);
         renderFormBadges('team-b-form', data.form_b);
         renderAcsTrendChart(data.form_a, data.form_b);
-        lucide.createIcons();
-        updateProgress('경기 흐름');
-    }).catch(err => {
-        if (err.name === 'AbortError') return;
-        failedSteps++;
-        if (selectedMatch === analysisMatch) {
-            document.getElementById('team-a-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-            document.getElementById('team-b-form').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-        }
-        console.error('Form fetch error:', err);
-    });
-
-    // 2. Fetch Maps & Server AI Ban/Pick Simulation
-    const mapsPromise = fetch('/api/analyze/maps', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal
-    }).then(async res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (signal.aborted || selectedMatch !== analysisMatch) return;
         renderMapsTable('team-a-maps-table', data.maps_a);
         renderMapsTable('team-b-maps-table', data.maps_b);
-
-        // Single Source of Truth: Call server banpick endpoint
-        const pool = (analysisMatch.map_pool && analysisMatch.map_pool.length > 0)
-            ? analysisMatch.map_pool
-            : FALLBACK_MAP_POOL;
-
-        try {
-            const simRes = await fetch('/api/simulate/banpick', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ maps_a: data.maps_a || {}, maps_b: data.maps_b || {}, map_pool: pool }),
-                signal
-            });
-            if (simRes.ok) {
-                const simData = await simRes.json();
-                if (!signal.aborted && selectedMatch === analysisMatch) {
-                    renderBanPickResults(simData);
-                }
-            } else {
-                if (!signal.aborted && selectedMatch === analysisMatch) {
-                    calculateAISimulation(data.maps_a, data.maps_b);
-                }
-            }
-        } catch (simErr) {
-            if (simErr.name !== 'AbortError' && selectedMatch === analysisMatch) {
-                calculateAISimulation(data.maps_a, data.maps_b);
-            }
-        }
-
-        lucide.createIcons();
-        updateProgress('진영별 맵 승률');
-    }).catch(err => {
-        if (err.name === 'AbortError') return;
-        failedSteps++;
-        if (selectedMatch === analysisMatch) {
-            document.getElementById('team-a-maps-table').innerHTML = '<tr><td colspan="4" class="py-4 text-center text-red-400">로드 실패</td></tr>';
-            document.getElementById('team-b-maps-table').innerHTML = '<tr><td colspan="4" class="py-4 text-center text-red-400">로드 실패</td></tr>';
-            document.getElementById('ai-ban-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
-            document.getElementById('ai-pick-list').innerHTML = '<p class="text-red-400">시뮬레이션 실패</p>';
-        }
-        console.error('Maps fetch error:', err);
-    });
-
-    // 3. Fetch Aces
-    const acesPromise = fetch('/api/analyze/aces', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal
-    }).then(async res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (signal.aborted || selectedMatch !== analysisMatch) return;
+        renderBanPickResults(data.simulation);
         renderAgentBadges('team-a-agents', data.ace_a.agents);
         renderAgentBadges('team-b-agents', data.ace_b.agents);
         populateAceCard('a', data.ace_a);
         populateAceCard('b', data.ace_b);
         renderAceRadarChart(data.ace_a, data.ace_b);
-        lucide.createIcons();
-        updateProgress('에이스 통계');
-    }).catch(err => {
-        if (err.name === 'AbortError') return;
-        failedSteps++;
-        if (selectedMatch === analysisMatch) {
-            document.getElementById('team-a-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-            document.getElementById('team-b-agents').innerHTML = '<span class="text-xs text-red-400">로드 실패</span>';
-            document.getElementById('ace-a-nickname').textContent = 'N/A';
-            document.getElementById('ace-b-nickname').textContent = 'N/A';
+        if (data.probability) {
+            updateWinProbabilityBar(data.probability.a, data.probability.b);
+        } else {
+            document.getElementById('win-probability-section').classList.add('hidden');
         }
-        console.error('Aces fetch error:', err);
-    });
-
-    // 4. Fetch Advanced Metrics (FK/FD Margin & Map Stats)
-    const advPromise = fetch('/api/analyze/advanced', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal
-    }).then(async res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (signal.aborted || selectedMatch !== analysisMatch) return;
-
-        // Calculate Win Probability using legitimate weighted metrics:
-        // 60% Map Win Rate + 40% First Kill/Death Margin
-        const mapWinA = (data.adv_a && typeof data.adv_a.map_win_rate === 'number') ? data.adv_a.map_win_rate : 50.0;
-        const mapWinB = (data.adv_b && typeof data.adv_b.map_win_rate === 'number') ? data.adv_b.map_win_rate : 50.0;
-        const fkMarginA = (data.adv_a && typeof data.adv_a.fk_fd_margin === 'number') ? data.adv_a.fk_fd_margin : 0.0;
-        const fkMarginB = (data.adv_b && typeof data.adv_b.fk_fd_margin === 'number') ? data.adv_b.fk_fd_margin : 0.0;
-
-        const scoreA = Math.max(10, (mapWinA * 0.6) + Math.max(0, (50 + fkMarginA * 5) * 0.4));
-        const scoreB = Math.max(10, (mapWinB * 0.6) + Math.max(0, (50 + fkMarginB * 5) * 0.4));
-        const total = (scoreA + scoreB) > 0 ? (scoreA + scoreB) : 100;
-
-        const probA = Math.min(85, Math.max(15, Math.round((scoreA / total) * 100)));
-        const probB = 100 - probA;
-        updateWinProbabilityBar(probA, probB);
-        updateProgress('고급 지표');
-    }).catch(err => {
-        if (err.name === 'AbortError') return;
-        failedSteps++;
-        console.error('Advanced metrics error:', err);
-    });
-
-    try {
-        await Promise.all([formPromise, mapsPromise, acesPromise, advPromise]);
-
-        if (!signal.aborted && selectedMatch === analysisMatch) {
-            if (failedSteps === 0) {
-                updateStatus('success', '전력 분석 완료.', '양 팀의 최신 경기 데이터 융합 분석이 무결하게 완료되었습니다.', 100);
-            } else if (failedSteps < totalSteps) {
-                updateStatus('alert', '전력 분석 일부 완료.', `${failedSteps}개 항목의 데이터를 불러오지 못했습니다. 일부 결과가 정확하지 않을 수 있습니다.`, 100);
-            } else {
-                updateStatus('error', '전력 분석 실패.', '모든 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.', 0);
-            }
+        lucide.createIcons();
+        const timestamp = new Date(data.updated_at).toLocaleString('ko-KR');
+        const notice = data.players_available === false ? ' · 선수 통계가 없는 대회는 해당 지표 미표시'
+            : data.stale ? ' · 최신 수집이 지연된 항목은 이전 데이터 사용' : ' · 선택한 대회 통계 반영';
+        updateStatus(data.stale || data.players_available === false ? 'alert' : 'success', '전력 분석 완료.', `${timestamp} 기준${notice}`, 100);
+        // Live score is independent and does not delay any analysis panel.
+        if (!analysisMatch.live_updates_started) {
+            analysisMatch.live_updates_started = true;
+            startLiveScorePolling();
         }
     } catch (err) {
-        if (err.name !== 'AbortError' && selectedMatch === analysisMatch) {
-            updateStatus('error', '일부 전력 분석 실패', '일부 데이터를 불러오는 중 에러가 발생했습니다.', 0);
+        if (err.name !== 'AbortError' && !signal.aborted && selectedMatch === analysisMatch) {
+            renderEmptyTable('team-a-maps-table');
+            renderEmptyTable('team-b-maps-table');
+            renderFormBadges('team-a-form', []);
+            renderFormBadges('team-b-form', []);
+            renderAcsTrendChart([], []);
+            clearAceCompare();
+            renderAgentBadges('team-a-agents', []);
+            renderAgentBadges('team-b-agents', []);
+            renderBanPickResults({bans:[],picks:[]});
+            document.getElementById('win-probability-section').classList.add('hidden');
+            updateStatus('alert', '전력 분석을 표시하지 못했습니다.', err.message, 0);
         }
     } finally {
         if (!signal.aborted && selectedMatch === analysisMatch) {
             analysisRunning = false;
             analyzeBtn.disabled = false;
-            setTimeout(() => {
-                if (!analysisRunning) progressBarContainer.classList.add('hidden');
-            }, 3000);
+            progressBarContainer.classList.add('hidden');
         }
     }
 }

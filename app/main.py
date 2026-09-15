@@ -16,7 +16,7 @@ from fastapi.responses import FileResponse, JSONResponse
 
 from app.config import PORT, PUBLIC_DIR, PUBLIC_DIR_NORM
 from app.schemas import (
-    TeamAnalysisPayload, BanPickPayload, MatchDetailsResponse,
+    TeamAnalysisPayload, FullAnalysisPayload, BanPickPayload, MatchDetailsResponse,
     TeamFormResponse, TeamMapsResponse, AceAnalysisResponse,
     AdvancedMetricsResponse, BanPickResponse, HealthResponse,
     UpstreamHealthResponse
@@ -39,6 +39,7 @@ from app.db import (
 )
 from app.catalog import (start_catalog_scheduler, stop_catalog_scheduler, refresh_catalog,
                          read_catalog, read_selection)
+from app.analysis import bootstrap_analysis, full_analysis, AnalysisNotReady
 
 if hasattr(sys.stdout, 'reconfigure'):
     try:
@@ -52,6 +53,7 @@ _global_executor = ThreadPoolExecutor(max_workers=12, thread_name_prefix="vlr-ap
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    bootstrap_analysis()
     start_catalog_scheduler()
     yield
     stop_catalog_scheduler()
@@ -60,7 +62,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="VLR Web Analyzer API",
-    version="3.0.0",
+    version="3.1.0",
     lifespan=lifespan
 )
 
@@ -275,6 +277,15 @@ def api_get_live_score(url: str = Query(...)):
     except Exception as e:
         logger.error("api_get_live_score failed: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/api/analyze")
+def api_full_analysis(payload: FullAnalysisPayload):
+    try:
+        data = full_analysis(payload.team_a_id, payload.team_b_id, payload.event_ids, payload.map_pool)
+        return JSONResponse(content=data, headers={"Cache-Control": "no-store"})
+    except AnalysisNotReady as exc:
+        raise HTTPException(status_code=409, detail=str(exc))
+
 
 @app.post("/api/analyze/form")
 def api_analyze_form(payload: TeamAnalysisPayload):

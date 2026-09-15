@@ -16,6 +16,10 @@ class BanPickPayload(BaseModel):
     maps_b: Dict[MapName, Any] = Field(default_factory=dict)
     map_pool: List[MapName] = Field(default_factory=list, max_length=15)
 
+
+class FullAnalysisPayload(TeamAnalysisPayload):
+    map_pool: List[MapName] = Field(default_factory=list, max_length=15)
+
 class MatchItem(BaseModel):
     id: str
     url: str
