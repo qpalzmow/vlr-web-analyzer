@@ -52,6 +52,8 @@ def test_empty_or_incomplete_career_cannot_be_available(players):
     result = analysis.aggregate_team(data)
     assert result['players_available'] is False
     assert result['ace']['nickname'] == 'N/A'
+    assert result['ace']['acs'] is None
+    assert result['ace']['kd_margin'] is None
 
 
 def test_team_refresh_failure_and_old_scopes_remain_stale(monkeypatch):

@@ -99,8 +99,8 @@ class TeamMapsResponse(BaseModel):
 
 class AcePlayer(BaseModel):
     nickname: str = "N/A"
-    acs: float = 0.0
-    kd_margin: int = 0
+    acs: Optional[float] = None
+    kd_margin: Optional[int] = None
     agents: List[str] = Field(default_factory=lambda: ["N/A"])
 
 class AceAnalysisResponse(BaseModel):
@@ -113,12 +113,12 @@ class AdvancedMetrics(BaseModel):
     def_win_rate: Optional[float] = None
     pistol_win_rate: Optional[float] = None
     fk_fd_margin: Optional[float] = 0.0
-    fk_fd_diff: int = 0
-    fk_fd_per_round: float = 0.0
+    fk_fd_diff: Optional[int] = None
+    fk_fd_per_round: Optional[float] = None
     total_played: int = 0
     total_wins: int = 0
-    total_fk: int = 0
-    total_fd: int = 0
+    total_fk: Optional[int] = None
+    total_fd: Optional[int] = None
     top_compositions: List[str] = Field(default_factory=list)
 
 class AdvancedMetricsResponse(BaseModel):

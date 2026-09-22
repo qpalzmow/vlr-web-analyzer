@@ -176,7 +176,10 @@ def aggregate_team(data, event_ids=None):
     # Never divide career/event-player totals by the team's unrelated round sample.
     for field in ('fk_fd_margin','fk_fd_diff','fk_fd_per_round','total_fk','total_fd'):
         advanced[field] = None
-    return {'form': data.get('form', []), 'maps': maps, 'ace': find_ace_player_from_stats(list(players.values()) if players_available else []),
+    ace = find_ace_player_from_stats(list(players.values())) if players_available else {
+        'nickname': 'N/A', 'acs': None, 'kd_margin': None, 'agents': []}
+    ace['available'] = bool(players_available)
+    return {'form': data.get('form', []), 'maps': maps, 'ace': ace,
             'advanced': advanced, 'updated_at': min(dates) if dates else data['updated_at'],
             'stale': bool(data.get('last_error')) or any(expired(d) for d in dates or [data.get('updated_at')]) or any(key in data.get('failed_scopes', []) for key in keys), 'event_ids': keys,
             'players_available': players_available}

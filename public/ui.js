@@ -610,11 +610,11 @@ function renderMapsTable(tableId, mapsData) {
 // Helper: Populate Ace Player Card
 function populateAceCard(teamLetter, aceData) {
     document.getElementById(`ace-${teamLetter}-nickname`).textContent = aceData.nickname;
-    document.getElementById(`ace-${teamLetter}-acs`).textContent = aceData.acs.toFixed(1);
+    document.getElementById(`ace-${teamLetter}-acs`).textContent = Number.isFinite(aceData.acs) ? aceData.acs.toFixed(1) : '—';
     
     const kdEl = document.getElementById(`ace-${teamLetter}-kd`);
     const kd = aceData.kd_margin;
-    kdEl.textContent = kd > 0 ? `+${kd}` : kd;
+    kdEl.textContent = Number.isFinite(kd) ? (kd > 0 ? `+${kd}` : kd) : '—';
     kdEl.className = kd > 0 ? 'text-emerald-400 font-bold' : (kd < 0 ? 'text-red-400 font-bold' : 'text-slate-200');
     
     const agentsContainer = document.getElementById(`ace-${teamLetter}-agents`);

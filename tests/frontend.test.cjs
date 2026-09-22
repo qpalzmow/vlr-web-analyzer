@@ -103,6 +103,13 @@ test('missing player data produces no radar dataset or synthetic midpoint', () =
     assert.equal(h.context.lastChart.data.datasets.length,1);
 });
 
+test('unavailable player cards show missing values instead of zero', () => {
+    const h=setup();
+    h.run("populateAceCard('a',{nickname:'N/A',acs:null,kd_margin:null,agents:[],available:false})");
+    assert.equal(h.elements.get('ace-a-acs').textContent,'—');
+    assert.equal(h.elements.get('ace-a-kd').textContent,'—');
+});
+
 test('stale and unavailable statistics are both explained', async () => {
     const h=setup();h.context.match=readyMatch();
     h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");

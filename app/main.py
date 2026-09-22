@@ -63,7 +63,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="VLR Web Analyzer API",
-    version="3.2.0",
+    version="3.2.1",
     lifespan=lifespan
 )
 
