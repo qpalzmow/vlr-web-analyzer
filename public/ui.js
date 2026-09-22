@@ -609,19 +609,40 @@ function renderMapsTable(tableId, mapsData) {
 
 // Helper: Populate Ace Player Card
 function populateAceCard(teamLetter, aceData) {
-    document.getElementById(`ace-${teamLetter}-nickname`).textContent = aceData.nickname;
-    document.getElementById(`ace-${teamLetter}-acs`).textContent = Number.isFinite(aceData.acs) ? aceData.acs.toFixed(1) : '—';
+    const available = hasCareerPlayerStats(aceData);
+    document.getElementById(`ace-${teamLetter}-nickname`).textContent = available ? aceData.nickname : '—';
+    document.getElementById(`ace-${teamLetter}-acs`).textContent = available ? aceData.acs.toFixed(1) : '—';
+    document.getElementById(`ace-${teamLetter}-kd-ratio`).textContent = available && Number.isFinite(aceData.kd_ratio) ? aceData.kd_ratio.toFixed(2) : '—';
+    document.getElementById(`ace-${teamLetter}-rounds`).textContent = available && Number.isFinite(aceData.rounds) ? aceData.rounds.toLocaleString('ko-KR') : '—';
     
     const kdEl = document.getElementById(`ace-${teamLetter}-kd`);
-    const kd = aceData.kd_margin;
+    const kd = available ? aceData.kd_margin : null;
     kdEl.textContent = Number.isFinite(kd) ? (kd > 0 ? `+${kd}` : kd) : '—';
     kdEl.className = kd > 0 ? 'text-emerald-400 font-bold' : (kd < 0 ? 'text-red-400 font-bold' : 'text-slate-200');
+
+    const coverage = document.getElementById(`ace-${teamLetter}-coverage`);
+    if (available) {
+        const missing = aceData.partial && aceData.missing_players?.length ? ` · 기록 없음: ${aceData.missing_players.join(', ')}` : '';
+        coverage.textContent = `기록 있는 현역 ${aceData.players_with_stats}/${aceData.roster_size}명 기준${missing}`;
+    } else {
+        const reasons = {
+            career_not_ready: '현역 선수 커리어 수집 대기 중',
+            roster_unverified: '현역 선수 명단을 확인할 수 없어 비교 불가',
+            no_roster: '확인 가능한 현역 선수 명단 없음',
+            no_player_stats: '확인 가능한 현역 선수 기록 없음'
+        };
+        coverage.textContent = reasons[aceData?.unavailable_reason] || '확인 가능한 현역 선수 기록 없음';
+    }
+    coverage.className = available && !aceData.partial ? 'text-[10px] text-slate-400 leading-relaxed' : 'text-[10px] text-amber-400 leading-relaxed';
+    const collected = aceData?.collected_at ? new Date(aceData.collected_at) : null;
+    document.getElementById(`ace-${teamLetter}-collected`).textContent = collected && Number.isFinite(collected.getTime())
+        ? `${collected.toLocaleString('ko-KR')} 수집 기준` : '';
     
     const agentsContainer = document.getElementById(`ace-${teamLetter}-agents`);
     agentsContainer.innerHTML = '';
     
-    if (!aceData.agents || aceData.agents.length === 0 || aceData.agents[0] === 'N/A') {
-        agentsContainer.innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
+    if (!available || !aceData.agents?.length || aceData.agents[0] === 'N/A') {
+        agentsContainer.innerHTML = '<span class="text-[10px] text-slate-500">—</span>';
         return;
     }
     
@@ -641,18 +662,18 @@ function populateAceCard(teamLetter, aceData) {
 }
 
 // Helper: Clear Ace compare
-function clearAceCompare() {
-    document.getElementById('ace-a-nickname').textContent = 'N/A';
-    document.getElementById('ace-a-acs').textContent = '0.0';
-    document.getElementById('ace-a-kd').textContent = '0';
-    document.getElementById('ace-a-kd').className = 'text-slate-200';
-    document.getElementById('ace-a-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
-    
-    document.getElementById('ace-b-nickname').textContent = 'N/A';
-    document.getElementById('ace-b-acs').textContent = '0.0';
-    document.getElementById('ace-b-kd').textContent = '0';
-    document.getElementById('ace-b-kd').className = 'text-slate-200';
-    document.getElementById('ace-b-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
+function clearAceCompare(message = '전력 분석 후 커리어를 표시합니다.') {
+    ['a', 'b'].forEach(teamLetter => {
+        ['nickname', 'acs', 'kd', 'kd-ratio', 'rounds'].forEach(field => {
+            document.getElementById(`ace-${teamLetter}-${field}`).textContent = '—';
+        });
+        document.getElementById(`ace-${teamLetter}-kd`).className = 'text-slate-200';
+        document.getElementById(`ace-${teamLetter}-agents`).innerHTML = '<span class="text-[10px] text-slate-500">—</span>';
+        document.getElementById(`ace-${teamLetter}-coverage`).textContent = message;
+        document.getElementById(`ace-${teamLetter}-coverage`).className = 'text-[10px] text-slate-400 leading-relaxed';
+        document.getElementById(`ace-${teamLetter}-collected`).textContent = '';
+    });
+    renderCareerAcsChart(null, null, message);
 }
 
 // Helper: Render Empty Table row

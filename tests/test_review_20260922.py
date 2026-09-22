@@ -40,13 +40,13 @@ def test_career_intro_is_separate_from_team_metrics_and_event_membership():
     assert result['adv_a']['total_fk'] is None
     assert result['probability'] is None
     filtered = analysis.full_analysis('1', '2', ['20'], [])
-    assert filtered['ace_a']['nickname'] == 'N/A'
-    assert filtered['players_available'] is False
+    assert filtered['ace_a'] == result['ace_a']
+    assert filtered['players_available'] is True
     assert filtered['probability'] is None
 
 
-@pytest.mark.parametrize('players', [{}, {'1': {'rounds': 0}}, {'1': {'rounds': 5}, '2': {'rounds': 0}}])
-def test_empty_or_incomplete_career_cannot_be_available(players):
+@pytest.mark.parametrize('players', [{}, {'1': {'rounds': 0}}])
+def test_empty_career_cannot_be_available(players):
     data = record()
     data['scopes']['all']['players'] = players
     result = analysis.aggregate_team(data)

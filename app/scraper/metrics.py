@@ -65,25 +65,25 @@ def calculate_advanced_metrics(maps_data: dict, total_fk: int, total_fd: int, to
     }
 
 def find_ace_player_from_stats(players_stats: List[dict]) -> dict:
-    valid_players = []
-    for p in players_stats:
-        if not p or p.get("rounds", 0) <= 0:
-            continue
-        rounds = p["rounds"]
-        acs = p["weighted_acs"] / rounds if rounds > 0 else 0.0
-        agents = sorted(p.get("agents", {}).items(), key=lambda x: x[1], reverse=True)
-        agent_names = [a[0].capitalize() for a in agents[:3]] if agents else ["N/A"]
-        valid_players.append({
-            "nickname": p.get("name", "N/A"),
-            "acs": round(acs, 1),
-            "kd_margin": p.get("kills", 0) - p.get("deaths", 0),
-            "agents": agent_names
-        })
-
+    valid_players = [p for p in players_stats if p and p.get('rounds', 0) > 0]
     if not valid_players:
-        return {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}
+        return {'nickname': 'N/A', 'player_id': None, 'acs': None,
+                'rounds': None, 'kills': None, 'deaths': None,
+                'kd_margin': None, 'kd_ratio': None, 'agents': []}
 
-    return max(valid_players, key=lambda x: x["acs"])
+    # Compare unrounded ACS; equal scores prefer the larger recorded sample.
+    player = sorted(valid_players, key=lambda p: (
+        -p['weighted_acs'] / p['rounds'], -p['rounds'],
+        str(p.get('player_id', p.get('name', '')))))[0]
+    rounds = player['rounds']
+    kills, deaths = player.get('kills'), player.get('deaths')
+    agents = sorted(player.get('agents', {}).items(), key=lambda item: (-item[1], item[0]))
+    return {'nickname': player.get('name', 'N/A'), 'player_id': player.get('player_id'),
+            'acs': round(player['weighted_acs'] / rounds, 1), 'rounds': rounds,
+            'kills': kills, 'deaths': deaths,
+            'kd_margin': kills - deaths if kills is not None and deaths is not None else None,
+            'kd_ratio': round(kills / deaths, 4) if kills is not None and deaths else None,
+            'agents': [agent.capitalize() for agent, count in agents[:3] if count > 0]}
 
 def simulate_banpick(maps_a: dict, maps_b: dict, map_pool: list) -> dict:
     if not map_pool:

@@ -161,15 +161,7 @@ async function runAnalysis() {
     document.getElementById('team-a-agents').innerHTML = spinnerHtml;
     document.getElementById('team-b-agents').innerHTML = spinnerHtml;
 
-    document.getElementById('ace-a-nickname').textContent = '분석 중...';
-    document.getElementById('ace-a-acs').textContent = '0.0';
-    document.getElementById('ace-a-kd').textContent = '0';
-    document.getElementById('ace-a-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
-
-    document.getElementById('ace-b-nickname').textContent = '분석 중...';
-    document.getElementById('ace-b-acs').textContent = '0.0';
-    document.getElementById('ace-b-kd').textContent = '0';
-    document.getElementById('ace-b-agents').innerHTML = '<span class="text-[10px] text-slate-500">N/A</span>';
+    clearAceCompare('현역 선수 커리어를 불러오는 중...');
 
     updateStatus('info', '전력 분석을 시작합니다...', '미리 수집한 통계를 한 번에 불러오고 있습니다.', 10);
 
@@ -199,7 +191,7 @@ async function runAnalysis() {
         renderAgentBadges('team-b-agents', data.ace_b.agents);
         populateAceCard('a', data.ace_a);
         populateAceCard('b', data.ace_b);
-        renderAceRadarChart(data.ace_a, data.ace_b);
+        renderCareerAcsChart(data.ace_a, data.ace_b);
         if (data.probability) {
             updateWinProbabilityBar(data.probability.a, data.probability.b);
         } else {
@@ -207,10 +199,15 @@ async function runAnalysis() {
         }
         lucide.createIcons();
         const timestamp = new Date(data.updated_at).toLocaleString('ko-KR');
+        const unavailableTeams = [
+            [analysisMatch.team_a, data.ace_a], [analysisMatch.team_b, data.ace_b]
+        ].filter(([, ace]) => !hasCareerPlayerStats(ace)).map(([name]) => name);
+        const partial = data.ace_a.partial || data.ace_b.partial;
         const notice = (data.stale ? ' · 갱신 지연: 이전 데이터 사용' : '') +
-            (data.players_available === false ? ' · 팀 소속·표본 범위를 확인할 수 없는 선수 지표와 예측 승률 미표시'
-            : ' · 커리어 선수 소개 / 팀 FK·FD 및 예측 승률 미표시');
-        updateStatus(data.stale || data.players_available === false ? 'alert' : 'success', '전력 분석 완료.', `${timestamp} 기준${notice}`, 100);
+            (unavailableTeams.length ? ` · ${unavailableTeams.join(', ')}: 커리어 비교 불가 (카드 안내 확인)` : '') +
+            (partial ? ' · 기록 없는 선수는 커리어 대표 선정에서 제외' : '') +
+            ' · 커리어 비교는 대회 필터와 무관 · 팀 FK·FD 및 예측 승률 미표시';
+        updateStatus(data.stale || unavailableTeams.length || partial ? 'alert' : 'success', '전력 분석 완료.', `${timestamp} 기준${notice}`, 100);
         // Live score is independent and does not delay any analysis panel.
         if (!analysisMatch.live_updates_started) {
             analysisMatch.live_updates_started = true;
@@ -223,7 +220,7 @@ async function runAnalysis() {
             renderFormBadges('team-a-form', []);
             renderFormBadges('team-b-form', []);
             renderAcsTrendChart([], []);
-            clearAceCompare();
+            clearAceCompare('커리어를 불러오지 못했습니다. 다시 분석해 주세요.');
             renderAgentBadges('team-a-agents', []);
             renderAgentBadges('team-b-agents', []);
             renderBanPickResults({bans:[],picks:[]});

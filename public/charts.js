@@ -1,11 +1,11 @@
 // Chart.js Manager
-let aceRadarChartInstance = null;
+let careerAcsChartInstance = null;
 let acsTrendChartInstance = null;
 
 function destroyCharts() {
-    if (aceRadarChartInstance) {
-        aceRadarChartInstance.destroy();
-        aceRadarChartInstance = null;
+    if (careerAcsChartInstance) {
+        careerAcsChartInstance.destroy();
+        careerAcsChartInstance = null;
     }
     if (acsTrendChartInstance) {
         acsTrendChartInstance.destroy();
@@ -13,76 +13,58 @@ function destroyCharts() {
     }
 }
 
-function renderAceRadarChart(aceA, aceB) {
-    const canvas = document.getElementById('ace-radar-chart');
-    if (!canvas || typeof Chart === 'undefined') return;
+function hasCareerPlayerStats(ace) {
+    return ace?.available === true && ace.nickname && ace.nickname !== 'N/A' && Number.isFinite(ace.acs);
+}
 
-    if (aceRadarChartInstance) {
-        aceRadarChartInstance.destroy();
-        aceRadarChartInstance = null;
+function renderCareerAcsChart(aceA, aceB, emptyMessage = '확인 가능한 현역 선수 기록 없음') {
+    const canvas = document.getElementById('career-acs-chart');
+    const empty = document.getElementById('career-acs-empty');
+    if (careerAcsChartInstance) {
+        careerAcsChartInstance.destroy();
+        careerAcsChartInstance = null;
     }
+    const players = [
+        { ace: aceA, color: '#0ea5e9', team: selectedMatch?.team_a || 'Team A' },
+        { ace: aceB, color: '#f97316', team: selectedMatch?.team_b || 'Team B' }
+    ].filter(player => hasCareerPlayerStats(player.ace));
+    const canDraw = players.length > 0 && typeof Chart !== 'undefined';
+    if (canvas) canvas.hidden = !canDraw;
+    if (empty) {
+        empty.hidden = canDraw;
+        empty.textContent = players.length && !canDraw ? '차트를 불러오지 못했습니다. 위 카드에서 수치를 확인하세요.' : emptyMessage;
+    }
+    if (!canvas || !canDraw) return;
+    canvas.setAttribute('aria-label', players.map(({ ace, team }) => `${team} ${ace.nickname}: 커리어 ACS ${ace.acs.toFixed(1)}`).join(', '));
 
-    const nickA = (aceA && aceA.nickname !== 'N/A') ? aceA.nickname : (selectedMatch ? selectedMatch.team_a + ' Ace' : 'Team A Ace');
-    const nickB = (aceB && aceB.nickname !== 'N/A') ? aceB.nickname : (selectedMatch ? selectedMatch.team_b + ' Ace' : 'Team B Ace');
-
-    const acsA = aceA ? (aceA.acs || 0) : 0;
-    const acsB = aceB ? (aceB.acs || 0) : 0;
-    const kdMarginA = aceA ? (aceA.kd_margin || 0) : 0;
-    const kdMarginB = aceB ? (aceB.kd_margin || 0) : 0;
-    const agentsCountA = (aceA && Array.isArray(aceA.agents)) ? aceA.agents.filter(a => a !== 'N/A').length : 1;
-    const agentsCountB = (aceB && Array.isArray(aceB.agents)) ? aceB.agents.filter(a => a !== 'N/A').length : 1;
-
-    // Normalized 0-100 real metrics without hardcoded constants
-    const metricsA = [
-        Math.min(100, Math.round(acsA / 3.0)),                         // ACS Score (300 ACS = 100)
-        Math.max(0, Math.min(100, Math.round(50 + kdMarginA * 2.5))),  // K/D Margin Index
-        Math.min(100, agentsCountA * 33),                             // Agent Pool Breadth
-        Math.max(0, Math.min(100, Math.round(acsA / 2.5)))             // Impact Rating
-    ];
-    const metricsB = [
-        Math.min(100, Math.round(acsB / 3.0)),
-        Math.max(0, Math.min(100, Math.round(50 + kdMarginB * 2.5))),
-        Math.min(100, agentsCountB * 33),
-        Math.max(0, Math.min(100, Math.round(acsB / 2.5)))
-    ];
-
-    aceRadarChartInstance = new Chart(canvas, {
-        type: 'radar',
+    careerAcsChartInstance = new Chart(canvas, {
+        type: 'bar',
         data: {
-            labels: ['ACS 환산 (÷3)', 'K/D 마진 환산', '표시된 요원 수 (최대 3)', 'ACS 환산 (÷2.5)'],
-            datasets: [
-                {
-                    label: nickA,
-                    data: metricsA,
-                    backgroundColor: 'rgba(14, 165, 233, 0.25)',
-                    borderColor: '#0ea5e9',
-                    pointBackgroundColor: '#0ea5e9'
-                },
-                {
-                    label: nickB,
-                    data: metricsB,
-                    backgroundColor: 'rgba(249, 115, 22, 0.25)',
-                    borderColor: '#f97316',
-                    pointBackgroundColor: '#f97316'
-                }
-            ].filter((_, i) => {
-                const ace = i === 0 ? aceA : aceB;
-                return ace && ace.available !== false && ace.nickname !== 'N/A' && ace.acs > 0;
-            })
+            labels: players.map(({ ace, team }) => `${team} · ${ace.nickname}`),
+            datasets: [{
+                label: '커리어 ACS',
+                data: players.map(({ ace }) => ace.acs),
+                backgroundColor: players.map(({ color }) => color),
+                maxBarThickness: 36
+            }]
         },
         options: {
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { labels: { color: '#94a3b8', font: { size: 10 } } }
+                legend: { display: false },
+                tooltip: { callbacks: { label: item => `커리어 ACS: ${item.raw.toFixed(1)}` } }
             },
             scales: {
-                r: {
-                    angleLines: { color: 'rgba(255,255,255,0.1)' },
+                x: {
+                    beginAtZero: true,
+                    min: 0,
+                    title: { display: true, text: '커리어 ACS', color: '#94a3b8' },
                     grid: { color: 'rgba(255,255,255,0.1)' },
-                    pointLabels: { color: '#cbd5e1', font: { size: 10 } },
-                    ticks: { display: false, min: 0, max: 100 }
-                }
+                    ticks: { color: '#94a3b8' }
+                },
+                y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 10 } } }
             }
         }
     });

@@ -13,7 +13,6 @@ from app.scraper.metrics import calculate_advanced_metrics, find_ace_player_from
 logger = logging.getLogger(__name__)
 SCHEMA_VERSION = 3
 MAP_FIELDS = ('played','w','l','atk_won','atk_total','def_won','def_total')
-PLAYER_FIELDS = ('rounds','weighted_acs','kills','deaths','fk','fd')
 
 
 class AnalysisNotReady(Exception):
@@ -68,7 +67,7 @@ def prepare_team(team_id, events, previous=None):
                    for pid, name in profile['roster'].items()}
         scopes['all'] = {'maps': overview['maps'], 'players': players, 'collected_at': now_iso(),
                          'career_roster_verified': True,
-                         'players_available': bool(players) and all(p['rounds'] > 0 for p in players.values())}
+                         'players_available': any(p['rounds'] > 0 for p in players.values())}
     except Exception:
         logger.exception('All-time player collection failed for %s', team_id)
         failed.append('all')
@@ -142,6 +141,36 @@ def bootstrap_analysis():
         logger.exception('Could not load analysis seed')
 
 
+def career_comparison(data):
+    """Select a current player's career independently of the team's map filters.
+
+    The verified scope contains every roster member, including explicitly empty
+    player pages. A failed fetch never publishes a partial replacement scope.
+    """
+    scope = data.get('scopes', {}).get('all', {})
+    verified = scope.get('career_roster_verified', False)
+    players = scope.get('players', {}) if verified else {}
+    recorded = [{**player, 'player_id': pid} for pid, player in players.items()
+                if player.get('rounds', 0) > 0]
+    missing = [player.get('name', pid) for pid, player in players.items()
+               if player.get('rounds', 0) <= 0]
+    ace = find_ace_player_from_stats(recorded)
+    reason = None
+    if not scope:
+        reason = 'career_not_ready'
+    elif not verified:
+        reason = 'roster_unverified'
+    elif not players:
+        reason = 'no_roster'
+    elif not recorded:
+        reason = 'no_player_stats'
+    return {**ace, 'scope': 'career', 'available': bool(recorded),
+            'partial': bool(recorded) and bool(missing),
+            'roster_size': len(players), 'players_with_stats': len(recorded),
+            'missing_players': missing, 'unavailable_reason': reason,
+            'collected_at': scope.get('collected_at')}
+
+
 def aggregate_team(data, event_ids=None):
     scopes = data.get('scopes', {})
     if not event_ids:
@@ -152,13 +181,7 @@ def aggregate_team(data, event_ids=None):
     missing = [key for key in keys if key not in scopes]
     if missing:
         raise AnalysisNotReady('선택한 대회의 통계를 준비 중입니다. 다음 업데이트 후 다시 선택해주세요.')
-    maps, players, dates = {}, {}, []
-    # Only complete, explicitly verified career introductions are available.
-    # Event team statistics require match-level attribution, absent in our source.
-    players_available = (keys == ['all'] and scopes['all'].get('career_roster_verified', False)
-                         and scopes['all'].get('players_available', False)
-                         and bool(scopes['all'].get('players'))
-                         and all(p.get('rounds', 0) > 0 for p in scopes['all']['players'].values()))
+    maps, dates = {}, []
     for key in keys:
         item = scopes[key]
         dates.append(item['collected_at'])
@@ -166,23 +189,19 @@ def aggregate_team(data, event_ids=None):
             target = maps.setdefault(name, {field: 0 for field in MAP_FIELDS})
             for field in MAP_FIELDS:
                 target[field] += counts.get(field, 0)
-        for pid, counts in item.get('players', {}).items():
-            target = players.setdefault(pid, {**sources.empty_player(), 'name': counts.get('name', 'N/A')})
-            for field in PLAYER_FIELDS:
-                target[field] += counts.get(field, 0)
-            for agent, rounds in counts.get('agents', {}).items():
-                target['agents'][agent] = target['agents'].get(agent, 0) + rounds
     advanced = calculate_advanced_metrics(maps, 0, 0, 0)
     # Never divide career/event-player totals by the team's unrelated round sample.
     for field in ('fk_fd_margin','fk_fd_diff','fk_fd_per_round','total_fk','total_fd'):
         advanced[field] = None
-    ace = find_ace_player_from_stats(list(players.values())) if players_available else {
-        'nickname': 'N/A', 'acs': None, 'kd_margin': None, 'agents': []}
-    ace['available'] = bool(players_available)
+    ace = career_comparison(data)
+    # A fresh map scope must not mask an older career snapshot in a filtered report.
+    dates.append(ace['collected_at'])
+    valid_dates = [stamp for stamp in dates if stamp]
     return {'form': data.get('form', []), 'maps': maps, 'ace': ace,
-            'advanced': advanced, 'updated_at': min(dates) if dates else data['updated_at'],
-            'stale': bool(data.get('last_error')) or any(expired(d) for d in dates or [data.get('updated_at')]) or any(key in data.get('failed_scopes', []) for key in keys), 'event_ids': keys,
-            'players_available': players_available}
+            'advanced': advanced, 'updated_at': min(valid_dates) if valid_dates else data.get('updated_at'),
+            'stale': bool(data.get('last_error')) or any(expired(d) for d in dates)
+                     or any(key in data.get('failed_scopes', []) for key in set(keys) | {'all'}),
+            'event_ids': keys, 'players_available': ace['available']}
 
 
 def full_analysis(team_a_id, team_b_id, event_ids, map_pool):

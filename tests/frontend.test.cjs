@@ -58,7 +58,11 @@ function setup(search = '') {
         clearTimeout(id) { timers.delete(id); },
         fetch: async () => { throw new Error('Unexpected fetch'); },
     };
-    context.Chart = function (_canvas, config) { context.lastChart = config; this.destroy = () => {}; };
+    context.chartDestroyCount = 0;
+    context.Chart = function (_canvas, config) {
+        context.lastChart = config;
+        this.destroy = () => { context.chartDestroyCount++; };
+    };
     vm.createContext(context);
     for (const file of ['constants.js', 'charts.js', 'ui.js', 'api.js']) {
         vm.runInContext(fs.readFileSync(path.join(__dirname, '../public', file), 'utf8'), context);
@@ -95,12 +99,31 @@ test('reselecting a match uses the newest pool while the active report keeps its
     assert.equal(h.read('teamAEvents[0].id'),'10');
 });
 
-test('missing player data produces no radar dataset or synthetic midpoint', () => {
+test('career ACS chart preserves raw values and a zero baseline without saturation', () => {
     const h=setup();
-    h.run("renderAceRadarChart({nickname:'N/A',acs:0,kd_margin:0,agents:['N/A']},null)");
-    assert.equal(h.context.lastChart.data.datasets.length,0);
-    h.run("renderAceRadarChart({nickname:'Player',acs:200,kd_margin:5,agents:['Jett']},null)");
-    assert.equal(h.context.lastChart.data.datasets.length,1);
+    h.run("renderCareerAcsChart({nickname:'GSR',acs:238.8,kd_margin:773,available:true},{nickname:'Jinggg',acs:239.0,kd_margin:1631,available:true})");
+    const chart = h.context.lastChart;
+    assert.equal(chart.type, 'bar');
+    assert.equal(chart.options.indexAxis, 'y');
+    assert.equal(chart.options.scales.x.beginAtZero, true);
+    assert.equal(chart.options.scales.x.min, 0);
+    assert.equal(chart.options.scales.x.max, undefined);
+    assert.deepEqual(h.read('lastChart.data.datasets[0].data'), [238.8, 239.0]);
+    assert.deepEqual(h.read('lastChart.data.labels'), ['Team A · GSR', 'Team B · Jinggg']);
+    assert.equal(chart.options.plugins.tooltip.callbacks.label({raw:239}), '커리어 ACS: 239.0');
+    assert.equal(h.elements.get('career-acs-empty').hidden, true);
+});
+
+test('missing player data clears the prior chart and cannot become a synthetic zero bar', () => {
+    const h=setup();
+    h.run("renderCareerAcsChart({nickname:'Player',acs:200,available:true},{nickname:'N/A',acs:0,available:false})");
+    assert.deepEqual(h.read('lastChart.data.datasets[0].data'), [200]);
+    h.run("renderCareerAcsChart({nickname:'N/A',acs:null,available:false},null)");
+    assert.equal(h.read('careerAcsChartInstance'), null);
+    assert.equal(h.context.chartDestroyCount, 1);
+    assert.equal(h.elements.get('career-acs-chart').hidden, true);
+    assert.equal(h.elements.get('career-acs-empty').hidden, false);
+    assert.equal(h.elements.get('career-acs-empty').textContent, '확인 가능한 현역 선수 기록 없음');
 });
 
 test('unavailable player cards show missing values instead of zero', () => {
@@ -108,15 +131,51 @@ test('unavailable player cards show missing values instead of zero', () => {
     h.run("populateAceCard('a',{nickname:'N/A',acs:null,kd_margin:null,agents:[],available:false})");
     assert.equal(h.elements.get('ace-a-acs').textContent,'—');
     assert.equal(h.elements.get('ace-a-kd').textContent,'—');
+    assert.equal(h.elements.get('ace-a-kd-ratio').textContent,'—');
+    assert.equal(h.elements.get('ace-a-rounds').textContent,'—');
+    assert.equal(h.elements.get('ace-a-coverage').textContent,'확인 가능한 현역 선수 기록 없음');
+});
+
+test('partial roster comparison displays actual statistics, coverage, and missing names', () => {
+    const h=setup();
+    h.context.ace = {...careerPlayer('Rb'), acs:219.3, kd_margin:753, kd_ratio:1.1648,
+        rounds:9012, partial:true, roster_size:6, players_with_stats:5, missing_players:['WoohyuN']};
+    h.run("populateAceCard('a',ace)");
+    assert.equal(h.elements.get('ace-a-acs').textContent, '219.3');
+    assert.equal(h.elements.get('ace-a-kd').textContent, '+753');
+    assert.equal(h.elements.get('ace-a-kd-ratio').textContent, '1.16');
+    assert.equal(h.elements.get('ace-a-rounds').textContent, '9,012');
+    assert.equal(h.elements.get('ace-a-coverage').textContent, '기록 있는 현역 5/6명 기준 · 기록 없음: WoohyuN');
+    assert.match(h.elements.get('ace-a-collected').textContent, /수집 기준/);
+});
+
+test('clearing comparison removes old metrics, coverage, timestamp, agents, and chart', () => {
+    const h=setup();
+    h.context.ace=careerPlayer('Previous');
+    h.run("populateAceCard('a',ace);renderCareerAcsChart(ace,null);clearAceCompare()");
+    for (const field of ['nickname','acs','kd','kd-ratio','rounds']) {
+        assert.equal(h.elements.get(`ace-a-${field}`).textContent,'—');
+    }
+    assert.equal(h.elements.get('ace-a-coverage').textContent,'전력 분석 후 커리어를 표시합니다.');
+    assert.equal(h.elements.get('ace-a-collected').textContent,'');
+    assert.equal(h.elements.get('ace-a-agents').children.length,0);
+    assert.equal(h.read('careerAcsChartInstance'),null);
+    assert.equal(h.elements.get('career-acs-chart').hidden,true);
 });
 
 test('stale and unavailable statistics are both explained', async () => {
     const h=setup();h.context.match=readyMatch();
     h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
-    h.context.fetch=async()=>response({...analysisResult(),stale:true,players_available:false,probability:null});
+    h.context.fetch=async()=>response({...analysisResult(),stale:true,players_available:false,probability:null,
+        ace_b:{nickname:'N/A',acs:null,available:false,agents:[],unavailable_reason:'roster_unverified'}});
     await h.run("handleMatchSelection(['8'],true)");
     assert.match(h.elements.get('sub-status-text').textContent,/갱신 지연/);
     assert.match(h.elements.get('sub-status-text').textContent,/미표시/);
+    assert.match(h.elements.get('sub-status-text').textContent,/Two:/);
+    assert.doesNotMatch(h.elements.get('sub-status-text').textContent,/One:/);
+    assert.equal(h.elements.get('ace-a-nickname').textContent,'Player A');
+    assert.equal(h.elements.get('ace-b-coverage').textContent,'현역 선수 명단을 확인할 수 없어 비교 불가');
+    assert.deepEqual(h.read('lastChart.data.datasets[0].data'),[220]);
 });
 
 test('selection renders synchronously with zero network requests even with an old snapshot or missing pool', async () => {
@@ -195,10 +254,15 @@ test('first startup polls only the stored catalog until a generation is publishe
     assert.equal(h.read('allMatches.length'),1);
 });
 
+const careerPlayer = (nickname, acs=220) => ({
+    nickname, acs, kd_margin:5, kd_ratio:1.25, rounds:100, kills:25, deaths:20,
+    agents:['Jett'], available:true, partial:false, roster_size:5, players_with_stats:5,
+    missing_players:[], unavailable_reason:null, scope:'career', collected_at:'2026-09-15T00:00:00Z'
+});
 const analysisResult = () => ({
     form_a:['W (2-0)'],form_b:['L (0-2)'],maps_a:{},maps_b:{},
-    ace_a:{nickname:'Player A',acs:220,kd_margin:5,agents:['Jett']},
-    ace_b:{nickname:'Player B',acs:200,kd_margin:1,agents:['Raze']},
+    ace_a:careerPlayer('Player A'),
+    ace_b:careerPlayer('Player B',200),
     adv_a:{},adv_b:{},simulation:{bans:[],picks:[]},probability:{a:55,b:45},
     updated_at:'2026-09-15T00:00:00Z',stale:false,players_available:true
 });
@@ -216,6 +280,9 @@ test('one analysis request sends filters and pool and paints every panel togethe
     assert.deepEqual(calls[0].body.map_pool,['Bind','Icebox']);
     assert.equal(h.elements.get('ace-a-nickname').textContent,'Player A');
     assert.equal(h.elements.get('ace-b-nickname').textContent,'Player B');
+    assert.equal(h.elements.get('ace-a-rounds').textContent,'100');
+    assert.deepEqual(h.read('lastChart.data.datasets[0].data'),[220,200]);
+    assert.match(h.elements.get('sub-status-text').textContent,/커리어 비교는 대회 필터와 무관/);
     assert.equal(h.elements.get('status-text').textContent,'전력 분석 완료.');
     assert.equal(h.read('analysisRunning'),false);
     assert.equal(h.read('analyzeBtn.disabled'),false);
@@ -230,7 +297,7 @@ test('switching matches before analysis resolves cannot paint stale results', as
     const pending=h.run('runAnalysis()');
     h.run("matchSelect.value='1'");await h.run('handleMatchSelection()');
     finish(response(analysisResult()));await pending;
-    assert.equal(h.elements.get('ace-a-nickname').textContent,'N/A');
+    assert.equal(h.elements.get('ace-a-nickname').textContent,'—');
     assert.equal(h.elements.get('status-text').textContent,'대회 선택 준비 완료.');
     assert.equal(h.read('selectedMatch.id'),'2');
 });
@@ -244,7 +311,28 @@ test('unprepared scope reports the reason without per-panel fallback requests', 
     assert.equal(calls,1);
     assert.match(h.elements.get('sub-status-text').textContent,/선택한 대회 통계/);
     assert.equal(h.read('analyzeBtn.disabled'),false);
-    assert.equal(h.elements.get('ace-a-nickname').textContent,'N/A');
+    assert.equal(h.elements.get('ace-a-nickname').textContent,'—');
+    assert.equal(h.elements.get('career-acs-chart').hidden,true);
+});
+
+test('re-analysis clears prior career statistics and chart while the new request is pending', async () => {
+    const h=setup();let finish;
+    h.context.match=readyMatch();
+    h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
+    h.context.fetch=async()=>response(analysisResult());
+    await h.run('handleMatchSelection([],true)');
+    h.context.fetch=()=>new Promise(resolve=>{finish=resolve;});
+    const pending=h.run('runAnalysis()');
+    for (const field of ['nickname','acs','kd','kd-ratio','rounds']) {
+        assert.equal(h.elements.get(`ace-a-${field}`).textContent,'—');
+    }
+    assert.equal(h.elements.get('ace-a-collected').textContent,'');
+    assert.equal(h.elements.get('career-acs-chart').hidden,true);
+    assert.equal(h.read('careerAcsChartInstance'),null);
+    assert.match(h.elements.get('career-acs-empty').textContent,/불러오는 중/);
+    finish(response(analysisResult()));await pending;
+    assert.equal(h.elements.get('ace-a-nickname').textContent,'Player A');
+    assert.equal(h.elements.get('career-acs-chart').hidden,false);
 });
 
 test('cache without score is fetched immediately and final score stops polling', async () => {

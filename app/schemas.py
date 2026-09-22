@@ -99,9 +99,22 @@ class TeamMapsResponse(BaseModel):
 
 class AcePlayer(BaseModel):
     nickname: str = "N/A"
+    player_id: Optional[str] = None
     acs: Optional[float] = None
     kd_margin: Optional[int] = None
-    agents: List[str] = Field(default_factory=lambda: ["N/A"])
+    rounds: Optional[int] = None
+    kills: Optional[int] = None
+    deaths: Optional[int] = None
+    kd_ratio: Optional[float] = None
+    agents: List[str] = Field(default_factory=list)
+    scope: str = 'career'
+    available: bool = False
+    partial: bool = False
+    roster_size: int = 0
+    players_with_stats: int = 0
+    missing_players: List[str] = Field(default_factory=list)
+    unavailable_reason: Optional[str] = None
+    collected_at: Optional[str] = None
 
 class AceAnalysisResponse(BaseModel):
     ace_a: AcePlayer
