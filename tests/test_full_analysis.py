@@ -28,10 +28,10 @@ def test_selected_events_sum_counts_before_calculating_rates():
     result = analysis.aggregate_team(record(), ['21','20','20'])
     assert result['maps']['Bind']['played'] == 10
     assert result['advanced']['map_win_rate'] == 40.0
-    assert result['ace']['acs'] == 120.0
-    assert result['ace']['kd_margin'] == 30
-    assert result['advanced']['fk_fd_margin'] == 0.02
-    assert result['advanced']['total_fk'] == 6
+    assert result['ace']['nickname'] == 'N/A'
+    assert result['players_available'] is False
+    assert result['advanced']['fk_fd_margin'] is None
+    assert result['advanced']['total_fk'] is None
     assert result['event_ids'] == ['20','21']
 
 
@@ -62,10 +62,10 @@ def test_one_analysis_endpoint_is_read_only_and_includes_simulation(client, monk
                                               'map_pool':['Bind','Haven','Lotus']})
     assert result.status_code == 200
     data = result.json()
-    assert data['ace_a']['acs'] == 120.0
+    assert data['ace_a']['nickname'] == 'N/A'
     assert data['form_a'] == ['W (2-0) vs Other']
     assert data['maps_b']['Bind']['played'] == 10
-    assert data['probability'] == {'a':50,'b':50}
+    assert data['probability'] is None
     assert data['simulation']['bans']
     assert data['event_ids'] == ['20','21']
     assert client.post('/api/analyze',json={'team_a_id':'1','team_b_id':'3'}).status_code == 409
@@ -115,12 +115,13 @@ def test_event_leaderboard_parser_uses_rounds_totals_and_agent_usage():
 
 def test_current_player_table_and_staff_without_stats():
     cells = ['<img alt="Jett">','50%',100,'1.0',250,1,70,100,1,1,1,120,80,30,20,10]
-    html = '<table class="st-table mod-agent-rows"><tbody><tr>'+''.join(f'<td>{v}</td>' for v in cells)+'</tr></tbody></table>'
+    headers = ['Agent','Use','Rnd','R','ACS','K:D','KAST','ADR','KPR','APR','FK:FD','K','D','A','FK','FD']
+    html = '<table class="st-table mod-agent-rows"><thead><tr>'+''.join(f'<th>{h}</th>' for h in headers)+'</tr></thead><tbody><tr>'+ ''.join(f'<td>{v}</td>' for v in cells)+'</tr></tbody></table>'
     p=sources.parse_player(BeautifulSoup(html,'html.parser'))
     assert p['weighted_acs'] == 25000
     assert p['kills'] == 120
     assert p['agents'] == {'jett':100}
-    assert sources.parse_player(BeautifulSoup('<div class="player-header"><h1>Coach</h1></div>','html.parser'))['rounds'] == 0
+    assert sources.parse_player(BeautifulSoup('<div class="player-header"><h1>Coach</h1></div>No stats available','html.parser'))['rounds'] == 0
 
 
 def test_no_data_does_not_generate_probability_or_ban_predictions():
@@ -133,7 +134,7 @@ def test_no_data_does_not_generate_probability_or_ban_predictions():
 
 
 def test_career_player_source_explicitly_requests_all_time(monkeypatch):
-    fetch = Mock(return_value=BeautifulSoup('<div class="player-header"><h1>Coach</h1></div>','html.parser'))
+    fetch = Mock(return_value=BeautifulSoup('<div class="player-header"><h1>Coach</h1></div>No stats available','html.parser'))
     monkeypatch.setattr(sources, 'page', fetch)
     sources.player_totals('7')
     fetch.assert_called_once_with('https://www.vlr.gg/player/7/?timespan=all')

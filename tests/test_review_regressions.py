@@ -24,11 +24,12 @@ def test_cached_match_has_unknown_score_until_explicit_score_request(client, mon
     fetch.assert_not_called()
     response = client.get("/api/live-score", params={"url": url})
     assert response.json()["status"] == "live"
-    fetch.assert_called_once_with(url)
+    fetch.assert_called_once_with('https://www.vlr.gg/999999')
 
 
 def test_live_score_normalizes_relative_url(client, monkeypatch):
     fetch = Mock(return_value={"status": "final"})
+    db.save_catalog_snapshot({'matches': [{'id': '123456', 'url': '/123456', 'selection_data': {'details': {}}}]})
     monkeypatch.setattr(main, "get_live_score", fetch)
     assert client.get("/api/live-score", params={"url": "/123456"}).status_code == 200
     fetch.assert_called_once_with("https://www.vlr.gg/123456")
@@ -101,7 +102,7 @@ def test_legacy_schema_migration_expires_ambiguous_scope(tmp_path, monkeypatch):
 
 def test_event_union_of_two_twelve_item_lists_is_accepted(client, monkeypatch):
     events = [str(i) for i in range(1, 25)]
-    monkeypatch.setattr(main, "_get_maps_for_team", lambda *a: {})
+    db.save_analysis_team("1", {"scopes":{"all":{"maps":{},"players":{},"collected_at":None}}, "available_events":[],"updated_at":None})
     response = client.post("/api/analyze/maps", json={"team_a_id": "1", "event_ids": events})
     assert response.status_code == 200
     with pytest.raises(ValueError):

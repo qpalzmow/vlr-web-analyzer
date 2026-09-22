@@ -91,7 +91,7 @@ function populateMatchesDropdown(preserveSelection = false) {
         return tierMatch && regionMatch && eventMatch;
     });
     const activeIndex = activeMatch ? filteredMatches.findIndex(m => m.id === activeMatch.id) : -1;
-    if (activeIndex >= 0) filteredMatches[activeIndex] = activeMatch;
+    // selectedMatch remains the displayed snapshot; dropdown entries always stay current.
     
     matchSelect.innerHTML = '';
     
@@ -717,21 +717,26 @@ function renderBanPickResults(simData) {
             banList.appendChild(p);
         });
     } else {
-        banList.innerHTML = '<p class="text-slate-500">밴 시뮬레이션 데이터 없음</p>';
+        banList.innerHTML = '<p class="text-slate-500">밴 추천 데이터 없음</p>';
     }
     
     if (simData && simData.picks && simData.picks.length > 0) {
         simData.picks.forEach(p => {
             const el = document.createElement('p');
             el.className = 'text-slate-200 font-semibold text-xs sm:text-sm';
-            const isDecider = p.team === 'Decider';
-            const tagText = isDecider ? '결정 맵 (Decider)' : '핵심 카드 픽';
-            const tagColor = isDecider ? 'text-amber-400 bg-amber-950/40 border-amber-900/30' : 'text-emerald-400 bg-emerald-950/40 border-emerald-900/30';
+            const tagText = '참고 픽';
+            const tagColor = 'text-emerald-400 bg-emerald-950/40 border-emerald-900/30';
             el.innerHTML = `<span class="text-[10px] sm:text-xs text-slate-500">${escapeHTML(p.team)}:</span> ${escapeHTML(p.map)} <span class="text-[9px] sm:text-[10px] ${tagColor} px-1.5 py-0.5 rounded border">${tagText} (${p.win_pct}%)</span>`;
             pickList.appendChild(el);
         });
     } else {
-        pickList.innerHTML = '<p class="text-slate-500">픽 시뮬레이션 데이터 없음</p>';
+        pickList.innerHTML = '<p class="text-slate-500">픽 추천 데이터 없음</p>';
+    }
+    if (simData?.remaining?.length) {
+        const remaining = document.createElement('p');
+        remaining.className = 'text-slate-400 text-xs';
+        remaining.textContent = `나머지 후보 (결정 순서 미정): ${simData.remaining.join(', ')}`;
+        pickList.appendChild(remaining);
     }
 }
 
@@ -822,6 +827,7 @@ function calculateAISimulation(mapsA, mapsB) {
 
 // 8. Update UI status display
 function updateStatus(type, title, desc, progressVal) {
+    const statusIcon = document.getElementById('status-icon');
     statusText.textContent = title;
     subStatusText.textContent = desc;
     

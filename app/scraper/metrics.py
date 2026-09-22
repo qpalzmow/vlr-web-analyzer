@@ -102,7 +102,7 @@ def simulate_banpick(maps_a: dict, maps_b: dict, map_pool: list) -> dict:
         return ((wins + 1) / (played + 2) * 100) if played > 0 else 50.0
     
     # Order-preserving deduplication of map pool
-    available = list(dict.fromkeys(map_pool))
+    available = sorted(set(map_pool))
     bans = []
     picks = []
     
@@ -130,8 +130,5 @@ def simulate_banpick(maps_a: dict, maps_b: dict, map_pool: list) -> dict:
         picks.append({"map": best_map, "team": team_label, "win_pct": round(pct, 1)})
         available.remove(best_map)
     
-    if available:
-        decider = available[0]
-        picks.append({"map": decider, "team": "Decider", "win_pct": 50.0})
-    
-    return {"bans": bans, "picks": picks}
+    # Recommendations only: no invented veto order or decider without event rules.
+    return {"bans": bans, "picks": picks, "remaining": available, "mode": "recommendations"}

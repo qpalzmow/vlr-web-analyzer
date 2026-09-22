@@ -117,6 +117,10 @@ def get_matches(strict=False):
 
 def get_match_details(match_url):
     res = request_with_retry(match_url)
+    res.raise_for_status()
+    soup = BeautifulSoup(res.text, 'html.parser')
+    if not soup.select_one('.match-header-vs') or len(soup.select('.match-header-link-name, .wf-title-team')) < 2:
+        raise ValueError('Match page structure missing')
     return parse_match_details(res.text, match_url)
 
 def get_event_map_pool(event_id):

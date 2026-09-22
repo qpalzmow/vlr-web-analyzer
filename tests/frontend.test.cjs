@@ -77,6 +77,41 @@ const readyMatch = (id = '1') => ({id, url: '/' + id, team_a: 'One', team_b: 'Tw
     selection_data: {details: {team_a_id: '1', team_b_id: '2', event_id: '20'},
         team_a_events: [{id:'8',name:'Event Eight'}], team_b_events: [], map_pool: ['Bind','Icebox']}});
 
+test('reselecting a match uses the newest pool while the active report keeps its snapshot', async () => {
+    const h=setup();
+    h.run("tierSelect.value='All';regionSelect.value='All'");
+    h.context.fetch=async()=>response({generation:'old',matches:[readyMatch()]});
+    await h.run('fetchMatches()');
+    h.run("matchSelect.value='0'");await h.run('handleMatchSelection()');
+    h.run('globalThis.prior=selectedMatch;analysisRunning=true');
+    const fresh=readyMatch();fresh.selection_data.map_pool=['Abyss'];
+    fresh.selection_data.team_a_events=[{id:'10',name:'New'}];
+    h.context.fetch=async()=>response({generation:'new',matches:[fresh]});
+    await h.run('fetchMatches(true)');
+    assert.equal(h.read('selectedMatch===prior'),true);
+    assert.deepEqual(h.read('selectedMatch.map_pool'),['Bind','Icebox']);
+    h.run("matchSelect.value='0'");await h.run('handleMatchSelection()');
+    assert.deepEqual(h.read('selectedMatch.map_pool'),['Abyss']);
+    assert.equal(h.read('teamAEvents[0].id'),'10');
+});
+
+test('missing player data produces no radar dataset or synthetic midpoint', () => {
+    const h=setup();
+    h.run("renderAceRadarChart({nickname:'N/A',acs:0,kd_margin:0,agents:['N/A']},null)");
+    assert.equal(h.context.lastChart.data.datasets.length,0);
+    h.run("renderAceRadarChart({nickname:'Player',acs:200,kd_margin:5,agents:['Jett']},null)");
+    assert.equal(h.context.lastChart.data.datasets.length,1);
+});
+
+test('stale and unavailable statistics are both explained', async () => {
+    const h=setup();h.context.match=readyMatch();
+    h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
+    h.context.fetch=async()=>response({...analysisResult(),stale:true,players_available:false,probability:null});
+    await h.run("handleMatchSelection(['8'],true)");
+    assert.match(h.elements.get('sub-status-text').textContent,/갱신 지연/);
+    assert.match(h.elements.get('sub-status-text').textContent,/미표시/);
+});
+
 test('selection renders synchronously with zero network requests even with an old snapshot or missing pool', async () => {
     const h = setup();
     const match = readyMatch();

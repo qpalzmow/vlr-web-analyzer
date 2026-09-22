@@ -17,7 +17,7 @@ ALLOWED_VLR_HOSTS = {"www.vlr.gg", "vlr.gg"}
 
 ALL_KNOWN_MAPS = [
     "Ascent", "Bind", "Breeze", "Haven", "Icebox", "Lotus", "Split", 
-    "Sunset", "Abyss", "Fracture", "Pearl", "Summit"
+    "Sunset", "Abyss", "Fracture", "Pearl", "Corrode", "Summit"
 ]
 
 # Core VCT Partner teams (Pacific, Americas, EMEA, China) guaranteed to be pre-cached

@@ -49,7 +49,7 @@ function renderAceRadarChart(aceA, aceB) {
     aceRadarChartInstance = new Chart(canvas, {
         type: 'radar',
         data: {
-            labels: ['전투 지수 (ACS)', '킬/데스 마진', '요원 풀 다양성', '임팩트 레이팅'],
+            labels: ['ACS 환산 (÷3)', 'K/D 마진 환산', '표시된 요원 수 (최대 3)', 'ACS 환산 (÷2.5)'],
             datasets: [
                 {
                     label: nickA,
@@ -65,7 +65,10 @@ function renderAceRadarChart(aceA, aceB) {
                     borderColor: '#f97316',
                     pointBackgroundColor: '#f97316'
                 }
-            ]
+            ].filter((_, i) => {
+                const ace = i === 0 ? aceA : aceB;
+                return ace && ace.available !== false && ace.nickname !== 'N/A' && ace.acs > 0;
+            })
         },
         options: {
             responsive: true,

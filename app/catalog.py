@@ -22,6 +22,7 @@ _stop = threading.Event()
 _worker = None
 _analytics_worker = None
 _analytics_lock = threading.Lock()
+_analytics_pending = None
 
 
 def utcnow():
@@ -113,6 +114,8 @@ def read_catalog():
         "matches": [], "ready_count": 0, "pending_count": 0,
         "refresh_interval_seconds": INTERVAL_SECONDS,
     }
+    from app.analysis import analysis_status
+    snapshot['analytics_status'] = analysis_status()
     status = get_sync_status()
     snapshot["sync_status"] = status.get("status", "pending")
     snapshot["next_refresh_at"] = status.get("details", {}).get("next_refresh_at")
@@ -144,14 +147,25 @@ def bootstrap_snapshot():
 
 
 def queue_analytics(matches):
-    global _analytics_worker
+    global _analytics_worker, _analytics_pending
     with _analytics_lock:
+        _analytics_pending = copy.deepcopy(matches)
         if _analytics_worker and _analytics_worker.is_alive():
             return
         def work():
+            global _analytics_pending, _analytics_worker
             from app.analysis import refresh_analysis
-            refresh_analysis(matches, stop=_stop, force=True)
-        _analytics_worker = threading.Thread(target=work, daemon=True, name="VLRAnalyticsWarmup")
+            while True:
+                with _analytics_lock:
+                    if _stop.is_set() or _analytics_pending is None:
+                        _analytics_worker = None
+                        return
+                    pending, _analytics_pending = _analytics_pending, None
+                try:
+                    refresh_analysis(pending, stop=_stop, force=True)
+                except Exception:
+                    logger.exception('Analysis refresh failed')
+        _analytics_worker = threading.Thread(target=work, daemon=True, name='VLRAnalyticsWarmup')
         _analytics_worker.start()
 
 

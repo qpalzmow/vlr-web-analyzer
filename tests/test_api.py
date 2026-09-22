@@ -27,7 +27,7 @@ def test_analyze_advanced_unified_schema(client):
     expected_keys = {
         "map_win_rate", "pistol_win_rate", "fk_fd_margin", "fk_fd_diff",
         "fk_fd_per_round", "total_played", "total_wins", "total_fk",
-        "total_fd", "top_compositions"
+        "total_fd", "top_compositions", "atk_win_rate", "def_win_rate"
     }
     assert set(data["adv_a"].keys()) == expected_keys
     assert set(data["adv_b"].keys()) == expected_keys

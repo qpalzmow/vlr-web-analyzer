@@ -4,8 +4,9 @@ function renderCatalogStatus(data) {
     const updated = data.updated_at ? new Date(data.updated_at).toLocaleString('ko-KR') : '';
     const refreshing = data.sync_status === 'running' ? ' · 갱신 중' : '';
     const failed = data.sync_status === 'error' ? ' · 이전 데이터 유지' : '';
+    const analytics = data.analytics_status?.stale_teams ? ` · 분석 갱신 대기 ${data.analytics_status.stale_teams}팀` : '';
     if (badge) badge.textContent = updated
-        ? `1시간마다 업데이트 · ${updated} 기준${refreshing}${failed}`
+        ? `1시간마다 업데이트 · ${updated} 기준${refreshing}${failed}${analytics}`
         : '첫 경기 목록을 준비하고 있습니다';
 }
 
@@ -206,8 +207,9 @@ async function runAnalysis() {
         }
         lucide.createIcons();
         const timestamp = new Date(data.updated_at).toLocaleString('ko-KR');
-        const notice = data.players_available === false ? ' · 선수 통계가 없는 대회는 해당 지표 미표시'
-            : data.stale ? ' · 최신 수집이 지연된 항목은 이전 데이터 사용' : ' · 선택한 대회 통계 반영';
+        const notice = (data.stale ? ' · 갱신 지연: 이전 데이터 사용' : '') +
+            (data.players_available === false ? ' · 팀 소속·표본 범위를 확인할 수 없는 선수 지표와 예측 승률 미표시'
+            : ' · 커리어 선수 소개 / 팀 FK·FD 및 예측 승률 미표시');
         updateStatus(data.stale || data.players_available === false ? 'alert' : 'success', '전력 분석 완료.', `${timestamp} 기준${notice}`, 100);
         // Live score is independent and does not delay any analysis panel.
         if (!analysisMatch.live_updates_started) {

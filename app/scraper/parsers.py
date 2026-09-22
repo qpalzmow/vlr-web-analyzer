@@ -13,10 +13,11 @@ def safe_int(s, default: int = 0) -> int:
     s_clean = clean_text(str(s))
     if not s_clean:
         return default
-    m = re.search(r'-?\d+', s_clean)
+    tokens = re.findall(r'[+-]?\d[\d,\u00a0\u202f]*(?:\.\d+)?', s_clean)
+    m = re.fullmatch(r'[+-]?(?:\d+|\d{1,3}(?:,\d{3})+)', tokens[0]) if len(tokens) == 1 else None
     if m:
         try:
-            return int(m.group())
+            return int(m.group().replace(',', ''))
         except ValueError:
             pass
     return default
@@ -305,13 +306,9 @@ def parse_live_score(html_text: str) -> dict:
             if m:
                 score_left, score_right = m.group(1), m.group(2)
 
-    status = "upcoming"
-    header_block = soup.find(class_='match-header')
-    header_text = clean_text(header_block.get_text()).lower() if header_block else ""
-    if 'final' in header_text:
-        status = "final"
-    elif 'live' in header_text:
-        status = "live"
+    # Only dedicated status nodes: stage names such as Semifinals are unrelated.
+    notes = {clean_text(n.get_text()).lower() for n in soup.select('.match-header-vs-note')}
+    status = 'live' if 'live' in notes else 'final' if 'final' in notes else 'upcoming'
 
     known_maps = set(m.lower() for m in ALL_KNOWN_MAPS)
     maps_played = []

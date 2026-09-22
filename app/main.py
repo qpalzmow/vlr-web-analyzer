@@ -8,6 +8,7 @@ import time
 import secrets
 from contextlib import asynccontextmanager
 from typing import Optional
+from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import FastAPI, HTTPException, Request, Query
@@ -62,7 +63,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="VLR Web Analyzer API",
-    version="3.1.0",
+    version="3.2.0",
     lifespan=lifespan
 )
 
@@ -270,8 +271,13 @@ def api_get_match_map_pool(url: str = Query(...)):
 def api_get_live_score(url: str = Query(...)):
     try:
         clean_url = validate_vlr_url(url)
+        if not read_selection(clean_url):
+            raise HTTPException(status_code=409, detail='Match is awaiting the next hourly update')
+        clean_url = 'https://www.vlr.gg/' + urlparse(clean_url).path.strip('/').split('/')[0]
         live_score = get_cached_live_score(clean_url, get_live_score)
         return JSONResponse(content=live_score)
+    except HTTPException:
+        raise
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
@@ -287,66 +293,47 @@ def api_full_analysis(payload: FullAnalysisPayload):
         raise HTTPException(status_code=409, detail=str(exc))
 
 
-@app.post("/api/analyze/form")
+def prepared_sections(payload, section):
+    from app.analysis import aggregate_team
+    from app.db import get_analysis_teams
+    records = get_analysis_teams([payload.team_a_id, payload.team_b_id])
+    data = {}
+    empty = {'scopes': {'all': {'maps': {}, 'players': {}, 'collected_at': None}},
+             'available_events': [], 'updated_at': None}
+    for side, tid in (('a', payload.team_a_id), ('b', payload.team_b_id)):
+        if tid and not records.get(tid, {}).get('scopes'):
+            raise HTTPException(status_code=409, detail='Analysis is awaiting collection')
+        try:
+            team = aggregate_team(records.get(tid, empty), payload.event_ids)
+        except AnalysisNotReady as exc:
+            raise HTTPException(status_code=409, detail=str(exc))
+        data[f'{section}_{side}'] = team['advanced' if section == 'adv' else section]
+    return JSONResponse(content=data, headers={'Cache-Control': 'no-store'})
+
+
+@app.post('/api/analyze/form')
 def api_analyze_form(payload: TeamAnalysisPayload):
-    try:
-        future_a = _global_executor.submit(_get_form_for_team, payload.team_a_id) if payload.team_a_id else None
-        future_b = _global_executor.submit(_get_form_for_team, payload.team_b_id) if payload.team_b_id else None
+    return prepared_sections(payload, 'form')
 
-        return JSONResponse(content={
-            "form_a": _safe_future_result(future_a, []),
-            "form_b": _safe_future_result(future_b, [])
-        })
-    except Exception as e:
-        logger.error("api_analyze_form failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/api/analyze/maps")
+@app.post('/api/analyze/maps')
 def api_analyze_maps(payload: TeamAnalysisPayload):
-    try:
-        future_a = _global_executor.submit(_get_maps_for_team, payload.team_a_id, payload.event_ids) if payload.team_a_id else None
-        future_b = _global_executor.submit(_get_maps_for_team, payload.team_b_id, payload.event_ids) if payload.team_b_id else None
+    return prepared_sections(payload, 'maps')
 
-        return JSONResponse(content={
-            "maps_a": _safe_future_result(future_a, {}),
-            "maps_b": _safe_future_result(future_b, {})
-        })
-    except Exception as e:
-        logger.error("api_analyze_maps failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/api/analyze/aces")
+@app.post('/api/analyze/aces')
 def api_analyze_aces(payload: TeamAnalysisPayload):
-    try:
-        future_a = _global_executor.submit(_get_ace_for_team, payload.team_a_id, payload.event_ids) if payload.team_a_id else None
-        future_b = _global_executor.submit(_get_ace_for_team, payload.team_b_id, payload.event_ids) if payload.team_b_id else None
+    return prepared_sections(payload, 'ace')
 
-        return JSONResponse(content={
-            "ace_a": _safe_future_result(future_a, {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}),
-            "ace_b": _safe_future_result(future_b, {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]})
-        })
-    except Exception as e:
-        logger.error("api_analyze_aces failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/api/analyze/advanced")
+@app.post('/api/analyze/advanced')
 def api_analyze_advanced(payload: TeamAnalysisPayload):
-    try:
-        default_adv = get_team_advanced_metrics("")
-        future_a = _global_executor.submit(_get_advanced_for_team, payload.team_a_id, payload.event_ids) if payload.team_a_id else None
-        future_b = _global_executor.submit(_get_advanced_for_team, payload.team_b_id, payload.event_ids) if payload.team_b_id else None
-
-        return JSONResponse(content={
-            "adv_a": _safe_future_result(future_a, default_adv),
-            "adv_b": _safe_future_result(future_b, default_adv)
-        })
-    except Exception as e:
-        logger.error("api_analyze_advanced failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+    return prepared_sections(payload, 'adv')
 
 @app.get("/api/sync/status")
 def api_get_sync_status_endpoint():
-    return JSONResponse(content=get_sync_status())
+    from app.analysis import analysis_status
+    return JSONResponse(content={**get_sync_status(), 'analytics': analysis_status()})
 
 @app.post("/api/sync/trigger")
 def api_trigger_sync_endpoint(request: Request):
@@ -356,7 +343,8 @@ def api_trigger_sync_endpoint(request: Request):
 @app.post("/api/simulate/banpick")
 def api_simulate_banpick(payload: BanPickPayload):
     try:
-        res = simulate_banpick(payload.maps_a, payload.maps_b, payload.map_pool)
+        maps = payload.model_dump()
+        res = simulate_banpick(maps['maps_a'], maps['maps_b'], payload.map_pool)
         return JSONResponse(content=res)
     except Exception as e:
         logger.error("api_simulate_banpick failed: %s", e, exc_info=True)
@@ -370,11 +358,13 @@ def api_trigger_cache_warm(request: Request):
 @app.post("/api/log-error")
 async def api_log_error(request: Request):
     try:
-        content_length = request.headers.get('content-length', '0')
-        if int(content_length) > 10240:  # 10KB limit
-            return JSONResponse(content={"status": "rejected", "reason": "payload too large"}, status_code=413)
+        raw = bytearray()
+        async for chunk in request.stream():
+            if len(raw) + len(chunk) > 10240:
+                return JSONResponse(content={"status": "rejected", "reason": "payload too large"}, status_code=413)
+            raw.extend(chunk)
         try:
-            body = await request.json()
+            body = json.loads(raw)
         except Exception:
             return JSONResponse(content={"status": "rejected", "reason": "invalid json"}, status_code=400)
         if not isinstance(body, dict):

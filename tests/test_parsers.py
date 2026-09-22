@@ -26,7 +26,7 @@ def test_parse_live_score_html():
         <div class="match-header-vs-score" data-vlr-score="2:1">
             <span>2</span><span>:</span><span>1</span>
         </div>
-        <div class="match-header">Final</div>
+        <div class="match-header-vs-note">Final</div>
     </div>
     <div class="vm-stats-game">
         <div class="vm-stats-game-header">

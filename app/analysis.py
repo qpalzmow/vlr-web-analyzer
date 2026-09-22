@@ -11,7 +11,7 @@ from app.db import get_analysis_teams, save_analysis_team
 from app.scraper.metrics import calculate_advanced_metrics, find_ace_player_from_stats, simulate_banpick
 
 logger = logging.getLogger(__name__)
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 MAP_FIELDS = ('played','w','l','atk_won','atk_total','def_won','def_total')
 PLAYER_FIELDS = ('rounds','weighted_acs','kills','deaths','fk','fd')
 
@@ -22,6 +22,20 @@ class AnalysisNotReady(Exception):
 
 def now_iso():
     return datetime.now(timezone.utc).isoformat()
+
+
+def expired(timestamp):
+    try:
+        age = (datetime.now(timezone.utc) - datetime.fromisoformat(timestamp)).total_seconds()
+        return age < 0 or age >= 3600
+    except (TypeError, ValueError):
+        return True
+
+
+def analysis_status():
+    teams = get_analysis_teams()
+    return {'teams': len(teams), 'failed_teams': sum(bool(t.get('last_error')) for t in teams.values()),
+            'stale_teams': sum(expired(t.get('last_success_at', t.get('updated_at'))) for t in teams.values())}
 
 
 def requirements(matches):
@@ -52,22 +66,27 @@ def prepare_team(team_id, events, previous=None):
     try:
         players = {pid: {**sources.player_totals(pid), 'name': name}
                    for pid, name in profile['roster'].items()}
-        scopes['all'] = {'maps': overview['maps'], 'players': players, 'collected_at': now_iso()}
+        scopes['all'] = {'maps': overview['maps'], 'players': players, 'collected_at': now_iso(),
+                         'career_roster_verified': True,
+                         'players_available': bool(players) and all(p['rounds'] > 0 for p in players.values())}
     except Exception:
         logger.exception('All-time player collection failed for %s', team_id)
         failed.append('all')
     for event_id in sorted(required):
         try:
             maps = sources.event_maps(team_id, event_id)
-            leaderboard = sources.event_players(event_id)
-            players = {pid: {**leaderboard[pid], 'name': name} for pid, name in profile['roster'].items() if pid in leaderboard}
-            scopes[event_id] = {'maps': maps, 'players': players, 'players_available': not leaderboard.get('_unavailable', False), 'collected_at': now_iso()}
+            # An event leaderboard does not identify a player's team for each match.
+            # Current roster membership cannot prove historical team coverage.
+            scopes[event_id] = {'maps': maps, 'players': {}, 'players_available': False,
+                                'collected_at': now_iso(), 'unavailable_reason': 'team_match_coverage_unverified'}
         except Exception as exc:
             logger.warning('Analysis event %s/%s: %s', team_id, event_id, exc)
             failed.append(event_id)
     data = {'schema_version': SCHEMA_VERSION, 'team_id': team_id, 'team_name': profile['name'],
             'form': profile['form'], 'available_events': sorted(available), 'scopes': scopes,
-            'updated_at': now_iso(), 'failed_scopes': failed}
+            'updated_at': now_iso(), 'failed_scopes': failed,
+            'last_attempt_at': now_iso(), 'last_success_at': previous.get('last_success_at', previous.get('updated_at')) if failed else now_iso(),
+            'last_error': 'scope_collection_failed' if failed else None}
     save_analysis_team(team_id, data)
     logger.info('Prepared analysis team %s: %d event scopes, %d failures', team_id, len(scopes)-('all' in scopes), len(failed))
     return data
@@ -99,6 +118,10 @@ def refresh_analysis(matches, stop=None, force=False):
                     results['updated'] += 1
                 except Exception as exc:
                     results['failed'] += 1
+                    tid = jobs[future]
+                    old = copy.deepcopy(previous.get(tid, {}))
+                    old.update(last_attempt_at=now_iso(), last_error='team_collection_failed')
+                    save_analysis_team(tid, old)
                     logger.warning('Keeping previous analysis for team %s: %s', jobs[future], exc)
     return results
 
@@ -130,7 +153,12 @@ def aggregate_team(data, event_ids=None):
     if missing:
         raise AnalysisNotReady('선택한 대회의 통계를 준비 중입니다. 다음 업데이트 후 다시 선택해주세요.')
     maps, players, dates = {}, {}, []
-    players_available = all(scopes[key].get('players_available', True) for key in keys)
+    # Only complete, explicitly verified career introductions are available.
+    # Event team statistics require match-level attribution, absent in our source.
+    players_available = (keys == ['all'] and scopes['all'].get('career_roster_verified', False)
+                         and scopes['all'].get('players_available', False)
+                         and bool(scopes['all'].get('players'))
+                         and all(p.get('rounds', 0) > 0 for p in scopes['all']['players'].values()))
     for key in keys:
         item = scopes[key]
         dates.append(item['collected_at'])
@@ -144,33 +172,23 @@ def aggregate_team(data, event_ids=None):
                 target[field] += counts.get(field, 0)
             for agent, rounds in counts.get('agents', {}).items():
                 target['agents'][agent] = target['agents'].get(agent, 0) + rounds
-    team_rounds = sum(m['atk_total'] + m['def_total'] for m in maps.values())
-    if not team_rounds:
-        team_rounds = max((p['rounds'] for p in players.values()), default=0)
-    advanced = calculate_advanced_metrics(maps, sum(p['fk'] for p in players.values()),
-                                          sum(p['fd'] for p in players.values()), team_rounds)
-    if not players_available:
-        for field in ('fk_fd_margin','fk_fd_diff','fk_fd_per_round','total_fk','total_fd'):
-            advanced[field] = None
+    advanced = calculate_advanced_metrics(maps, 0, 0, 0)
+    # Never divide career/event-player totals by the team's unrelated round sample.
+    for field in ('fk_fd_margin','fk_fd_diff','fk_fd_per_round','total_fk','total_fd'):
+        advanced[field] = None
     return {'form': data.get('form', []), 'maps': maps, 'ace': find_ace_player_from_stats(list(players.values()) if players_available else []),
             'advanced': advanced, 'updated_at': min(dates) if dates else data['updated_at'],
-            'stale': any(key in data.get('failed_scopes', []) for key in keys), 'event_ids': keys,
+            'stale': bool(data.get('last_error')) or any(expired(d) for d in dates or [data.get('updated_at')]) or any(key in data.get('failed_scopes', []) for key in keys), 'event_ids': keys,
             'players_available': players_available}
 
 
 def full_analysis(team_a_id, team_b_id, event_ids, map_pool):
     records = get_analysis_teams([team_a_id, team_b_id])
-    if team_a_id not in records or team_b_id not in records:
+    if any(not records.get(tid, {}).get('scopes') for tid in (team_a_id, team_b_id)):
         raise AnalysisNotReady('이 팀의 전력 분석을 준비 중입니다. 다음 업데이트 후 다시 선택해주세요.')
     a = aggregate_team(records[team_a_id], event_ids)
     b = aggregate_team(records[team_b_id], event_ids)
     probability = None
-    if a['advanced']['total_played'] and b['advanced']['total_played'] and a['players_available'] and b['players_available']:
-        def score(adv):
-            return max(10, adv['map_win_rate'] * 0.6 + max(0, (50 + adv['fk_fd_margin'] * 5) * 0.4))
-        sa, sb = score(a['advanced']), score(b['advanced'])
-        pa = min(85, max(15, int(sa / (sa + sb) * 100 + 0.5)))
-        probability = {'a': pa, 'b': 100-pa}
     return {'form_a': a['form'], 'form_b': b['form'], 'maps_a': a['maps'], 'maps_b': b['maps'],
             'ace_a': a['ace'], 'ace_b': b['ace'], 'adv_a': a['advanced'], 'adv_b': b['advanced'],
             'simulation': simulate_banpick(a['maps'], b['maps'], map_pool) if a['advanced']['total_played'] and b['advanced']['total_played'] else {'bans': [], 'picks': []}, 'probability': probability,

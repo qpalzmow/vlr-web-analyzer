@@ -51,21 +51,34 @@ def parse_maps(soup):
     if table is None:
         raise ValueError('Team maps table missing')
     cols = parse_column_indices_from_header(table)
+    headers = table.find_all('th')
+    if len(headers) <= max(cols.values()) or not {'w', 'l'} <= {clean_text(h.get_text()).lower() for h in headers}:
+        raise ValueError('Map statistics headers missing')
     maps = {}
     for row in table.select('tbody tr'):
         cells = row.find_all('td', recursive=False)
-        if len(cells) <= max(cols.values()):
+        if row.get('class') and any(c == 'mod-toggle' or 'expand' in c or 'map-games' in c for c in row['class']):
             continue
+        if len(cells) == 1 and cells[0].get('colspan') and row.select_one('table'):
+            continue
+        if len(cells) <= max(cols.values()):
+            raise ValueError('Malformed map statistics row')
         raw = clean_text(cells[cols['map']].get_text())
         name = next((m for m in ALL_KNOWN_MAPS if re.search(r'\b'+re.escape(m)+r'\b', raw, re.I)), None)
         if not name:
-            continue
+            raise ValueError('Unknown map in statistics')
         number = re.search(r'\((\d+)\)', raw)
         counts = {key: safe_int(cells[cols[key]].get_text()) for key in ('w','l','atk_won','atk_lost','def_won','def_lost')}
+        if any(safe_int(cells[cols[key]].get_text(), -1) < 0 for key in counts):
+            raise ValueError('Invalid map counts')
+        if number and int(number[1]) != counts['w'] + counts['l']:
+            raise ValueError('Inconsistent map counts')
         maps[name] = {'played': int(number[1]) if number else counts['w'] + counts['l'],
                       'w': counts['w'], 'l': counts['l'], 'atk_won': counts['atk_won'],
                       'atk_total': counts['atk_won'] + counts['atk_lost'], 'def_won': counts['def_won'],
                       'def_total': counts['def_won'] + counts['def_lost']}
+    if not maps and 'No stats available' not in soup.get_text():
+        raise ValueError('Map statistics rows missing')
     return maps
 
 
@@ -90,6 +103,9 @@ def parse_profile(soup):
     name = clean_text(header.get_text())
     roster = {}
     for item in soup.select('.team-roster-item'):
+        roles = ' '.join(r.get_text().lower() for r in item.select('.team-roster-item-name-role'))
+        if re.search(r'coach|manager|analyst|inactive|sub|staff', roles):
+            continue
         link = item.select_one('a[href^="/player/"]')
         if link:
             alias = link.select_one('.team-roster-item-name-alias')
@@ -116,7 +132,7 @@ def parse_profile(soup):
 
 
 def team_profile(team_id):
-    return source(f'profile:{team_id}', lambda: parse_profile(page(f'https://www.vlr.gg/team/{team_id}')))
+    return source(f'profile-v3:{team_id}', lambda: parse_profile(page(f'https://www.vlr.gg/team/{team_id}')))
 
 
 def empty_player():
@@ -127,16 +143,24 @@ def parse_player(soup):
     table = soup.select_one('table.mod-player-summary, table.mod-agent-rows')
     if table is None:
         # Coaches and staff profiles legitimately have no player statistics.
-        if soup.select_one('.player-header h1, .player-header-name'):
+        if any(marker in soup.get_text() for marker in ('No stats available', 'No agent data available for this period')) and soup.select_one('.player-header h1, .player-header-name'):
             return empty_player()
         raise ValueError('Player statistics missing')
     cols = parse_player_column_indices_from_header(table)
+    if not {'rnd', 'acs', 'k', 'd', 'fk', 'fd'} <= {clean_text(h.get_text()).lower() for h in table.find_all('th')}:
+        raise ValueError('Player statistics headers missing')
     player = empty_player()
     for row in table.select('tbody tr'):
         cells = row.find_all('td', recursive=False)
         if len(cells) <= max(cols.values()):
-            continue
-        rounds = safe_int(cells[cols['rounds']].get_text())
+            raise ValueError('Malformed player statistics row')
+        rounds = safe_int(cells[cols['rounds']].get_text(), -1)
+        if rounds < 0 or any(safe_int(cells[cols[k]].get_text(), -1) < 0 for k in ('kills','deaths','fk','fd')):
+            raise ValueError('Invalid player counts')
+        if any(safe_int(cells[cols[k]].get_text()) > rounds for k in ('fk','fd')):
+            raise ValueError('First kill/death counts exceed player rounds')
+        if safe_float(cells[cols['acs']].get_text(), -1) < 0:
+            raise ValueError('Invalid ACS')
         player['rounds'] += rounds
         player['weighted_acs'] += safe_float(cells[cols['acs']].get_text()) * rounds
         for key in ('kills','deaths','fk','fd'):
@@ -144,6 +168,8 @@ def parse_player(soup):
         img = cells[cols['agent']].find('img')
         agent = (img.get('alt') or img.get('src','').split('/')[-1].split('.')[0]) if img else 'unknown'
         player['agents'][agent.lower()] = player['agents'].get(agent.lower(), 0) + rounds
+    if not table.select('tbody tr'):
+        raise ValueError('Player statistics rows missing')
     return player
 
 
