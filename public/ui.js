@@ -31,65 +31,181 @@ function initUITheme() {
     setUITheme(savedTheme);
 }
 
-// 2. Populate Events Dropdown (filtered by selected Tier and Region, grouped by Tournament)
+const TOURNAMENT_CATEGORIES = [
+    { id: 'champions', label: '챔피언스' },
+    { id: 'masters', label: '마스터스' },
+    { id: 'vct', label: 'VCT 지역 리그' },
+    { id: 'game-changers', label: '게임 체인저스' },
+    { id: 'challengers', label: '챌린저스 / 어센션' },
+    { id: 'other', label: '기타 대회' }
+];
+
+function cleanTournamentName(match) {
+    let name = String(match.tournament || match.event || '기타 대회').replace(/\s+/g, ' ').trim();
+    // Older catalog rows include a stage/round before the actual event name.
+    // Strip only a recognized prefix, preserving region, year and qualifiers.
+    const prefix = /^(?:(?:Group Stage|Playoffs|Play[- ]?ins?|Main Event|Regional Final)\s*[–—-]?\s*)?(?:(?:Upper|Lower|Consolation)\s+)?(?:Grand Finals?|Quarterfinals?|Semifinals?|Finals?|Round(?: of)?\s+\d+|Opening|Winner['’]?s|Elimination|Decider)(?:\s*\([A-Z]\))?\s+/i;
+    name = name.replace(prefix, '');
+    return name || '기타 대회';
+}
+
+function tournamentCategory(name) {
+    if (/\bgame\s+changers\b/i.test(name)) return 'game-changers';
+    if (/^(?:valorant\s+)?champions\b(?!\s+tour\b)/i.test(name)) return 'champions';
+    if (/^(?:valorant\s+)?masters\b/i.test(name)) return 'masters';
+    if (/\b(challengers|ascension|vcl)\b/i.test(name)) return 'challengers';
+    if (/\b(vct|champions tour)\b/i.test(name)) return 'vct';
+    return 'other';
+}
+
+function tournamentDisplayName(name) {
+    return name.replace(/^(?:valorant\s+)?champions\b(?!\s+tour\b)/i, '챔피언스')
+        .replace(/^(?:valorant\s+)?masters\b/i, '마스터스')
+        .replace(/\bGame Changers\b/i, '게임 체인저스');
+}
+
+function buildTournamentGroups(matches) {
+    const aliases = new Map();
+    const rows = matches.map(match => {
+        const name = cleanTournamentName(match);
+        const alias = name.toLowerCase();
+        const id = String(match.selection_data?.details?.event_id || '');
+        if (id) {
+            if (!aliases.has(alias)) aliases.set(alias, new Set());
+            aliases.get(alias).add(id);
+        }
+        return { match, name, alias, id };
+    });
+    const groups = new Map();
+    tournamentKeyByMatch = new Map();
+    for (const { match, name, alias, id } of rows) {
+        const knownIds = aliases.get(alias);
+        const resolvedId = id || (knownIds?.size === 1 ? [...knownIds][0] : '');
+        const key = resolvedId ? `event:${resolvedId}` : `name:${alias}`;
+        if (!groups.has(key)) groups.set(key, { key, name, category: tournamentCategory(name), matches: [] });
+        groups.get(key).matches.push(match);
+        tournamentKeyByMatch.set(match.id, key);
+    }
+    return [...groups.values()];
+}
+
+function getTournamentKey(match) {
+    return tournamentKeyByMatch.get(match.id);
+}
+
+function matchesSelectionFilters(match) {
+    return (tierSelect.value === 'All' || match.tier === tierSelect.value) &&
+        (regionSelect.value === 'All' || match.region === regionSelect.value);
+}
+
+function renderTournamentCategories(groups) {
+    const container = document.getElementById('tournament-category-filters');
+    if (!container) return;
+    container.innerHTML = '';
+    for (const category of [{ id: 'all', label: '전체' }, ...TOURNAMENT_CATEGORIES]) {
+        const count = category.id === 'all' ? groups.length : groups.filter(group => group.category === category.id).length;
+        if (!count && category.id !== 'all') continue;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'tournament-category-button';
+        button.dataset.category = category.id;
+        button.setAttribute('aria-pressed', String(selectedTournamentCategory === category.id));
+        button.textContent = `${category.label} · ${count}`;
+        button.title = `${category.label} 대회 ${count}개`;
+        button.disabled = !count;
+        button.addEventListener('click', () => {
+            selectedTournamentCategory = category.id;
+            populateEventsDropdown();
+        });
+        container.appendChild(button);
+    }
+}
+
+function updateTournamentSummary() {
+    const summary = document.getElementById('tournament-selection-summary');
+    if (!summary) return;
+    const group = tournamentGroups.find(item => item.key === eventSelect.value);
+    if (!group) {
+        summary.textContent = '선택한 등급·지역에 해당하는 대회가 없습니다.';
+        return;
+    }
+    const matches = group.matches.filter(matchesSelectionFilters);
+    const ready = matches.filter(match => match.selection_data).length;
+    summary.textContent = `${tournamentDisplayName(group.name)} · ${matches.length}경기 / 분석 가능 ${ready}경기`;
+}
+
+// 2. Tournament identity is built before filters, so pending matches stay with their event.
 function populateEventsDropdown(preserveSelection = false) {
     const previousTournament = eventSelect.value;
-    const tier = tierSelect.value;
-    const region = regionSelect.value;
-    
-    // Filter matches by tier and region
-    const tempMatches = allMatches.filter(m => {
-        const tierMatch = (tier === 'All' || m.tier === tier);
-        const regionMatch = (region === 'All' || m.region === region);
-        return tierMatch && regionMatch;
-    });
-    
-    // Group by tournament name
-    const tournamentCounts = {};
-    tempMatches.forEach(m => {
-        const tourney = m.tournament || m.event || '기타 대회';
-        tournamentCounts[tourney] = (tournamentCounts[tourney] || 0) + 1;
-    });
-    
-    const uniqueTournaments = Object.keys(tournamentCounts);
+    tournamentGroups = buildTournamentGroups(allMatches);
+    const groups = tournamentGroups.map(group => ({ ...group, matches: group.matches.filter(matchesSelectionFilters) }))
+        .filter(group => group.matches.length);
+    const activeKey = preserveSelection && selectedMatch ? getTournamentKey(selectedMatch) : previousTournament;
+    const activeGroup = groups.find(group => group.key === activeKey);
+    if (preserveSelection && activeGroup && selectedTournamentCategory !== 'all') selectedTournamentCategory = activeGroup.category;
+    if (!groups.some(group => group.category === selectedTournamentCategory)) selectedTournamentCategory = 'all';
+    renderTournamentCategories(groups);
     eventSelect.innerHTML = '';
-    
-    if (uniqueTournaments.length === 0) {
+    if (!groups.length) {
         eventSelect.innerHTML = '<option>대회가 없습니다.</option>';
         eventSelect.disabled = true;
         matchSelect.innerHTML = '<option>매치가 없습니다.</option>';
         matchSelect.disabled = true;
         analyzeBtn.disabled = true;
+        selectedMatch = null;
         clearDashboard();
+        updateTournamentSummary();
         return;
     }
-    
-    uniqueTournaments.forEach(tourney => {
-        const opt = document.createElement('option');
-        opt.value = tourney;
-        opt.textContent = `${tourney} (${tournamentCounts[tourney]}경기)`;
-        eventSelect.appendChild(opt);
-    });
-    
+    const visibleGroups = [];
+    for (const category of TOURNAMENT_CATEGORIES) {
+        if (selectedTournamentCategory !== 'all' && selectedTournamentCategory !== category.id) continue;
+        const categoryGroups = groups.filter(group => group.category === category.id).sort((a, b) =>
+            Number((b.name.match(/\b20\d{2}\b/) || [0])[0]) - Number((a.name.match(/\b20\d{2}\b/) || [0])[0]) ||
+            a.name.localeCompare(b.name, 'ko', { numeric: true }) || a.key.localeCompare(b.key));
+        if (!categoryGroups.length) continue;
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = category.label;
+        for (const group of categoryGroups) {
+            const opt = document.createElement('option');
+            opt.value = group.key;
+            opt.textContent = `${tournamentDisplayName(group.name)} · ${group.matches.length}경기`;
+            optgroup.appendChild(opt);
+            visibleGroups.push(group);
+        }
+        eventSelect.appendChild(optgroup);
+    }
     eventSelect.disabled = false;
-    if (preserveSelection && uniqueTournaments.includes(previousTournament)) eventSelect.value = previousTournament;
+    eventSelect.value = preserveSelection && visibleGroups.some(group => group.key === activeKey)
+        ? activeKey : visibleGroups[0].key;
     populateMatchesDropdown(preserveSelection);
+}
+
+function matchRoundLabel(match) {
+    const name = cleanTournamentName(match);
+    const event = String(match.event || '');
+    const nameIndex = event.toLowerCase().lastIndexOf(name.toLowerCase());
+    let round = nameIndex > 0 ? event.slice(0, nameIndex) : String(match.round_name || '');
+    round = round.replace(/[–—]/g, ' ').replace(/\s+/g, ' ').trim()
+        .replace(/^(Group Stage|Playoffs|Play[- ]?ins?|Main Event)\s*[-:]?\s*/i, '').trim();
+    const grouped = round.match(/^(Opening|Winner['’]?s|Elimination|Decider)\s*\(([A-Z])\)$/i);
+    if (grouped) {
+        const labels = { opening: '첫 경기', winners: '승자전', elimination: '패자전', decider: '최종전' };
+        return `${grouped[2]}조 ${labels[grouped[1].toLowerCase().replace(/['’]/g, '')]}`;
+    }
+    const rounds = { 'grand final': '결승전', 'upper final': '상위 결승', 'lower final': '하위 결승',
+        'upper semifinals': '상위 4강', 'lower semifinals': '하위 4강', 'upper quarterfinals': '상위 8강',
+        'quarterfinals': '8강', 'semifinals': '4강', 'consolation final': '3위 결정전' };
+    return rounds[round.toLowerCase()] || round.replace(/^Lower Round (\d+)$/i, '하위 $1R')
+        .replace(/^Upper Round of (\d+)$/i, '상위 $1강');
 }
 
 // 3. Populate Matches Dropdown (grouped by Stage optgroups: Playoffs, Play-Ins, Group Stage)
 function populateMatchesDropdown(preserveSelection = false) {
     const activeMatch = preserveSelection ? selectedMatch : null;
-    const tier = tierSelect.value;
-    const region = regionSelect.value;
     const selectedTournament = eventSelect.value;
-    
-    filteredMatches = allMatches.filter(m => {
-        const tierMatch = (tier === 'All' || m.tier === tier);
-        const regionMatch = (region === 'All' || m.region === region);
-        const tourney = m.tournament || m.event || '기타 대회';
-        const eventMatch = (tourney === selectedTournament);
-        return tierMatch && regionMatch && eventMatch;
-    });
+    filteredMatches = allMatches.filter(m => matchesSelectionFilters(m) && getTournamentKey(m) === selectedTournament);
+    updateTournamentSummary();
     const activeIndex = activeMatch ? filteredMatches.findIndex(m => m.id === activeMatch.id) : -1;
     // selectedMatch remains the displayed snapshot; dropdown entries always stay current.
     
@@ -114,10 +230,10 @@ function populateMatchesDropdown(preserveSelection = false) {
     // Group filteredMatches by Stage
     const stageGroups = {};
     const stageOrder = [
-        '🏆 플레이오프 (Playoffs)',
         '⚔️ 플레이인 (Play-Ins)',
         '📅 그룹 스테이지 (Group Stage)',
-        '기타 스테이지'
+        '기타 스테이지',
+        '🏆 플레이오프 (Playoffs)'
     ];
     
     filteredMatches.forEach((m, idx) => {
@@ -137,7 +253,8 @@ function populateMatchesDropdown(preserveSelection = false) {
             stageGroups[stageName].forEach(({ match: m, globalIdx }) => {
                 const opt = document.createElement('option');
                 opt.value = globalIdx;
-                const roundTag = m.round_name ? `[${m.round_name}] ` : '';
+                const round = matchRoundLabel(m);
+                const roundTag = round ? `[${round}] ` : '';
                 const timeDate = m.time || m.date ? ` (${[m.time, m.date].filter(Boolean).join(' | ')})` : '';
                 opt.textContent = `${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
                 opt.disabled = !m.selection_data;
@@ -158,7 +275,8 @@ function populateMatchesDropdown(preserveSelection = false) {
             stageGroups[stageName].forEach(({ match: m, globalIdx }) => {
                 const opt = document.createElement('option');
                 opt.value = globalIdx;
-                const roundTag = m.round_name ? `[${m.round_name}] ` : '';
+                const round = matchRoundLabel(m);
+                const roundTag = round ? `[${round}] ` : '';
                 const timeDate = m.time || m.date ? ` (${[m.time, m.date].filter(Boolean).join(' | ')})` : '';
                 opt.textContent = `${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
                 opt.disabled = !m.selection_data;
@@ -183,6 +301,10 @@ function populateMatchesDropdown(preserveSelection = false) {
 
 function categorizeTournament(name) {
     const lower = (name || '').toLowerCase();
+    if (/\bgame\s+changers\b/i.test(lower)) {
+        return { type: 'game-changers', badgeText: '게임 체인저스',
+            badgeCls: 'bg-pink-950/80 text-pink-300 border-pink-800/40', order: 1 };
+    }
     if (/\b(champions|masters|world cup|ewc)\b/i.test(lower)) {
         return {
             type: 'global',
@@ -282,9 +404,9 @@ function drawTournamentChecklist() {
     sortedEvents.forEach((evt, idx) => {
         const evId = evt.id.toString();
         const evName = evt.name;
-        const shortName = evName.length > 24 ? evName.substring(0, 24) + '..' : evName;
         
         const label = document.createElement('label');
+        label.title = evName;
         label.className = 'flex items-center space-x-1.5 sm:space-x-2 bg-zinc-900 border border-slate-800 px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-medium text-slate-300 hover:border-slate-600 transition-colors cursor-pointer';
         
         const cb = document.createElement('input');
@@ -317,7 +439,10 @@ function drawTournamentChecklist() {
         
         label.appendChild(cb);
         label.appendChild(badge);
-        label.appendChild(document.createTextNode(` ${shortName}`));
+        const name = document.createElement('span');
+        name.className = 'min-w-0 break-words leading-relaxed';
+        name.textContent = tournamentDisplayName(evName);
+        label.appendChild(name);
         tournamentChecklist.appendChild(label);
     });
 

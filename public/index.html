@@ -60,7 +60,7 @@
     <!-- html2canvas Export CDN -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <!-- Apple iOS 27 UI Kit Theme Stylesheet -->
-    <link rel="stylesheet" href="ios-theme.css">
+    <link rel="stylesheet" href="ios-theme.css?v=20260923.1">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
         body {
@@ -94,7 +94,7 @@
             </div>
             
             <!-- UI Theme Switcher Segmented Control -->
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2 shrink-0">
                 <div class="flex items-center bg-zinc-900/90 border border-slate-800 p-1 rounded-xl text-xs font-semibold shrink-0 shadow-inner">
                     <button id="theme-btn-original" onclick="setUITheme('original')" class="px-2.5 py-1.5 sm:px-3 rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 font-bold shadow-sm">
                         <i data-lucide="gamepad-2" class="w-3.5 h-3.5"></i>
@@ -120,27 +120,27 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
 
         <!-- Top Controls Panel (Matchup Selection & Filter) -->
-        <section class="bg-zinc-900/40 border border-slate-800/80 rounded-2xl p-3 sm:p-6 space-y-4 sm:space-y-6 backdrop-blur-sm">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+        <section id="match-selection-panel" class="min-w-0 bg-zinc-900/40 border border-slate-800/80 rounded-2xl p-3 sm:p-6 space-y-4 sm:space-y-6 backdrop-blur-sm">
+            <div class="grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl min-w-0">
                 <!-- Tier Filter -->
-                <div class="space-y-1.5 sm:space-y-2">
+                <div class="min-w-0 space-y-1.5 sm:space-y-2">
                     <label for="tier-select" class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2 cursor-pointer">
                         <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i> 대회 등급 (Tier)
                     </label>
-                    <select id="tier-select" class="w-full bg-zinc-900 border border-slate-800 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-medium text-white focus:outline-none focus:border-slate-600 transition-colors">
+                    <select id="tier-select" class="min-w-0 max-w-full w-full bg-zinc-900 border border-slate-800 rounded-xl px-3 py-2.5 sm:px-4 text-xs sm:text-sm font-medium text-white focus:outline-none focus:border-slate-600 transition-colors">
                         <option value="All">전체 등급</option>
-                        <option value="S-Tier">S-Tier (Champions/Masters/Leagues)</option>
-                        <option value="A-Tier">A-Tier (Challengers/Game Changers)</option>
+                        <option value="S-Tier">S-Tier · 국제/주요 리그</option>
+                        <option value="A-Tier">A-Tier · 챌린저스/GC</option>
                         <option value="Other">기타 리그</option>
                     </select>
                 </div>
 
                 <!-- Region Filter -->
-                <div class="space-y-1.5 sm:space-y-2">
+                <div class="min-w-0 space-y-1.5 sm:space-y-2">
                     <label for="region-select" class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2 cursor-pointer">
                         <i data-lucide="globe" class="w-4 h-4 text-purple-500"></i> 지역 (Region)
                     </label>
-                    <select id="region-select" class="w-full bg-zinc-900 border border-slate-800 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-medium text-white focus:outline-none focus:border-slate-600 transition-colors">
+                    <select id="region-select" class="min-w-0 max-w-full w-full bg-zinc-900 border border-slate-800 rounded-xl px-3 py-2.5 sm:px-4 text-xs sm:text-sm font-medium text-white focus:outline-none focus:border-slate-600 transition-colors">
                         <option value="All">전체 지역</option>
                         <option value="Pacific">Pacific (아시아/태평양)</option>
                         <option value="EMEA">EMEA (유럽/중동)</option>
@@ -150,25 +150,36 @@
                         <option value="Other">기타</option>
                     </select>
                 </div>
+            </div>
 
+            <div class="min-w-0 space-y-2">
+                <p class="text-xs font-semibold text-slate-300">대회 종류</p>
+                <div id="tournament-category-filters" role="group" aria-label="대회 종류"></div>
+            </div>
+
+            <div class="min-w-0 space-y-3">
+                <p id="tournament-selection-help" class="text-xs sm:text-sm text-slate-400">대회를 고른 뒤 스테이지별 경기를 선택하세요.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 min-w-0">
                 <!-- Event / Tournament Filter -->
-                <div class="space-y-1.5 sm:space-y-2">
-                    <label for="event-select" class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="trophy" class="w-4 h-4 text-sky-500"></i> 대회 선택 (Tournament)
+                <div class="min-w-0 space-y-2">
+                    <label for="event-select" class="text-sm font-bold text-slate-100 flex items-center gap-2 cursor-pointer">
+                        <i data-lucide="trophy" class="w-4 h-4 text-sky-400 shrink-0"></i> 1. 대회 선택
                     </label>
-                    <select id="event-select" class="w-full bg-zinc-900 border border-slate-800 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-medium text-white focus:outline-none focus:border-slate-600 transition-colors" disabled>
+                    <select id="event-select" aria-describedby="tournament-selection-summary" class="min-w-0 max-w-full w-full bg-zinc-900 border border-slate-600 rounded-xl px-3 py-3 sm:px-4 text-sm sm:text-base font-semibold text-white focus:outline-none focus:border-sky-400 transition-colors" disabled>
                         <option>대회 로드 중...</option>
                     </select>
+                    <p id="tournament-selection-summary" aria-live="polite" class="tournament-selection-summary">대회 목록을 불러오는 중입니다.</p>
                 </div>
 
                 <!-- Match / Stage Select -->
-                <div class="space-y-1.5 sm:space-y-2">
-                    <label for="match-select" class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="swords" class="w-4 h-4 text-rose-500"></i> 매치 / 스테이지 선택
+                <div class="min-w-0 space-y-2">
+                    <label for="match-select" class="text-sm font-bold text-slate-100 flex items-center gap-2 cursor-pointer">
+                        <i data-lucide="swords" class="w-4 h-4 text-rose-400 shrink-0"></i> 2. 경기 선택
                     </label>
-                    <select id="match-select" class="w-full bg-zinc-900 border border-slate-800 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-medium text-white focus:outline-none focus:border-slate-600 transition-colors" disabled>
+                    <select id="match-select" aria-describedby="tournament-selection-help" class="min-w-0 max-w-full w-full bg-zinc-900 border border-slate-600 rounded-xl px-3 py-3 sm:px-4 text-sm sm:text-base font-semibold text-white focus:outline-none focus:border-sky-400 transition-colors" disabled>
                         <option value="">-- 분석할 매치를 선택해주세요 --</option>
                     </select>
+                </div>
                 </div>
             </div>
 
@@ -512,10 +523,10 @@
     </footer>
 
     <!-- App Scripts -->
-    <script src="constants.js?v=20260922.3"></script>
-    <script src="charts.js?v=20260922.3"></script>
-    <script src="ui.js?v=20260922.3"></script>
-    <script src="api.js?v=20260922.3"></script>
-    <script src="app.js?v=20260922.3"></script>
+    <script src="constants.js?v=20260923.1"></script>
+    <script src="charts.js?v=20260923.1"></script>
+    <script src="ui.js?v=20260923.1"></script>
+    <script src="api.js?v=20260923.1"></script>
+    <script src="app.js?v=20260923.1"></script>
 </body>
 </html>

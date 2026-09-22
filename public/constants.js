@@ -2,6 +2,9 @@
 let allMatches = [];
 let filteredMatches = [];
 let selectedMatch = null;
+let selectedTournamentCategory = 'all';
+let tournamentGroups = [];
+let tournamentKeyByMatch = new Map();
 let teamAEvents = [];
 let teamBEvents = [];
 let selectedEvents = new Set();

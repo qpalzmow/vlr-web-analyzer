@@ -71,8 +71,9 @@ async function restoreSharedSelection() {
     sharedSelectionRestored = true;
     tierSelect.value = 'All';
     regionSelect.value = 'All';
+    selectedTournamentCategory = 'all';
     populateEventsDropdown();
-    eventSelect.value = match.tournament || match.event || '기타 대회';
+    eventSelect.value = getTournamentKey(match);
     populateMatchesDropdown();
     matchSelect.value = String(filteredMatches.indexOf(match));
     await handleMatchSelection(eventIds, true);

@@ -430,3 +430,142 @@ test('trend chart orders old to recent, aligns shorter histories, and does not i
     h.run('renderAcsTrendChart([],[])');
     assert.equal(h.context.lastChart.data.datasets[0].data.length, 0);
 });
+
+function tournamentMatch(id, name, eventId = null) {
+    const match = { ...readyMatch(id), tournament: name, event: name,
+        stage: '📅 그룹 스테이지 (Group Stage)', round_name: name };
+    if (eventId) match.selection_data.details.event_id = eventId;
+    else { match.selection_data = null; match.selection_status = 'unassigned'; }
+    return match;
+}
+
+test('bundled stage fragments collapse into 14 tournaments without losing pending matches', () => {
+    const h = setup();
+    h.context.seedMatches = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/catalog_seed.json'), 'utf8')).matches;
+    h.run('allMatches=seedMatches;tierSelect.value="All";regionSelect.value="All";populateEventsDropdown()');
+    const groups = h.read('tournamentGroups.map(g=>({key:g.key,category:g.category,name:g.name,count:g.matches.length}))');
+    assert.equal(groups.length, 14);
+    assert.equal(groups.reduce((sum,g)=>sum+g.count,0), h.context.seedMatches.length);
+    assert.equal(groups.find(g=>g.key==='event:2766').count, 27);
+    assert.equal(groups.find(g=>g.key==='event:2766').name, 'Valorant Champions 2026');
+    assert.equal(groups.filter(g=>g.category==='game-changers').length, 6);
+    const sections = h.elements.get('event-select').children;
+    assert.deepEqual(sections.map(g=>g.label), ['챔피언스','VCT 지역 리그','게임 체인저스','기타 대회']);
+    assert.equal(sections[0].children[0].textContent, '챔피언스 2026 · 27경기');
+    assert.equal(h.read('filteredMatches.length'), 27);
+    assert.match(h.elements.get('tournament-selection-summary').textContent, /분석 가능 8경기/);
+});
+
+test('category buttons show only that family and switching category clears the prior report', () => {
+    const h = setup();
+    h.context.matches = [
+        tournamentMatch('1', 'Group Stage–Opening (C) Valorant Champions 2026', '2766'),
+        tournamentMatch('2', 'Game Changers 2026: Pacific', '3065'),
+        tournamentMatch('3', 'Game Changers 2026: China', '3129')];
+    h.run('allMatches=matches;tierSelect.value="All";regionSelect.value="All";populateEventsDropdown();selectedMatch=matches[0];selectedEvents.add("8")');
+    h.elements.get('tournament-category-filters').children.find(button=>button.dataset.category==='game-changers').click();
+    assert.equal(h.read('selectedTournamentCategory'), 'game-changers');
+    assert.deepEqual(h.elements.get('event-select').children.map(g=>g.label), ['게임 체인저스']);
+    assert.equal(h.elements.get('event-select').children[0].children.length, 2);
+    assert.equal(h.read('selectedMatch'), null);
+    assert.equal(h.read('selectedEvents.size'), 0);
+});
+
+test('no-ID pending rows follow a unique full-name alias built before region and tier filters', () => {
+    const h=setup();
+    const known=tournamentMatch('1','Group Stage–Opening (A) Valorant Champions 2026','2766');
+    const pending=tournamentMatch('2','Playoffs–Grand Final Valorant Champions 2026');
+    pending.tier='Other';
+    h.context.matches=[known,pending];
+    h.run('allMatches=matches;tierSelect.value="Other";regionSelect.value="All";populateEventsDropdown()');
+    assert.equal(h.read('eventSelect.value'),'event:2766');
+    assert.deepEqual(h.read('filteredMatches.map(m=>m.id)'),['2']);
+    const options=h.elements.get('match-select').children.flatMap(g=>g.children);
+    assert.equal(options[0].disabled,true);
+});
+
+test('years, regions and qualifiers remain separate and Game Changers Championship is not Champions', () => {
+    const h=setup();
+    h.context.matches=[
+        tournamentMatch('1','Valorant Champions 2025','11'),
+        tournamentMatch('2','Valorant Champions 2026','12'),
+        tournamentMatch('3','Game Changers 2026: Pacific','13'),
+        tournamentMatch('4','Game Changers 2026: Pacific Open Qualifier','14'),
+        tournamentMatch('5','Game Changers 2026: China','15'),
+        tournamentMatch('6','Champions Tour Game Changers Championship','16'),
+        tournamentMatch('7','Kaizen Valorant Championship Division 1 - Season 1','17')];
+    assert.equal(h.read('buildTournamentGroups(matches).length'),7);
+    assert.equal(h.read('tournamentCategory(matches[5].tournament)'),'game-changers');
+    assert.equal(h.read('tournamentDisplayName(matches[5].tournament)'), 'Champions Tour 게임 체인저스 Championship');
+    assert.equal(h.read("tournamentCategory('Champions Tour 2021: Europe Stage 2')"), 'vct');
+    assert.equal(h.read('tournamentCategory(matches[6].tournament)'),'other');
+    h.run('allMatches=matches;tierSelect.value="All";regionSelect.value="All";populateEventsDropdown()');
+    assert.match(h.elements.get('event-select').children[0].children[0].textContent,/2026/);
+});
+
+test('ambiguous no-ID rows never merge two different events with the same title', () => {
+    const h=setup();
+    h.context.matches=[tournamentMatch('1','Same Event','11'),tournamentMatch('2','Same Event','12'),tournamentMatch('3','Same Event')];
+    const groups=h.read('buildTournamentGroups(matches)');
+    assert.equal(groups.length,3);
+    assert.deepEqual(groups.map(g=>g.matches.length),[1,1,1]);
+});
+
+test('refresh preserves selected match and filters even when its tournament gains an event ID', async () => {
+    const h=setup();
+    const match=tournamentMatch('1','Group Stage–Opening (C) Valorant Champions 2026','2766');
+    delete match.selection_data.details.event_id;
+    h.context.match=match;
+    h.run('allMatches=[match];tierSelect.value="All";regionSelect.value="All";populateEventsDropdown();matchSelect.value="0"');
+    await h.run('handleMatchSelection(["8"])');
+    h.run('globalThis.active=selectedMatch;selectedTournamentCategory="champions"');
+    h.context.newMatch=tournamentMatch('1','Valorant Champions 2026','2766');
+    h.run('allMatches=[newMatch];populateEventsDropdown(true)');
+    assert.equal(h.read('selectedMatch===active'),true);
+    assert.equal(h.read('eventSelect.value'),'event:2766');
+    assert.deepEqual(h.read('[...selectedEvents]'),['8']);
+    assert.equal(h.read('selectedTournamentCategory'),'champions');
+});
+
+test('shared links restore the canonical event and match across category filters', async () => {
+    const h=setup('?match=123456&events=8');
+    h.context.matches=[tournamentMatch('123456','Group Stage–Opening (C) Valorant Champions 2026','2766'),
+        tournamentMatch('222222','Game Changers 2026: Pacific','3065')];
+    h.run('allMatches=matches;selectedTournamentCategory="game-changers";globalThis.restored=null;handleMatchSelection=async ids=>{restored={id:filteredMatches[matchSelect.value].id,ids};}');
+    await h.run('restoreSharedSelection()');
+    assert.equal(h.read('eventSelect.value'),'event:2766');
+    assert.equal(h.read('selectedTournamentCategory'),'all');
+    assert.deepEqual(h.read('restored'),{id:'123456',ids:['8']});
+});
+
+test('empty category after changing region falls back to remaining events and empty results clear selection', () => {
+    const h=setup();
+    const champs=tournamentMatch('1','Valorant Champions 2026','11');
+    const gc=tournamentMatch('2','Game Changers 2026: Pacific','12'); gc.region='Pacific';
+    h.context.matches=[champs,gc];
+    h.run('allMatches=matches;tierSelect.value="All";regionSelect.value="All";populateEventsDropdown();selectedTournamentCategory="champions";regionSelect.value="Pacific";populateEventsDropdown()');
+    assert.equal(h.read('selectedTournamentCategory'),'all');
+    assert.equal(h.read('eventSelect.value'),'event:12');
+    h.run('selectedMatch=matches[1];regionSelect.value="EMEA";populateEventsDropdown()');
+    assert.equal(h.read('selectedMatch'),null);
+    assert.equal(h.read('eventSelect.disabled'),true);
+    assert.match(h.elements.get('tournament-selection-summary').textContent,/대회가 없습니다/);
+});
+
+test('round labels retain group identity without repeating the tournament name', () => {
+    const h=setup();
+    h.context.match=tournamentMatch('1','Group Stage–Opening (C) Valorant Champions 2026','2766');
+    assert.equal(h.read('matchRoundLabel(match)'),'C조 첫 경기');
+    h.context.match=tournamentMatch('2',"Group Stage–Winner's (D) Valorant Champions 2026",'2766');
+    assert.equal(h.read('matchRoundLabel(match)'),'D조 승자전');
+    h.context.match=tournamentMatch('3','Playoffs–Grand Final THE POKAL 2026','3077');
+    assert.equal(h.read('matchRoundLabel(match)'),'결승전');
+});
+
+test('map event checkboxes retain the full distinguishing regional suffix', () => {
+    const h=setup();
+    h.run("teamAEvents=[{id:'1',name:'Game Changers 2026: North America Stage 2'}];teamBEvents=[];drawTournamentChecklist()");
+    const label=h.elements.get('tournament-checklist').children[0];
+    assert.equal(label.children.at(-1).textContent,'게임 체인저스 2026: North America Stage 2');
+    assert.equal(label.children[0].dataset.eventType,'game-changers');
+});
