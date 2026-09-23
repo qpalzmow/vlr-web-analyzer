@@ -1,36 +1,3 @@
-// Theme Manager (Original eSports Dark vs Apple iOS 27 Glass UI Kit)
-function setUITheme(theme) {
-    const htmlEl = document.documentElement;
-    const btnOriginal = document.getElementById('theme-btn-original');
-    const btnIos = document.getElementById('theme-btn-ios');
-    
-    htmlEl.setAttribute('data-theme', theme);
-
-    if (theme === 'ios') {
-        htmlEl.classList.add('theme-ios');
-        if (btnOriginal && btnIos) {
-            btnOriginal.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-1.5';
-            btnIos.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-blue-600/30 text-sky-300 border border-sky-400/30 font-bold shadow-sm backdrop-blur-md';
-        }
-        localStorage.setItem('vlr_ui_theme', 'ios');
-    } else {
-        htmlEl.classList.remove('theme-ios');
-        if (btnOriginal && btnIos) {
-            btnOriginal.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 font-bold shadow-sm';
-            btnIos.className = 'px-2.5 py-1.5 sm:px-3 rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-1.5';
-        }
-        localStorage.setItem('vlr_ui_theme', 'original');
-    }
-    if (window.lucide) {
-        lucide.createIcons();
-    }
-}
-
-function initUITheme() {
-    const savedTheme = localStorage.getItem('vlr_ui_theme') || 'original';
-    setUITheme(savedTheme);
-}
-
 const TOURNAMENT_CATEGORIES = [
     { id: 'champions', label: '챔피언스' },
     { id: 'masters', label: '마스터스' },
@@ -223,7 +190,7 @@ function populateMatchesDropdown(preserveSelection = false) {
     // Default placeholder option: requires explicit user selection
     const placeholderOpt = document.createElement('option');
     placeholderOpt.value = '';
-    placeholderOpt.textContent = '-- 분석할 매치를 선택해주세요 --';
+    placeholderOpt.textContent = '분석할 경기를 선택하세요';
     placeholderOpt.selected = true;
     matchSelect.appendChild(placeholderOpt);
     
@@ -248,7 +215,7 @@ function populateMatchesDropdown(preserveSelection = false) {
     stageOrder.forEach(stageName => {
         if (stageGroups[stageName] && stageGroups[stageName].length > 0) {
             const optgroup = document.createElement('optgroup');
-            optgroup.label = `${stageName} - ${stageGroups[stageName].length}경기`;
+            optgroup.label = `${stageName.replace(/^[^A-Za-z가-힣]+/, '')} · ${stageGroups[stageName].length}경기`;
             
             stageGroups[stageName].forEach(({ match: m, globalIdx }) => {
                 const opt = document.createElement('option');
@@ -270,7 +237,7 @@ function populateMatchesDropdown(preserveSelection = false) {
     Object.keys(stageGroups).forEach(stageName => {
         if (!stageOrder.includes(stageName) && stageGroups[stageName].length > 0) {
             const optgroup = document.createElement('optgroup');
-            optgroup.label = `${stageName} - ${stageGroups[stageName].length}경기`;
+            optgroup.label = `${stageName.replace(/^[^A-Za-z가-힣]+/, '')} · ${stageGroups[stageName].length}경기`;
             
             stageGroups[stageName].forEach(({ match: m, globalIdx }) => {
                 const opt = document.createElement('option');
@@ -303,13 +270,12 @@ function categorizeTournament(name) {
     const lower = (name || '').toLowerCase();
     if (/\bgame\s+changers\b/i.test(lower)) {
         return { type: 'game-changers', badgeText: '게임 체인저스',
-            badgeCls: 'bg-pink-950/80 text-pink-300 border-pink-800/40', order: 1 };
+            order: 1 };
     }
     if (/\b(champions|masters|world cup|ewc)\b/i.test(lower)) {
         return {
             type: 'global',
             badgeText: '국제대회',
-            badgeCls: 'bg-amber-950/80 text-amber-300 border-amber-800/40',
             order: 1
         };
     }
@@ -317,7 +283,6 @@ function categorizeTournament(name) {
         return {
             type: 'vct',
             badgeText: '킥오프',
-            badgeCls: 'bg-sky-950/80 text-sky-300 border-sky-800/40',
             order: 2
         };
     }
@@ -325,7 +290,6 @@ function categorizeTournament(name) {
         return {
             type: 'vct',
             badgeText: '스테이지 2',
-            badgeCls: 'bg-emerald-950/80 text-emerald-300 border-emerald-800/40',
             order: 3
         };
     }
@@ -333,7 +297,6 @@ function categorizeTournament(name) {
         return {
             type: 'vct',
             badgeText: '스테이지 1',
-            badgeCls: 'bg-teal-950/80 text-teal-300 border-teal-800/40',
             order: 4
         };
     }
@@ -341,7 +304,6 @@ function categorizeTournament(name) {
         return {
             type: 'vct',
             badgeText: 'VCT 정규',
-            badgeCls: 'bg-indigo-950/80 text-indigo-300 border-indigo-800/40',
             order: 5
         };
     }
@@ -349,14 +311,12 @@ function categorizeTournament(name) {
         return {
             type: 'challengers',
             badgeText: '챌린저스',
-            badgeCls: 'bg-rose-950/80 text-rose-300 border-rose-800/40',
             order: 6
         };
     }
     return {
         type: 'offseason',
         badgeText: '오프시즌',
-        badgeCls: 'bg-purple-950/80 text-purple-300 border-purple-800/40',
         order: 7
     };
 }
@@ -407,11 +367,11 @@ function drawTournamentChecklist() {
         
         const label = document.createElement('label');
         label.title = evName;
-        label.className = 'flex items-center space-x-1.5 sm:space-x-2 bg-zinc-900 border border-slate-800 px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-medium text-slate-300 hover:border-slate-600 transition-colors cursor-pointer';
+        label.className = 'event-check';
         
         const cb = document.createElement('input');
         cb.type = 'checkbox';
-        cb.className = 'rounded border-slate-700 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-zinc-950 cursor-pointer';
+        cb.className = 'event-checkbox';
         cb.value = evId;
         cb.dataset.eventType = evt.type;
         
@@ -429,18 +389,19 @@ function drawTournamentChecklist() {
             } else {
                 selectedEvents.delete(evId);
             }
+            updateFilterCount();
         });
         
         checkboxes.push(cb);
         
         const badge = document.createElement('span');
-        badge.className = `text-[8px] sm:text-[9px] font-bold px-1 py-0.5 rounded border ${evt.badgeCls}`;
+        badge.className = 'event-kind';
         badge.textContent = evt.badgeText;
         
         label.appendChild(cb);
         label.appendChild(badge);
         const name = document.createElement('span');
-        name.className = 'min-w-0 break-words leading-relaxed';
+        name.className = 'event-name';
         name.textContent = tournamentDisplayName(evName);
         label.appendChild(name);
         tournamentChecklist.appendChild(label);
@@ -476,6 +437,7 @@ function drawTournamentChecklist() {
 function setTournamentSelection(ids) {
     const uniqueIds = [...new Set(ids)];
     selectedEvents = new Set(uniqueIds.slice(0, MAX_SELECTED_EVENTS));
+    updateFilterCount();
     tournamentChecklist.querySelectorAll('input[type="checkbox"]').forEach(cb => {
         cb.checked = selectedEvents.has(cb.value);
     });
@@ -484,267 +446,157 @@ function setTournamentSelection(ids) {
     }
 }
 
-// Toast & Export Utilities
+// Presentation state belongs to a completed response, never to edited filters.
+let reportSnapshot = null;
+let mapComparison = { a: {}, b: {} };
+let toastTimer = null;
+let exportRunning = false;
+
 function showToast(message, type = 'success') {
-    let toast = document.getElementById('app-toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'app-toast';
-        toast.className = 'fixed bottom-5 right-5 px-4 py-3 rounded-xl shadow-2xl z-50 transition-all duration-300 transform translate-y-4 opacity-0 text-xs font-bold flex items-center gap-2 border';
-        document.body.appendChild(toast);
-    }
-    
-    if (type === 'success') {
-        toast.style.background = 'rgba(16, 185, 129, 0.92)';
-        toast.style.borderColor = 'rgba(52, 211, 153, 0.4)';
-        toast.style.color = '#ffffff';
-    } else {
-        toast.style.background = 'rgba(239, 68, 68, 0.92)';
-        toast.style.borderColor = 'rgba(248, 113, 113, 0.4)';
-        toast.style.color = '#ffffff';
-    }
-    
+    const toast = document.getElementById('app-toast');
     toast.textContent = message;
-    toast.classList.remove('translate-y-4', 'opacity-0');
-    
-    setTimeout(() => {
-        toast.classList.add('translate-y-4', 'opacity-0');
-    }, 3000);
+    toast.dataset.state = type;
+    toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.hidden = true; }, 4000);
 }
 
-function exportReportImage() {
+async function exportReportImage() {
+    if (!reportSnapshot || analysisRunning || exportRunning) return;
     if (typeof html2canvas === 'undefined') {
-        showToast('html2canvas 라이브러리가 로드되지 않았습니다.', 'error');
+        showToast('이미지 저장 도구를 불러오지 못했습니다. 페이지를 새로고침해 주세요.', 'error');
         return;
     }
-    
-    showToast('리포트 이미지를 생성 중입니다...', 'success');
-    
-    const target = document.querySelector('main');
-    html2canvas(target, {
-        backgroundColor: '#05070c',
-        scale: 1.5,
-        useCORS: true
-    }).then(canvas => {
+    const snapshot = reportSnapshot;
+    const button = document.getElementById('export-img-btn');
+    const target = document.getElementById('match-report');
+    exportRunning = true;
+    button.disabled = true;
+    button.textContent = '이미지 생성 중…';
+    try {
+        const canvas = await html2canvas(target, {
+            backgroundColor: '#191b1e', scale: 1.5, useCORS: true,
+            windowWidth: 1280, scrollX: 0, scrollY: 0,
+            onclone: doc => {
+                const report = doc.getElementById('match-report');
+                report.classList.add('export-report');
+                // Isolate the report from the mobile page and open every data column.
+                doc.body.replaceChildren(report);
+            }
+        });
         const link = document.createElement('a');
-        const matchName = selectedMatch ? `${selectedMatch.team_a}-vs-${selectedMatch.team_b}` : 'vlr-analysis';
-        link.download = `${matchName}-report.png`;
+        const filename = `${snapshot.match.team_a}-vs-${snapshot.match.team_b}`.replace(/[<>:"/\\|?*\x00-\x1f]/g, '_');
+        link.download = `${filename}-report.png`;
         link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
         link.click();
-        showToast('리포트 이미지가 저장되었습니다! 📸', 'success');
-    }).catch(err => {
+        link.remove();
+        showToast('리포트 이미지를 저장했습니다.');
+    } catch (err) {
         console.error('Export error:', err);
-        showToast('이미지 저장 중 오류가 발생했습니다.', 'error');
-    });
+        showToast('이미지를 저장하지 못했습니다. 다시 시도해 주세요.', 'error');
+    } finally {
+        exportRunning = false;
+        button.disabled = false;
+        button.textContent = '이미지 저장';
+    }
 }
 
 function generateShareableLink() {
-    if (!selectedMatch) {
-        showToast('선택된 매치가 없습니다.', 'error');
-        return;
-    }
-    
+    const match = reportSnapshot?.match || selectedMatch;
+    const events = reportSnapshot?.events || Array.from(selectedEvents);
+    if (!match) { showToast('먼저 경기를 선택해 주세요.', 'error'); return; }
     const url = new URL(window.location.href);
-    url.searchParams.set('match', selectedMatch.id);
-    url.searchParams.set('url', selectedMatch.url);
-    if (selectedEvents.size > 0) {
-        url.searchParams.set('events', Array.from(selectedEvents).join(','));
-    } else {
-        url.searchParams.delete('events');
+    url.searchParams.set('match', match.id);
+    url.searchParams.set('url', match.url);
+    if (events.length) url.searchParams.set('events', events.join(','));
+    else url.searchParams.delete('events');
+    async function copy(text) {
+        if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+        const field = document.createElement('textarea');
+        field.value = text;
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        try { if (!document.execCommand('copy')) throw new Error('Copy failed'); }
+        finally { field.remove(); }
     }
-    
-    const link = url.toString();
-    
-    function copyToClipboard(text) {
-        if (navigator.clipboard && window.isSecureContext) {
-            return navigator.clipboard.writeText(text);
-        } else {
-            // Fallback for non-HTTPS environments
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                return Promise.resolve();
-            } catch (err) {
-                return Promise.reject(err);
-            } finally {
-                document.body.removeChild(textarea);
-            }
-        }
-    }
-    
-    copyToClipboard(link).then(() => {
-        showToast('분석 공유 링크가 클립보드에 복사되었습니다! 🔗', 'success');
-    }).catch(() => {
-        showToast('클립보드 복사 실패. 주소창의 URL을 공유해 주세요.', 'error');
-    });
+    copy(url.toString()).then(() => showToast('분석 링크를 복사했습니다.'))
+        .catch(() => showToast('링크를 복사하지 못했습니다. 브라우저의 클립보드 권한을 확인해 주세요.', 'error'));
 }
 
-// Helper: Render Form Badges
+function escapeHTML(value) {
+    return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
 function renderFormBadges(containerId, formList) {
     const el = document.getElementById(containerId);
     el.innerHTML = '';
-    
-    if (!formList || formList.length === 0) {
-        el.innerHTML = '<span class="text-xs text-slate-500 italic">경기 기록 없음 (N/A)</span>';
-        return;
-    }
-    
-    formList.forEach(f => {
-        const isWin = f.startsWith('W');
-        const outcomeText = isWin ? '승' : '패';
-        
-        let score = '';
-        const scoreMatch = f.match(/\((.*?)\)/);
-        if (scoreMatch) {
-            score = scoreMatch[1];
-        }
-        
-        let opponent = '';
-        const vsIdx = f.indexOf('vs ');
-        if (vsIdx !== -1) {
-            opponent = f.substring(vsIdx + 3).trim();
-        }
-        
-        const badge = document.createElement('span');
-        badge.className = isWin 
-            ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold'
-            : 'bg-red-950/40 text-red-400 border border-red-800/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold';
-            
-        let displayText = score ? `${outcomeText} ${score}` : outcomeText;
-        if (opponent) {
-            // Capitalize opponent name for professional clean display
-            displayText += ` vs ${opponent.toUpperCase()}`;
-        }
-        
-        badge.textContent = displayText;
-        el.appendChild(badge);
+    if (!formList?.length) { el.innerHTML = '<span class="meta">기록 없음</span>'; return; }
+    formList.slice(0, 5).forEach(item => {
+        const f = parseFormResult(item);
+        const mark = document.createElement('span');
+        mark.className = `form-result ${f.result === 'W' ? 'win' : f.result === 'L' ? 'loss' : ''}`;
+        mark.textContent = f.result;
+        mark.title = f.raw;
+        mark.setAttribute('aria-label', f.raw);
+        el.appendChild(mark);
     });
 }
 
-// Helper: Render Agent Badges
-function renderAgentBadges(containerId, agentList) {
+function renderAgentBadges(containerId, list) {
     const el = document.getElementById(containerId);
     el.innerHTML = '';
-    
-    if (!agentList || agentList.length === 0 || agentList[0] === 'N/A') {
-        el.innerHTML = '<span class="text-xs text-slate-500 italic">기록 없음 (N/A)</span>';
-        return;
-    }
-    
-    agentList.forEach(agent => {
-        const key = agent.trim().toLowerCase();
-        let classes = { bg: 'bg-slate-800/40 border-slate-700/30', text: 'text-slate-300' };
-        
-        if (agentColors[key]) {
-            classes = agentColors[key];
-        }
-        
-        const badge = document.createElement('span');
-        badge.className = `${classes.bg} ${classes.text} border px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold`;
-        badge.textContent = agent;
-        el.appendChild(badge);
-    });
+    el.textContent = list?.filter(agent => agent && agent !== 'N/A').join(', ') || '—';
 }
 
-function escapeHTML(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+function percent(won, total) {
+    return Number.isFinite(won) && Number.isFinite(total) && total > 0
+        ? `${Math.round(won / total * 100)}%` : '—';
 }
 
-// Helper: Render Maps Table (Compact, Zero-Scroll, Overall Winrate Display)
+// The legacy map IDs now label column groups in one direct comparison table.
 function renderMapsTable(tableId, mapsData) {
-    const el = document.getElementById(tableId);
-    if (!el) return;
-    el.innerHTML = '';
-    
-    const mapNames = Object.keys(mapsData || {});
-    if (mapNames.length === 0) {
-        el.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-500 italic">기록된 맵 데이터가 없습니다.</td></tr>';
-        return;
-    }
-    
-    // Active tournament map pool: Dynamically scraped from VLR event page, fallbacks to VCT 2026 Competitive pool
-    const fallbackMapPool = FALLBACK_MAP_POOL;
-    const activeMapPool = (selectedMatch && selectedMatch.map_pool && selectedMatch.map_pool.length > 0)
-        ? selectedMatch.map_pool
-        : fallbackMapPool;
-    
-    // Sort by: (1) active map first, (2) play count descending
-    const sortedMaps = Object.entries(mapsData).sort((a, b) => {
-        const aActive = activeMapPool.includes(a[0]);
-        const bActive = activeMapPool.includes(b[0]);
-        if (aActive && !bActive) return -1;
-        if (!aActive && bActive) return 1;
-        return b[1].played - a[1].played;
-    });
-    
-    sortedMaps.forEach(([mapName, s]) => {
-        const isActive = activeMapPool.includes(mapName);
-        const tr = document.createElement('tr');
-        
-        if (isActive) {
-            // High contrast emerald left-border highlight for active pool
-            tr.className = 'border-b border-slate-800/60 hover:bg-emerald-950/15 bg-emerald-950/5 transition-colors font-medium border-l-2 border-l-emerald-500/80';
-        } else {
-            // Dimmed/translucent look for inactive/retired maps
-            tr.className = 'border-b border-slate-900/40 hover:bg-slate-900/5 bg-zinc-950/10 opacity-35 transition-colors font-medium';
-        }
-        
-        const totalPlayed = s.played || 0;
-        const overallWinrate = totalPlayed > 0 ? Math.round((s.w / totalPlayed) * 100) : 0;
-        let wrColor = 'text-slate-300';
-        if (overallWinrate >= 60) wrColor = 'text-emerald-400 font-extrabold';
-        else if (overallWinrate <= 40 && totalPlayed > 0) wrColor = 'text-red-400 font-bold';
-        else if (totalPlayed > 0) wrColor = 'text-amber-300 font-bold';
-
-        const atkPct = s.atk_total > 0 ? Math.round((s.atk_won / s.atk_total) * 100) + '%' : '0%';
-        const defPct = s.def_total > 0 ? Math.round((s.def_won / s.def_total) * 100) + '%' : '0%';
-        
-        const badgeHtml = isActive 
-            ? `<span class="ml-1 text-[7px] sm:text-[8px] font-bold text-emerald-400 bg-emerald-950/90 border border-emerald-500/30 px-1 py-0.2 rounded uppercase">Act</span>`
-            : `<span class="ml-1 text-[7px] sm:text-[8px] font-bold text-slate-500 bg-zinc-800/40 border border-slate-700/20 px-1 py-0.2 rounded uppercase">Leg</span>`;
-            
-        tr.innerHTML = `
-            <td class="py-2 px-1 text-slate-100 font-bold text-[11px] sm:text-xs truncate">
-                <div class="flex items-center gap-0.5 truncate">
-                    <span class="truncate">${escapeHTML(mapName)}</span>
-                    ${badgeHtml}
-                </div>
-            </td>
-            <td class="py-2 px-1 text-center truncate">
-                <span class="${wrColor} text-[11px] sm:text-xs">${overallWinrate}%</span>
-                <span class="text-[9px] text-slate-400 font-medium ml-1">(${s.w}승${s.l}패)</span>
-            </td>
-            <td class="py-2 px-1 text-center text-sky-400 font-bold text-[11px] sm:text-xs">${atkPct}</td>
-            <td class="py-2 px-1 text-center text-orange-400 font-bold text-[11px] sm:text-xs">${defPct}</td>
-        `;
-        el.appendChild(tr);
-    });
+    mapComparison[tableId === 'team-a-maps-table' ? 'a' : 'b'] = mapsData || {};
+    renderMapComparison();
 }
 
-// Helper: Populate Ace Player Card
+function renderEmptyTable(tableId) { renderMapsTable(tableId, {}); }
+
+function renderMapComparison() {
+    const body = document.getElementById('maps-comparison-body');
+    body.innerHTML = '';
+    const pool = selectedMatch?.map_pool?.length ? selectedMatch.map_pool : FALLBACK_MAP_POOL;
+    const { a, b } = mapComparison;
+    const names = [...new Set([...Object.keys(a), ...Object.keys(b)])].sort((x, y) =>
+        Number(pool.includes(y)) - Number(pool.includes(x)) ||
+        ((a[y]?.played || 0) + (b[y]?.played || 0)) - ((a[x]?.played || 0) + (b[x]?.played || 0)) || x.localeCompare(y));
+    const cells = (s, team) => {
+        if (!s || !(s.played > 0)) return '<td class="team-start muted">—</td><td class="muted">—</td><td class="muted">—</td>';
+        const width = Math.max(0, Math.min(100, s.w / s.played * 100));
+        return `<td class="team-start"><div class="map-record"><b>${percent(s.w, s.played)}</b><small>${escapeHTML(s.w)}–${escapeHTML(s.l)}</small></div><span class="map-rate team-${team}" aria-hidden="true"><span style="width:${width}%"></span></span></td><td>${percent(s.atk_won, s.atk_total)}</td><td>${percent(s.def_won, s.def_total)}</td>`;
+    };
+    names.forEach(name => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<th scope="row">${escapeHTML(name)}${pool.includes(name) ? '' : '<span class="map-note">풀 외</span>'}</th>${cells(a[name], 'a')}${cells(b[name], 'b')}`;
+        body.appendChild(row);
+    });
+    if (!names.length) body.innerHTML = '<tr><td colspan="7" class="empty-row">선택한 범위에 수집된 맵 기록이 없습니다.</td></tr>';
+}
+
 function populateAceCard(teamLetter, aceData) {
     const available = hasCareerPlayerStats(aceData);
     document.getElementById(`ace-${teamLetter}-nickname`).textContent = available ? aceData.nickname : '—';
     document.getElementById(`ace-${teamLetter}-acs`).textContent = available ? aceData.acs.toFixed(1) : '—';
     document.getElementById(`ace-${teamLetter}-kd-ratio`).textContent = available && Number.isFinite(aceData.kd_ratio) ? aceData.kd_ratio.toFixed(2) : '—';
     document.getElementById(`ace-${teamLetter}-rounds`).textContent = available && Number.isFinite(aceData.rounds) ? aceData.rounds.toLocaleString('ko-KR') : '—';
-    
-    const kdEl = document.getElementById(`ace-${teamLetter}-kd`);
     const kd = available ? aceData.kd_margin : null;
-    kdEl.textContent = Number.isFinite(kd) ? (kd > 0 ? `+${kd}` : kd) : '—';
-    kdEl.className = kd > 0 ? 'text-emerald-400 font-bold' : (kd < 0 ? 'text-red-400 font-bold' : 'text-slate-200');
-
+    const kdEl = document.getElementById(`ace-${teamLetter}-kd`);
+    kdEl.textContent = Number.isFinite(kd) ? (kd > 0 ? `+${kd}` : String(kd)) : '—';
+    // Neutral text keeps team and result colors meaningful.
+    kdEl.className = '';
     const coverage = document.getElementById(`ace-${teamLetter}-coverage`);
     if (available) {
         const missing = aceData.partial && aceData.missing_players?.length ? ` · 기록 없음: ${aceData.missing_players.join(', ')}` : '';
@@ -758,347 +610,167 @@ function populateAceCard(teamLetter, aceData) {
         };
         coverage.textContent = reasons[aceData?.unavailable_reason] || '확인 가능한 현역 선수 기록 없음';
     }
-    coverage.className = available && !aceData.partial ? 'text-[10px] text-slate-400 leading-relaxed' : 'text-[10px] text-amber-400 leading-relaxed';
+    coverage.className = 'meta';
     const collected = aceData?.collected_at ? new Date(aceData.collected_at) : null;
     document.getElementById(`ace-${teamLetter}-collected`).textContent = collected && Number.isFinite(collected.getTime())
         ? `${collected.toLocaleString('ko-KR')} 수집 기준` : '';
-    
-    const agentsContainer = document.getElementById(`ace-${teamLetter}-agents`);
-    agentsContainer.innerHTML = '';
-    
-    if (!available || !aceData.agents?.length || aceData.agents[0] === 'N/A') {
-        agentsContainer.innerHTML = '<span class="text-[10px] text-slate-500">—</span>';
-        return;
-    }
-    
-    aceData.agents.forEach(agent => {
-        const key = agent.trim().toLowerCase();
-        let classes = { bg: 'bg-slate-800/40 border-slate-700/30', text: 'text-slate-300' };
-        
-        if (agentColors[key]) {
-            classes = agentColors[key];
-        }
-        
-        const chip = document.createElement('span');
-        chip.className = `${classes.bg} ${classes.text} border px-1.5 py-0.5 sm:px-2 rounded text-[9px] sm:text-[10px] font-bold`;
-        chip.textContent = agent;
-        agentsContainer.appendChild(chip);
-    });
+    renderAgentBadges(`ace-${teamLetter}-agents`, available ? aceData.agents : []);
 }
 
-// Helper: Clear Ace compare
 function clearAceCompare(message = '전력 분석 후 커리어를 표시합니다.') {
-    ['a', 'b'].forEach(teamLetter => {
-        ['nickname', 'acs', 'kd', 'kd-ratio', 'rounds'].forEach(field => {
-            document.getElementById(`ace-${teamLetter}-${field}`).textContent = '—';
-        });
-        document.getElementById(`ace-${teamLetter}-kd`).className = 'text-slate-200';
-        document.getElementById(`ace-${teamLetter}-agents`).innerHTML = '<span class="text-[10px] text-slate-500">—</span>';
-        document.getElementById(`ace-${teamLetter}-coverage`).textContent = message;
-        document.getElementById(`ace-${teamLetter}-coverage`).className = 'text-[10px] text-slate-400 leading-relaxed';
-        document.getElementById(`ace-${teamLetter}-collected`).textContent = '';
-    });
+    for (const team of ['a', 'b']) {
+        for (const field of ['nickname', 'acs', 'kd', 'kd-ratio', 'rounds']) document.getElementById(`ace-${team}-${field}`).textContent = '—';
+        document.getElementById(`ace-${team}-coverage`).textContent = message;
+        document.getElementById(`ace-${team}-collected`).textContent = '';
+        renderAgentBadges(`ace-${team}-agents`, []);
+    }
     renderCareerAcsChart(null, null, message);
 }
 
-// Helper: Render Empty Table row
+function reportTeamName(team) { return selectedMatch?.[`team_${team}`] || '—'; }
+
+function syncReportTeamNames() {
+    for (const team of ['a', 'b']) {
+        for (const id of [`team-${team}-name`, `team-${team}-maps-table`, `ace-${team}-team`, `ace-${team}-note-team`, `form-${team}-team`]) {
+            document.getElementById(id).textContent = reportTeamName(team);
+        }
+    }
+}
+
+function setReportState(state) {
+    const ready = state === 'ready';
+    document.getElementById('match-report').classList[ready ? 'remove' : 'add']('hidden');
+    document.getElementById('report-toolbar').classList[ready ? 'remove' : 'add']('hidden');
+    document.getElementById('match-report').setAttribute('aria-busy', String(state === 'loading'));
+    analyzeBtn.textContent = state === 'loading' ? '분석 중…' : ready ? '다시 분석' : '경기 분석';
+    if (!ready) reportSnapshot = null;
+}
+
+function beginReport() {
+    setReportState('loading');
+    destroyCharts();
+    mapComparison = { a: {}, b: {} };
+    renderMapComparison();
+    renderFormBadges('team-a-form', []);
+    renderFormBadges('team-b-form', []);
+    renderBanPickResults(null);
+    clearAceCompare('현역 선수 커리어를 불러오는 중...');
+    document.getElementById('win-probability-section').classList.add('hidden');
+}
+
+function renderReportSummary(data, match, events) {
+    syncReportTeamNames();
+    reportSnapshot = { match: { ...match }, events: [...(events || [])] };
+    document.getElementById('report-event').textContent = tournamentDisplayName(cleanTournamentName(match));
+    document.getElementById('report-fixture').textContent = [matchRoundLabel(match), match.date, match.time].filter(Boolean).join(' · ');
+    document.getElementById('selection-caption').textContent = `${match.team_a} vs ${match.team_b}`;
+    const pool = match.map_pool?.length ? match.map_pool : FALLBACK_MAP_POOL;
+    for (const team of ['a', 'b']) {
+        const maps = Object.entries(data[`maps_${team}`] || {});
+        const total = maps.reduce((sum, [, s]) => sum + (s.played || 0), 0);
+        const wins = maps.reduce((sum, [, s]) => sum + (s.w || 0), 0);
+        const losses = maps.reduce((sum, [, s]) => sum + (s.l || 0), 0);
+        document.getElementById(`summary-${team}-rate`).textContent = percent(wins, total);
+        document.getElementById(`summary-${team}-record`).textContent = total ? `${wins}승 ${losses}패` : '기록 없음';
+        const strongest = maps.filter(([name, s]) => pool.includes(name) && s.played > 0)
+            .sort(([, x], [, y]) => y.w / y.played - x.w / x.played || y.played - x.played)[0];
+        document.getElementById(`summary-${team}-map`).textContent = strongest
+            ? `${strongest[0]} · ${percent(strongest[1].w, strongest[1].played)} (${strongest[1].played}맵)` : '기록 없음';
+        const ace = data[`ace_${team}`];
+        document.getElementById(`summary-${team}-player`).textContent = hasCareerPlayerStats(ace)
+            ? `${ace.nickname} · 커리어 ACS ${ace.acs.toFixed(1)}` : '현역 선수 커리어 확인 불가';
+        document.getElementById(`summary-${team}-sample`).textContent = `맵 표본 ${total.toLocaleString('ko-KR')}개 · ${maps.filter(([, s]) => s.played > 0).length}종`;
+    }
+    const filterNames = (events || []).map(id => [...teamAEvents, ...teamBEvents].find(e => e.id === id)?.name || `대회 #${id}`);
+    document.getElementById('report-scope').textContent = `맵 기록 범위: ${filterNames.length ? filterNames.join(' / ') : '수집된 전체 대회'}. 표시된 맵 승률은 과거 기록이며 이 경기의 예측 승률이 아닙니다.`;
+    const date = new Date(data.updated_at);
+    document.getElementById('report-updated').textContent = `통계 수집: ${Number.isFinite(date.getTime()) ? date.toLocaleString('ko-KR') : '시각 확인 불가'}${data.stale ? ' · 갱신 지연으로 이전 데이터 사용' : ''}`;
+    document.getElementById('map-pool-note').textContent = `${match.map_pool?.length ? '확인된 대회 맵 풀' : '대회 맵 풀 미확인 · 기본 풀'}을 먼저 표시합니다. ‘풀 외’는 이 풀에 포함되지 않는 과거 맵입니다. 기록이 없는 값은 —로 표시합니다.`;
+    setReportState('ready');
+    document.getElementById('match-selection-panel').open = false;
+    document.getElementById('advanced-filters').open = false;
+    document.getElementById('tournament-explorer').open = false;
+    document.getElementById('overview').focus({ preventScroll: true });
+}
+
+function updateFilterCount() {
+    document.getElementById('filter-count').textContent = selectedEvents.size ? `· ${selectedEvents.size}개 선택` : '';
+}
+
 function clearDashboard() {
     analysisRunning = false;
     selectedEvents.clear();
-    document.getElementById('team-a-name').textContent = 'Team A';
-    document.getElementById('team-b-name').textContent = 'Team B';
-    document.getElementById('team-a-form').innerHTML = '<span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>';
-    document.getElementById('team-b-form').innerHTML = '<span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>';
-    document.getElementById('team-a-agents').innerHTML = '<span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>';
-    document.getElementById('team-b-agents').innerHTML = '<span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>';
-    
-    renderEmptyTable('team-a-maps-table');
-    renderEmptyTable('team-b-maps-table');
-    
-    document.getElementById('ai-ban-list').innerHTML = '<p class="text-slate-500">- Team A: N/A</p><p class="text-slate-500">- Team B: N/A</p>';
-    document.getElementById('ai-pick-list').innerHTML = '<p class="text-slate-500">- Team A: N/A</p><p class="text-slate-500">- Team B: N/A</p>';
-    
+    updateFilterCount();
+    setReportState('idle');
+    document.getElementById('match-selection-panel').open = true;
+    document.getElementById('selection-caption').textContent = '';
+    mapComparison = { a: {}, b: {} };
+    renderMapComparison();
+    renderFormBadges('team-a-form', []);
+    renderFormBadges('team-b-form', []);
+    renderAgentBadges('team-a-agents', []);
+    renderAgentBadges('team-b-agents', []);
+    renderBanPickResults(null);
     clearAceCompare();
-    
-    if (typeof analysisAbortController !== 'undefined' && analysisAbortController) {
-        analysisAbortController.abort();
-    }
-    if (typeof stopLiveScorePolling === 'function') {
-        stopLiveScorePolling();
-    }
-    
-    updateStatus('info', '대기 중', '매치를 선택해 주세요.', 0);
-    document.getElementById('progress-bar-container').classList.add('hidden');
-    document.getElementById('tournament-checklist-container').classList.add('hidden');
-    document.getElementById('win-probability-section').classList.add('hidden');
-    document.getElementById('live-scoreboard-panel').classList.add('hidden');
-    
-    // Clear all charts cleanly
-    if (typeof destroyCharts === 'function') {
-        destroyCharts();
-    }
+    if (analysisAbortController) analysisAbortController.abort();
+    if (typeof stopLiveScorePolling === 'function') stopLiveScorePolling();
+    updateStatus('info', '대기 중', '경기를 선택해 주세요.', 0);
+    for (const id of ['progress-bar-container', 'tournament-checklist-container', 'win-probability-section', 'live-scoreboard-panel']) document.getElementById(id).classList.add('hidden');
+    destroyCharts();
 }
 
-function renderEmptyTable(tableId) {
-    const el = document.getElementById(tableId);
-    if (el) {
-        el.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-500 italic">데이터가 없습니다.</td></tr>';
-    }
-}
-
-// Render Server-Driven Ban & Pick Simulation Results
 function renderBanPickResults(simData) {
-    const banList = document.getElementById('ai-ban-list');
-    const pickList = document.getElementById('ai-pick-list');
-    if (!banList || !pickList) return;
-    
-    banList.innerHTML = '';
-    pickList.innerHTML = '';
-    
-    if (simData && simData.bans && simData.bans.length > 0) {
-        simData.bans.forEach(b => {
-            const p = document.createElement('p');
-            p.className = 'text-slate-200 font-semibold text-xs sm:text-sm';
-            p.innerHTML = `<span class="text-[10px] sm:text-xs text-slate-500">${escapeHTML(b.team)}:</span> ${escapeHTML(b.map)} <span class="text-[9px] sm:text-[10px] text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30">${escapeHTML(b.reason)}</span>`;
-            banList.appendChild(p);
+    const resolveTeam = value => value === 'Team A' ? reportTeamName('a') : value === 'Team B' ? reportTeamName('b') : value;
+    const render = (id, entries, isPick) => {
+        const el = document.getElementById(id);
+        el.innerHTML = '';
+        if (!entries?.length) { el.innerHTML = '<p class="meta">참고할 맵 기록이 없습니다.</p>'; return; }
+        entries.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'outlook-row';
+            const note = isPick ? (Number.isFinite(item.win_pct) ? `기록상 승률 ${item.win_pct}%` : '') : item.reason;
+            row.innerHTML = `<span>${escapeHTML(resolveTeam(item.team))}</span><strong>${escapeHTML(item.map)}</strong><small>${escapeHTML(note)}</small>`;
+            el.appendChild(row);
         });
-    } else {
-        banList.innerHTML = '<p class="text-slate-500">밴 추천 데이터 없음</p>';
-    }
-    
-    if (simData && simData.picks && simData.picks.length > 0) {
-        simData.picks.forEach(p => {
-            const el = document.createElement('p');
-            el.className = 'text-slate-200 font-semibold text-xs sm:text-sm';
-            const tagText = '참고 픽';
-            const tagColor = 'text-emerald-400 bg-emerald-950/40 border-emerald-900/30';
-            el.innerHTML = `<span class="text-[10px] sm:text-xs text-slate-500">${escapeHTML(p.team)}:</span> ${escapeHTML(p.map)} <span class="text-[9px] sm:text-[10px] ${tagColor} px-1.5 py-0.5 rounded border">${tagText} (${p.win_pct}%)</span>`;
-            pickList.appendChild(el);
-        });
-    } else {
-        pickList.innerHTML = '<p class="text-slate-500">픽 추천 데이터 없음</p>';
-    }
+    };
+    render('ai-ban-list', simData?.bans, false);
+    render('ai-pick-list', simData?.picks, true);
     if (simData?.remaining?.length) {
         const remaining = document.createElement('p');
-        remaining.className = 'text-slate-400 text-xs';
-        remaining.textContent = `나머지 후보 (결정 순서 미정): ${simData.remaining.join(', ')}`;
-        pickList.appendChild(remaining);
+        remaining.className = 'meta';
+        remaining.textContent = `그 외 후보: ${simData.remaining.join(', ')}`;
+        document.getElementById('ai-pick-list').appendChild(remaining);
     }
 }
 
-// Helper: Calculate AI Simulation (Bans and Picks)
-function calculateAISimulation(mapsA, mapsB) {
-    const banList = document.getElementById('ai-ban-list');
-    const pickList = document.getElementById('ai-pick-list');
-    
-    const allMaps = Array.from(new Set([...Object.keys(mapsA || {}), ...Object.keys(mapsB || {})]));
-    
-    // Active competitive tournament map pool: Dynamically scraped from VLR event page, fallbacks to VCT 2026 Competitive pool
-    const fallbackMapPool = FALLBACK_MAP_POOL;
-    const activeMapPool = (selectedMatch && selectedMatch.map_pool && selectedMatch.map_pool.length > 0)
-        ? selectedMatch.map_pool
-        : fallbackMapPool;
-    const activeMaps = allMaps.filter(m => activeMapPool.includes(m));
-    
-    if (activeMaps.length === 0) {
-        banList.innerHTML = '<p class="text-slate-500">- Team A: N/A</p><p class="text-slate-500">- Team B: N/A</p>';
-        pickList.innerHTML = '<p class="text-slate-500">- Team A: N/A</p><p class="text-slate-500">- Team B: N/A</p>';
-        return;
-    }
-    
-    function getWinrate(mapsDict, mapName) {
-        if (!mapsDict[mapName]) return -1;
-        const total = mapsDict[mapName].w + mapsDict[mapName].l;
-        return total > 0 ? mapsDict[mapName].w / total : -1;
-    }
-    
-    function getPlayed(mapsDict, mapName) {
-        if (!mapsDict[mapName]) return 0;
-        return mapsDict[mapName].played;
-    }
-    
-    // Sort for picks (highest winrate, highest play count) using active map pool only
-    const sortedA = activeMaps.map(m => ({ name: m, wr: getWinrate(mapsA, m), p: getPlayed(mapsA, m) })).sort((x, y) => y.wr - x.wr || y.p - x.p);
-    const sortedB = activeMaps.map(m => ({ name: m, wr: getWinrate(mapsB, m), p: getPlayed(mapsB, m) })).sort((x, y) => y.wr - x.wr || y.p - x.p);
-    
-    const pickA = sortedA[0]?.name || 'N/A';
-    const pickB = sortedB[0]?.name || 'N/A';
-    
-    // Smart tactical bans:
-    // Team A wants to block Team B's best map.
-    // Team B wants to block Team A's best map.
-    
-    // Team A Ban (targeting Team B's maps, but don't ban our own pick)
-    let banA = 'N/A';
-    let banReasonA = '낮은 승률 밴';
-    const candidateBansForA = sortedB.filter(item => item.name !== pickA);
-    const highestOpponentMapForA = candidateBansForA[0];
-    const ourWinrateOnOpponentMapForA = getWinrate(mapsA, highestOpponentMapForA?.name);
-    
-    if (highestOpponentMapForA && highestOpponentMapForA.wr > 0.60 && highestOpponentMapForA.wr > ourWinrateOnOpponentMapForA) {
-        banA = highestOpponentMapForA.name;
-        banReasonA = '상대 핵심 카드 견제 밴';
-    } else {
-        // Fallback to Team A's lowest winrate map
-        const sortedSelfBanA = activeMaps.map(m => ({ name: m, wr: getWinrate(mapsA, m), p: getPlayed(mapsA, m) })).sort((x, y) => x.wr - y.wr || x.p - y.p);
-        banA = sortedSelfBanA[0]?.name || 'N/A';
-    }
-    
-    // Team B Ban (targeting Team A's maps, but don't ban our own pick)
-    let banB = 'N/A';
-    let banReasonB = '낮은 승률 밴';
-    const candidateBansForB = sortedA.filter(item => item.name !== pickB);
-    const highestOpponentMapForB = candidateBansForB[0];
-    const ourWinrateOnOpponentMapForB = getWinrate(mapsB, highestOpponentMapForB?.name);
-    
-    if (highestOpponentMapForB && highestOpponentMapForB.wr > 0.60 && highestOpponentMapForB.wr > ourWinrateOnOpponentMapForB) {
-        banB = highestOpponentMapForB.name;
-        banReasonB = '상대 핵심 카드 견제 밴';
-    } else {
-        // Fallback to Team B's lowest winrate map
-        const sortedSelfBanB = activeMaps.map(m => ({ name: m, wr: getWinrate(mapsB, m), p: getPlayed(mapsB, m) })).sort((x, y) => x.wr - y.wr || x.p - y.p);
-        banB = sortedSelfBanB[0]?.name || 'N/A';
-    }
-    
-    banList.innerHTML = `
-        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team A:</span> ${banA} <span class="text-[9px] sm:text-[10px] text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30">${banReasonA}</span></p>
-        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team B:</span> ${banB} <span class="text-[9px] sm:text-[10px] text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30">${banReasonB}</span></p>
-    `;
-    
-    pickList.innerHTML = `
-        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team A:</span> ${pickA} <span class="text-[9px] sm:text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">핵심 카드 픽</span></p>
-        <p class="text-slate-200 font-semibold text-xs sm:text-sm"><span class="text-[10px] sm:text-xs text-slate-500">Team B:</span> ${pickB} <span class="text-[9px] sm:text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">핵심 카드 픽</span></p>
-    `;
-}
-
-// 8. Update UI status display
 function updateStatus(type, title, desc, progressVal) {
-    const statusIcon = document.getElementById('status-icon');
     statusText.textContent = title;
     subStatusText.textContent = desc;
-    
-    // Status style mapping
-    if (type === 'success') {
-        statusIconContainer.className = 'p-1.5 sm:p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl';
-        statusIcon.setAttribute('data-lucide', 'check-circle');
-    } else if (type === 'error') {
-        statusIconContainer.className = 'p-1.5 sm:p-2 bg-red-500/10 border border-red-500/20 rounded-xl';
-        statusIcon.setAttribute('data-lucide', 'x-circle');
-    } else if (type === 'info') {
-        statusIconContainer.className = 'p-1.5 sm:p-2 bg-sky-500/10 border border-sky-500/20 rounded-xl';
-        statusIcon.setAttribute('data-lucide', 'loader-2');
-    } else {
-        statusIconContainer.className = 'p-1.5 sm:p-2 bg-slate-800/50 rounded-xl';
-        statusIcon.setAttribute('data-lucide', 'info');
-    }
-    
-    // Update progress bar
-    if (progressVal > 0) {
-        progressBar.style.width = `${progressVal}%`;
-    } else {
-        progressBar.style.width = '0%';
-    }
-    
-    // Trigger icons refresh — Lucide replaces the element with a new SVG,
-    // so we must query the fresh element afterwards to add/remove spin class.
-    lucide.createIcons();
-    
-    // Re-query the icon after Lucide replaces it
-    const freshIcon = statusIconContainer.querySelector('svg');
-    if (freshIcon) {
-        const wClass = type === 'info' ? 'w-4 h-4 sm:w-5 sm:h-5' : 'w-4 h-4 sm:w-5 sm:h-5';
-        let colorClass = 'text-slate-400';
-        if (type === 'success') colorClass = 'text-emerald-400';
-        else if (type === 'error') colorClass = 'text-red-400';
-        else if (type === 'info') colorClass = 'text-sky-400';
-        
-        freshIcon.setAttribute('class', `${wClass} ${colorClass}`);
-        
-        // Only spin during 'info' (loading) state
-        if (type === 'info') {
-            freshIcon.classList.add('animate-spin');
-        }
-    }
+    document.getElementById('analysis-status').dataset.state = type;
+    const progress = Math.max(0, Math.min(100, progressVal || 0));
+    progressBar.style.width = `${progress}%`;
+    progressBarContainer.setAttribute('aria-valuenow', String(progress));
 }
 
 function updateLiveScoreboard() {
     const panel = document.getElementById('live-scoreboard-panel');
-    if (!selectedMatch || !selectedMatch.live_score) {
-        panel.classList.add('hidden');
-        return;
+    const score = selectedMatch?.live_score;
+    const maps = score?.maps || [];
+    if (!score || (!maps.length && String(score.series_score_a) === '0' && String(score.series_score_b) === '0' && score.status !== 'live')) {
+        panel.classList.add('hidden'); return;
     }
-    
-    const scoreData = selectedMatch.live_score;
-    const maps = scoreData.maps || [];
-    
-    // If no maps exist and series score is 0-0 and not live, hide panel
-    if (maps.length === 0 && scoreData.series_score_a === "0" && scoreData.series_score_b === "0" && scoreData.status !== 'live') {
-        panel.classList.add('hidden');
-        return;
-    }
-    
     panel.classList.remove('hidden');
-    
-    // Render series score
-    const seriesScoreEl = document.getElementById('live-series-score');
-    const teamA = selectedMatch.team_a || 'Team A';
-    const teamB = selectedMatch.team_b || 'Team B';
-    const span = (className, value) => {
-        const el = document.createElement('span');
-        el.className = className;
-        el.textContent = String(value ?? '');
-        return el;
-    };
-    seriesScoreEl.replaceChildren(
-        span('break-all', teamA),
-        document.createTextNode(' '),
-        span('text-emerald-400 font-extrabold', scoreData.series_score_a),
-        document.createTextNode(' : '),
-        span('text-emerald-400 font-extrabold', scoreData.series_score_b),
-        document.createTextNode(' '),
-        span('break-all', teamB)
-    );
-    
-    // Render status badge
+    document.getElementById('live-series-score').textContent = `${reportTeamName('a')}  ${score.series_score_a ?? '—'} : ${score.series_score_b ?? '—'}  ${reportTeamName('b')}`;
     const badge = document.getElementById('live-status-badge');
-    if (scoreData.status === 'live') {
-        badge.className = 'text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl animate-pulse';
-        badge.textContent = 'LIVE';
-    } else if (scoreData.status === 'final') {
-        badge.className = 'text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700/60 rounded-xl';
-        badge.textContent = 'FINAL';
-    } else {
-        badge.className = 'text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-zinc-950 text-slate-400 border border-slate-800 rounded-xl';
-        badge.textContent = 'UPCOMING';
-    }
-    
-    // Render maps
-    const mapsContainer = document.getElementById('live-maps-container');
-    const mapsGrid = document.getElementById('live-maps-grid');
-    mapsGrid.innerHTML = '';
-    
-    if (maps.length > 0) {
-        mapsContainer.classList.remove('hidden');
-        maps.forEach(m => {
-            const card = document.createElement('div');
-            card.className = 'bg-zinc-950/80 border border-slate-800/80 rounded-xl p-2 sm:p-3 flex flex-col items-center justify-center space-y-1';
-            
-            const mapNameEl = document.createElement('span');
-            mapNameEl.className = 'text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider';
-            mapNameEl.textContent = m.map;
-            
-            const scoreEl = document.createElement('span');
-            scoreEl.className = 'text-xs sm:text-sm font-extrabold text-white';
-            scoreEl.textContent = `${m.score_a} - ${m.score_b}`;
-            
-            card.appendChild(mapNameEl);
-            card.appendChild(scoreEl);
-            mapsGrid.appendChild(card);
-        });
-    } else {
-        mapsContainer.classList.add('hidden');
-    }
-    
-    // Refresh icons inside the panel if any
-    lucide.createIcons();
+    badge.textContent = score.status === 'live' ? '진행 중' : score.status === 'final' ? '경기 종료' : '예정';
+    badge.dataset.live = String(score.status === 'live');
+    const grid = document.getElementById('live-maps-grid');
+    grid.innerHTML = '';
+    document.getElementById('live-maps-container').classList[maps.length ? 'remove' : 'add']('hidden');
+    maps.forEach(map => {
+        const row = document.createElement('div');
+        row.className = 'live-map';
+        row.innerHTML = `<span>${escapeHTML(map.map)}</span><span>${escapeHTML(map.score_a ?? '—')} – ${escapeHTML(map.score_b ?? '—')}</span>`;
+        grid.appendChild(row);
+    });
 }

@@ -1,7 +1,8 @@
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
-    initUITheme();
     fetchMatches();
+    document.getElementById('export-link-btn').addEventListener('click', generateShareableLink);
+    document.getElementById('export-img-btn').addEventListener('click', exportReportImage);
 
     // Wire up events
     tierSelect.addEventListener('change', () => {

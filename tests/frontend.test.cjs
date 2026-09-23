@@ -12,7 +12,10 @@ function setup(search = '') {
             this.value = '';
             this.dataset = {};
             this.style = {};
-            this.classList = { add() {}, remove() {} };
+            this.classes = new Set();
+            this.classList = { add: (...names) => names.forEach(n => this.classes.add(n)),
+                remove: (...names) => names.forEach(n => this.classes.delete(n)), contains: n => this.classes.has(n) };
+            this.attributes = {};
         }
         set innerHTML(value) {
             this.html = value;
@@ -25,7 +28,10 @@ function setup(search = '') {
             if (this.tag === 'select' && child.tag === 'option' && !this.value) this.value = child.value;
         }
         addEventListener(name, callback) { this[name] = callback; }
-        setAttribute() {}
+        setAttribute(key, value) { this.attributes[key] = value; }
+        click() { this.clicked = true; }
+        focus() { this.focused = true; }
+        remove() { this.removed = true; }
         querySelector() { return null; }
         querySelectorAll() {
             const found = [];
@@ -57,11 +63,6 @@ function setup(search = '') {
         setTimeout(callback, delay) { const id = ++nextTimer; timers.set(id, { callback, delay }); return id; },
         clearTimeout(id) { timers.delete(id); },
         fetch: async () => { throw new Error('Unexpected fetch'); },
-    };
-    context.chartDestroyCount = 0;
-    context.Chart = function (_canvas, config) {
-        context.lastChart = config;
-        this.destroy = () => { context.chartDestroyCount++; };
     };
     vm.createContext(context);
     for (const file of ['constants.js', 'charts.js', 'ui.js', 'api.js']) {
@@ -99,34 +100,26 @@ test('reselecting a match uses the newest pool while the active report keeps its
     assert.equal(h.read('teamAEvents[0].id'),'10');
 });
 
-test('career ACS chart preserves raw values and a zero baseline without saturation', () => {
+test('career comparison preserves exact ACS in semantic table cells', () => {
     const h=setup();
-    h.run("renderCareerAcsChart({nickname:'GSR',acs:238.8,kd_margin:773,available:true},{nickname:'Jinggg',acs:239.0,kd_margin:1631,available:true})");
-    const chart = h.context.lastChart;
-    assert.equal(chart.type, 'bar');
-    assert.equal(chart.options.indexAxis, 'y');
-    assert.equal(chart.options.scales.x.beginAtZero, true);
-    assert.equal(chart.options.scales.x.min, 0);
-    assert.equal(chart.options.scales.x.max, undefined);
-    assert.deepEqual(h.read('lastChart.data.datasets[0].data'), [238.8, 239.0]);
-    assert.deepEqual(h.read('lastChart.data.labels'), ['Team A · GSR', 'Team B · Jinggg']);
-    assert.equal(chart.options.plugins.tooltip.callbacks.label({raw:239}), '커리어 ACS: 239.0');
-    assert.equal(h.elements.get('career-acs-empty').hidden, true);
+    h.context.a=careerPlayer('GSR',238.8); h.context.b=careerPlayer('Jinggg',239);
+    h.run("populateAceCard('a',a);populateAceCard('b',b);renderCareerAcsChart(a,b)");
+    assert.equal(h.elements.get('ace-a-acs').textContent,'238.8');
+    assert.equal(h.elements.get('ace-b-acs').textContent,'239.0');
+    assert.equal(h.elements.get('career-acs-empty').hidden,true);
+    assert.equal(h.elements.get('career-acs-chart').hidden,false);
 });
 
-test('missing player data clears the prior chart and cannot become a synthetic zero bar', () => {
+test('missing players remain inspectable without synthetic zero values', () => {
     const h=setup();
-    h.run("renderCareerAcsChart({nickname:'Player',acs:200,available:true},{nickname:'N/A',acs:0,available:false})");
-    assert.deepEqual(h.read('lastChart.data.datasets[0].data'), [200]);
-    h.run("renderCareerAcsChart({nickname:'N/A',acs:null,available:false},null)");
-    assert.equal(h.read('careerAcsChartInstance'), null);
-    assert.equal(h.context.chartDestroyCount, 1);
-    assert.equal(h.elements.get('career-acs-chart').hidden, true);
-    assert.equal(h.elements.get('career-acs-empty').hidden, false);
-    assert.equal(h.elements.get('career-acs-empty').textContent, '확인 가능한 현역 선수 기록 없음');
+    h.run("populateAceCard('a',{nickname:'N/A',acs:null,available:false});renderCareerAcsChart(null,null)");
+    assert.equal(h.elements.get('ace-a-acs').textContent,'—');
+    assert.equal(h.elements.get('career-acs-chart').hidden,false);
+    assert.equal(h.elements.get('career-acs-empty').hidden,false);
+    assert.equal(h.elements.get('career-acs-empty').textContent,'확인 가능한 현역 선수 기록 없음');
 });
 
-test('unavailable player cards show missing values instead of zero', () => {
+test('unavailable player rows show missing values instead of zero', () => {
     const h=setup();
     h.run("populateAceCard('a',{nickname:'N/A',acs:null,kd_margin:null,agents:[],available:false})");
     assert.equal(h.elements.get('ace-a-acs').textContent,'—');
@@ -149,7 +142,7 @@ test('partial roster comparison displays actual statistics, coverage, and missin
     assert.match(h.elements.get('ace-a-collected').textContent, /수집 기준/);
 });
 
-test('clearing comparison removes old metrics, coverage, timestamp, agents, and chart', () => {
+test('clearing comparison removes old metrics, coverage, timestamp, agents, and comparison state', () => {
     const h=setup();
     h.context.ace=careerPlayer('Previous');
     h.run("populateAceCard('a',ace);renderCareerAcsChart(ace,null);clearAceCompare()");
@@ -159,8 +152,8 @@ test('clearing comparison removes old metrics, coverage, timestamp, agents, and 
     assert.equal(h.elements.get('ace-a-coverage').textContent,'전력 분석 후 커리어를 표시합니다.');
     assert.equal(h.elements.get('ace-a-collected').textContent,'');
     assert.equal(h.elements.get('ace-a-agents').children.length,0);
-    assert.equal(h.read('careerAcsChartInstance'),null);
-    assert.equal(h.elements.get('career-acs-chart').hidden,true);
+    assert.equal(h.elements.get('career-acs-empty').hidden,false);
+    assert.equal(h.elements.get('career-acs-chart').hidden,false);
 });
 
 test('stale and unavailable statistics are both explained', async () => {
@@ -170,12 +163,13 @@ test('stale and unavailable statistics are both explained', async () => {
         ace_b:{nickname:'N/A',acs:null,available:false,agents:[],unavailable_reason:'roster_unverified'}});
     await h.run("handleMatchSelection(['8'],true)");
     assert.match(h.elements.get('sub-status-text').textContent,/갱신 지연/);
-    assert.match(h.elements.get('sub-status-text').textContent,/미표시/);
-    assert.match(h.elements.get('sub-status-text').textContent,/Two:/);
-    assert.doesNotMatch(h.elements.get('sub-status-text').textContent,/One:/);
+    assert.match(h.elements.get('report-integrity-note').textContent,/미표시/);
+    assert.match(h.elements.get('report-integrity-note').textContent,/Two:/);
+    assert.doesNotMatch(h.elements.get('report-integrity-note').textContent,/One:/);
     assert.equal(h.elements.get('ace-a-nickname').textContent,'Player A');
     assert.equal(h.elements.get('ace-b-coverage').textContent,'현역 선수 명단을 확인할 수 없어 비교 불가');
-    assert.deepEqual(h.read('lastChart.data.datasets[0].data'),[220]);
+    assert.equal(h.elements.get('ace-a-acs').textContent,'220.0');
+    assert.equal(h.elements.get('ace-b-acs').textContent,'—');
 });
 
 test('selection renders synchronously with zero network requests even with an old snapshot or missing pool', async () => {
@@ -281,8 +275,9 @@ test('one analysis request sends filters and pool and paints every panel togethe
     assert.equal(h.elements.get('ace-a-nickname').textContent,'Player A');
     assert.equal(h.elements.get('ace-b-nickname').textContent,'Player B');
     assert.equal(h.elements.get('ace-a-rounds').textContent,'100');
-    assert.deepEqual(h.read('lastChart.data.datasets[0].data'),[220,200]);
-    assert.match(h.elements.get('sub-status-text').textContent,/커리어 비교는 대회 필터와 무관/);
+    assert.equal(h.elements.get('ace-a-acs').textContent,'220.0');
+    assert.equal(h.elements.get('ace-b-acs').textContent,'200.0');
+    assert.match(h.elements.get('report-integrity-note').textContent,/커리어 비교는 대회 필터와 무관/);
     assert.equal(h.elements.get('status-text').textContent,'전력 분석 완료.');
     assert.equal(h.read('analysisRunning'),false);
     assert.equal(h.read('analyzeBtn.disabled'),false);
@@ -298,7 +293,7 @@ test('switching matches before analysis resolves cannot paint stale results', as
     h.run("matchSelect.value='1'");await h.run('handleMatchSelection()');
     finish(response(analysisResult()));await pending;
     assert.equal(h.elements.get('ace-a-nickname').textContent,'—');
-    assert.equal(h.elements.get('status-text').textContent,'대회 선택 준비 완료.');
+    assert.equal(h.elements.get('status-text').textContent,'분석 준비 완료.');
     assert.equal(h.read('selectedMatch.id'),'2');
 });
 
@@ -312,10 +307,10 @@ test('unprepared scope reports the reason without per-panel fallback requests', 
     assert.match(h.elements.get('sub-status-text').textContent,/선택한 대회 통계/);
     assert.equal(h.read('analyzeBtn.disabled'),false);
     assert.equal(h.elements.get('ace-a-nickname').textContent,'—');
-    assert.equal(h.elements.get('career-acs-chart').hidden,true);
+    assert.equal(h.elements.get('career-acs-chart').hidden,false);
 });
 
-test('re-analysis clears prior career statistics and chart while the new request is pending', async () => {
+test('re-analysis clears prior career statistics and comparison state while the new request is pending', async () => {
     const h=setup();let finish;
     h.context.match=readyMatch();
     h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
@@ -327,8 +322,8 @@ test('re-analysis clears prior career statistics and chart while the new request
         assert.equal(h.elements.get(`ace-a-${field}`).textContent,'—');
     }
     assert.equal(h.elements.get('ace-a-collected').textContent,'');
-    assert.equal(h.elements.get('career-acs-chart').hidden,true);
-    assert.equal(h.read('careerAcsChartInstance'),null);
+    assert.equal(h.elements.get('career-acs-chart').hidden,false);
+    assert.equal(h.elements.get('career-acs-empty').hidden,false);
     assert.match(h.elements.get('career-acs-empty').textContent,/불러오는 중/);
     finish(response(analysisResult()));await pending;
     assert.equal(h.elements.get('ace-a-nickname').textContent,'Player A');
@@ -420,15 +415,20 @@ test('sharing with no filters removes stale filters from the existing URL', asyn
     assert.equal(url.searchParams.has('events'), false);
 });
 
-test('trend chart orders old to recent, aligns shorter histories, and does not invent missing form', () => {
-    const h = setup();
-    h.run("renderAcsTrendChart(['W (2-0)','L (0-2)'],['W (2-1)'])");
-    const chart = h.context.lastChart;
-    assert.deepEqual(JSON.parse(JSON.stringify(chart.data.labels)), ['2경기 전', '1경기 전']);
-    assert.deepEqual(JSON.parse(JSON.stringify(chart.data.datasets[0].data)), [10, 100]);
-    assert.deepEqual(JSON.parse(JSON.stringify(chart.data.datasets[1].data)), [null, 75]);
+test('recent results retain newest-first order, scores and opponents without invented ratings', () => {
+    const h=setup();
+    h.run("renderAcsTrendChart(['W (2-0) vs Alpha','L (0-2) vs Beta'],['W (2-1) vs Gamma'])");
+    const rows=h.elements.get('acs-trend-chart').children;
+    assert.equal(rows.length,2);
+    assert.match(rows[0].innerHTML,/Alpha/);
+    assert.match(rows[0].innerHTML,/Gamma/);
+    assert.match(rows[0].innerHTML,/2-0/);
+    assert.match(rows[1].innerHTML,/Beta/);
+    assert.match(rows[1].innerHTML,/기록 없음/);
+    assert.equal(h.read("parseFormResult('Unknown').result"),'—');
     h.run('renderAcsTrendChart([],[])');
-    assert.equal(h.context.lastChart.data.datasets[0].data.length, 0);
+    assert.equal(h.elements.get('acs-trend-chart').children.length,0);
+    assert.match(h.elements.get('acs-trend-chart').innerHTML,/기록이 없습니다/);
 });
 
 function tournamentMatch(id, name, eventId = null) {
@@ -568,4 +568,110 @@ test('map event checkboxes retain the full distinguishing regional suffix', () =
     const label=h.elements.get('tournament-checklist').children[0];
     assert.equal(label.children.at(-1).textContent,'게임 체인저스 2026: North America Stage 2');
     assert.equal(label.children[0].dataset.eventType,'game-changers');
+});
+
+test('map rows align both teams, distinguish missing rounds from losses, and escape names', () => {
+    const h=setup();
+    h.run("selectedMatch={map_pool:['Haven']};renderMapsTable('team-a-maps-table',{Haven:{played:4,w:3,l:1,atk_won:0,atk_total:0,def_won:0,def_total:10}});renderMapsTable('team-b-maps-table',{'<script>':{played:2,w:0,l:2,atk_won:0,atk_total:3,def_won:1,def_total:2},Haven:{played:2,w:1,l:1,atk_won:1,atk_total:2,def_won:1,def_total:2}})");
+    const rows=h.elements.get('maps-comparison-body').children;
+    assert.equal(rows.length,2);
+    assert.match(rows[0].innerHTML,/Haven/);
+    assert.match(rows[0].innerHTML,/75%/);
+    assert.match(rows[0].innerHTML,/50%/);
+    assert.match(rows[0].innerHTML,/<td>—<\/td><td>0%<\/td>/);
+    assert.match(rows[1].innerHTML,/&lt;script&gt;/);
+    assert.doesNotMatch(rows[1].innerHTML,/<script>/);
+    assert.match(rows[1].innerHTML,/풀 외/);
+    h.run("renderEmptyTable('team-a-maps-table');renderEmptyTable('team-b-maps-table')");
+    assert.equal(h.elements.get('maps-comparison-body').children.length,0);
+    assert.match(h.elements.get('maps-comparison-body').innerHTML,/기록이 없습니다/);
+});
+
+test('a complete report shows honest map rates and keeps the applied filter snapshot for sharing', async () => {
+    const h=setup();h.context.match=readyMatch();
+    h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
+    const result={...analysisResult(),probability:null,maps_a:{Haven:{played:4,w:3,l:1}},maps_b:{}};
+    h.context.fetch=async()=>response(result);
+    await h.run("handleMatchSelection(['8'],true)");
+    assert.equal(h.elements.get('summary-a-rate').textContent,'75%');
+    assert.equal(h.elements.get('summary-b-rate').textContent,'—');
+    assert.match(h.elements.get('report-scope').textContent,/Event Eight/);
+    assert.match(h.elements.get('report-scope').textContent,/예측 승률이 아닙니다/);
+    assert.equal(h.elements.get('win-probability-section').classList.contains('hidden'),true);
+    assert.equal(h.elements.get('match-report').classList.contains('hidden'),false);
+    assert.equal(h.elements.get('match-selection-panel').open,false);
+    assert.equal(h.elements.get('overview').focused,true);
+    h.run("setTournamentSelection(['9']);generateShareableLink()");await flush();
+    assert.equal(new URL(h.context.copied).searchParams.get('events'),'8');
+    assert.deepEqual(h.read('reportSnapshot.events'),['8']);
+    h.run('clearDashboard()');
+    assert.equal(h.read('reportSnapshot'),null);
+    assert.equal(h.elements.get('report-toolbar').classList.contains('hidden'),true);
+});
+
+test('loading and failed analysis hide export and stale report then allow retry', async () => {
+    const h=setup();h.context.match=readyMatch();let finish;
+    h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
+    await h.run('handleMatchSelection()');
+    h.context.fetch=()=>new Promise(resolve=>{finish=resolve;});
+    const pending=h.run('runAnalysis()');
+    assert.equal(h.elements.get('match-report').attributes['aria-busy'],'true');
+    assert.equal(h.elements.get('analyze-btn').disabled,true);
+    assert.equal(h.elements.get('report-toolbar').classList.contains('hidden'),true);
+    finish({ok:false,status:409,json:async()=>({detail:'Not ready'})});await pending;
+    assert.equal(h.elements.get('match-report').attributes['aria-busy'],'false');
+    assert.equal(h.elements.get('analyze-btn').disabled,false);
+    assert.equal(h.elements.get('match-selection-panel').open,true);
+    assert.equal(h.read('reportSnapshot'),null);
+    assert.equal(h.elements.get('analysis-status').dataset.state,'alert');
+});
+
+test('reference indicator rejects nonfinite or out-of-range values', () => {
+    const h=setup();
+    h.run('updateWinProbabilityBar(55,45)');
+    assert.equal(h.elements.get('win-prob-val-a').textContent,'55%');
+    assert.equal(h.elements.get('win-prob-bar-a').style.width,'55%');
+    h.run('updateWinProbabilityBar(NaN,45)');
+    assert.equal(h.elements.get('win-probability-section').classList.contains('hidden'),true);
+    h.run('updateWinProbabilityBar(101,-1)');
+    assert.equal(h.elements.get('win-probability-section').classList.contains('hidden'),true);
+});
+
+test('export captures only the full-width report and restores its button after errors', async () => {
+    const h=setup();h.context.match=readyMatch();
+    h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
+    h.context.fetch=async()=>response(analysisResult());
+    await h.run('handleMatchSelection([],true)');
+    let options;
+    const links=[];
+    const create=h.context.document.createElement;
+    h.context.document.createElement=tag=>{const el=create(tag);if(tag==='a') links.push(el);return el;};
+    h.context.html2canvas=async(target,config)=>{
+        assert.equal(target,h.elements.get('match-report'));options=config;
+        return {toDataURL:()=> 'data:image/png;base64,test'};
+    };
+    await h.run('exportReportImage()');
+    assert.equal(options.windowWidth,1280);
+    assert.equal(options.scale,1.5);
+    const report=create('article'),body=create('body');
+    options.onclone({getElementById:id=>{assert.equal(id,'match-report');return report;},body});
+    assert.deepEqual(body.children,[report]);
+    assert.equal(report.classList.contains('export-report'),true);
+    assert.equal(links[0].download,'One-vs-Two-report.png');
+    assert.equal(links[0].clicked,true);
+    assert.equal(links[0].removed,true);
+    assert.equal(h.elements.get('export-img-btn').disabled,false);
+    h.context.html2canvas=async()=>{throw Error('Canvas failure');};
+    await h.run('exportReportImage()');
+    assert.equal(h.elements.get('export-img-btn').disabled,false);
+    assert.equal(h.read('exportRunning'),false);
+    assert.equal(h.elements.get('app-toast').dataset.state,'error');
+});
+
+test('form and recommendation rendering never interpret team or opponent names as markup', () => {
+    const h=setup();
+    h.run("selectedMatch={team_a:'<img src=x>',team_b:'Two'};renderBanPickResults({bans:[{team:'Team A',map:'<svg>',reason:'<script>'}],picks:[]});renderAcsTrendChart(['W (2-0) vs <img>'],[])");
+    const ban=h.elements.get('ai-ban-list').children[0].innerHTML;
+    assert.match(ban,/&lt;img/);assert.doesNotMatch(ban,/<img/);
+    assert.match(h.elements.get('acs-trend-chart').children[0].innerHTML,/&lt;img&gt;/);
 });

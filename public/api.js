@@ -1,10 +1,11 @@
 // 1. Fetch matches from server
 function renderCatalogStatus(data) {
     const badge = document.getElementById('sync-badge-text');
-    const updated = data.updated_at ? new Date(data.updated_at).toLocaleString('ko-KR') : '';
+    const updated = data.updated_at ? new Date(data.updated_at).toLocaleString('ko-KR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
     const refreshing = data.sync_status === 'running' ? ' · 갱신 중' : '';
     const failed = data.sync_status === 'error' ? ' · 이전 데이터 유지' : '';
     const analytics = data.analytics_status?.stale_teams ? ` · 분석 갱신 대기 ${data.analytics_status.stale_teams}팀` : '';
+    if (badge) badge.title = data.updated_at || '';
     if (badge) badge.textContent = updated
         ? `1시간마다 업데이트 · ${updated} 기준${refreshing}${failed}${analytics}`
         : '첫 경기 목록을 준비하고 있습니다';
@@ -108,6 +109,7 @@ async function handleMatchSelection(restoredEventIds = [], autoAnalyze = false) 
     requestMatch.live_updates_started = false;
     document.getElementById('team-a-name').textContent = requestMatch.team_a;
     document.getElementById('team-b-name').textContent = requestMatch.team_b;
+    syncReportTeamNames();
     teamAEvents = [...(data.team_a_events || [])];
     teamBEvents = [...(data.team_b_events || [])];
     const available = new Set([...teamAEvents, ...teamBEvents].map(e => e.id));
@@ -119,9 +121,9 @@ async function handleMatchSelection(restoredEventIds = [], autoAnalyze = false) 
     requestMatch.details_ready = true;
     analyzeBtn.disabled = false;
     progressBarContainer.classList.add('hidden');
-    updateStatus('success', '대회 선택 준비 완료.', data.stale
+    updateStatus('success', '분석 준비 완료.', data.stale
         ? '이 경기의 최신 수집이 지연되어 이전 데이터를 표시합니다.'
-        : '필터를 선택한 뒤 전력 분석 버튼을 눌러주세요.', 0);
+        : '경기 분석을 누르면 모든 결과를 한 번에 표시합니다.', 0);
     if (autoAnalyze) await runAnalysis();
 }
 
@@ -147,22 +149,7 @@ async function runAnalysis() {
     analyzeBtn.disabled = true;
     progressBarContainer.classList.remove('hidden');
 
-    // Set individual loading indicators (with spinner SVG)
-    const spinnerHtml = `<span class="flex items-center gap-1 text-slate-500 italic"><svg class="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 분석 중...</span>`;
-
-    document.getElementById('team-a-form').innerHTML = spinnerHtml;
-    document.getElementById('team-b-form').innerHTML = spinnerHtml;
-
-    document.getElementById('team-a-maps-table').innerHTML = `<tr><td colspan="4" class="py-4 text-center">${spinnerHtml}</td></tr>`;
-    document.getElementById('team-b-maps-table').innerHTML = `<tr><td colspan="4" class="py-4 text-center">${spinnerHtml}</td></tr>`;
-
-    document.getElementById('ai-ban-list').innerHTML = `<p>${spinnerHtml}</p>`;
-    document.getElementById('ai-pick-list').innerHTML = `<p>${spinnerHtml}</p>`;
-
-    document.getElementById('team-a-agents').innerHTML = spinnerHtml;
-    document.getElementById('team-b-agents').innerHTML = spinnerHtml;
-
-    clearAceCompare('현역 선수 커리어를 불러오는 중...');
+    beginReport();
 
     updateStatus('info', '전력 분석을 시작합니다...', '미리 수집한 통계를 한 번에 불러오고 있습니다.', 10);
 
@@ -198,17 +185,18 @@ async function runAnalysis() {
         } else {
             document.getElementById('win-probability-section').classList.add('hidden');
         }
-        lucide.createIcons();
+        renderReportSummary(data, analysisMatch, payload.event_ids);
         const timestamp = new Date(data.updated_at).toLocaleString('ko-KR');
         const unavailableTeams = [
             [analysisMatch.team_a, data.ace_a], [analysisMatch.team_b, data.ace_b]
         ].filter(([, ace]) => !hasCareerPlayerStats(ace)).map(([name]) => name);
         const partial = data.ace_a.partial || data.ace_b.partial;
         const notice = (data.stale ? ' · 갱신 지연: 이전 데이터 사용' : '') +
-            (unavailableTeams.length ? ` · ${unavailableTeams.join(', ')}: 커리어 비교 불가 (카드 안내 확인)` : '') +
+            (unavailableTeams.length ? ` · ${unavailableTeams.join(', ')}: 커리어 비교 불가 (선수 표의 안내 확인)` : '') +
             (partial ? ' · 기록 없는 선수는 커리어 대표 선정에서 제외' : '') +
             ' · 커리어 비교는 대회 필터와 무관 · 팀 FK·FD 및 예측 승률 미표시';
-        updateStatus(data.stale || unavailableTeams.length || partial ? 'alert' : 'success', '전력 분석 완료.', `${timestamp} 기준${notice}`, 100);
+        document.getElementById('report-integrity-note').textContent = notice.replace(/^ · /, '');
+        updateStatus(data.stale || unavailableTeams.length || partial ? 'alert' : 'success', '전력 분석 완료.', `${timestamp} 기준${data.stale ? ' · 갱신 지연: 이전 데이터 사용' : ''}${unavailableTeams.length || partial ? ' · 선수별 표본 안내 확인' : ''}`, 100);
         // Live score is independent and does not delay any analysis panel.
         if (!analysisMatch.live_updates_started) {
             analysisMatch.live_updates_started = true;
@@ -216,6 +204,8 @@ async function runAnalysis() {
         }
     } catch (err) {
         if (err.name !== 'AbortError' && !signal.aborted && selectedMatch === analysisMatch) {
+            setReportState('error');
+            document.getElementById('match-selection-panel').open = true;
             renderEmptyTable('team-a-maps-table');
             renderEmptyTable('team-b-maps-table');
             renderFormBadges('team-a-form', []);
@@ -241,6 +231,10 @@ async function runAnalysis() {
 function updateWinProbabilityBar(probA, probB) {
     const sec = document.getElementById('win-probability-section');
     if (!sec) return;
+    if (![probA, probB].every(value => Number.isFinite(value) && value >= 0 && value <= 100)) {
+        sec.classList.add('hidden');
+        return;
+    }
     sec.classList.remove('hidden');
 
     const teamAName = selectedMatch ? selectedMatch.team_a : 'Team A';
@@ -256,9 +250,9 @@ function updateWinProbabilityBar(probA, probB) {
     const barB = document.getElementById('win-prob-bar-b');
     if (barA && barB) {
         barA.style.width = `${probA}%`;
-        barA.textContent = `${probA}% ${teamAName}`;
+        barA.textContent = '';
         barB.style.width = `${probB}%`;
-        barB.textContent = `${teamBName} ${probB}%`;
+        barB.textContent = '';
     }
 }
 

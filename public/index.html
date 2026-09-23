@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#191b1e">
+  <meta name="description" content="VLR.gg 경기 기록으로 비교하는 발로란트 팀 전적, 맵, 현역 선수 커리어.">
+  <title>VLR Analyzer · 경기 분석</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="report.css?v=20260923.2">
+  <script>
         window.onerror = function(message, source, lineno, colno, error) {
             const payload = {
                 message: message,
@@ -33,500 +40,114 @@
             }).catch(e => console.error(e));
         });
     </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VLR.gg e스포츠 매치업 정밀 전력 분석기</title>
-    <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        zinc: {
-                            950: '#09090b',
-                            900: '#18181b',
-                            800: '#27272a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- html2canvas Export CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <!-- Apple iOS 27 UI Kit Theme Stylesheet -->
-    <link rel="stylesheet" href="ios-theme.css?v=20260923.1">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        .skeleton-shimmer {
-            background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.04) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.6s infinite ease-in-out;
-        }
-    </style>
 </head>
-<body class="bg-zinc-950 text-slate-100 min-h-screen flex flex-col antialiased">
-
-    <!-- Header Navigation -->
-    <header class="border-b border-slate-800/80 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-3 py-2.5 sm:px-6 sm:py-4 flex items-center justify-between gap-2">
-            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
-                <div class="p-1.5 sm:p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl shrink-0">
-                    <i data-lucide="activity" class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400"></i>
-                </div>
-                <div class="min-w-0">
-                    <h1 class="text-sm sm:text-lg font-bold tracking-tight text-white truncate">VLR.GG ANALYZER</h1>
-                    <p class="text-[10px] sm:text-xs text-slate-400 font-medium truncate">vlr.gg 기반 e스포츠 매치업 정밀 전력 분석기</p>
-                </div>
-            </div>
-            
-            <!-- UI Theme Switcher Segmented Control -->
-            <div class="flex items-center space-x-2 shrink-0">
-                <div class="flex items-center bg-zinc-900/90 border border-slate-800 p-1 rounded-xl text-xs font-semibold shrink-0 shadow-inner">
-                    <button id="theme-btn-original" onclick="setUITheme('original')" class="px-2.5 py-1.5 sm:px-3 rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 font-bold shadow-sm">
-                        <i data-lucide="gamepad-2" class="w-3.5 h-3.5"></i>
-                        <span class="hidden sm:inline">e스포츠 다크</span>
-                        <span class="sm:hidden">다크</span>
-                    </button>
-                    <button id="theme-btn-ios" onclick="setUITheme('ios')" class="px-2.5 py-1.5 sm:px-3 rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-1.5">
-                        <i data-lucide="apple" class="w-3.5 h-3.5"></i>
-                        <span class="hidden sm:inline">Apple iOS 27</span>
-                        <span class="sm:hidden">iOS 27</span>
-                    </button>
-                </div>
-                
-                <div id="db-sync-badge" class="hidden sm:flex items-center space-x-1.5 text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 shrink-0">
-                    <i data-lucide="zap" class="w-3.5 h-3.5 text-emerald-400"></i>
-                    <span id="sync-badge-text">1시간마다 업데이트</span>
-                </div>
-            </div>
+<body>
+  <a class="skip-link" href="#main-content">본문으로 이동</a>
+  <header class="site-header shell">
+    <div><h1>VLR Analyzer</h1><p>Valorant match analysis</p></div>
+    <div id="db-sync-badge"><span id="sync-badge-text">1시간마다 업데이트</span></div>
+  </header>
+  <main id="main-content" class="shell">
+    <details id="match-selection-panel" class="match-finder" open>
+      <summary><span class="finder-title">경기 선택</span><span id="selection-caption"></span><span class="finder-toggle">선택 / 변경</span></summary>
+      <div class="finder-body">
+        <div class="primary-fields">
+          <div class="field">
+            <label for="event-select"><span>01</span>대회</label>
+            <select id="event-select" aria-describedby="tournament-selection-summary" disabled><option>대회 불러오는 중…</option></select>
+            <p id="tournament-selection-summary" aria-live="polite">저장된 대회 목록을 불러옵니다.</p>
+          </div>
+          <div class="field">
+            <label for="match-select"><span>02</span>경기</label>
+            <select id="match-select" aria-describedby="tournament-selection-help" disabled><option value="">분석할 경기를 선택하세요</option></select>
+            <p id="tournament-selection-help">대진이 확정된 경기만 분석할 수 있습니다.</p>
+          </div>
         </div>
-    </header>
-
-    <!-- Main Content Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
-
-        <!-- Top Controls Panel (Matchup Selection & Filter) -->
-        <section id="match-selection-panel" class="min-w-0 bg-zinc-900/40 border border-slate-800/80 rounded-2xl p-3 sm:p-6 space-y-4 sm:space-y-6 backdrop-blur-sm">
-            <div class="grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl min-w-0">
-                <!-- Tier Filter -->
-                <div class="min-w-0 space-y-1.5 sm:space-y-2">
-                    <label for="tier-select" class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i> 대회 등급 (Tier)
-                    </label>
-                    <select id="tier-select" class="min-w-0 max-w-full w-full bg-zinc-900 border border-slate-800 rounded-xl px-3 py-2.5 sm:px-4 text-xs sm:text-sm font-medium text-white focus:outline-none focus:border-slate-600 transition-colors">
-                        <option value="All">전체 등급</option>
-                        <option value="S-Tier">S-Tier · 국제/주요 리그</option>
-                        <option value="A-Tier">A-Tier · 챌린저스/GC</option>
-                        <option value="Other">기타 리그</option>
-                    </select>
-                </div>
-
-                <!-- Region Filter -->
-                <div class="min-w-0 space-y-1.5 sm:space-y-2">
-                    <label for="region-select" class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="globe" class="w-4 h-4 text-purple-500"></i> 지역 (Region)
-                    </label>
-                    <select id="region-select" class="min-w-0 max-w-full w-full bg-zinc-900 border border-slate-800 rounded-xl px-3 py-2.5 sm:px-4 text-xs sm:text-sm font-medium text-white focus:outline-none focus:border-slate-600 transition-colors">
-                        <option value="All">전체 지역</option>
-                        <option value="Pacific">Pacific (아시아/태평양)</option>
-                        <option value="EMEA">EMEA (유럽/중동)</option>
-                        <option value="Americas">Americas (아메리카)</option>
-                        <option value="China">China (중국)</option>
-                        <option value="Global">Global (국제대회)</option>
-                        <option value="Other">기타</option>
-                    </select>
-                </div>
+        <div class="filter-tools">
+          <details id="tournament-explorer">
+            <summary>대회 탐색 · 종류, 등급, 지역</summary>
+            <div id="tournament-category-filters" role="group" aria-label="대회 종류"></div>
+            <div class="secondary-fields">
+              <div class="field"><label for="tier-select">대회 등급</label><select id="tier-select">
+                <option value="All">전체 등급</option><option value="S-Tier">S-Tier · 국제/주요 리그</option><option value="A-Tier">A-Tier · 챌린저스/GC</option><option value="Other">기타 리그</option>
+              </select></div>
+              <div class="field"><label for="region-select">지역</label><select id="region-select">
+                <option value="All">전체 지역</option><option value="Pacific">Pacific (아시아/태평양)</option><option value="EMEA">EMEA (유럽/중동)</option><option value="Americas">Americas (아메리카)</option><option value="China">China (중국)</option><option value="Global">Global (국제대회)</option><option value="Other">기타</option>
+              </select></div>
             </div>
-
-            <div class="min-w-0 space-y-2">
-                <p class="text-xs font-semibold text-slate-300">대회 종류</p>
-                <div id="tournament-category-filters" role="group" aria-label="대회 종류"></div>
+          </details>
+          <details id="advanced-filters">
+            <summary>상세 필터 · 맵 기록 범위 <span id="filter-count"></span></summary>
+            <p class="meta">선택하지 않으면 수집된 전체 대회 기록을 사용합니다. 현역 선수 커리어에는 적용되지 않습니다.</p>
+            <div id="tournament-checklist-container" class="hidden">
+              <div id="tournament-quick-filters" role="group" aria-label="맵 기록 빠른 필터">
+                <button type="button" id="btn-filter-all">전체 선택</button><button type="button" id="btn-filter-vct">VCT 정규</button><button type="button" id="btn-filter-global">국제대회</button><button type="button" id="btn-filter-offseason">오프시즌</button><button type="button" id="btn-filter-clear">선택 해제</button>
+              </div>
+              <div id="tournament-checklist" role="group" aria-label="맵 기록에 사용할 대회"></div>
             </div>
-
-            <div class="min-w-0 space-y-3">
-                <p id="tournament-selection-help" class="text-xs sm:text-sm text-slate-400">대회를 고른 뒤 스테이지별 경기를 선택하세요.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 min-w-0">
-                <!-- Event / Tournament Filter -->
-                <div class="min-w-0 space-y-2">
-                    <label for="event-select" class="text-sm font-bold text-slate-100 flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="trophy" class="w-4 h-4 text-sky-400 shrink-0"></i> 1. 대회 선택
-                    </label>
-                    <select id="event-select" aria-describedby="tournament-selection-summary" class="min-w-0 max-w-full w-full bg-zinc-900 border border-slate-600 rounded-xl px-3 py-3 sm:px-4 text-sm sm:text-base font-semibold text-white focus:outline-none focus:border-sky-400 transition-colors" disabled>
-                        <option>대회 로드 중...</option>
-                    </select>
-                    <p id="tournament-selection-summary" aria-live="polite" class="tournament-selection-summary">대회 목록을 불러오는 중입니다.</p>
-                </div>
-
-                <!-- Match / Stage Select -->
-                <div class="min-w-0 space-y-2">
-                    <label for="match-select" class="text-sm font-bold text-slate-100 flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="swords" class="w-4 h-4 text-rose-400 shrink-0"></i> 2. 경기 선택
-                    </label>
-                    <select id="match-select" aria-describedby="tournament-selection-help" class="min-w-0 max-w-full w-full bg-zinc-900 border border-slate-600 rounded-xl px-3 py-3 sm:px-4 text-sm sm:text-base font-semibold text-white focus:outline-none focus:border-sky-400 transition-colors" disabled>
-                        <option value="">-- 분석할 매치를 선택해주세요 --</option>
-                    </select>
-                </div>
-                </div>
-            </div>
-
-            <!-- Tournament Filters Checklist -->
-            <div id="tournament-checklist-container" class="space-y-2 sm:space-y-3 pt-2 border-t border-slate-800/60 hidden">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2">
-                    <h3 class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                        <i data-lucide="sliders" class="w-4 h-4 text-emerald-500"></i> 맵 기록 대회 필터 (선수 커리어는 전체 기록)
-                    </h3>
-                    <div id="tournament-quick-filters" class="flex flex-wrap items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px]">
-                        <button type="button" id="btn-filter-all" class="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-slate-300 font-semibold transition-colors">전체</button>
-                        <button type="button" id="btn-filter-vct" class="px-2 py-0.5 rounded bg-sky-950/60 border border-sky-800/50 hover:bg-sky-900/60 text-sky-300 font-semibold transition-colors">⚡ VCT 정규만 (Kickoff/S1/S2)</button>
-                        <button type="button" id="btn-filter-global" class="px-2 py-0.5 rounded bg-amber-950/60 border border-amber-800/50 hover:bg-amber-900/60 text-amber-300 font-semibold transition-colors">🌍 국제대회만</button>
-                        <button type="button" id="btn-filter-offseason" class="px-2 py-0.5 rounded bg-purple-950/60 border border-purple-800/50 hover:bg-purple-900/60 text-purple-300 font-semibold transition-colors">🎪 오프시즌만</button>
-                        <button type="button" id="btn-filter-clear" class="px-2 py-0.5 rounded bg-zinc-900 border border-slate-800 hover:bg-zinc-800 text-slate-400 font-semibold transition-colors">해제</button>
-                    </div>
-                </div>
-                <div id="tournament-checklist" class="flex flex-wrap gap-1.5 sm:gap-2 max-h-36 overflow-y-auto p-1 scrollbar-thin">
-                    <!-- Checkboxes injected here -->
-                </div>
-            </div>
-
-            <!-- Action Button & Export Options -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
-                <div class="flex items-center space-x-3 min-w-0">
-                    <!-- Status display -->
-                    <span id="status-icon-container" class="p-1.5 sm:p-2 bg-slate-800/40 rounded-xl shrink-0">
-                        <i id="status-icon" data-lucide="info" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-400"></i>
-                    </span>
-                    <div class="min-w-0">
-                        <p id="status-text" class="text-xs sm:text-sm font-semibold text-slate-200">일정을 불러오는 중입니다...</p>
-                        <p id="sub-status-text" class="text-[10px] sm:text-xs text-slate-500 truncate">잠시만 기다려 주세요.</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-center space-x-2 shrink-0">
-                    <button id="export-link-btn" onclick="generateShareableLink()" class="bg-zinc-800 hover:bg-zinc-700 text-slate-300 font-semibold text-xs px-3 py-2.5 rounded-xl border border-slate-700/80 flex items-center space-x-1.5 transition-all cursor-pointer">
-                        <i data-lucide="share-2" class="w-3.5 h-3.5 text-sky-400"></i>
-                        <span class="hidden sm:inline">분석 링크 복사</span>
-                    </button>
-                    <button id="export-img-btn" onclick="exportReportImage()" class="bg-zinc-800 hover:bg-zinc-700 text-slate-300 font-semibold text-xs px-3 py-2.5 rounded-xl border border-slate-700/80 flex items-center space-x-1.5 transition-all cursor-pointer">
-                        <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-400"></i>
-                        <span class="hidden sm:inline">리포트 이미지 저장</span>
-                    </button>
-                    <button id="analyze-btn" class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-slate-600 border border-emerald-500/20 text-white font-bold text-xs sm:text-sm px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl shadow-lg flex items-center space-x-2 transition-all cursor-pointer shrink-0" disabled>
-                        <i data-lucide="sparkles" class="w-4 h-4"></i>
-                        <span>전력 분석 시작</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Custom Progress Bar -->
-            <div class="w-full bg-zinc-900 border border-slate-800 rounded-full h-2 overflow-hidden hidden" id="progress-bar-container">
-                <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full transition-all duration-300" style="width: 0%;"></div>
-            </div>
-        </section>
-
-        <!-- Phase 4.1: Win Probability Gauge Bar (hidden by default until analyzed) -->
-        <section id="win-probability-section" class="hidden bg-zinc-900/40 border border-slate-800/80 rounded-2xl p-4 space-y-3 shadow-md backdrop-blur-sm">
-            <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider">
-                <span class="text-sky-400 flex items-center gap-1.5"><i data-lucide="shield" class="w-4 h-4"></i> <span id="win-prob-team-a">Team A</span> (<span id="win-prob-val-a">50%</span>)</span>
-                <span class="text-slate-300 font-extrabold text-xs sm:text-sm flex items-center gap-1.5"><i data-lucide="calculator" class="w-4 h-4 text-emerald-400"></i> 참고 전력 지수</span>
-                <span class="text-orange-400 flex items-center gap-1.5"><span id="win-prob-val-b">50%</span> <span id="win-prob-team-b">Team B</span> <i data-lucide="swords" class="w-4 h-4"></i></span>
-            </div>
-            <div class="w-full bg-zinc-950 border border-slate-800 rounded-full h-4 overflow-hidden flex shadow-inner">
-                <div id="win-prob-bar-a" class="bg-gradient-to-r from-sky-500 to-blue-600 h-full transition-all duration-700 flex items-center justify-end pr-2 text-[10px] font-bold text-white shadow-sm" style="width: 50%;"></div>
-                <div id="win-prob-bar-b" class="bg-gradient-to-r from-orange-500 to-rose-600 h-full transition-all duration-700 flex items-center justify-start pl-2 text-[10px] font-bold text-white shadow-sm" style="width: 50%;"></div>
-            </div>
-        </section>
-
-        <!-- Live Scoreboard Card (visible only when match is live or has live data) -->
-        <section id="live-scoreboard-panel" class="hidden bg-zinc-900/40 border border-emerald-500/20 rounded-2xl p-3 sm:p-6 space-y-4 shadow-xl backdrop-blur-sm">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
-                <div class="flex items-center space-x-3">
-                    <span class="flex h-2.5 w-2.5 relative">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                    </span>
-                    <span class="text-[10px] sm:text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
-                        <i data-lucide="tv" class="w-4 h-4"></i> 실시간 스코어보드 (Live Scoreboard)
-                    </span>
-                </div>
-                <div id="live-series-score" class="text-base sm:text-xl md:text-2xl font-black tracking-wider text-white text-center md:text-left">
-                    - <span class="text-emerald-400">0</span> : <span class="text-emerald-400">0</span> -
-                </div>
-                <div class="flex items-center justify-center">
-                    <span id="live-status-badge" class="text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl">
-                        LIVE
-                    </span>
-                </div>
-            </div>
-            <div id="live-maps-container" class="pt-2 border-t border-slate-800/60 hidden">
-                <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">세부 세트별 스코어</p>
-                <div id="live-maps-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
-                    <!-- Dynamic map score items injected here -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Dashboard Layout Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-3 sm:gap-6">
-
-            <!-- Left Panel: Team A Dashboard (Col span 3) -->
-            <section class="md:col-span-1 lg:col-span-3 space-y-3 sm:space-y-6 order-2 md:order-1">
-                <!-- Team Summary Card -->
-                <div class="bg-zinc-900/30 border border-slate-800/80 rounded-2xl p-3 sm:p-6 space-y-3 sm:space-y-4 shadow-sm">
-                    <div class="flex items-center justify-between gap-2">
-                        <h2 id="team-a-name" class="text-lg sm:text-2xl font-bold tracking-tight text-white truncate">Team A</h2>
-                        <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 sm:px-2.5 sm:py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-lg shrink-0">TEAM A</span>
-                    </div>
-                    <hr class="border-slate-800/60">
-                    <!-- Form -->
-                    <div class="space-y-2">
-                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">최근 5경기 흐름</p>
-                        <div id="team-a-form" class="flex flex-wrap gap-1.5 sm:gap-2">
-                            <span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>
-                        </div>
-                    </div>
-                    <!-- Most Agents -->
-                    <div class="space-y-2">
-                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">커리어 대표 선수의 주요 요원</p>
-                        <div id="team-a-agents" class="flex flex-wrap gap-1.5 sm:gap-2">
-                            <span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Maps Win Rates -->
-                <div class="bg-zinc-900/30 border border-slate-800/80 rounded-2xl p-3 sm:p-5 space-y-3 shadow-sm">
-                    <h3 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-2">
-                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-400"></i> 맵별 전적 및 승률 (Map Win Rates)
-                    </h3>
-                    <div class="w-full">
-                        <table class="w-full table-fixed text-left border-collapse text-[11px] sm:text-xs">
-                            <thead>
-                                <tr class="border-b border-slate-800/80 text-[10px] sm:text-xs">
-                                    <th class="py-2 px-1 w-[30%] font-bold text-slate-400 uppercase tracking-wider">맵</th>
-                                    <th class="py-2 px-1 w-[34%] font-bold text-slate-400 uppercase tracking-wider text-center">전체 승률 (승패)</th>
-                                    <th class="py-2 px-1 w-[18%] font-bold text-slate-400 uppercase tracking-wider text-center text-sky-400">공격</th>
-                                    <th class="py-2 px-1 w-[18%] font-bold text-slate-400 uppercase tracking-wider text-center text-orange-400">수비</th>
-                                </tr>
-                            </thead>
-                            <tbody id="team-a-maps-table">
-                                <tr>
-                                    <td colspan="4" class="py-4 text-center text-slate-500 italic">데이터가 없습니다.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Center Panel: AI Analysis & Aces (Col span 4) -->
-            <section class="md:col-span-2 lg:col-span-4 space-y-3 sm:space-y-6 order-1 md:order-2">
-                <!-- AI Simulator Card -->
-                <div class="bg-gradient-to-b from-slate-900/80 to-zinc-900/40 border border-emerald-500/20 rounded-2xl p-3 sm:p-6 space-y-3 sm:space-y-4 shadow-xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-6 sm:p-8 opacity-5">
-                        <i data-lucide="cpu" class="w-24 h-24 sm:w-32 sm:h-32 text-emerald-400"></i>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="cpu" class="w-5 h-5 text-emerald-400"></i>
-                        <h2 class="text-xs sm:text-sm font-bold tracking-wider uppercase text-emerald-400">맵 밴·픽 참고 추천</h2>
-                    </div>
-                    <p class="text-[11px] sm:text-xs text-slate-400 font-medium">맵 전적 기반의 참고 추천입니다. 실제 BO 형식·밴픽 순서·결정 맵을 예측하지 않습니다.</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-2">
-                        <!-- Ban Card -->
-                        <div class="bg-red-950/20 border border-red-900/30 rounded-xl p-3 sm:p-4 space-y-2">
-                            <span class="text-[11px] sm:text-xs font-bold text-red-400 flex items-center gap-1.5"><i data-lucide="ban" class="w-3.5 h-3.5"></i> 밴 참고 (Ban Suggestions)</span>
-                            <div class="space-y-1 text-xs sm:text-sm font-medium" id="ai-ban-list">
-                                <p class="text-slate-500">- Team A: N/A</p>
-                                <p class="text-slate-500">- Team B: N/A</p>
-                            </div>
-                        </div>
-                        <!-- Pick Card -->
-                        <div class="bg-emerald-950/20 border border-emerald-900/30 rounded-xl p-3 sm:p-4 space-y-2">
-                            <span class="text-[11px] sm:text-xs font-bold text-emerald-400 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> 픽 참고 (Pick Suggestions)</span>
-                            <div class="space-y-1 text-xs sm:text-sm font-medium" id="ai-pick-list">
-                                <p class="text-slate-500">- Team A: N/A</p>
-                                <p class="text-slate-500">- Team B: N/A</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Current roster career comparison -->
-                <div class="bg-zinc-900/30 border border-slate-800/80 rounded-2xl p-3 sm:p-6 space-y-3 sm:space-y-4 shadow-sm">
-                    <h3 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center justify-between">
-                        <span class="flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i> 현역 선수 커리어 비교</span>
-                        <span class="text-[10px] font-semibold text-slate-500">Career ACS</span>
-                    </h3>
-                    <p class="text-[11px] text-slate-400 leading-relaxed">기록이 있는 현역 선수 중 커리어 ACS 최고 선수 1명씩 · 이전 소속 포함 전체 기록 · 대회 필터와 무관</p>
-                    <p class="text-[10px] text-slate-500 leading-relaxed">ACS는 라운드 수로 가중한 평균입니다. 표본 크기와 역할이 다르므로 함께 확인하세요.</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                        <!-- Team A Ace -->
-                        <div class="bg-zinc-900/50 border border-slate-800/60 rounded-xl p-3 sm:p-4 space-y-2 sm:space-y-3 relative overflow-hidden">
-                            <div class="absolute -top-3 -right-3 w-10 h-10 sm:w-12 sm:h-12 bg-sky-500/5 rounded-full flex items-center justify-center">
-                                <span class="text-xs font-bold text-sky-400">A</span>
-                            </div>
-                            <p class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest">TEAM A · 커리어 ACS 최고</p>
-                            <h4 class="text-base sm:text-lg font-extrabold text-white leading-tight" id="ace-a-nickname">—</h4>
-                            <div class="space-y-1.5 text-[11px] sm:text-xs font-semibold">
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">평균 ACS:</span>
-                                    <span class="text-slate-200" id="ace-a-acs">—</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">K/D 비율:</span>
-                                    <span id="ace-a-kd-ratio" class="text-slate-200">—</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">누적 K−D:</span>
-                                    <span id="ace-a-kd" class="text-slate-200">—</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">표본 라운드:</span>
-                                    <span id="ace-a-rounds" class="text-slate-200">—</span>
-                                </div>
-                                <div class="space-y-1 pt-1">
-                                    <span class="text-slate-400 block">핵심 기용 요원:</span>
-                                    <div class="flex flex-wrap gap-1" id="ace-a-agents">
-                                        <span class="text-[10px] text-slate-500">—</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <p id="ace-a-coverage" class="text-[10px] text-slate-400 leading-relaxed">전력 분석 후 커리어를 표시합니다.</p>
-                            <p id="ace-a-collected" class="text-[9px] text-slate-500"></p>
-                        </div>
-
-                        <!-- Team B Ace -->
-                        <div class="bg-zinc-900/50 border border-slate-800/60 rounded-xl p-3 sm:p-4 space-y-2 sm:space-y-3 relative overflow-hidden">
-                            <div class="absolute -top-3 -right-3 w-10 h-10 sm:w-12 sm:h-12 bg-orange-500/5 rounded-full flex items-center justify-center">
-                                <span class="text-xs font-bold text-orange-400">B</span>
-                            </div>
-                            <p class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest">TEAM B · 커리어 ACS 최고</p>
-                            <h4 class="text-base sm:text-lg font-extrabold text-white leading-tight" id="ace-b-nickname">—</h4>
-                            <div class="space-y-1.5 text-[11px] sm:text-xs font-semibold">
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">평균 ACS:</span>
-                                    <span class="text-slate-200" id="ace-b-acs">—</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">K/D 비율:</span>
-                                    <span id="ace-b-kd-ratio" class="text-slate-200">—</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">누적 K−D:</span>
-                                    <span id="ace-b-kd" class="text-slate-200">—</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">표본 라운드:</span>
-                                    <span id="ace-b-rounds" class="text-slate-200">—</span>
-                                </div>
-                                <div class="space-y-1 pt-1">
-                                    <span class="text-slate-400 block">핵심 기용 요원:</span>
-                                    <div class="flex flex-wrap gap-1" id="ace-b-agents">
-                                        <span class="text-[10px] text-slate-500">—</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <p id="ace-b-coverage" class="text-[10px] text-slate-400 leading-relaxed">전력 분석 후 커리어를 표시합니다.</p>
-                            <p id="ace-b-collected" class="text-[9px] text-slate-500"></p>
-                        </div>
-                    </div>
-
-                    <!-- Raw career ACS, with zero baseline -->
-                    <div class="pt-2">
-                        <div class="h-48 sm:h-56 relative w-full flex items-center justify-center">
-                            <canvas id="career-acs-chart" role="img" aria-label="현역 선수 커리어 ACS 비교" hidden></canvas>
-                            <p id="career-acs-empty" class="text-xs text-slate-500 text-center">전력 분석 후 커리어를 표시합니다.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Phase 2.2: Recent 5 Games ACS Trend Line Chart -->
-                <div class="bg-zinc-900/30 border border-slate-800/80 rounded-2xl p-3 sm:p-6 space-y-3 sm:space-y-4 shadow-sm">
-                    <h3 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-2">
-                        <i data-lucide="trending-up" class="w-4 h-4 text-sky-400"></i> 최근 5경기 팀 승패 흐름
-                    </h3>
-                    <div class="h-44 sm:h-52 relative w-full">
-                        <canvas id="acs-trend-chart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Right Panel: Team B Dashboard (Col span 3) -->
-            <section class="md:col-span-1 lg:col-span-3 space-y-3 sm:space-y-6 order-3">
-                <!-- Team Summary Card -->
-                <div class="bg-zinc-900/30 border border-slate-800/80 rounded-2xl p-3 sm:p-6 space-y-3 sm:space-y-4 shadow-sm">
-                    <div class="flex items-center justify-between gap-2">
-                        <h2 id="team-b-name" class="text-lg sm:text-2xl font-bold tracking-tight text-white truncate">Team B</h2>
-                        <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 sm:px-2.5 sm:py-1 bg-orange-500/10 text-orange-400 border border-orange-500/20 rounded-lg shrink-0">TEAM B</span>
-                    </div>
-                    <hr class="border-slate-800/60">
-                    <!-- Form -->
-                    <div class="space-y-2">
-                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">최근 5경기 흐름</p>
-                        <div id="team-b-form" class="flex flex-wrap gap-1.5 sm:gap-2">
-                            <span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>
-                        </div>
-                    </div>
-                    <!-- Most Agents -->
-                    <div class="space-y-2">
-                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">커리어 대표 선수의 주요 요원</p>
-                        <div id="team-b-agents" class="flex flex-wrap gap-1.5 sm:gap-2">
-                            <span class="text-xs sm:text-sm font-medium text-slate-500">N/A</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Maps Win Rates -->
-                <div class="bg-zinc-900/30 border border-slate-800/80 rounded-2xl p-3 sm:p-5 space-y-3 shadow-sm">
-                    <h3 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-2">
-                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-400"></i> 맵별 전적 및 승률 (Map Win Rates)
-                    </h3>
-                    <div class="w-full">
-                        <table class="w-full table-fixed text-left border-collapse text-[11px] sm:text-xs">
-                            <thead>
-                                <tr class="border-b border-slate-800/80 text-[10px] sm:text-xs">
-                                    <th class="py-2 px-1 w-[30%] font-bold text-slate-400 uppercase tracking-wider">맵</th>
-                                    <th class="py-2 px-1 w-[34%] font-bold text-slate-400 uppercase tracking-wider text-center">전체 승률 (승패)</th>
-                                    <th class="py-2 px-1 w-[18%] font-bold text-slate-400 uppercase tracking-wider text-center text-sky-400">공격</th>
-                                    <th class="py-2 px-1 w-[18%] font-bold text-slate-400 uppercase tracking-wider text-center text-orange-400">수비</th>
-                                </tr>
-                            </thead>
-                            <tbody id="team-b-maps-table">
-                                <tr>
-                                    <td colspan="4" class="py-4 text-center text-slate-500 italic">데이터가 없습니다.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
+          </details>
         </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="border-t border-slate-900 bg-zinc-950 py-6 text-center text-xs text-slate-600 font-medium">
-        <p>© 2026 VLR.gg Matchup Intelligence Analyzer. Designed for pro-tier analytics.</p>
-    </footer>
-
-    <!-- App Scripts -->
-    <script src="constants.js?v=20260923.1"></script>
-    <script src="charts.js?v=20260923.1"></script>
-    <script src="ui.js?v=20260923.1"></script>
-    <script src="api.js?v=20260923.1"></script>
-    <script src="app.js?v=20260923.1"></script>
+        <div class="finder-actions"><p class="meta">대회와 경기를 고른 뒤 분석하세요.</p><button type="button" id="analyze-btn" class="primary-button" disabled>경기 분석</button></div>
+      </div>
+    </details>
+    <div id="analysis-status" class="status-area" role="status" aria-live="polite" aria-atomic="true">
+      <span id="status-icon-container" aria-hidden="true"><span id="status-icon"></span></span>
+      <span id="status-text">경기 목록을 준비하고 있습니다.</span><span id="sub-status-text"></span>
+      <div id="progress-bar-container" class="hidden" role="progressbar" aria-label="분석 진행" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progress-bar"></div></div>
+    </div>
+    <div id="report-toolbar" class="report-toolbar hidden">
+      <nav class="report-nav" aria-label="분석 리포트"><a href="#overview">Overview</a><a href="#maps">Maps</a><a href="#players">Players</a><a href="#form">Form</a></nav>
+      <div class="report-actions"><button type="button" id="export-link-btn" class="text-button">링크 복사</button><button type="button" id="export-img-btn" class="text-button">이미지 저장</button></div>
+    </div>
+    <article id="match-report" class="hidden" aria-label="경기 분석 리포트" aria-busy="false">
+      <section id="overview" class="report-section" aria-label="두 팀 요약" tabindex="-1">
+        <div class="report-kicker"><p id="report-event"></p><span id="report-fixture"></span></div>
+        <div class="matchup">
+          <div class="matchup-side"><h2 id="team-a-name" class="team-a">—</h2><div class="summary-stat"><strong id="summary-a-rate">—</strong><span id="summary-a-record"></span></div><p class="meta">수집된 맵 승률</p><div id="team-a-form" class="form-strip" aria-label="최근 경기 결과 · 최신순"></div><p class="meta">최근 전적 · 왼쪽이 최신</p></div>
+          <span class="versus">vs</span>
+          <div class="matchup-side"><h2 id="team-b-name" class="team-b">—</h2><div class="summary-stat"><strong id="summary-b-rate">—</strong><span id="summary-b-record"></span></div><p class="meta">수집된 맵 승률</p><div id="team-b-form" class="form-strip" aria-label="최근 경기 결과 · 최신순"></div><p class="meta">최근 전적 · 왼쪽이 최신</p></div>
+        </div>
+        <div id="win-probability-section" class="probability hidden">
+          <p class="meta">참고 전력 지수 · 제공된 지표이며 실제 경기 결과를 보장하지 않습니다.</p>
+          <div class="probability-labels"><span><span id="win-prob-team-a"></span> <b id="win-prob-val-a"></b></span><span><span id="win-prob-team-b"></span> <b id="win-prob-val-b"></b></span></div>
+          <div class="probability-track" aria-hidden="true"><div id="win-prob-bar-a"></div><div id="win-prob-bar-b"></div></div>
+        </div>
+        <div class="summary-notes">
+          <div class="summary-note"><p><span class="muted">주요 맵</span> <b id="summary-a-map">—</b></p><p id="summary-a-player"></p><p id="summary-a-sample" class="meta"></p></div>
+          <div class="summary-note"><p><span class="muted">주요 맵</span> <b id="summary-b-map">—</b></p><p id="summary-b-player"></p><p id="summary-b-sample" class="meta"></p></div>
+        </div>
+        <section id="live-scoreboard-panel" class="live-scoreboard hidden" aria-label="경기 스코어">
+          <div class="live-heading"><h3>스코어</h3><span id="live-status-badge"></span></div><div id="live-series-score"></div>
+          <div id="live-maps-container" class="hidden"><div id="live-maps-grid"></div></div>
+        </section>
+        <div class="outlook"><h2>맵 밴·픽 참고</h2><div class="outlook-grid"><div><h3>밴 우선 검토</h3><div id="ai-ban-list"></div></div><div><h3>유리한 픽 후보</h3><div id="ai-pick-list"></div></div></div><p class="meta">수집된 맵 기록을 바탕으로 한 참고 정보입니다. 실제 밴·픽 순서를 예측하지 않습니다.</p></div>
+        <p id="report-scope" class="scope-note"></p>
+      </section>
+      <section id="maps" class="report-section" aria-labelledby="maps-heading">
+        <div class="section-heading"><h2 id="maps-heading">맵별 비교</h2><p>승률 · 승–패 · 공격 / 수비 라운드 승률</p></div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="맵 비교 표 · 좌우 스크롤 가능">
+          <table class="map-table"><caption class="hidden">동일한 맵에서 두 팀의 기록 비교</caption><thead><tr><th rowspan="2" scope="col">맵</th><th id="team-a-maps-table" colspan="3" scope="colgroup" class="team-a team-start">—</th><th id="team-b-maps-table" colspan="3" scope="colgroup" class="team-b team-start">—</th></tr><tr><th scope="col" class="team-start">승률 / 전적</th><th scope="col">공격</th><th scope="col">수비</th><th scope="col" class="team-start">승률 / 전적</th><th scope="col">공격</th><th scope="col">수비</th></tr></thead><tbody id="maps-comparison-body"></tbody></table>
+        </div><p id="map-pool-note" class="scope-note"></p>
+      </section>
+      <section id="players" class="report-section" aria-labelledby="players-heading">
+        <div class="section-heading"><h2 id="players-heading">현역 선수 커리어 비교</h2><p>기록이 있는 현역 중 커리어 ACS가 가장 높은 선수 · 팀별 1명</p></div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="선수 커리어 표 · 좌우 스크롤 가능">
+          <table id="career-acs-chart" class="player-table"><thead><tr><th scope="col">선수</th><th scope="col">팀</th><th scope="col" class="number">커리어 ACS</th><th scope="col" class="number">K/D</th><th scope="col" class="number">누적 킬–데스 차</th><th scope="col" class="number">라운드</th></tr></thead><tbody><tr><th scope="row" id="ace-a-nickname" class="player-name">—</th><td id="ace-a-team" class="team-a">—</td><td id="ace-a-acs" class="number acs-value">—</td><td id="ace-a-kd-ratio" class="number">—</td><td class="number"><span id="ace-a-kd">—</span></td><td id="ace-a-rounds" class="number">—</td></tr><tr><th scope="row" id="ace-b-nickname" class="player-name">—</th><td id="ace-b-team" class="team-b">—</td><td id="ace-b-acs" class="number acs-value">—</td><td id="ace-b-kd-ratio" class="number">—</td><td class="number"><span id="ace-b-kd">—</span></td><td id="ace-b-rounds" class="number">—</td></tr></tbody></table>
+        </div><p id="career-acs-empty" class="scope-note" hidden></p>
+        <div class="player-notes"><div><h3 id="ace-a-note-team" class="team-a">—</h3><p id="ace-a-coverage" class="meta"></p><p class="agents"><span class="muted">주요 요원 </span><span id="ace-a-agents"></span></p><p id="team-a-agents" class="hidden" aria-hidden="true"></p><p id="ace-a-collected" class="meta"></p></div><div><h3 id="ace-b-note-team" class="team-b">—</h3><p id="ace-b-coverage" class="meta"></p><p class="agents"><span class="muted">주요 요원 </span><span id="ace-b-agents"></span></p><p id="team-b-agents" class="hidden" aria-hidden="true"></p><p id="ace-b-collected" class="meta"></p></div></div>
+        <p class="scope-note">ACS는 라운드당 평균 전투 점수입니다. 선수별 전체 커리어 기록으로 비교하며 맵 기록 필터와 무관합니다. 출전 기간과 표본 차이를 함께 확인하세요.</p>
+      </section>
+      <section id="form" class="report-section" aria-labelledby="form-heading">
+        <div class="section-heading"><h2 id="form-heading">최근 경기</h2><p>최신순 · 수집된 최근 최대 5경기</p></div>
+        <table class="form-table"><thead><tr><th scope="col">순서</th><th id="form-a-team" scope="col" class="team-a">—</th><th id="form-b-team" scope="col" class="team-b">—</th></tr></thead><tbody id="acs-trend-chart"></tbody></table>
+        <p class="scope-note">각 팀의 최신 경기부터 나란히 표시합니다. 같은 행이 같은 날짜의 경기를 의미하지는 않습니다.</p>
+      </section>
+      <footer class="report-footer"><p id="report-updated"></p><p id="report-integrity-note"></p><p>Data sourced from VLR.gg · Unofficial analysis tool</p></footer>
+    </article>
+  </main>
+  <footer class="site-footer shell"><span>Data sourced from <a href="https://www.vlr.gg/" target="_blank" rel="noopener noreferrer">VLR.gg</a></span><span>Unofficial analysis tool</span></footer>
+  <div id="app-toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" async></script>
+  <script src="constants.js?v=20260923.2" defer></script><script src="charts.js?v=20260923.2" defer></script><script src="ui.js?v=20260923.2" defer></script><script src="api.js?v=20260923.2" defer></script><script src="app.js?v=20260923.2" defer></script>
 </body>
 </html>
