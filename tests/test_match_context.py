@@ -38,6 +38,9 @@ def test_real_match_context_uses_labelled_timezone_not_legacy_utc_attribute():
 @pytest.mark.parametrize('day,raw,clock,expected', [
     ('Wednesday, September 30', '2026-09-30 05:00:00', '5:00 AM EDT', '2026-09-30T09:00:00+00:00'),
     ('Wednesday, September 30', '2026-09-30 05:00:00', '11:00 AM CEST', '2026-09-30T09:00:00+00:00'),
+    ('Wednesday, September 30', '2026-09-30 05:00:00', '4:00 AM CDT', '2026-09-30T09:00:00+00:00'),
+    ('Wednesday, September 30', '2026-09-30 05:00:00', '3:00 AM MDT', '2026-09-30T09:00:00+00:00'),
+    ('Wednesday, September 30', '2026-09-30 05:00:00', '2:00 AM MST', '2026-09-30T09:00:00+00:00'),
     ('Thursday, January 1', '2025-12-31 14:00:00', '4:00 AM KST', '2025-12-31T19:00:00+00:00'),
     ('Thursday, January 1', '2026-01-01 05:00:00', '5:00 AM EST', '2026-01-01T10:00:00+00:00'),
     ('Wednesday, September 30', '2026-09-30 05:00:00', '5:00 AM', None),

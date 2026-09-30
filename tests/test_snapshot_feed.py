@@ -95,6 +95,28 @@ def test_export_preserves_scope_dates_and_has_no_private_source_cache(tmp_path):
     assert path.exists() and not path.with_suffix('.tmp').exists()
 
 
+@pytest.mark.parametrize('catalog_only', [True, False])
+def test_catalog_only_export_preserves_analysis_and_default_still_refreshes(monkeypatch, tmp_path, catalog_only):
+    import json
+    import sys
+    from app import snapshot_export as export
+    data = bundle()
+    path = tmp_path / 'snapshot.json'
+    monkeypatch.setattr(sys, 'argv', ['snapshot_export', '--output', str(path)] + (['--catalog-only'] if catalog_only else []))
+    monkeypatch.setattr(export, 'bootstrap_snapshot', lambda: None)
+    monkeypatch.setattr(export, 'bootstrap_analysis', lambda: None)
+    monkeypatch.setattr(export, 'build_snapshot', lambda _: data['catalog'])
+    refresh = Mock(return_value={'updated': 1})
+    monkeypatch.setattr(export, 'refresh_analysis', refresh)
+    export.main()
+    assert json.loads(path.read_text(encoding='utf-8'))['analysis'] == data['analysis']
+    if catalog_only:
+        refresh.assert_not_called()
+    else:
+        refresh.assert_called_once()
+        assert refresh.call_args.kwargs['force'] is True
+
+
 def test_export_checkpoints_are_throttled_and_failure_can_retry(monkeypatch, tmp_path):
     from app import snapshot_export as export
     clock = [0]

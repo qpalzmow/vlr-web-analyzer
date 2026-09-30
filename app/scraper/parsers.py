@@ -1,4 +1,5 @@
 import re
+import logging
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
@@ -35,7 +36,8 @@ def parse_scheduled_time(soup):
     nodes = soup.select('.match-header-date .moment-tz-convert')
     offsets = {'UTC': 0, 'GMT': 0, 'KST': 9, 'JST': 9, 'EDT': -4, 'EST': -5,
                'PDT': -7, 'PST': -8, 'CEST': 2, 'CET': 1, 'BST': 1,
-               'CDT': -5, 'AEST': 10, 'AEDT': 11}
+               'CDT': -5, 'MDT': -6, 'MST': -7, 'AKDT': -8, 'AKST': -9, 'HST': -10,
+               'EEST': 3, 'EET': 2, 'WET': 0, 'WEST': 1, 'AEST': 10, 'AEDT': 11}
     # Ambiguous abbreviations such as CST / IST are deliberately unsupported.
     day_text = next((clean_text(n.get_text()) for n in nodes if 'dddd' in n.get('data-moment-format', '')), '')
     for node in nodes:
@@ -59,6 +61,9 @@ def parse_scheduled_time(soup):
             return {'scheduled_at': date.astimezone(timezone.utc).isoformat(), 'schedule_source_zone': zone}
         except (ValueError, TypeError):
             continue
+    clocks = [clean_text(n.get_text())[:80] for n in nodes if 'h:mm' in n.get('data-moment-format', '')]
+    if clocks and any(re.search(r'\d:\d{2}', value) for value in clocks):
+        logging.getLogger(__name__).warning('Unparsed public match clock: %s', clocks)
     return {'scheduled_at': None, 'schedule_source_zone': None}
 
 

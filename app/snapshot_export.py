@@ -40,6 +40,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--previous', type=Path)
+    parser.add_argument('--catalog-only', action='store_true', help='Refresh match context while preserving prepared team analysis')
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
     init_db()
@@ -53,6 +54,9 @@ def main():
     # during analysis. Periodic checkpoints avoid rewriting every team payload
     # after each individual team; the final snapshot always includes all results.
     write_snapshot(args.output)
+    if args.catalog_only:
+        logging.info('Catalog-only refresh: %s', payload['updated_at'])
+        return
     result = refresh_analysis(payload['matches'], force=True,
                               on_progress=SnapshotCheckpoint(args.output))
     write_snapshot(args.output)

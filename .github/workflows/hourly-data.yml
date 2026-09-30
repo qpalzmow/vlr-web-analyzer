@@ -8,6 +8,10 @@ on:
         description: 'Check public match clock parsing without publishing data'
         type: boolean
         default: false
+      catalog_only:
+        description: 'Refresh match context only; keep prepared team analysis'
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -55,9 +59,13 @@ jobs:
       - name: Collect catalog and analysis
         if: ${{ inputs.check_source != true }}
         shell: bash
+        env:
+          CATALOG_ONLY: ${{ inputs.catalog_only }}
         run: |
+          args=()
+          if [ "$CATALOG_ONLY" = "true" ]; then args+=(--catalog-only); fi
           set +e
-          timeout 45m python -m app.snapshot_export --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json"
+          timeout 45m python -m app.snapshot_export --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json" "${args[@]}"
           code=$?
           set -e
           if [ "$code" -eq 124 ] && [ -s "$RUNNER_TEMP/snapshot.json" ]; then
