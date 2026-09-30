@@ -1,6 +1,7 @@
 """Import public data collected independently of a sleeping web service."""
 import json
 import os
+import time
 from datetime import datetime, timedelta, timezone
 
 import httpx
@@ -74,7 +75,8 @@ def install(payload):
 def download():
     # Fixed public repository, no bearer token, no user-provided URL or redirects.
     with httpx.Client(timeout=httpx.Timeout(30, connect=5), follow_redirects=False) as client:
-        with client.stream('GET', FEED_URL, headers={'Cache-Control': 'no-cache'}) as response:
+        with client.stream('GET', FEED_URL, params={'v': int(time.time() // 300)},
+                           headers={'Cache-Control': 'no-cache'}) as response:
             response.raise_for_status()
             body = bytearray()
             for chunk in response.iter_bytes():
