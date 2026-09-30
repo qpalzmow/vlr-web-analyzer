@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "published_at": "2026-09-30T06:08:45.364698+00:00",
+  "published_at": "2026-09-30T06:09:10.526844+00:00",
   "catalog": {
     "schema_version": 1,
     "generation": "6d89ae0e174942a4b9b1d6a6c5f664e6",
@@ -34597,11 +34597,11 @@
         "team_id": "11060",
         "team_name": "Nongshim RedForce NS",
         "form": [
+          "L (0-2) vs NRG",
           "L (2-3) vs Global Esports",
           "W (2-1) vs Global Esports",
           "W (2-1) vs Gen.G",
-          "W (2-0) vs Paper Rex",
-          "W (2-0) vs T1"
+          "W (2-0) vs Paper Rex"
         ],
         "available_events": [
           "1414",
@@ -34618,6 +34618,7 @@
           "2667",
           "2683",
           "2760",
+          "2766",
           "2775",
           "2776",
           "2952",
@@ -34871,7 +34872,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.257173+00:00",
+            "collected_at": "2026-09-30T06:09:07.027173+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "2449": {
@@ -34996,7 +34997,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.259179+00:00",
+            "collected_at": "2026-09-30T06:09:07.553723+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "2500": {
@@ -35121,7 +35122,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.260173+00:00",
+            "collected_at": "2026-09-30T06:09:07.851465+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "2535": {
@@ -35246,7 +35247,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.262174+00:00",
+            "collected_at": "2026-09-30T06:09:08.150713+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "2667": {
@@ -35371,7 +35372,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.264182+00:00",
+            "collected_at": "2026-09-30T06:09:08.436763+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "2683": {
@@ -35496,7 +35497,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.266188+00:00",
+            "collected_at": "2026-09-30T06:09:08.718008+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "2760": {
@@ -35621,7 +35622,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.268186+00:00",
+            "collected_at": "2026-09-30T06:09:09.001900+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "2775": {
@@ -35746,7 +35747,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.270184+00:00",
+            "collected_at": "2026-09-30T06:09:09.609466+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "2776": {
@@ -35871,7 +35872,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.272186+00:00",
+            "collected_at": "2026-09-30T06:09:09.932222+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "2952": {
@@ -35996,7 +35997,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.274184+00:00",
+            "collected_at": "2026-09-30T06:09:10.247271+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "2955": {
@@ -36121,7 +36122,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:29.275183+00:00",
+            "collected_at": "2026-09-30T06:09:10.518844+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "all": {
@@ -36145,13 +36146,13 @@
                 "def_total": 481
               },
               "Split": {
-                "played": 37,
+                "played": 38,
                 "w": 23,
-                "l": 14,
-                "atk_won": 211,
-                "atk_total": 401,
-                "def_won": 219,
-                "def_total": 399
+                "l": 15,
+                "atk_won": 218,
+                "atk_total": 412,
+                "def_won": 222,
+                "def_total": 411
               },
               "Ascent": {
                 "played": 45,
@@ -36199,13 +36200,13 @@
                 "def_total": 227
               },
               "Lotus": {
-                "played": 46,
+                "played": 47,
                 "w": 26,
-                "l": 20,
-                "atk_won": 265,
-                "atk_total": 501,
-                "def_won": 260,
-                "def_total": 514
+                "l": 21,
+                "atk_won": 269,
+                "atk_total": 513,
+                "def_won": 261,
+                "def_total": 520
               },
               "Sunset": {
                 "played": 27,
@@ -36246,15 +36247,15 @@
             },
             "players": {
               "488": {
-                "rounds": 11921,
-                "weighted_acs": 2479396.5999999996,
-                "kills": 8743,
-                "deaths": 7850,
-                "fk": 1315,
-                "fd": 1159,
+                "rounds": 11962,
+                "weighted_acs": 2485464.4999999995,
+                "kills": 8766,
+                "deaths": 7879,
+                "fk": 1316,
+                "fd": 1162,
                 "agents": {
                   "jett": 2699,
-                  "omen": 1471,
+                  "omen": 1512,
                   "raze": 1088,
                   "sova": 1056,
                   "killjoy": 925,
@@ -36287,17 +36288,17 @@
                 "name": "WoohyuN"
               },
               "42772": {
-                "rounds": 4528,
-                "weighted_acs": 933740.8999999999,
-                "kills": 3270,
-                "deaths": 2899,
-                "fk": 384,
-                "fd": 278,
+                "rounds": 4569,
+                "weighted_acs": 941444.7999999998,
+                "kills": 3297,
+                "deaths": 2928,
+                "fk": 385,
+                "fd": 279,
                 "agents": {
+                  "fade": 678,
                   "yoru": 647,
                   "phoenix": 668,
                   "sova": 645,
-                  "fade": 637,
                   "killjoy": 465,
                   "omen": 399,
                   "cypher": 195,
@@ -36316,14 +36317,14 @@
                 "name": "Xross"
               },
               "31828": {
-                "rounds": 5771,
-                "weighted_acs": 1201929.6,
-                "kills": 4214,
-                "deaths": 4085,
-                "fk": 712,
-                "fd": 666,
+                "rounds": 5812,
+                "weighted_acs": 1209651.0000000002,
+                "kills": 4240,
+                "deaths": 4115,
+                "fk": 717,
+                "fd": 676,
                 "agents": {
-                  "yoru": 1482,
+                  "yoru": 1505,
                   "sova": 669,
                   "fade": 643,
                   "breach": 561,
@@ -36336,7 +36337,7 @@
                   "viper": 146,
                   "raze": 124,
                   "omen": 122,
-                  "chamber": 87,
+                  "chamber": 105,
                   "reyna": 80,
                   "gekko": 43,
                   "waylay": 42,
@@ -36346,14 +36347,14 @@
                 "name": "Francis"
               },
               "31827": {
-                "rounds": 5771,
-                "weighted_acs": 1325898.9000000001,
-                "kills": 4586,
-                "deaths": 4244,
-                "fk": 943,
-                "fd": 892,
+                "rounds": 5812,
+                "weighted_acs": 1331670.2000000002,
+                "kills": 4604,
+                "deaths": 4278,
+                "fk": 949,
+                "fd": 899,
                 "agents": {
-                  "neon": 3025,
+                  "neon": 3066,
                   "raze": 830,
                   "waylay": 598,
                   "jett": 424,
@@ -36370,14 +36371,14 @@
                 "name": "Dambi"
               },
               "31829": {
-                "rounds": 5771,
-                "weighted_acs": 1128814.2000000002,
-                "kills": 4056,
-                "deaths": 3788,
-                "fk": 485,
-                "fd": 465,
+                "rounds": 5812,
+                "weighted_acs": 1134794.9000000004,
+                "kills": 4077,
+                "deaths": 3819,
+                "fk": 489,
+                "fd": 468,
                 "agents": {
-                  "viper": 1156,
+                  "viper": 1197,
                   "cypher": 846,
                   "sova": 780,
                   "deadlock": 694,
@@ -36399,15 +36400,140 @@
                 "name": "Ivy"
               }
             },
-            "collected_at": "2026-09-22T00:37:29.253176+00:00",
+            "collected_at": "2026-09-30T06:09:06.705422+00:00",
             "career_roster_verified": true,
-            "players_available": false
+            "players_available": true
+          },
+          "2766": {
+            "maps": {
+              "Bind": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              },
+              "Haven": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              },
+              "Split": {
+                "played": 1,
+                "w": 0,
+                "l": 1,
+                "atk_won": 7,
+                "atk_total": 11,
+                "def_won": 3,
+                "def_total": 12
+              },
+              "Ascent": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              },
+              "Icebox": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              },
+              "Breeze": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              },
+              "Fracture": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              },
+              "Pearl": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              },
+              "Lotus": {
+                "played": 1,
+                "w": 0,
+                "l": 1,
+                "atk_won": 4,
+                "atk_total": 12,
+                "def_won": 1,
+                "def_total": 6
+              },
+              "Sunset": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              },
+              "Abyss": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              },
+              "Corrode": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              },
+              "Summit": {
+                "played": 0,
+                "w": 0,
+                "l": 0,
+                "atk_won": 0,
+                "atk_total": 0,
+                "def_won": 0,
+                "def_total": 0
+              }
+            },
+            "players": {},
+            "players_available": false,
+            "collected_at": "2026-09-30T06:09:09.267608+00:00",
+            "unavailable_reason": "team_match_coverage_unverified"
           }
         },
-        "updated_at": "2026-09-22T00:37:29.275183+00:00",
+        "updated_at": "2026-09-30T06:09:10.518844+00:00",
         "failed_scopes": [],
-        "last_attempt_at": "2026-09-22T00:37:29.275183+00:00",
-        "last_success_at": "2026-09-22T00:37:29.275183+00:00",
+        "last_attempt_at": "2026-09-30T06:09:10.518844+00:00",
+        "last_success_at": "2026-09-30T06:09:10.518844+00:00",
         "last_error": null
       },
       "731": {
@@ -153363,6 +153489,7 @@
         "team_id": "23362",
         "team_name": "Atlas Legacy ATL",
         "form": [
+          "L (0-1) vs MCA Esports",
           "W (1-0) vs ALLIANCE ESP",
           "W (1-0) vs NBL esports",
           "L (0-2) vs Level One"
@@ -153494,7 +153621,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:36:55.274195+00:00",
+            "collected_at": "2026-09-30T06:08:55.246145+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "3128": {
@@ -153509,13 +153636,13 @@
                 "def_total": 0
               },
               "Haven": {
-                "played": 0,
+                "played": 1,
                 "w": 0,
-                "l": 0,
-                "atk_won": 0,
-                "atk_total": 0,
-                "def_won": 0,
-                "def_total": 0
+                "l": 1,
+                "atk_won": 3,
+                "atk_total": 12,
+                "def_won": 6,
+                "def_total": 10
               },
               "Split": {
                 "played": 0,
@@ -153619,7 +153746,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:36:55.537062+00:00",
+            "collected_at": "2026-09-30T06:08:55.530356+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "all": {
@@ -153634,13 +153761,13 @@
                 "def_total": 0
               },
               "Haven": {
-                "played": 1,
+                "played": 2,
                 "w": 0,
-                "l": 1,
-                "atk_won": 3,
-                "atk_total": 12,
-                "def_won": 2,
-                "def_total": 6
+                "l": 2,
+                "atk_won": 6,
+                "atk_total": 24,
+                "def_won": 8,
+                "def_total": 16
               },
               "Split": {
                 "played": 0,
@@ -153744,28 +153871,30 @@
             },
             "players": {
               "62592": {
-                "rounds": 115,
-                "weighted_acs": 20450.0,
-                "kills": 73,
-                "deaths": 86,
-                "fk": 10,
-                "fd": 11,
+                "rounds": 137,
+                "weighted_acs": 24828.0,
+                "kills": 90,
+                "deaths": 102,
+                "fk": 12,
+                "fd": 13,
                 "agents": {
                   "neon": 77,
+                  "sova": 22,
                   "chamber": 20,
                   "killjoy": 18
                 },
                 "name": "loai"
               },
               "62588": {
-                "rounds": 62,
-                "weighted_acs": 16131.0,
-                "kills": 60,
-                "deaths": 41,
+                "rounds": 84,
+                "weighted_acs": 20399.0,
+                "kills": 76,
+                "deaths": 58,
                 "fk": 9,
                 "fd": 8,
                 "agents": {
                   "killjoy": 24,
+                  "breach": 22,
                   "chamber": 21,
                   "vyse": 17
                 },
@@ -153785,15 +153914,15 @@
                 "name": "lightning"
               }
             },
-            "collected_at": "2026-09-22T00:36:54.995604+00:00",
+            "collected_at": "2026-09-30T06:08:54.964727+00:00",
             "career_roster_verified": true,
             "players_available": true
           }
         },
-        "updated_at": "2026-09-22T00:36:55.537062+00:00",
+        "updated_at": "2026-09-30T06:08:55.530356+00:00",
         "failed_scopes": [],
-        "last_attempt_at": "2026-09-22T00:36:55.537062+00:00",
-        "last_success_at": "2026-09-22T00:36:55.537062+00:00",
+        "last_attempt_at": "2026-09-30T06:08:55.530356+00:00",
+        "last_success_at": "2026-09-30T06:08:55.530356+00:00",
         "last_error": null
       },
       "21541": {
@@ -153801,6 +153930,7 @@
         "team_id": "21541",
         "team_name": "NBL esports",
         "form": [
+          "L (0-1) vs USMA E-SPORTS",
           "L (0-1) vs MCA Esports",
           "L (0-1) vs Atlas Legacy",
           "L (0-1) vs Nemli Team"
@@ -153932,7 +154062,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:36:56.072338+00:00",
+            "collected_at": "2026-09-30T06:08:55.926353+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "3128": {
@@ -153965,13 +154095,13 @@
                 "def_total": 0
               },
               "Ascent": {
-                "played": 1,
+                "played": 2,
                 "w": 0,
-                "l": 1,
-                "atk_won": 1,
-                "atk_total": 12,
-                "def_won": 2,
-                "def_total": 4
+                "l": 2,
+                "atk_won": 3,
+                "atk_total": 16,
+                "def_won": 3,
+                "def_total": 16
               },
               "Icebox": {
                 "played": 0,
@@ -154057,7 +154187,7 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:36:56.421335+00:00",
+            "collected_at": "2026-09-30T06:08:56.187987+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           },
           "all": {
@@ -154090,13 +154220,13 @@
                 "def_total": 0
               },
               "Ascent": {
-                "played": 1,
+                "played": 2,
                 "w": 0,
-                "l": 1,
-                "atk_won": 1,
-                "atk_total": 12,
-                "def_won": 2,
-                "def_total": 4
+                "l": 2,
+                "atk_won": 3,
+                "atk_total": 16,
+                "def_won": 3,
+                "def_total": 16
               },
               "Icebox": {
                 "played": 0,
@@ -154182,55 +154312,57 @@
             },
             "players": {
               "62593": {
-                "rounds": 33,
-                "weighted_acs": 4925.0,
-                "kills": 16,
-                "deaths": 30,
-                "fk": 1,
-                "fd": 4,
+                "rounds": 49,
+                "weighted_acs": 7341.0,
+                "kills": 24,
+                "deaths": 43,
+                "fk": 2,
+                "fd": 6,
                 "agents": {
                   "astra": 17,
-                  "omen": 16
+                  "omen": 16,
+                  "cypher": 16
                 },
                 "name": "abiga"
               },
               "62594": {
-                "rounds": 40,
-                "weighted_acs": 5475.0,
-                "kills": 17,
-                "deaths": 32,
+                "rounds": 59,
+                "weighted_acs": 9711.6,
+                "kills": 30,
+                "deaths": 46,
                 "fk": 3,
-                "fd": 7,
+                "fd": 10,
                 "agents": {
-                  "omen": 23,
+                  "omen": 42,
                   "yoru": 17
                 },
                 "name": "Revox"
               },
               "62595": {
-                "rounds": 48,
-                "weighted_acs": 7882.0,
-                "kills": 24,
-                "deaths": 44,
-                "fk": 2,
-                "fd": 5,
+                "rounds": 64,
+                "weighted_acs": 10026.0,
+                "kills": 31,
+                "deaths": 58,
+                "fk": 3,
+                "fd": 6,
                 "agents": {
                   "tejo": 17,
                   "phoenix": 16,
+                  "sova": 16,
                   "fade": 15
                 },
                 "name": "TweeTyy"
               },
               "62596": {
-                "rounds": 48,
-                "weighted_acs": 7727.7,
-                "kills": 24,
-                "deaths": 44,
-                "fk": 5,
-                "fd": 4,
+                "rounds": 64,
+                "weighted_acs": 9039.6,
+                "kills": 28,
+                "deaths": 59,
+                "fk": 6,
+                "fd": 5,
                 "agents": {
                   "sova": 33,
-                  "omen": 15
+                  "omen": 31
                 },
                 "name": "blueberryy"
               },
@@ -154247,15 +154379,15 @@
                 "name": "rigl"
               }
             },
-            "collected_at": "2026-09-22T00:36:55.784543+00:00",
+            "collected_at": "2026-09-30T06:08:55.507451+00:00",
             "career_roster_verified": true,
             "players_available": true
           }
         },
-        "updated_at": "2026-09-22T00:36:56.421335+00:00",
+        "updated_at": "2026-09-30T06:08:56.187987+00:00",
         "failed_scopes": [],
-        "last_attempt_at": "2026-09-22T00:36:56.421335+00:00",
-        "last_success_at": "2026-09-22T00:36:56.421335+00:00",
+        "last_attempt_at": "2026-09-30T06:08:56.187987+00:00",
+        "last_success_at": "2026-09-30T06:08:56.187987+00:00",
         "last_error": null
       },
       "14478": {
@@ -156043,6 +156175,7 @@
         "team_id": "23391",
         "team_name": "DPL Esports",
         "form": [
+          "L (0-1) vs NUTHERS ESPORTS",
           "W (1-0) vs Argea",
           "L (0-1) vs USMA E-SPORTS"
         ],
@@ -156125,13 +156258,13 @@
                 "def_total": 0
               },
               "Lotus": {
-                "played": 1,
+                "played": 2,
                 "w": 0,
-                "l": 1,
-                "atk_won": 1,
-                "atk_total": 8,
-                "def_won": 6,
-                "def_total": 12
+                "l": 2,
+                "atk_won": 5,
+                "atk_total": 20,
+                "def_won": 8,
+                "def_total": 19
               },
               "Sunset": {
                 "played": 0,
@@ -156171,7 +156304,7 @@
               }
             },
             "players": {},
-            "collected_at": "2026-09-22T00:37:07.647508+00:00",
+            "collected_at": "2026-09-30T06:08:54.076869+00:00",
             "career_roster_verified": true,
             "players_available": false
           },
@@ -156250,13 +156383,13 @@
                 "def_total": 0
               },
               "Lotus": {
-                "played": 1,
+                "played": 2,
                 "w": 0,
-                "l": 1,
-                "atk_won": 1,
-                "atk_total": 8,
-                "def_won": 6,
-                "def_total": 12
+                "l": 2,
+                "atk_won": 5,
+                "atk_total": 20,
+                "def_won": 8,
+                "def_total": 19
               },
               "Sunset": {
                 "played": 0,
@@ -156297,14 +156430,14 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:08.023089+00:00",
+            "collected_at": "2026-09-30T06:08:54.528037+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           }
         },
-        "updated_at": "2026-09-22T00:37:08.023089+00:00",
+        "updated_at": "2026-09-30T06:08:54.528037+00:00",
         "failed_scopes": [],
-        "last_attempt_at": "2026-09-22T00:37:08.023089+00:00",
-        "last_success_at": "2026-09-22T00:37:08.023089+00:00",
+        "last_attempt_at": "2026-09-30T06:08:54.528037+00:00",
+        "last_success_at": "2026-09-30T06:08:54.528037+00:00",
         "last_error": null
       },
       "23392": {
@@ -156312,6 +156445,7 @@
         "team_id": "23392",
         "team_name": "Argea",
         "form": [
+          "W (1-0) vs ALLIANCE ESP",
           "L (0-1) vs DPL Esports",
           "W (1-0) vs MCA Esports"
         ],
@@ -156349,13 +156483,13 @@
                 "def_total": 7
               },
               "Ascent": {
-                "played": 1,
-                "w": 0,
+                "played": 2,
+                "w": 1,
                 "l": 1,
-                "atk_won": 4,
-                "atk_total": 8,
-                "def_won": 3,
-                "def_total": 12
+                "atk_won": 12,
+                "atk_total": 20,
+                "def_won": 8,
+                "def_total": 17
               },
               "Icebox": {
                 "played": 0,
@@ -156440,7 +156574,7 @@
               }
             },
             "players": {},
-            "collected_at": "2026-09-22T00:37:07.644504+00:00",
+            "collected_at": "2026-09-30T06:09:04.106657+00:00",
             "career_roster_verified": true,
             "players_available": false
           },
@@ -156474,13 +156608,13 @@
                 "def_total": 7
               },
               "Ascent": {
-                "played": 1,
-                "w": 0,
+                "played": 2,
+                "w": 1,
                 "l": 1,
-                "atk_won": 4,
-                "atk_total": 8,
-                "def_won": 3,
-                "def_total": 12
+                "atk_won": 12,
+                "atk_total": 20,
+                "def_won": 8,
+                "def_total": 17
               },
               "Icebox": {
                 "played": 0,
@@ -156566,14 +156700,14 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:08.040642+00:00",
+            "collected_at": "2026-09-30T06:09:04.529072+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           }
         },
-        "updated_at": "2026-09-22T00:37:08.040642+00:00",
+        "updated_at": "2026-09-30T06:09:04.529072+00:00",
         "failed_scopes": [],
-        "last_attempt_at": "2026-09-22T00:37:08.040642+00:00",
-        "last_success_at": "2026-09-22T00:37:08.040642+00:00",
+        "last_attempt_at": "2026-09-30T06:09:04.529072+00:00",
+        "last_success_at": "2026-09-30T06:09:04.529072+00:00",
         "last_error": null
       },
       "23396": {
@@ -156581,6 +156715,7 @@
         "team_id": "23396",
         "team_name": "NUTHERS ESPORTS",
         "form": [
+          "W (1-0) vs DPL Esports",
           "L (0-1) vs USMA E-SPORTS",
           "W (1-0) vs ALLIANCE ESP"
         ],
@@ -156663,13 +156798,13 @@
                 "def_total": 0
               },
               "Lotus": {
-                "played": 0,
-                "w": 0,
+                "played": 1,
+                "w": 1,
                 "l": 0,
-                "atk_won": 0,
-                "atk_total": 0,
-                "def_won": 0,
-                "def_total": 0
+                "atk_won": 5,
+                "atk_total": 7,
+                "def_won": 8,
+                "def_total": 12
               },
               "Sunset": {
                 "played": 0,
@@ -156709,7 +156844,7 @@
               }
             },
             "players": {},
-            "collected_at": "2026-09-22T00:37:07.662595+00:00",
+            "collected_at": "2026-09-30T06:08:53.761391+00:00",
             "career_roster_verified": true,
             "players_available": false
           },
@@ -156788,13 +156923,13 @@
                 "def_total": 0
               },
               "Lotus": {
-                "played": 0,
-                "w": 0,
+                "played": 1,
+                "w": 1,
                 "l": 0,
-                "atk_won": 0,
-                "atk_total": 0,
-                "def_won": 0,
-                "def_total": 0
+                "atk_won": 5,
+                "atk_total": 7,
+                "def_won": 8,
+                "def_total": 12
               },
               "Sunset": {
                 "played": 0,
@@ -156835,14 +156970,14 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:08.020090+00:00",
+            "collected_at": "2026-09-30T06:08:54.084870+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           }
         },
-        "updated_at": "2026-09-22T00:37:08.020090+00:00",
+        "updated_at": "2026-09-30T06:08:54.084870+00:00",
         "failed_scopes": [],
-        "last_attempt_at": "2026-09-22T00:37:08.020090+00:00",
-        "last_success_at": "2026-09-22T00:37:08.020090+00:00",
+        "last_attempt_at": "2026-09-30T06:08:54.084870+00:00",
+        "last_success_at": "2026-09-30T06:08:54.084870+00:00",
         "last_error": null
       },
       "23395": {
@@ -156850,6 +156985,7 @@
         "team_id": "23395",
         "team_name": "MCA Esports",
         "form": [
+          "W (1-0) vs Atlas Legacy",
           "W (1-0) vs NBL esports",
           "L (0-1) vs Argea"
         ],
@@ -156869,13 +157005,13 @@
                 "def_total": 0
               },
               "Haven": {
-                "played": 0,
-                "w": 0,
+                "played": 1,
+                "w": 1,
                 "l": 0,
-                "atk_won": 0,
-                "atk_total": 0,
-                "def_won": 0,
-                "def_total": 0
+                "atk_won": 4,
+                "atk_total": 10,
+                "def_won": 9,
+                "def_total": 12
               },
               "Split": {
                 "played": 1,
@@ -156978,7 +157114,7 @@
               }
             },
             "players": {},
-            "collected_at": "2026-09-22T00:37:08.002089+00:00",
+            "collected_at": "2026-09-30T06:09:04.530076+00:00",
             "career_roster_verified": true,
             "players_available": false
           },
@@ -156994,13 +157130,13 @@
                 "def_total": 0
               },
               "Haven": {
-                "played": 0,
-                "w": 0,
+                "played": 1,
+                "w": 1,
                 "l": 0,
-                "atk_won": 0,
-                "atk_total": 0,
-                "def_won": 0,
-                "def_total": 0
+                "atk_won": 4,
+                "atk_total": 10,
+                "def_won": 9,
+                "def_total": 12
               },
               "Split": {
                 "played": 1,
@@ -157104,14 +157240,14 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:08.277312+00:00",
+            "collected_at": "2026-09-30T06:09:05.052281+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           }
         },
-        "updated_at": "2026-09-22T00:37:08.277312+00:00",
+        "updated_at": "2026-09-30T06:09:05.052281+00:00",
         "failed_scopes": [],
-        "last_attempt_at": "2026-09-22T00:37:08.277312+00:00",
-        "last_success_at": "2026-09-22T00:37:08.277312+00:00",
+        "last_attempt_at": "2026-09-30T06:09:05.052281+00:00",
+        "last_success_at": "2026-09-30T06:09:05.052281+00:00",
         "last_error": null
       },
       "23393": {
@@ -157119,6 +157255,7 @@
         "team_id": "23393",
         "team_name": "ALLIANCE ESP",
         "form": [
+          "L (0-1) vs Argea",
           "L (0-1) vs Atlas Legacy",
           "L (0-1) vs NUTHERS ESPORTS"
         ],
@@ -157156,13 +157293,13 @@
                 "def_total": 0
               },
               "Ascent": {
-                "played": 0,
+                "played": 1,
                 "w": 0,
-                "l": 0,
+                "l": 1,
                 "atk_won": 0,
-                "atk_total": 0,
-                "def_won": 0,
-                "def_total": 0
+                "atk_total": 5,
+                "def_won": 4,
+                "def_total": 12
               },
               "Icebox": {
                 "played": 0,
@@ -157247,7 +157384,7 @@
               }
             },
             "players": {},
-            "collected_at": "2026-09-22T00:37:10.596056+00:00",
+            "collected_at": "2026-09-30T06:09:04.125890+00:00",
             "career_roster_verified": true,
             "players_available": false
           },
@@ -157281,13 +157418,13 @@
                 "def_total": 0
               },
               "Ascent": {
-                "played": 0,
+                "played": 1,
                 "w": 0,
-                "l": 0,
+                "l": 1,
                 "atk_won": 0,
-                "atk_total": 0,
-                "def_won": 0,
-                "def_total": 0
+                "atk_total": 5,
+                "def_won": 4,
+                "def_total": 12
               },
               "Icebox": {
                 "played": 0,
@@ -157373,14 +157510,14 @@
             },
             "players": {},
             "players_available": false,
-            "collected_at": "2026-09-22T00:37:10.852634+00:00",
+            "collected_at": "2026-09-30T06:09:04.546074+00:00",
             "unavailable_reason": "team_match_coverage_unverified"
           }
         },
-        "updated_at": "2026-09-22T00:37:10.852634+00:00",
+        "updated_at": "2026-09-30T06:09:04.546074+00:00",
         "failed_scopes": [],
-        "last_attempt_at": "2026-09-22T00:37:10.852634+00:00",
-        "last_success_at": "2026-09-22T00:37:10.852634+00:00",
+        "last_attempt_at": "2026-09-30T06:09:04.546074+00:00",
+        "last_success_at": "2026-09-30T06:09:04.546074+00:00",
         "last_error": null
       }
     }
