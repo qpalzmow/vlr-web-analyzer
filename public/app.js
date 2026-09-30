@@ -1,6 +1,7 @@
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
     initReportNavigation();
+    document.getElementById('hero-analyze-btn').addEventListener('click', runAnalysis);
     fetchMatches();
     document.getElementById('match-search').addEventListener('input', event => {
         matchSearchQuery = event.target.value;

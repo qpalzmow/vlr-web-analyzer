@@ -456,7 +456,7 @@ async function exportReportImage() {
     button.textContent = '이미지 생성 중…';
     try {
         const canvas = await html2canvas(target, {
-            backgroundColor: '#191b1e', scale: 1.5, useCORS: true,
+            backgroundColor: '#14191e', scale: 1.5, useCORS: true,
             windowWidth: 1280, scrollX: 0, scrollY: 0,
             onclone: doc => {
                 const report = doc.getElementById('match-report');
@@ -656,11 +656,13 @@ function initReportNavigation() {
 
 function setReportState(state) {
     const ready = state === 'ready';
-    document.getElementById('match-report').classList[ready ? 'remove' : 'add']('hidden');
+    const showHero = ready || (['preview', 'loading', 'error'].includes(state) && selectedMatch?.details_ready);
+    document.getElementById('match-report').classList[showHero ? 'remove' : 'add']('hidden');
     document.getElementById('report-toolbar').classList[ready ? 'remove' : 'add']('hidden');
     document.getElementById('match-report').setAttribute('aria-busy', String(state === 'loading'));
     analyzeBtn.textContent = state === 'loading' ? '분석 중…' : ready ? '다시 분석' : '경기 분석';
     if (!ready) reportSnapshot = null;
+    MatchUI.onReportState(state);
     updateReportNavigation();
 }
 
@@ -706,6 +708,7 @@ function renderReportSummary(data, match, events) {
     const date = new Date(data.updated_at);
     document.getElementById('report-updated').textContent = `통계 수집: ${Number.isFinite(date.getTime()) ? date.toLocaleString('ko-KR') : '시각 확인 불가'}${data.stale ? ' · 갱신 지연으로 이전 데이터 사용' : ''}`;
     document.getElementById('map-pool-note').textContent = `${match.map_pool?.length ? '확인된 대회 맵 풀' : '대회 맵 풀 미확인 · 기본 풀'}을 먼저 표시합니다. ‘풀 외’는 이 풀에 포함되지 않는 과거 맵입니다. 5맵 미만은 ‘표본 부족’으로 표시하며 주요 맵 선정에서 제외합니다. 기록이 없는 값은 —로 표시합니다.`;
+    MatchUI.render(data, match);
     setReportState('ready');
     document.getElementById('match-selection-panel').open = false;
     document.getElementById('advanced-filters').open = false;
@@ -737,6 +740,7 @@ function clearDashboard() {
     if (typeof stopLiveScorePolling === 'function') stopLiveScorePolling();
     updateStatus('info', '대기 중', '경기를 선택해 주세요.', 0);
     for (const id of ['progress-bar-container', 'tournament-checklist-container', 'win-probability-section', 'live-scoreboard-panel']) document.getElementById(id).classList.add('hidden');
+    document.getElementById('confirmed-veto').hidden = true;
     destroyCharts();
 }
 
@@ -779,6 +783,7 @@ function updateStatus(type, title, desc, progressVal) {
 
 function updateLiveScoreboard() {
     renderFixtureContext();
+    MatchUI.refresh();
     const panel = document.getElementById('live-scoreboard-panel');
     const score = selectedMatch?.live_score;
     const maps = score?.maps || [];

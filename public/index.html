@@ -1,14 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#191b1e">
-  <meta name="description" content="VLR.gg 경기 기록으로 비교하는 발로란트 팀 전적, 맵, 현역 선수 커리어.">
-  <title>VLR Analyzer · 경기 분석</title>
-  <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="report.css?v=20260930.4">
-  <script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="#14191e" name="theme-color"/>
+<meta content="VLR.gg 경기 기록으로 비교하는 발로란트 팀 전적, 맵, 현역 선수 커리어." name="description"/>
+<title>VLR Analyzer · 경기 분석</title>
+<link href="data:," rel="icon"/>
+
+<script>
         window.onerror = function(message, source, lineno, colno, error) {
             const payload = {
                 message: message,
@@ -40,124 +41,127 @@
             }).catch(e => console.error(e));
         });
     </script>
-</head>
+<link href="design/tokens.css?v=20261001.1" rel="stylesheet"/><link href="design/theme.css?v=20261001.1" rel="stylesheet"/><link href="design/layout.css?v=20261001.1" rel="stylesheet"/><link href="report.css?v=20261001.1" rel="stylesheet"/><link href="design/animation.css?v=20261001.1" rel="stylesheet"/></head>
 <body>
-  <a class="skip-link" href="#main-content">본문으로 이동</a>
-  <header class="site-header shell">
-    <div><h1>VLR Analyzer</h1><p>Valorant match analysis</p></div>
-    <div id="db-sync-badge"><span id="sync-badge-text">1시간마다 업데이트</span></div>
-  </header>
-  <main id="main-content" class="shell">
-    <details id="match-selection-panel" class="match-finder" open>
-      <summary><span class="finder-title">경기 선택</span><span id="selection-caption"></span><span class="finder-toggle">선택 / 변경</span></summary>
-      <div class="finder-body">
-        <div class="primary-fields">
-          <div class="field">
-            <label for="event-select"><span>01</span>대회</label>
-            <select id="event-select" aria-describedby="tournament-selection-summary" disabled><option>대회 불러오는 중…</option></select>
-            <p id="tournament-selection-summary" aria-live="polite">저장된 대회 목록을 불러옵니다.</p>
-          </div>
-          <div class="field">
-            <label for="match-search"><span>02</span>경기 찾기</label>
-            <input id="match-search" type="search" placeholder="팀 또는 대회 이름" autocomplete="off" aria-controls="match-browser">
-            <p>저장된 목록에서 바로 검색합니다. 시간은 한국 시간(KST)입니다.</p>
-          </div>
-        </div>
-        <section class="match-browser-panel" aria-label="경기 목록">
-          <div class="browser-heading"><div id="match-status-filters" class="status-filters" aria-label="경기 상태 필터"></div><p id="match-results-count" class="meta" role="status"></p></div>
-          <div id="match-browser" class="match-browser" role="region" aria-label="날짜별 경기 · 스크롤 가능" tabindex="0"><p class="meta">경기 목록을 준비하고 있습니다.</p></div>
-        </section>
-        <div class="finder-actions"><p id="match-selection-hint" class="meta">목록에서 경기를 고른 뒤 분석하세요.</p><button type="button" id="analyze-btn" class="primary-button" disabled>경기 분석</button></div>
-        <details class="native-match-select"><summary>경기 선택 메뉴로 보기</summary><div class="field"><label for="match-select">경기</label><select id="match-select" aria-describedby="tournament-selection-help" disabled><option value="">분석할 경기를 선택하세요</option></select><p id="tournament-selection-help">대진이 확정된 경기만 분석할 수 있습니다.</p></div></details>
-        <div class="filter-tools">
-          <details id="tournament-explorer">
-            <summary>대회 탐색 · 종류, 등급, 지역</summary>
-            <div id="tournament-category-filters" role="group" aria-label="대회 종류"></div>
-            <div class="secondary-fields">
-              <div class="field"><label for="tier-select">대회 등급</label><select id="tier-select">
-                <option value="All">전체 등급</option><option value="S-Tier">S-Tier · 국제/주요 리그</option><option value="A-Tier">A-Tier · 챌린저스/GC</option><option value="Other">기타 리그</option>
-              </select></div>
-              <div class="field"><label for="region-select">지역</label><select id="region-select">
-                <option value="All">전체 지역</option><option value="Pacific">Pacific (아시아/태평양)</option><option value="EMEA">EMEA (유럽/중동)</option><option value="Americas">Americas (아메리카)</option><option value="China">China (중국)</option><option value="Global">Global (국제대회)</option><option value="Other">기타</option>
-              </select></div>
-            </div>
-          </details>
-          <details id="advanced-filters">
-            <summary>상세 필터 · 맵 기록 범위 <span id="filter-count"></span></summary>
-            <p class="meta">선택하지 않으면 수집된 전체 대회 기록을 사용합니다. 현역 선수 커리어에는 적용되지 않습니다.</p>
-            <div id="tournament-checklist-container" class="hidden">
-              <div id="tournament-quick-filters" role="group" aria-label="맵 기록 빠른 필터">
-                <button type="button" id="btn-filter-all">전체 선택</button><button type="button" id="btn-filter-vct">VCT 정규</button><button type="button" id="btn-filter-global">국제대회</button><button type="button" id="btn-filter-offseason">오프시즌</button><button type="button" id="btn-filter-clear">선택 해제</button>
-              </div>
-              <div id="tournament-checklist" role="group" aria-label="맵 기록에 사용할 대회"></div>
-            </div>
-          </details>
-        </div>
-      </div>
-    </details>
-    <div id="analysis-status" class="status-area" role="status" aria-live="polite" aria-atomic="true">
-      <span id="status-icon-container" aria-hidden="true"><span id="status-icon"></span></span>
-      <span id="status-text">경기 목록을 준비하고 있습니다.</span><span id="sub-status-text"></span>
-      <div id="progress-bar-container" class="hidden" role="progressbar" aria-label="분석 진행" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progress-bar"></div></div>
-    </div>
-    <div class="report-layout">
-    <div id="report-toolbar" class="report-toolbar hidden">
-      <nav class="report-nav" aria-label="분석 리포트"><a href="#overview" aria-current="location">Overview</a><a href="#maps">Maps</a><a href="#players">Players</a><a href="#form">Form</a></nav>
-      <div class="report-actions"><button type="button" id="export-link-btn" class="text-button">링크 복사</button><button type="button" id="export-img-btn" class="text-button">이미지 저장</button></div>
-    </div>
-    <article id="match-report" class="hidden" aria-label="경기 분석 리포트" aria-busy="false">
-      <section id="overview" class="report-section" aria-label="두 팀 요약" tabindex="-1">
-        <div class="report-kicker"><a id="report-event" target="_blank" rel="noopener noreferrer"></a><span id="report-fixture"></span></div>
-        <div class="matchup">
-          <div class="matchup-side"><div class="team-heading"><img id="team-a-logo" class="team-logo" alt="" hidden><a id="team-a-source" target="_blank" rel="noopener noreferrer"><h2 id="team-a-name" class="team-a">—</h2></a></div><div class="summary-stat"><strong id="summary-a-rate">—</strong><span id="summary-a-record"></span></div><p class="meta">수집된 맵 승률</p><div id="team-a-form" class="form-strip" aria-label="최근 경기 결과 · 최신순"></div><p class="meta">최근 전적 · 왼쪽이 최신</p></div>
-          <div class="versus"><strong id="match-summary-score">vs</strong><span id="match-summary-status" class="meta"></span><span id="match-summary-format" class="meta"></span><a id="match-source" class="meta" target="_blank" rel="noopener noreferrer">VLR 경기</a></div>
-          <div class="matchup-side"><div class="team-heading"><img id="team-b-logo" class="team-logo" alt="" hidden><a id="team-b-source" target="_blank" rel="noopener noreferrer"><h2 id="team-b-name" class="team-b">—</h2></a></div><div class="summary-stat"><strong id="summary-b-rate">—</strong><span id="summary-b-record"></span></div><p class="meta">수집된 맵 승률</p><div id="team-b-form" class="form-strip" aria-label="최근 경기 결과 · 최신순"></div><p class="meta">최근 전적 · 왼쪽이 최신</p></div>
-        </div>
-        <div id="win-probability-section" class="probability hidden">
-          <p class="meta">참고 전력 지수 · 제공된 지표이며 실제 경기 결과를 보장하지 않습니다.</p>
-          <div class="probability-labels"><span><span id="win-prob-team-a"></span> <b id="win-prob-val-a"></b></span><span><span id="win-prob-team-b"></span> <b id="win-prob-val-b"></b></span></div>
-          <div class="probability-track" aria-hidden="true"><div id="win-prob-bar-a"></div><div id="win-prob-bar-b"></div></div>
-        </div>
-        <div class="summary-notes">
-          <div class="summary-note"><p><span class="muted">주요 맵</span> <b id="summary-a-map">—</b></p><p id="summary-a-player"></p><p id="summary-a-sample" class="meta"></p></div>
-          <div class="summary-note"><p><span class="muted">주요 맵</span> <b id="summary-b-map">—</b></p><p id="summary-b-player"></p><p id="summary-b-sample" class="meta"></p></div>
-        </div>
-        <section id="live-scoreboard-panel" class="live-scoreboard hidden" aria-label="맵별 스코어">
-          <div class="live-heading"><h3>맵별 스코어</h3><span id="live-status-badge" class="sr-only"></span></div><div id="live-series-score" class="sr-only"></div>
-          <div id="live-maps-container" class="hidden"><div id="live-maps-grid"></div></div>
-        </section>
-        <section id="confirmed-veto" class="outlook" aria-labelledby="confirmed-veto-title" hidden><h2 id="confirmed-veto-title">확정 밴·픽</h2><ol id="confirmed-veto-list" class="veto-list"></ol><p id="confirmed-veto-note" class="meta"></p></section>
-        <details id="map-outlook" class="outlook" open><summary>맵 밴·픽 참고</summary><div class="outlook-grid"><div><h3>밴 우선 검토</h3><div id="ai-ban-list"></div></div><div><h3>유리한 픽 후보</h3><div id="ai-pick-list"></div></div></div><p class="meta">수집된 맵 기록을 바탕으로 한 참고 정보입니다. 실제 밴·픽 순서를 예측하지 않습니다. 표본이 5맵 미만인 후보는 표본 부족으로 표시합니다.</p></details>
-        <p id="report-scope" class="scope-note"></p>
-      </section>
-      <section id="maps" class="report-section" aria-labelledby="maps-heading">
-        <div class="section-heading"><h2 id="maps-heading">맵별 비교</h2><p>승률 · 승–패 · 공격 / 수비 라운드 승률</p></div>
-        <div class="table-scroll" tabindex="0" role="region" aria-label="맵 비교 표 · 좌우 스크롤 가능">
-          <table class="map-table"><caption class="hidden">동일한 맵에서 두 팀의 기록 비교</caption><thead><tr><th rowspan="2" scope="col">맵</th><th id="team-a-maps-table" colspan="3" scope="colgroup" class="team-a team-start">—</th><th id="team-b-maps-table" colspan="3" scope="colgroup" class="team-b team-start">—</th></tr><tr><th scope="col" class="team-start">승률 / 전적</th><th scope="col">공격</th><th scope="col">수비</th><th scope="col" class="team-start">승률 / 전적</th><th scope="col">공격</th><th scope="col">수비</th></tr></thead><tbody id="maps-comparison-body"></tbody></table>
-        </div><p id="map-pool-note" class="scope-note"></p>
-      </section>
-      <section id="players" class="report-section" aria-labelledby="players-heading">
-        <div class="section-heading"><h2 id="players-heading">현역 선수 커리어 비교</h2><div id="roster-sort" class="status-filters" aria-label="선수 정렬"><button type="button" data-sort="team" aria-pressed="true">팀별</button><button type="button" data-sort="acs" aria-pressed="false">ACS순</button></div></div>
-        <div class="table-scroll" tabindex="0" role="region" aria-label="전체 현역 선수 커리어 · 좌우 스크롤 가능"><table class="roster-table"><caption class="sr-only">확인된 양 팀 현역 선수 전체 커리어 비교</caption><thead><tr><th scope="col">선수</th><th scope="col">팀</th><th scope="col" class="number">커리어 ACS</th><th scope="col" class="number">K/D</th><th scope="col" class="number">킬–데스 차</th><th scope="col" class="number">라운드</th><th scope="col">주요 요원</th></tr></thead><tbody id="career-roster-body"></tbody></table></div>
-        <details class="career-leaders"><summary>커리어 ACS 대표 선수 비교</summary>
-        <div class="table-scroll" tabindex="0" role="region" aria-label="선수 커리어 표 · 좌우 스크롤 가능">
-          <table id="career-acs-chart" class="player-table"><thead><tr><th scope="col">선수</th><th scope="col">팀</th><th scope="col" class="number">커리어 ACS</th><th scope="col" class="number">K/D</th><th scope="col" class="number">누적 킬–데스 차</th><th scope="col" class="number">라운드</th></tr></thead><tbody><tr><th scope="row" id="ace-a-nickname" class="player-name">—</th><td id="ace-a-team" class="team-a">—</td><td id="ace-a-acs" class="number acs-value">—</td><td id="ace-a-kd-ratio" class="number">—</td><td class="number"><span id="ace-a-kd">—</span></td><td id="ace-a-rounds" class="number">—</td></tr><tr><th scope="row" id="ace-b-nickname" class="player-name">—</th><td id="ace-b-team" class="team-b">—</td><td id="ace-b-acs" class="number acs-value">—</td><td id="ace-b-kd-ratio" class="number">—</td><td class="number"><span id="ace-b-kd">—</span></td><td id="ace-b-rounds" class="number">—</td></tr></tbody></table>
-        </div><p id="career-acs-empty" class="scope-note" hidden></p></details>
-        <div class="player-notes"><div><h3 id="ace-a-note-team" class="team-a">—</h3><p id="ace-a-coverage" class="meta"></p><p class="agents"><span class="muted">주요 요원 </span><span id="ace-a-agents"></span></p><p id="team-a-agents" class="hidden" aria-hidden="true"></p><p id="ace-a-collected" class="meta"></p></div><div><h3 id="ace-b-note-team" class="team-b">—</h3><p id="ace-b-coverage" class="meta"></p><p class="agents"><span class="muted">주요 요원 </span><span id="ace-b-agents"></span></p><p id="team-b-agents" class="hidden" aria-hidden="true"></p><p id="ace-b-collected" class="meta"></p></div></div>
-        <p class="scope-note">ACS는 라운드당 평균 전투 점수입니다. 선수별 전체 커리어 기록으로 비교하며 맵 기록 필터와 무관합니다. 출전 기간과 표본 차이를 함께 확인하세요.</p>
-      </section>
-      <section id="form" class="report-section" aria-labelledby="form-heading">
-        <div class="section-heading"><h2 id="form-heading">최근 경기</h2><p>최신순 · 수집된 최근 최대 5경기</p></div>
-        <table class="form-table"><thead><tr><th scope="col">순서</th><th id="form-a-team" scope="col" class="team-a">—</th><th id="form-b-team" scope="col" class="team-b">—</th></tr></thead><tbody id="acs-trend-chart"></tbody></table>
-        <p class="scope-note">각 팀의 최신 경기부터 나란히 표시합니다. 같은 행이 같은 날짜의 경기를 의미하지는 않습니다.</p>
-      </section>
-      <footer class="report-footer"><p id="report-updated"></p><p id="report-integrity-note"></p><p>Data sourced from VLR.gg · Unofficial analysis tool</p></footer>
-    </article>
-    </div>
-  </main>
-  <footer class="site-footer shell"><span>Data sourced from <a href="https://www.vlr.gg/" target="_blank" rel="noopener noreferrer">VLR.gg</a></span><span>Unofficial analysis tool</span></footer>
-  <div id="app-toast" class="toast" role="status" aria-live="polite" hidden></div>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" async></script>
-  <script src="constants.js?v=20260930.4" defer></script><script src="match-context.js?v=20260930.4" defer></script><script src="charts.js?v=20260930.4" defer></script><script src="ui.js?v=20260930.4" defer></script><script src="api.js?v=20260930.4" defer></script><script src="app.js?v=20260930.4" defer></script>
-</body>
+<a class="skip-link" href="#main-content">본문으로 이동</a>
+<header class="site-header shell">
+<div><h1>VLR Analyzer</h1><p>Valorant 경기 분석</p></div>
+<div id="db-sync-badge"><span id="sync-badge-text">1시간마다 업데이트</span></div>
+</header>
+<main class="shell" id="main-content">
+<details class="match-finder" id="match-selection-panel" open="">
+<summary><span class="finder-title">경기 찾기</span><span id="selection-caption"></span><span class="finder-toggle">선택 / 변경</span></summary>
+<div class="finder-body">
+<div class="primary-fields">
+<div class="field">
+<label for="event-select"><span>01</span>대회</label>
+<select aria-describedby="tournament-selection-summary" disabled="" id="event-select"><option>대회 불러오는 중…</option></select>
+<p aria-live="polite" id="tournament-selection-summary">저장된 대회 목록을 불러옵니다.</p>
+</div>
+<div class="field">
+<label for="match-search"><span>02</span>경기 찾기</label>
+<input aria-controls="match-browser" autocomplete="off" id="match-search" placeholder="팀 또는 대회 이름" type="search"/>
+<p>저장된 목록에서 바로 검색합니다. 시간은 한국 시간(KST)입니다.</p>
+</div>
+</div>
+<section aria-label="경기 목록" class="match-browser-panel">
+<div class="browser-heading"><div aria-label="경기 상태 필터" class="status-filters" id="match-status-filters"></div><p class="meta" id="match-results-count" role="status"></p></div>
+<div aria-label="날짜별 경기 · 스크롤 가능" class="match-browser" id="match-browser" role="region" tabindex="0"><p class="meta">경기 목록을 준비하고 있습니다.</p></div>
+</section>
+<div class="finder-actions"><p class="meta" id="match-selection-hint">목록에서 경기를 고른 뒤 분석하세요.</p><button class="primary-button" disabled="" id="analyze-btn" type="button">경기 분석</button></div>
+<details class="native-match-select"><summary>경기 선택 메뉴로 보기</summary><div class="field"><label for="match-select">경기</label><select aria-describedby="tournament-selection-help" disabled="" id="match-select"><option value="">분석할 경기를 선택하세요</option></select><p id="tournament-selection-help">대진이 확정된 경기만 분석할 수 있습니다.</p></div></details>
+<div class="filter-tools">
+<details id="tournament-explorer">
+<summary>대회 탐색 · 종류, 등급, 지역</summary>
+<div aria-label="대회 종류" id="tournament-category-filters" role="group"></div>
+<div class="secondary-fields">
+<div class="field"><label for="tier-select">대회 등급</label><select id="tier-select">
+<option value="All">전체 등급</option><option value="S-Tier">S-Tier · 국제/주요 리그</option><option value="A-Tier">A-Tier · 챌린저스/GC</option><option value="Other">기타 리그</option>
+</select></div>
+<div class="field"><label for="region-select">지역</label><select id="region-select">
+<option value="All">전체 지역</option><option value="Pacific">Pacific (아시아/태평양)</option><option value="EMEA">EMEA (유럽/중동)</option><option value="Americas">Americas (아메리카)</option><option value="China">China (중국)</option><option value="Global">Global (국제대회)</option><option value="Other">기타</option>
+</select></div>
+</div>
+</details>
+<details id="advanced-filters">
+<summary>상세 필터 · 맵 기록 범위 <span id="filter-count"></span></summary>
+<p class="meta">선택하지 않으면 수집된 전체 대회 기록을 사용합니다. 현역 선수 커리어에는 적용되지 않습니다.</p>
+<div class="hidden" id="tournament-checklist-container">
+<div aria-label="맵 기록 빠른 필터" id="tournament-quick-filters" role="group">
+<button id="btn-filter-all" type="button">전체 선택</button><button id="btn-filter-vct" type="button">VCT 정규</button><button id="btn-filter-global" type="button">국제대회</button><button id="btn-filter-offseason" type="button">오프시즌</button><button id="btn-filter-clear" type="button">선택 해제</button>
+</div>
+<div aria-label="맵 기록에 사용할 대회" id="tournament-checklist" role="group"></div>
+</div>
+</details>
+</div>
+</div>
+</details>
+<div aria-atomic="true" aria-live="polite" class="status-area" id="analysis-status" role="status">
+<span aria-hidden="true" id="status-icon-container"><span id="status-icon"></span></span>
+<span id="status-text">경기 목록을 준비하고 있습니다.</span><span id="sub-status-text"></span>
+<div aria-label="분석 진행" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="hidden" id="progress-bar-container" role="progressbar"><div id="progress-bar"></div></div>
+</div>
+<div class="report-layout">
+<div class="report-toolbar hidden" id="report-toolbar">
+<nav aria-label="분석 리포트" class="report-nav"><a aria-current="location" href="#overview">Overview</a><a href="#maps">Maps</a><a href="#players">Players</a><a href="#form">Form</a></nav>
+<div class="report-actions"><button class="text-button" id="export-link-btn" type="button">링크 복사</button><button class="text-button" id="export-img-btn" type="button">이미지 저장</button></div>
+</div>
+<article aria-busy="false" aria-label="경기 분석 리포트" class="hidden" id="match-report">
+<section aria-label="두 팀 요약" class="report-section overview-story" id="overview" tabindex="-1"><div class="analysis-card match-hero" data-balance="unknown" data-match-state="unknown" id="match-hero"><div class="hero-heading"><p class="eyebrow" id="hero-phase">경기 정보</p><div class="report-kicker"><a id="report-event" rel="noopener noreferrer" target="_blank"></a><span id="report-fixture"></span></div></div><div class="matchup">
+<div class="matchup-side"><div class="team-heading"><img alt="" class="team-logo" hidden="" id="team-a-logo"/><a id="team-a-source" rel="noopener noreferrer" target="_blank"><h2 class="team-a" id="team-a-name">—</h2></a></div><div class="summary-stat"><strong id="summary-a-rate">—</strong><span id="summary-a-record"></span></div><p class="meta">수집된 맵 승률</p></div>
+<div class="versus"><strong id="match-summary-score">vs</strong><span class="meta" id="match-summary-status"></span><span class="meta" id="match-summary-format"></span><a class="meta" id="match-source" rel="noopener noreferrer" target="_blank">VLR 경기</a></div>
+<div class="matchup-side"><div class="team-heading"><img alt="" class="team-logo" hidden="" id="team-b-logo"/><a id="team-b-source" rel="noopener noreferrer" target="_blank"><h2 class="team-b" id="team-b-name">—</h2></a></div><div class="summary-stat"><strong id="summary-b-rate">—</strong><span id="summary-b-record"></span></div><p class="meta">수집된 맵 승률</p></div>
+</div><div class="probability hidden" id="win-probability-section">
+<p class="meta">참고 전력 지수 · 제공된 지표이며 실제 경기 결과를 보장하지 않습니다.</p>
+<div class="probability-labels"><span><span id="win-prob-team-a"></span> <b id="win-prob-val-a"></b></span><span><span id="win-prob-team-b"></span> <b id="win-prob-val-b"></b></span></div>
+<div aria-hidden="true" class="probability-track"><div id="win-prob-bar-a"></div><div id="win-prob-bar-b"></div></div>
+</div><div class="hero-footer"><p class="meta" id="hero-data-note"></p><div class="hero-actions"><p class="meta" id="hero-action-note"></p><button class="primary-button" id="hero-analyze-btn" type="button">매치업 분석</button></div></div></div><section aria-labelledby="insight-title" class="insight-strip" id="insight-strip">
+<div class="insight-story"><p class="eyebrow" id="insight-kicker">기록을 보는 관점</p><h2 id="insight-title"></h2><p class="meta" id="insight-detail"></p><p class="data-notice" hidden="" id="insight-freshness"></p></div>
+<div class="insight-form"><div class="form-summary"><p class="team-a" id="insight-form-a"></p><div aria-label="최근 경기 결과 · 최신순" class="form-strip" id="team-a-form"></div><p class="meta" id="insight-form-note-a"></p></div><div class="form-summary"><p class="team-b" id="insight-form-b"></p><div aria-label="최근 경기 결과 · 최신순" class="form-strip" id="team-b-form"></div><p class="meta" id="insight-form-note-b"></p></div><p class="form-direction meta">왼쪽이 최신 경기</p></div>
+</section><div class="module-grid" id="report-modules"><section aria-label="맵별 스코어" class="analysis-card live-scoreboard hidden" id="live-scoreboard-panel">
+<div class="live-heading"><h3 id="live-heading-title">맵별 스코어</h3><span class="sr-only" id="live-status-badge"></span><p class="meta" id="live-caption"></p></div><div class="sr-only" id="live-series-score"></div>
+<div class="hidden" id="live-maps-container"><div id="live-maps-grid"></div></div>
+</section><section aria-labelledby="map-preview-title" class="analysis-card map-preview" id="map-preview-card"><div class="card-heading"><div><p class="eyebrow">맵 기록</p><h3 id="map-preview-title">맵별로 달라지는 강점</h3></div><a class="detail-link" href="#maps">전체 맵 보기 <span aria-hidden="true">↗</span></a></div><ul class="forecast-list" id="map-preview-list"></ul><p class="meta" id="map-preview-sample"></p><div class="map-sample-notes">
+<div class="summary-note"><p class="meta team-a" id="map-preview-team-a"></p><p><span class="muted">주요 맵</span> <b id="summary-a-map">—</b></p><p class="meta" id="summary-a-sample"></p></div>
+<div class="summary-note"><p class="meta team-b" id="map-preview-team-b"></p><p><span class="muted">주요 맵</span> <b id="summary-b-map">—</b></p><p class="meta" id="summary-b-sample"></p></div>
+</div></section><section aria-labelledby="veto-card-title" class="analysis-card veto-card" id="veto-card"><div class="card-heading"><div><p class="eyebrow">밴·픽</p><h3 id="veto-card-title">맵 선택의 방향</h3></div></div><p class="meta" id="veto-phase"></p><section aria-labelledby="confirmed-veto-title" class="outlook" hidden="" id="confirmed-veto"><h4 id="confirmed-veto-title">확정 밴·픽</h4><ol class="veto-list" id="confirmed-veto-list"></ol><p class="meta" id="confirmed-veto-note"></p></section><details class="outlook" id="map-outlook" open=""><summary>맵 밴·픽 참고</summary><div class="outlook-grid"><div><h3>밴 우선 검토</h3><div id="ai-ban-list"></div></div><div><h3>유리한 픽 후보</h3><div id="ai-pick-list"></div></div></div><p class="meta">수집된 맵 기록을 바탕으로 한 참고 정보입니다. 실제 밴·픽 순서를 예측하지 않습니다. 표본이 5맵 미만인 후보는 표본 부족으로 표시합니다.</p></details></section><section aria-labelledby="player-impact-title" class="analysis-card player-impact" id="player-impact-card"><div class="card-heading"><div><p class="eyebrow">선수 커리어</p><h3 id="player-impact-title">현역 로스터의 ACS 리더</h3></div><a class="detail-link" href="#players">전체 선수 보기 <span aria-hidden="true">↗</span></a></div><div class="impact-grid"><div class="impact-player team-a"><p class="meta" id="impact-a-team"></p><h4 class="impact-player-name" id="summary-a-player"></h4><p class="impact-metric"><strong id="impact-a-acs">—</strong><span>커리어 ACS</span></p><p class="meta" id="impact-a-detail"></p></div><div class="impact-player team-b"><p class="meta" id="impact-b-team"></p><h4 class="impact-player-name" id="summary-b-player"></h4><p class="impact-metric"><strong id="impact-b-acs">—</strong><span>커리어 ACS</span></p><p class="meta" id="impact-b-detail"></p></div></div><p class="meta">전체 커리어 ACS 기준 · 이번 경기의 선수 성적이나 대회 평균 비교가 아닙니다.</p></section></div>
+
+
+
+
+
+
+
+<p class="scope-note overview-scope" id="report-scope"></p>
+</section><div class="report-details" id="report-details"><section aria-labelledby="maps-heading" class="report-section analysis-card detail-section" id="maps">
+<div class="section-heading"><h2 id="maps-heading">맵 기록 자세히 보기</h2><p>승률 · 승–패 · 공격 / 수비 라운드 승률</p></div>
+<div aria-label="맵 비교 표 · 좌우 스크롤 가능" class="table-scroll" role="region" tabindex="0">
+<table class="map-table"><caption class="hidden">동일한 맵에서 두 팀의 기록 비교</caption><thead><tr><th rowspan="2" scope="col">맵</th><th class="team-a team-start" colspan="3" id="team-a-maps-table" scope="colgroup">—</th><th class="team-b team-start" colspan="3" id="team-b-maps-table" scope="colgroup">—</th></tr><tr><th class="team-start" scope="col">승률 / 전적</th><th scope="col">공격</th><th scope="col">수비</th><th class="team-start" scope="col">승률 / 전적</th><th scope="col">공격</th><th scope="col">수비</th></tr></thead><tbody id="maps-comparison-body"></tbody></table>
+</div><p class="scope-note" id="map-pool-note"></p>
+</section><section aria-labelledby="players-heading" class="report-section analysis-card detail-section" id="players">
+<div class="section-heading"><h2 id="players-heading">현역 선수 커리어 비교</h2><div aria-label="선수 정렬" class="status-filters" id="roster-sort"><button aria-pressed="true" data-sort="team" type="button">팀별</button><button aria-pressed="false" data-sort="acs" type="button">ACS순</button></div></div>
+<div aria-label="전체 현역 선수 커리어 · 좌우 스크롤 가능" class="table-scroll" role="region" tabindex="0"><table class="roster-table"><caption class="sr-only">확인된 양 팀 현역 선수 전체 커리어 비교</caption><thead><tr><th scope="col">선수</th><th scope="col">팀</th><th class="number" scope="col">커리어 ACS</th><th class="number" scope="col">K/D</th><th class="number" scope="col">킬–데스 차</th><th class="number" scope="col">라운드</th><th scope="col">주요 요원</th></tr></thead><tbody id="career-roster-body"></tbody></table></div>
+<details class="career-leaders"><summary>커리어 ACS 대표 선수 비교</summary>
+<div aria-label="선수 커리어 표 · 좌우 스크롤 가능" class="table-scroll" role="region" tabindex="0">
+<table class="player-table" id="career-acs-chart"><thead><tr><th scope="col">선수</th><th scope="col">팀</th><th class="number" scope="col">커리어 ACS</th><th class="number" scope="col">K/D</th><th class="number" scope="col">누적 킬–데스 차</th><th class="number" scope="col">라운드</th></tr></thead><tbody><tr><th class="player-name" id="ace-a-nickname" scope="row">—</th><td class="team-a" id="ace-a-team">—</td><td class="number acs-value" id="ace-a-acs">—</td><td class="number" id="ace-a-kd-ratio">—</td><td class="number"><span id="ace-a-kd">—</span></td><td class="number" id="ace-a-rounds">—</td></tr><tr><th class="player-name" id="ace-b-nickname" scope="row">—</th><td class="team-b" id="ace-b-team">—</td><td class="number acs-value" id="ace-b-acs">—</td><td class="number" id="ace-b-kd-ratio">—</td><td class="number"><span id="ace-b-kd">—</span></td><td class="number" id="ace-b-rounds">—</td></tr></tbody></table>
+</div><p class="scope-note" hidden="" id="career-acs-empty"></p></details>
+<div class="player-notes"><div><h3 class="team-a" id="ace-a-note-team">—</h3><p class="meta" id="ace-a-coverage"></p><p class="agents"><span class="muted">주요 요원 </span><span id="ace-a-agents"></span></p><p aria-hidden="true" class="hidden" id="team-a-agents"></p><p class="meta" id="ace-a-collected"></p></div><div><h3 class="team-b" id="ace-b-note-team">—</h3><p class="meta" id="ace-b-coverage"></p><p class="agents"><span class="muted">주요 요원 </span><span id="ace-b-agents"></span></p><p aria-hidden="true" class="hidden" id="team-b-agents"></p><p class="meta" id="ace-b-collected"></p></div></div>
+<p class="scope-note">ACS는 라운드당 평균 전투 점수입니다. 선수별 전체 커리어 기록으로 비교하며 맵 기록 필터와 무관합니다. 출전 기간과 표본 차이를 함께 확인하세요.</p>
+</section><section aria-labelledby="form-heading" class="report-section analysis-card detail-section" id="form">
+<div class="section-heading"><h2 id="form-heading">최근 경기 흐름</h2><p>최신순 · 수집된 최근 최대 5경기</p></div>
+<table class="form-table"><thead><tr><th scope="col">순서</th><th class="team-a" id="form-a-team" scope="col">—</th><th class="team-b" id="form-b-team" scope="col">—</th></tr></thead><tbody id="acs-trend-chart"></tbody></table>
+<p class="scope-note">각 팀의 최신 경기부터 나란히 표시합니다. 같은 행이 같은 날짜의 경기를 의미하지는 않습니다.</p>
+</section></div>
+
+
+
+<footer class="report-footer"><p id="report-updated"></p><p id="report-integrity-note"></p><p>Data sourced from VLR.gg · Unofficial analysis tool</p></footer>
+</article>
+</div>
+</main>
+<footer class="site-footer shell"><span>Data sourced from <a href="https://www.vlr.gg/" rel="noopener noreferrer" target="_blank">VLR.gg</a></span><span>Unofficial analysis tool</span></footer>
+<div aria-live="polite" class="toast" hidden="" id="app-toast" role="status"></div>
+<script async="" src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script defer="" src="constants.js?v=20261001.1"></script><script defer="" src="components/primitives.js?v=20261001.1"></script><script defer="" src="match-context.js?v=20261001.1"></script><script defer="" src="charts.js?v=20261001.1"></script><script defer="" src="components/insight-strip.js?v=20261001.1"></script><script defer="" src="components/matchup-hero.js?v=20261001.1"></script><script defer="" src="components/map-card.js?v=20261001.1"></script><script defer="" src="components/player-card.js?v=20261001.1"></script><script defer="" src="ui.js?v=20261001.1"></script><script defer="" src="api.js?v=20261001.1"></script><script defer="" src="pages/match.js?v=20261001.1"></script><script defer="" src="app.js?v=20261001.1"></script></body>
 </html>

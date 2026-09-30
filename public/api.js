@@ -124,6 +124,7 @@ async function handleMatchSelection(restoredEventIds = [], autoAnalyze = false) 
     drawTournamentChecklist();
     setTournamentSelection(restoredEventIds);
     requestMatch.details_ready = true;
+    MatchUI.preview(requestMatch);
     document.getElementById('match-selection-hint').textContent = `${requestMatch.team_a} vs ${requestMatch.team_b}`;
     analyzeBtn.disabled = false;
     renderMatchBrowser();

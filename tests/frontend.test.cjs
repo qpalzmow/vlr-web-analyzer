@@ -35,6 +35,8 @@ function setup(search = '') {
         }
         get innerHTML() { return this.html || ''; }
         appendChild(child) {
+            if (child.parent) child.parent.children = child.parent.children.filter(item => item !== child);
+            child.parent = this;
             this.children.push(child);
             if (this.tag === 'select' && child.tag === 'option' && !this.value) this.value = child.value;
         }
@@ -78,7 +80,7 @@ function setup(search = '') {
         fetch: async () => { throw new Error('Unexpected fetch'); },
     };
     vm.createContext(context);
-    for (const file of ['constants.js', 'match-context.js', 'charts.js', 'ui.js', 'api.js']) {
+    for (const file of ['constants.js', 'components/primitives.js', 'match-context.js', 'charts.js', 'components/insight-strip.js', 'components/matchup-hero.js', 'components/map-card.js', 'components/player-card.js', 'ui.js', 'api.js', 'pages/match.js']) {
         vm.runInContext(fs.readFileSync(path.join(__dirname, '../public', file), 'utf8'), context);
     }
     return {
@@ -797,4 +799,74 @@ test('three-map perfect results do not outrank established maps and stay labelle
     assert.match(h.elements.get('summary-a-map').textContent,/Ascent/);
     const rows=h.elements.get('maps-comparison-body').children;
     assert.match(rows.find(row=>row.innerHTML.includes('Summit')).innerHTML,/표본 부족/);
+});
+
+const mapSample = (played, wins) => ({played,w:wins,l:played-wins,atk_won:50,atk_total:100,def_won:50,def_total:100});
+
+test('match narrative excludes small samples and never turns map history into an odds prediction', () => {
+    const h=setup();h.context.match=readyMatch();h.context.data=analysisResult();
+    h.run("match.status_code='upcoming';match.map_pool=['Ascent','Summit'];data.maps_a={Ascent:{played:20,w:12},Summit:{played:3,w:3}};data.maps_b={Ascent:{played:20,w:10},Summit:{played:3,w:0}}");
+    const result=h.read('MatchUI.buildMatchSummary(data,match)');
+    assert.match(result.title,/One.*Ascent.*과거/);
+    assert.doesNotMatch(result.title,/Summit|승리|예측|확률|55%/);
+    assert.equal(result.comparable.length,1);
+    assert.equal(result.balance,'unknown');
+    h.run('data.maps_a={};data.maps_b={}');
+    assert.match(h.read('MatchUI.buildMatchSummary(data,match)').title,/표본/);
+});
+
+test('final result uses the actual winner even when historical maps and reference indicator favor the loser', () => {
+    const h=setup();h.context.match=readyMatch();h.context.data=analysisResult();
+    h.run("match.live_score={status:'final',series_score_a:'0',series_score_b:'2'};data.maps_a={Bind:{played:20,w:20}};data.maps_b={Bind:{played:20,w:0}};data.probability={a:90,b:10}");
+    const result=h.read('MatchUI.buildMatchSummary(data,match)');
+    assert.equal(result.status,'final');
+    assert.match(result.title,/Two 승리.*2 : 0/);
+    assert.doesNotMatch(result.title,/역전|예측|90|One가/);
+    h.run("match.live_score.series_score_b='unavailable'");
+    assert.match(h.read('MatchUI.buildMatchSummary(data,match)').title,/확인/);
+});
+
+test('live zero scores and phase changes update insight without replacing modules or career data', () => {
+    const h=setup();h.context.match=readyMatch();h.context.data=analysisResult();
+    h.run("selectedMatch=match;match.live_score={status:'upcoming',series_score_a:'0',series_score_b:'0'};MatchUI.render(data,match)");
+    const parent=h.elements.get('report-modules');
+    const ids=()=>parent.children.map(child=>[...h.elements.entries()].find(([,value])=>value===child)[0]);
+    assert.deepEqual(ids(),['map-preview-card','veto-card','player-impact-card','live-scoreboard-panel']);
+    const nodes=[...parent.children];
+    h.run("match.live_score.status='live';MatchUI.refresh()");
+    assert.match(h.elements.get('insight-title').textContent,/0 : 0.*동률/);
+    assert.equal(ids()[0],'live-scoreboard-panel');
+    h.run("match.live_score={status:'final',series_score_a:'2',series_score_b:'1'};MatchUI.refresh();MatchUI.refresh()");
+    assert.deepEqual(ids(),['live-scoreboard-panel','veto-card','map-preview-card','player-impact-card']);
+    assert.equal(new Set(parent.children).size,4);
+    assert.ok(nodes.every(node=>parent.children.includes(node)));
+    assert.equal(h.elements.get('impact-a-acs').textContent,'220.0');
+    assert.match(h.elements.get('insight-title').textContent,/One 승리.*2 : 1/);
+});
+
+test('selecting a match previews its hero locally and clears old analysis before a new request', async () => {
+    const h=setup();h.context.match=readyMatch();
+    h.run("filteredMatches=[match];matchSelect.value='0';MatchUI.analysis={maps_a:{}};MatchUI.matchId='old'");
+    await h.run('handleMatchSelection()');
+    assert.equal(h.elements.get('match-report').dataset.reportState,'preview');
+    assert.equal(h.elements.get('match-report').classList.contains('hidden'),false);
+    assert.equal(h.elements.get('hero-analyze-btn').disabled,false);
+    assert.equal(h.read('MatchUI.analysis'),null);
+    h.run('beginReport()');
+    assert.equal(h.elements.get('hero-analyze-btn').disabled,true);
+    assert.equal(h.elements.get('match-report').dataset.reportState,'loading');
+});
+
+test('map preview preserves missing attack rounds, escapes names and labels low sample records', () => {
+    const h=setup();h.context.match={...readyMatch(),team_a:'<img src=x>',map_pool:['<svg>']};
+    h.context.data={...analysisResult(),maps_a:{'<svg>':mapSample(3,3)},maps_b:{'<svg>':mapSample(5,1)}};
+    h.run('MatchUI.renderMapCard(data,match,MatchUI.buildMatchSummary(data,match))');
+    const html=h.elements.get('map-preview-list').children[0].innerHTML;
+    assert.match(html,/&lt;svg&gt;/);assert.match(html,/&lt;img/);
+    assert.doesNotMatch(html,/<svg|<img/);
+    assert.match(html,/표본 부족/);assert.match(html,/공격 비교 표본 부족/);
+    h.context.match={...readyMatch(),map_pool:['Ascent']};
+    h.context.data={...analysisResult(),maps_a:{Ascent:{...mapSample(10,6),atk_total:0}},maps_b:{Ascent:mapSample(10,5)}};
+    h.run('MatchUI.renderMapCard(data,match,MatchUI.buildMatchSummary(data,match))');
+    assert.match(h.elements.get('map-preview-list').children[0].innerHTML,/공격 비교 표본 부족/);
 });

@@ -1,0 +1,10 @@
+@keyframes report-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes live-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+#match-report[data-report-state="ready"] .match-hero { animation: report-in var(--duration) ease-out; }
+.match-hero[data-match-state="live"] #hero-phase::before { animation: live-pulse 2.4s ease-in-out infinite; }
+.forecast-track i { transition: left var(--duration) ease-out; }
+button, .report-nav a { transition: background-color var(--duration), color var(--duration); }
+.export-report *, .export-report *::before, .export-report *::after { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

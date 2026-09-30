@@ -10,7 +10,7 @@ def test_frontend_bindings_have_unique_real_destinations():
     soup = BeautifulSoup((PUBLIC / "index.html").read_text(encoding="utf-8"), "html.parser")
     ids = [tag["id"] for tag in soup.select("[id]")]
     assert len(ids) == len(set(ids))
-    for source in PUBLIC.glob("*.js"):
+    for source in PUBLIC.rglob("*.js"):
         for name in re.findall(r"getElementById\(['\"]([^'\"]+)['\"]\)", source.read_text(encoding="utf-8")):
             assert name in ids, (source.name, name)
     for team in "ab":
@@ -45,7 +45,7 @@ def test_navigation_labels_assets_and_disclosures_are_valid():
 
 def test_new_stylesheet_is_served_without_old_theme_or_tiny_fonts(client):
     page = client.get("/").text
-    assert "report.css?v=20260930.4" in page
+    assert "report.css?v=20261001.1" in page
     assert all(name not in page for name in ["ios-theme.css", "tailwind", "lucide", "chart.js", "theme-btn"])
     response = client.get("/report.css")
     assert response.status_code == 200
@@ -54,3 +54,7 @@ def test_new_stylesheet_is_served_without_old_theme_or_tiny_fonts(client):
     assert all(int(size) >= 12 for size in sizes)
     assert "backdrop-filter" not in response.text
     assert "gradient(" not in response.text
+    for name in ['tokens', 'theme', 'layout', 'animation']:
+        response = client.get(f'/design/{name}.css')
+        assert response.status_code == 200 and 'text/css' in response.headers['content-type']
+    assert 'prefers-reduced-motion' in client.get('/design/animation.css').text
