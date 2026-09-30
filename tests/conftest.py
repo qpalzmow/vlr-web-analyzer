@@ -1,4 +1,3 @@
-import os
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
@@ -17,16 +16,13 @@ def isolate_test_db(tmp_path, monkeypatch):
 @pytest.fixture(autouse=True)
 def isolate_memory_state(monkeypatch):
     import app.main as main
-    from app.cache import CACHE, LIVE_SCORE_CACHE, _cache_lock, _cache_timestamps
+    from app.cache import LIVE_SCORE_CACHE, _cache_lock
     monkeypatch.delenv("VLR_MAINTENANCE_TOKEN", raising=False)
     monkeypatch.delenv("RENDER", raising=False)
     monkeypatch.delenv("VLR_REFRESH_MODE", raising=False)
     monkeypatch.setattr(main, "_maintenance_last_started", None)
     with _cache_lock:
-        for config in CACHE.values():
-            config["data"].clear()
         LIVE_SCORE_CACHE.clear()
-        _cache_timestamps.clear()
 
 @pytest.fixture
 def client():

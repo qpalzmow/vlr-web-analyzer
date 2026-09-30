@@ -6,7 +6,6 @@ from unittest.mock import Mock
 import pytest
 import app.catalog as catalog
 import app.db as db
-import app.main as main
 import app.scraper.vlr as vlr
 
 
@@ -33,7 +32,7 @@ def mock_sources(monkeypatch):
 
 def test_selection_endpoints_never_scrape_or_expire_last_snapshot(client, monkeypatch):
     forbidden = Mock(side_effect=AssertionError("Selection must not access VLR"))
-    for module in (main, catalog):
+    for module in (vlr, catalog):
         for name in ("get_matches", "get_match_details", "get_team_events", "get_event_map_pool"):
             monkeypatch.setattr(module, name, forbidden)
     assert client.get("/api/catalog").json()["matches"] == []
@@ -140,7 +139,7 @@ def test_strict_events_distinguish_failed_scrape_from_empty_menu(monkeypatch):
 def test_static_assets_revalidate_after_deployment(client):
     assert client.get("/").headers["cache-control"] == "no-cache"
     assert client.get("/api/catalog").headers["cache-control"] == "no-store"
-    assert 'api.js?v=20260930.1' in client.get("/").text
+    assert 'api.js?v=20260930.2' in client.get("/").text
 
 
 def test_catalog_source_failure_is_not_a_successful_empty_or_partial_result(monkeypatch):

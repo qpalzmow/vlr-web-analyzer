@@ -95,6 +95,26 @@ def test_export_preserves_scope_dates_and_has_no_private_source_cache(tmp_path):
     assert path.exists() and not path.with_suffix('.tmp').exists()
 
 
+def test_export_checkpoints_are_throttled_and_failure_can_retry(monkeypatch, tmp_path):
+    from app import snapshot_export as export
+    clock = [0]
+    monkeypatch.setattr(export.time, 'monotonic', lambda: clock[0])
+    writer = Mock()
+    monkeypatch.setattr(export, 'write_snapshot', writer)
+    checkpoint = export.SnapshotCheckpoint(tmp_path/'snapshot.json')
+    for stamp in (0, 1, 59, 60, 61, 119, 120):
+        clock[0] = stamp
+        checkpoint({})
+    assert writer.call_count == 2
+    clock[0] = 180
+    writer.side_effect = RuntimeError('disk failure')
+    with pytest.raises(RuntimeError):
+        checkpoint({})
+    writer.side_effect = None
+    checkpoint({})
+    assert checkpoint.last_written == 180
+
+
 def test_database_install_is_atomic_on_failure():
     data = bundle()
     prior = db.get_catalog_snapshot()

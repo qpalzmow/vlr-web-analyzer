@@ -176,36 +176,3 @@ def parse_player(soup):
 def player_totals(player_id):
     # Bare player profiles default to a recent time window, not career totals.
     return source(f'player-all:{player_id}', lambda: parse_player(page(f'https://www.vlr.gg/player/{player_id}/?timespan=all')))
-
-
-def parse_event_players(soup):
-    table = soup.select_one('table.st-table')
-    if table is None:
-        if 'No stats available' in soup.get_text():
-            return {'_unavailable': True}
-        raise ValueError('Event player statistics missing')
-    players = {}
-    for row in table.select('tbody tr'):
-        link = row.select_one('a[href^="/player/"]')
-        cells = {c.get('data-col'): c for c in row.find_all('td', recursive=False)}
-        if not link or not {'rnd','acs','k','d','fk','fd'} <= cells.keys():
-            continue
-        player = empty_player()
-        player['rounds'] = safe_int(cells['rnd'].get_text())
-        player['weighted_acs'] = safe_float(cells['acs'].get_text()) * player['rounds']
-        for key, col in (('kills','k'),('deaths','d'),('fk','fk'),('fd','fd')):
-            player[key] = safe_int(cells[col].get_text())
-        for agent in row.select('.st-agent'):
-            img = agent.find('img')
-            if img:
-                name = img.get('src','').split('/')[-1].split('.')[0]
-                player['agents'][name] = safe_float(agent.get_text()) * player['rounds'] / 100
-        players[link['href'].split('/')[2]] = player
-    if not players:
-        raise ValueError('Event player rows missing')
-    return players
-
-
-def event_players(event_id):
-    # One leaderboard request supplies every player in a tournament.
-    return source(f'event-players:{event_id}', lambda: parse_event_players(page(f'https://www.vlr.gg/event/stats/{event_id}')))

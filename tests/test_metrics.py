@@ -1,8 +1,4 @@
-import pytest
-from app.scraper.metrics import (
-    normalize_team_name, team_matches, calculate_advanced_metrics,
-    find_ace_player_from_stats, simulate_banpick
-)
+from app.scraper.metrics import team_matches, calculate_advanced_metrics, find_ace_player_from_stats, simulate_banpick
 
 def test_team_matching_priority():
     # 1. Exact match

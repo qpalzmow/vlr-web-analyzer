@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Any
+from typing import List
 
 def normalize_team_name(name: str) -> str:
     if not name:

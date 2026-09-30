@@ -7,7 +7,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app import analysis_sources as sources
-from app.db import get_analysis_teams, save_analysis_team, get_catalog_snapshot
+from app.db import (get_analysis_teams, get_analysis_metadata, save_analysis_team,
+                    save_analysis_seed, get_catalog_snapshot)
 from app.scraper.metrics import calculate_advanced_metrics, find_ace_player_from_stats, simulate_banpick
 
 logger = logging.getLogger(__name__)
@@ -31,15 +32,16 @@ def expired(timestamp):
         return True
 
 
-def analysis_status():
-    teams = get_analysis_teams()
-    active = requirements((get_catalog_snapshot() or {}).get('matches', []))
-    stored_count = len(teams)
+def analysis_status(matches=None):
+    if matches is None:
+        matches = (get_catalog_snapshot() or {}).get('matches', [])
+    active = requirements(matches)
+    teams, stored_count = get_analysis_metadata(active if active else None)
     if active:
         teams = {tid: teams.get(tid, {}) for tid in active}
     return {'teams': len(teams), 'failed_teams': sum(bool(t.get('last_error')) for t in teams.values()),
-            'stored_teams': stored_count, 'pending_teams': sum(not t.get('scopes') for t in teams.values()),
-            'stale_teams': sum(expired(t.get('last_success_at', t.get('updated_at'))) for t in teams.values())}
+            'stored_teams': stored_count, 'pending_teams': sum(not t.get('has_scopes') for t in teams.values()),
+            'stale_teams': sum(expired(t.get('last_success_at')) for t in teams.values())}
 
 
 def requirements(matches):
@@ -144,10 +146,7 @@ def bootstrap_analysis():
         data = json.loads(seed.read_text(encoding='utf-8'))
         if data.get('schema_version') != SCHEMA_VERSION:
             return
-        existing = get_analysis_teams()
-        for tid, payload in data.get('teams', {}).items():
-            if tid not in existing:
-                save_analysis_team(tid, payload)
+        save_analysis_seed(data.get('teams', {}))
     except Exception:
         logger.exception('Could not load analysis seed')
 

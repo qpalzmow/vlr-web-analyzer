@@ -1,8 +1,13 @@
-.git/
-__pycache__/
-*.pyc
-.tempmediaStorage/
-test_*.py
-debug_*.py
-inspect_*.py
-liquipedia_test.py
+# Only runtime code and public seed data belong in the image.
+*
+!Dockerfile
+!requirements.txt
+!tier_config.json
+!app/
+!app/**
+!public/
+!public/**
+!data/
+!data/*_seed.json
+**/__pycache__/
+**/*.pyc

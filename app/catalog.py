@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from app.db import (get_catalog_snapshot, save_catalog_snapshot, get_sync_status,
-                    set_sync_status, save_team_data)
+                    set_sync_status)
 from app.scraper.vlr import get_matches, get_match_details, get_team_events, get_event_map_pool
 from app.scraper.http import validate_vlr_url
 from app.sync_lease import sync_lease
@@ -74,8 +74,6 @@ def build_snapshot(previous=None):
     team_ids = [str(d[k]) for d in details.values() for k in ("team_a_id", "team_b_id") if d.get(k)]
     # Fresh once per team per generation, including genuinely empty event menus.
     menus = _collect(team_ids, lambda tid: get_team_events(tid, strict=True), failures, "team")
-    for tid, events in menus.items():
-        save_team_data(tid, events_data=events)
     event_ids = [str(d["event_id"]) for d in details.values() if d.get("event_id")]
     pools = _collect(event_ids, get_event_map_pool, failures, "pool")
     collected_at = utcnow().isoformat()
@@ -115,7 +113,7 @@ def read_catalog():
         "refresh_interval_seconds": INTERVAL_SECONDS,
     }
     from app.analysis import analysis_status
-    snapshot['analytics_status'] = analysis_status()
+    snapshot['analytics_status'] = analysis_status(snapshot['matches'])
     status = get_sync_status()
     snapshot["sync_status"] = status.get("status", "pending")
     snapshot["next_refresh_at"] = status.get("details", {}).get("next_refresh_at")

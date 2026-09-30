@@ -2,9 +2,8 @@ import os
 import json
 import sqlite3
 import logging
-import re
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 
 logger = logging.getLogger(__name__)
 
@@ -31,35 +30,6 @@ def init_db():
             # Serialize additive migrations across server workers.
             conn.execute("BEGIN IMMEDIATE")
             conn.execute("""
-                CREATE TABLE IF NOT EXISTS team_data (
-                    team_id TEXT PRIMARY KEY,
-                    team_name TEXT,
-                    maps_json TEXT,
-                    form_json TEXT,
-                    ace_json TEXT,
-                    advanced_json TEXT,
-                    events_json TEXT,
-                    updated_at TEXT
-                );
-            """)
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS matches_cache (
-                    cache_key TEXT PRIMARY KEY,
-                    matches_json TEXT,
-                    updated_at TEXT
-                );
-            """)
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS match_details_cache (
-                    match_url TEXT PRIMARY KEY,
-                    details_json TEXT,
-                    map_pool_json TEXT,
-                    team_a_events_json TEXT,
-                    team_b_events_json TEXT,
-                    updated_at TEXT
-                );
-            """)
-            conn.execute("""
                 CREATE TABLE IF NOT EXISTS catalog_snapshot (
                     id INTEGER PRIMARY KEY CHECK (id = 1), payload_json TEXT NOT NULL
                 );
@@ -74,20 +44,11 @@ def init_db():
                     details_json TEXT
                 );
             """)
-            columns = {row[1] for row in conn.execute("PRAGMA table_info(team_data)")}
-            for field in ("maps", "form", "ace", "advanced", "events"):
-                column = f"{field}_updated_at"
-                if column not in columns:
-                    conn.execute(f"ALTER TABLE team_data ADD COLUMN {column} TEXT")
-            # Legacy analytics have no per-field timestamps and are intentionally
-            # expired: older versions stored a three-event scope as all-time data.
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS sync_lease (
                     key TEXT PRIMARY KEY, owner TEXT NOT NULL, expires_at REAL NOT NULL
                 )
             """)
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_team_updated ON team_data(updated_at);")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_match_details_updated ON match_details_cache(updated_at);")
         logger.info("SQLite database initialized at %s", DB_PATH)
     finally:
         conn.close()
@@ -172,6 +133,41 @@ def save_analysis_team(team_id, payload):
         conn.close()
 
 
+def save_analysis_seed(teams):
+    """Insert missing seed teams together; collected records always take priority."""
+    rows = [(str(tid), json.dumps(payload, ensure_ascii=False)) for tid, payload in teams.items()]
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.executemany("INSERT OR IGNORE INTO analysis_teams VALUES (?, ?)", rows)
+    finally:
+        conn.close()
+
+
+def get_analysis_metadata(team_ids=None):
+    """Read freshness and availability without materializing player/map payloads."""
+    conn = get_db_connection()
+    try:
+        count = conn.execute("SELECT COUNT(*) FROM analysis_teams").fetchone()[0]
+        query = """SELECT team_id,
+            CASE WHEN json_type(payload_json, '$.last_success_at') IS NULL
+                 THEN json_extract(payload_json, '$.updated_at')
+                 ELSE json_extract(payload_json, '$.last_success_at') END AS last_success_at,
+            json_extract(payload_json, '$.last_error') AS last_error,
+            COALESCE(json_type(payload_json, '$.scopes') = 'object'
+                     AND length(json_extract(payload_json, '$.scopes')) > 2, 0) AS has_scopes
+            FROM analysis_teams"""
+        ids = list(dict.fromkeys(str(tid) for tid in team_ids)) if team_ids is not None else None
+        if ids == []:
+            return {}, count
+        if ids is not None:
+            query += " WHERE team_id IN (" + ','.join('?' for _ in ids) + ')'
+        rows = conn.execute(query, ids or []).fetchall()
+        return {row['team_id']: dict(row) for row in rows}, count
+    finally:
+        conn.close()
+
+
 def get_analysis_source(key, max_age_seconds=3600, not_before=None):
     conn = get_db_connection()
     try:
@@ -194,263 +190,8 @@ def save_analysis_source(key, payload):
         conn.close()
 
 
-def save_team_data(
-    team_id: str,
-    team_name: str = "",
-    maps_data: Optional[Dict[str, Any]] = None,
-    form_data: Optional[List[str]] = None,
-    ace_data: Optional[Dict[str, Any]] = None,
-    advanced_data: Optional[Dict[str, Any]] = None,
-    events_data: Optional[List[Dict[str, Any]]] = None
-):
-    """Save all-time analytics, refreshing only the supplied fields."""
-    if not team_id:
-        return
-    now_iso = datetime.now(timezone.utc).isoformat()
-    fields = {"maps": maps_data, "form": form_data, "ace": ace_data,
-              "advanced": advanced_data, "events": events_data}
-    columns = ["team_id", "team_name", "updated_at"]
-    values = [str(team_id), team_name or "", now_iso]
-    updates = [
-        "team_name = CASE WHEN excluded.team_name <> '' THEN excluded.team_name ELSE team_data.team_name END",
-        "updated_at = excluded.updated_at",
-    ]
-    for field, value in fields.items():
-        if value is not None:
-            columns.extend([f"{field}_json", f"{field}_updated_at"])
-            values.extend([json.dumps(value, ensure_ascii=False), now_iso])
-            updates.extend([f"{field}_json = excluded.{field}_json",
-                            f"{field}_updated_at = excluded.{field}_updated_at"])
-
-    conn = get_db_connection()
-    try:
-        with conn:
-            conn.execute(
-                f"INSERT INTO team_data ({', '.join(columns)}) "
-                f"VALUES ({', '.join('?' for _ in values)}) "
-                f"ON CONFLICT(team_id) DO UPDATE SET {', '.join(updates)}",
-                values,
-            )
-    finally:
-        conn.close()
-
-
-def get_cached_team_data(team_id: str, max_age_seconds: int = 3600) -> Optional[Dict[str, Any]]:
-    """Return only fresh fields; missing/legacy timestamps are expired."""
-    if not team_id:
-        return None
-    conn = get_db_connection()
-    try:
-        cursor = conn.execute("SELECT * FROM team_data WHERE team_id = ?", (str(team_id),))
-        row = cursor.fetchone()
-        if not row:
-            return None
-        result = {
-            "team_id": row["team_id"],
-            "team_name": row["team_name"],
-            "updated_at": row["updated_at"]
-        }
-        now = datetime.now(timezone.utc)
-        for field in ("maps", "form", "ace", "advanced", "events"):
-            fresh = False
-            try:
-                age = (now - datetime.fromisoformat(row[f"{field}_updated_at"])).total_seconds()
-                fresh = 0 <= age < max_age_seconds
-            except (TypeError, ValueError):
-                pass
-            empty = [] if field in ("form", "events") else {}
-            result[field] = json.loads(row[f"{field}_json"]) if fresh and row[f"{field}_json"] else empty
-        return result
-    except Exception as e:
-        logger.warning("Error fetching cached team data for %s: %s", team_id, e)
-        return None
-    finally:
-        conn.close()
-
-
-def save_matches_cache(tier: str, region: str, matches: List[Dict[str, Any]]):
-    """Saves matches list for tier and region."""
-    cache_key = f"{tier}:{region}"
-    now_iso = datetime.now(timezone.utc).isoformat()
-    conn = get_db_connection()
-    try:
-        with conn:
-            conn.execute("""
-                INSERT INTO matches_cache (cache_key, matches_json, updated_at)
-                VALUES (?, ?, ?)
-                ON CONFLICT(cache_key) DO UPDATE SET
-                    matches_json = excluded.matches_json,
-                    updated_at = excluded.updated_at;
-            """, (cache_key, json.dumps(matches, ensure_ascii=False), now_iso))
-    finally:
-        conn.close()
-
-def get_cached_team_events_map(max_age_seconds: int = 86400) -> Dict[str, list]:
-    """Load fresh event menus in one query for the match selector."""
-    conn = get_db_connection()
-    try:
-        now = datetime.now(timezone.utc)
-        result = {}
-        for row in conn.execute("SELECT team_id, events_json, events_updated_at FROM team_data"):
-            try:
-                age = (now - datetime.fromisoformat(row["events_updated_at"])).total_seconds()
-                events = json.loads(row["events_json"])
-                if 0 <= age < max_age_seconds and isinstance(events, list):
-                    result[row["team_id"]] = events[:12]
-            except (TypeError, ValueError):
-                continue
-        return result
-    finally:
-        conn.close()
-
-
-def get_cached_matches(tier: str, region: str, max_age_seconds: int = 600) -> Optional[List[Dict[str, Any]]]:
-    """Retrieves cached matches list for tier and region with TTL verification."""
-    cache_key = f"{tier}:{region}"
-    conn = get_db_connection()
-    try:
-        cursor = conn.execute("SELECT matches_json, updated_at FROM matches_cache WHERE cache_key = ?", (cache_key,))
-        row = cursor.fetchone()
-        if not row or not row["matches_json"]:
-            return None
-        if row["updated_at"]:
-            try:
-                updated_at = datetime.fromisoformat(row["updated_at"])
-                age = (datetime.now(timezone.utc) - updated_at).total_seconds()
-                if age > max_age_seconds:
-                    return None
-            except Exception:
-                pass
-        return json.loads(row["matches_json"])
-    except Exception as e:
-        logger.warning("Error reading cached matches for %s: %s", cache_key, e)
-        return None
-    finally:
-        conn.close()
-
-
-def save_cached_match_details(
-    match_url: str,
-    details: Dict[str, Any],
-    map_pool: Optional[List[str]] = None,
-    team_a_events: Optional[List[Dict[str, Any]]] = None,
-    team_b_events: Optional[List[Dict[str, Any]]] = None
-):
-    """Saves or updates cached match details and map pool in SQLite."""
-    if not match_url or not details:
-        return
-    now_iso = datetime.now(timezone.utc).isoformat()
-    conn = get_db_connection()
-    try:
-        with conn:
-            conn.execute("""
-                INSERT INTO match_details_cache (match_url, details_json, map_pool_json, team_a_events_json, team_b_events_json, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?)
-                ON CONFLICT(match_url) DO UPDATE SET
-                    details_json = excluded.details_json,
-                    map_pool_json = COALESCE(excluded.map_pool_json, match_details_cache.map_pool_json),
-                    team_a_events_json = COALESCE(excluded.team_a_events_json, match_details_cache.team_a_events_json),
-                    team_b_events_json = COALESCE(excluded.team_b_events_json, match_details_cache.team_b_events_json),
-                    updated_at = excluded.updated_at;
-            """, (
-                match_url,
-                json.dumps(details, ensure_ascii=False),
-                json.dumps(map_pool, ensure_ascii=False) if map_pool is not None else None,
-                json.dumps(team_a_events, ensure_ascii=False) if team_a_events is not None else None,
-                json.dumps(team_b_events, ensure_ascii=False) if team_b_events is not None else None,
-                now_iso
-            ))
-    except Exception as e:
-        logger.warning("Error saving cached match details for %s: %s", match_url, e)
-    finally:
-        conn.close()
-
-
-def get_cached_match_details(match_url: str, max_age_seconds: int = 3600) -> Optional[Dict[str, Any]]:
-    """Retrieves cached match details from SQLite with TTL check."""
-    if not match_url:
-        return None
-    conn = get_db_connection()
-    try:
-        cursor = conn.execute("SELECT * FROM match_details_cache WHERE match_url = ?", (match_url,))
-        row = cursor.fetchone()
-        if not row:
-            m_id = re.search(r'/(\d+)', match_url)
-            if m_id:
-                mid = m_id.group(1)
-                cursor = conn.execute(
-                    "SELECT * FROM match_details_cache WHERE match_url LIKE ? OR match_url LIKE ? LIMIT 1",
-                    (f"%/{mid}/%", f"%/{mid}")
-                )
-                row = cursor.fetchone()
-        if not row or not row["details_json"]:
-            return None
-        if row["updated_at"]:
-            try:
-                updated_at = datetime.fromisoformat(row["updated_at"])
-                age = (datetime.now(timezone.utc) - updated_at).total_seconds()
-                if age > max_age_seconds:
-                    return None
-            except Exception:
-                pass
-        return {
-            "details": json.loads(row["details_json"]),
-            "map_pool": json.loads(row["map_pool_json"] or "[]"),
-            "team_a_events": json.loads(row["team_a_events_json"] or "[]"),
-            "team_b_events": json.loads(row["team_b_events_json"] or "[]"),
-            "updated_at": row["updated_at"]
-        }
-    except Exception as e:
-        logger.warning("Error reading cached match details for %s: %s", match_url, e)
-        return None
-    finally:
-        conn.close()
-
-
-def get_all_cached_match_details_map() -> Dict[str, Dict[str, Any]]:
-    """Returns all cached match details mapped by match_url and match_id in a single ultra-fast query."""
-    conn = get_db_connection()
-    res = {}
-    try:
-        cursor = conn.execute("SELECT * FROM match_details_cache")
-        for row in cursor.fetchall():
-            try:
-                det = json.loads(row["details_json"])
-                # The hourly sync prepares menus here before full team analytics.
-                # Carry fresh selection data with the catalog so a user need not
-                # make another request just to open the tournament chooser.
-                try:
-                    age = (datetime.now(timezone.utc) - datetime.fromisoformat(row["updated_at"])).total_seconds()
-                    events_a = json.loads(row["team_a_events_json"])
-                    events_b = json.loads(row["team_b_events_json"])
-                    if (0 <= age < 86400 and det.get("team_a_id") and det.get("team_b_id")
-                            and isinstance(events_a, list) and isinstance(events_b, list)):
-                        selection = {
-                            "details": dict(det),
-                            "team_a_events": events_a[:12], "team_b_events": events_b[:12],
-                            "map_pool": json.loads(row["map_pool_json"] or "[]"),
-                            "live_score": None, "cached": True,
-                        }
-                        det["selection_data"] = selection
-                except (TypeError, ValueError):
-                    pass
-                u = row["match_url"]
-                res[u] = det
-                m_id = re.search(r'/(\d+)', u)
-                if m_id:
-                    res[m_id.group(1)] = det
-            except Exception:
-                pass
-        return res
-    except Exception as e:
-        logger.warning("Error getting all cached match details map: %s", e)
-        return {}
-    finally:
-        conn.close()
-
-
 def set_sync_status(status: str, details: Optional[Dict[str, Any]] = None):
-    """Updates global daily sync status metadata."""
+    """Updates hourly collection status metadata."""
     now_iso = datetime.now(timezone.utc).isoformat()
     conn = get_db_connection()
     try:
@@ -468,14 +209,14 @@ def set_sync_status(status: str, details: Optional[Dict[str, Any]] = None):
 
 
 def get_sync_status() -> Dict[str, Any]:
-    """Returns the last daily sync status."""
+    """Returns the last collection status."""
     conn = get_db_connection()
     try:
         cursor = conn.execute("SELECT * FROM sync_meta WHERE key = 'daily_sync'")
         row = cursor.fetchone()
         
         # Count total synced teams
-        cursor_teams = conn.execute("SELECT COUNT(*) as cnt FROM team_data")
+        cursor_teams = conn.execute("SELECT COUNT(*) as cnt FROM analysis_teams")
         team_count = cursor_teams.fetchone()["cnt"]
 
         if not row:

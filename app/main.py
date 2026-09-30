@@ -2,12 +2,10 @@ import os
 import sys
 import json
 import logging
-import traceback
 import threading
 import time
 import secrets
 from contextlib import asynccontextmanager
-from typing import Optional
 from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor
 
@@ -15,29 +13,13 @@ from fastapi import FastAPI, HTTPException, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
-from app.config import PORT, PUBLIC_DIR, PUBLIC_DIR_NORM
-from app.schemas import (
-    TeamAnalysisPayload, FullAnalysisPayload, BanPickPayload, MatchDetailsResponse,
-    TeamFormResponse, TeamMapsResponse, AceAnalysisResponse,
-    AdvancedMetricsResponse, BanPickResponse, HealthResponse,
-    UpstreamHealthResponse
-)
-from app.cache import get_cached_data, get_cached_live_score, make_cache_key, LIVE_SCORE_CACHE, CACHE_TTL
+from app.config import PUBLIC_DIR, PUBLIC_DIR_NORM
+from app.schemas import TeamAnalysisPayload, FullAnalysisPayload, BanPickPayload, HealthResponse, UpstreamHealthResponse
+from app.cache import get_cached_live_score
 from app.scraper.http import close_httpx_client, request_with_retry, validate_vlr_url
-from app.scraper.vlr import (
-    get_matches, get_match_details, get_event_map_pool,
-    get_team_events, get_live_score, get_team_form,
-    get_team_maps_stats, get_team_roster, get_player_stats,
-    get_team_advanced_metrics
-)
-from app.scraper.metrics import find_ace_player_from_stats, simulate_banpick
-
-from app.db import (
-    init_db, get_cached_team_data, save_team_data,
-    get_sync_status, get_cached_matches, save_matches_cache,
-    get_cached_match_details, save_cached_match_details,
-    get_all_cached_match_details_map, get_cached_team_events_map
-)
+from app.scraper.vlr import get_live_score
+from app.scraper.metrics import simulate_banpick
+from app.db import init_db, get_sync_status, get_catalog_snapshot
 from app.catalog import (start_catalog_scheduler, stop_catalog_scheduler, refresh_catalog,
                          read_catalog, read_selection)
 from app.analysis import bootstrap_analysis, full_analysis, AnalysisNotReady
@@ -77,41 +59,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def _safe_future_result(future, default):
-    if future is None:
-        return default
-    try:
-        return future.result(timeout=30)
-    except Exception:
-        return default
-
-def find_ace_player(roster, event_ids):
-    if not roster:
-        return {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}
-
-    def get_stats_for_player(p):
-        try:
-            player_cache_key = make_cache_key(p['id'], event_ids)
-            stats = get_cached_data('player_stats', player_cache_key, get_player_stats, p["id"], event_ids)
-            if stats:
-                stats["name"] = p.get("name", "N/A")
-            return stats
-        except Exception:
-            return None
-
-    # Fetch stats concurrently across roster with up to 6 workers
-    with ThreadPoolExecutor(max_workers=6) as executor:
-        futures = [executor.submit(get_stats_for_player, p) for p in roster]
-        players_data = []
-        for f in futures:
-            try:
-                res = f.result(timeout=10)
-                if res is not None:
-                    players_data.append(res)
-            except Exception:
-                pass
-
-    return find_ace_player_from_stats(players_data)
 
 @app.get("/health", response_model=HealthResponse)
 def health_check():
@@ -127,81 +74,6 @@ def upstream_health_check():
     except Exception as e:
         return {"status": "degraded", "vlr": f"unreachable: {e}"}
 
-def _get_form_for_team(team_id: str) -> list:
-    if not team_id:
-        return []
-    cached = get_cached_team_data(team_id)
-    if cached and cached.get("form"):
-        return cached["form"]
-    form = get_cached_data('team_form', team_id, get_team_form, team_id)
-    if form:
-        save_team_data(team_id, form_data=form)
-    return form
-
-def _get_maps_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
-    if not team_id:
-        return {}
-    cached = get_cached_team_data(team_id) if not event_ids else None
-    cached_maps = (cached.get("maps") or {}) if cached else {}
-    if not event_ids and cached_maps:
-        return cached_maps
-
-    key = make_cache_key(team_id, event_ids)
-    try:
-        maps = get_cached_data('team_stats', key, get_team_maps_stats, team_id, event_ids)
-    except Exception as e:
-        logger.warning("Error fetching maps for team %s: %s", team_id, e)
-        maps = {}
-
-    if maps and not event_ids:
-        save_team_data(team_id, maps_data=maps)
-    return maps
-
-def _get_ace_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
-    fallback_ace = {"nickname": "N/A", "acs": 0.0, "kd_margin": 0, "agents": ["N/A"]}
-    if not team_id:
-        return fallback_ace
-    cached = get_cached_team_data(team_id) if not event_ids else None
-    cached_ace = cached.get("ace") if cached else None
-    if cached_ace and cached_ace.get("nickname") != "N/A":
-        fallback_ace = cached_ace
-        if not event_ids:
-            return cached_ace
-
-    try:
-        roster = get_cached_data('team_roster', team_id, get_team_roster, team_id)
-        ace = find_ace_player(roster, event_ids)
-    except Exception as e:
-        logger.warning("Error fetching ace for team %s: %s", team_id, e)
-        ace = None
-
-    if ace and ace.get("nickname") != "N/A":
-        if not event_ids:
-            save_team_data(team_id, ace_data=ace)
-        return ace
-    return fallback_ace
-
-def _get_advanced_for_team(team_id: str, event_ids: Optional[list] = None) -> dict:
-    default_adv = get_team_advanced_metrics("")
-    if not team_id:
-        return default_adv
-    cached = get_cached_team_data(team_id) if not event_ids else None
-    cached_adv = cached.get("advanced") if cached else None
-    if cached_adv and cached_adv.get("total_played", 0) > 0:
-        default_adv = cached_adv
-        if not event_ids:
-            return cached_adv
-
-    key = make_cache_key(team_id, event_ids)
-    try:
-        adv = get_cached_data('pistol_stats', key, get_team_advanced_metrics, team_id, event_ids)
-    except Exception as e:
-        logger.warning("Error fetching advanced for team %s: %s", team_id, e)
-        adv = None
-
-    if adv and not event_ids:
-        save_team_data(team_id, advanced_data=adv)
-    return adv or default_adv
 
 _maintenance_lock = threading.Lock()
 _maintenance_last_started = None
@@ -241,7 +113,7 @@ def api_get_catalog():
 
 @app.get("/api/matches")
 def api_get_matches():
-    return JSONResponse(content=read_catalog()["matches"], headers={"Cache-Control": "no-store"})
+    return JSONResponse(content=(get_catalog_snapshot() or {}).get("matches", []), headers={"Cache-Control": "no-store"})
 
 
 @app.get("/api/match-details")

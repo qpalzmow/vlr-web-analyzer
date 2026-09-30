@@ -211,50 +211,25 @@ function populateMatchesDropdown(preserveSelection = false) {
         stageGroups[stage].push({ match: m, globalIdx: idx });
     });
     
-    // Render optgroup in logical stage order
-    stageOrder.forEach(stageName => {
-        if (stageGroups[stageName] && stageGroups[stageName].length > 0) {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = `${stageName.replace(/^[^A-Za-z가-힣]+/, '')} · ${stageGroups[stageName].length}경기`;
-            
-            stageGroups[stageName].forEach(({ match: m, globalIdx }) => {
-                const opt = document.createElement('option');
-                opt.value = globalIdx;
-                const round = matchRoundLabel(m);
-                const roundTag = round ? `[${round}] ` : '';
-                const timeDate = m.time || m.date ? ` (${[m.time, m.date].filter(Boolean).join(' | ')})` : '';
-                opt.textContent = `${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
-                opt.disabled = !m.selection_data;
-                if (opt.disabled) opt.textContent += m.selection_status === 'unassigned' ? ' · 대진 미정' : ' · 업데이트 대기';
-                optgroup.appendChild(opt);
-            });
-            
-            matchSelect.appendChild(optgroup);
-        }
+    const orderedStages = [...stageOrder.filter(stage => stageGroups[stage]),
+        ...Object.keys(stageGroups).filter(stage => !stageOrder.includes(stage))];
+    orderedStages.forEach(stageName => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = `${stageName.replace(/^[^A-Za-z가-힣]+/, '')} · ${stageGroups[stageName].length}경기`;
+        stageGroups[stageName].forEach(({ match: m, globalIdx }) => {
+            const opt = document.createElement('option');
+            opt.value = globalIdx;
+            const round = matchRoundLabel(m);
+            const roundTag = round ? `[${round}] ` : '';
+            const timeDate = m.time || m.date ? ` (${[m.time, m.date].filter(Boolean).join(' | ')})` : '';
+            opt.textContent = `${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
+            opt.disabled = !m.selection_data;
+            if (opt.disabled) opt.textContent += m.selection_status === 'unassigned' ? ' · 대진 미정' : ' · 업데이트 대기';
+            optgroup.appendChild(opt);
+        });
+        matchSelect.appendChild(optgroup);
     });
-    
-    // Any remaining stages not in stageOrder
-    Object.keys(stageGroups).forEach(stageName => {
-        if (!stageOrder.includes(stageName) && stageGroups[stageName].length > 0) {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = `${stageName.replace(/^[^A-Za-z가-힣]+/, '')} · ${stageGroups[stageName].length}경기`;
-            
-            stageGroups[stageName].forEach(({ match: m, globalIdx }) => {
-                const opt = document.createElement('option');
-                opt.value = globalIdx;
-                const round = matchRoundLabel(m);
-                const roundTag = round ? `[${round}] ` : '';
-                const timeDate = m.time || m.date ? ` (${[m.time, m.date].filter(Boolean).join(' | ')})` : '';
-                opt.textContent = `${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
-                opt.disabled = !m.selection_data;
-                if (opt.disabled) opt.textContent += m.selection_status === 'unassigned' ? ' · 대진 미정' : ' · 업데이트 대기';
-                optgroup.appendChild(opt);
-            });
-            
-            matchSelect.appendChild(optgroup);
-        }
-    });
-    
+
     matchSelect.disabled = false;
     if (activeIndex >= 0) {
         matchSelect.value = String(activeIndex);
@@ -560,6 +535,11 @@ function percent(won, total) {
 // The legacy map IDs now label column groups in one direct comparison table.
 function renderMapsTable(tableId, mapsData) {
     mapComparison[tableId === 'team-a-maps-table' ? 'a' : 'b'] = mapsData || {};
+    renderMapComparison();
+}
+
+function renderMapsComparison(mapsA, mapsB) {
+    mapComparison = { a: mapsA || {}, b: mapsB || {} };
     renderMapComparison();
 }
 

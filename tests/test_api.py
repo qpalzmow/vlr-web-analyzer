@@ -1,4 +1,3 @@
-import pytest
 
 def test_health_check(client):
     res = client.get("/health")
@@ -53,25 +52,3 @@ def test_api_404_protection(client):
     res = client.get("/api/nonexistent-endpoint")
     assert res.status_code == 404
     assert res.json() == {"detail": "API endpoint not found"}
-
-def test_single_flight_cache():
-    import time
-    from concurrent.futures import ThreadPoolExecutor
-    from app.cache import get_cached_data, CACHE
-    
-    call_count = 0
-    def slow_fetch():
-        nonlocal call_count
-        call_count += 1
-        time.sleep(0.1)
-        return {"result": 42}
-    
-    # Run 10 parallel requests on cold cache key
-    key = f"test_single_flight_{time.time()}"
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [executor.submit(get_cached_data, 'matches', key, slow_fetch) for _ in range(10)]
-        results = [f.result() for f in futures]
-    
-    # Assert all 10 got the exact same result, but slow_fetch was called exactly ONCE!
-    assert all(r == {"result": 42} for r in results)
-    assert call_count == 1

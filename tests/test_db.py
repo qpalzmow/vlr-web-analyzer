@@ -1,68 +1,75 @@
-import os
-import pytest
-from app.db import (
-    init_db, save_team_data, get_cached_team_data,
-    save_matches_cache, get_cached_matches,
-    set_sync_status, get_sync_status, get_db_connection
-)
+from datetime import datetime, timezone
 
-def test_db_initialization_and_wal():
-    init_db()
-    conn = get_db_connection()
+import pytest
+
+from app import db
+from app.analysis import analysis_status
+
+
+def test_initialization_preserves_existing_legacy_data():
+    conn = db.get_db_connection()
     try:
-        cursor = conn.execute("PRAGMA journal_mode;")
-        row = cursor.fetchone()
-        # In memory or file, WAL is returned
-        assert row[0].lower() in ("wal", "memory")
+        with conn:
+            conn.execute('CREATE TABLE team_data (team_id TEXT, payload TEXT)')
+            conn.execute("INSERT INTO team_data VALUES ('old', 'preserve')")
+        db.init_db()
+        assert conn.execute('SELECT payload FROM team_data').fetchone()[0] == 'preserve'
+        assert conn.execute('PRAGMA journal_mode').fetchone()[0] == 'wal'
     finally:
         conn.close()
 
-def test_save_and_get_team_data():
-    init_db()
-    team_id = "test_team_999"
-    maps_data = {"Ascent": {"played": 10, "w": 7, "l": 3}}
-    form_data = ["W (2-0) vs T1", "W (2-1) vs GEN"]
-    ace_data = {"nickname": "f0rsakeN", "acs": 260.0, "kd_margin": 15, "agents": ["Jett", "Yoru"]}
-    adv_data = {"map_win_rate": 70.0, "fk_fd_margin": 0.15, "total_played": 10}
 
-    save_team_data(
-        team_id=team_id,
-        team_name="Paper Rex Test",
-        maps_data=maps_data,
-        form_data=form_data,
-        ace_data=ace_data,
-        advanced_data=adv_data
-    )
+def test_catalog_and_analysis_roundtrip():
+    catalog = {'matches': [{'team_a': 'DRX', 'team_b': 'PRX'}]}
+    team = {'scopes': {'all': {'players': {'1': {'acs': 260.0}}}}}
+    db.save_catalog_snapshot(catalog)
+    db.save_analysis_team('100', team)
+    assert db.get_catalog_snapshot() == catalog
+    assert db.get_analysis_teams(['100']) == {'100': team}
+    assert db.get_analysis_teams([]) == {}
 
-    cached = get_cached_team_data(team_id)
-    assert cached is not None
-    assert cached["team_name"] == "Paper Rex Test"
-    assert cached["maps"] == maps_data
-    assert cached["form"] == form_data
-    assert cached["ace"]["nickname"] == "f0rsakeN"
-    assert cached["advanced"]["map_win_rate"] == 70.0
 
-def test_matches_cache_crud():
-    init_db()
-    matches = [
-        {"team_a": "DRX", "team_b": "PRX", "event": "VCT 2026: Pacific Stage 2"}
-    ]
-    save_matches_cache("s_tier", "pacific", matches)
-    retrieved = get_cached_matches("s_tier", "pacific")
-    assert retrieved == matches
+def test_seed_is_atomic_and_does_not_overwrite_collected_teams():
+    collected = {'updated_at': 'new', 'scopes': {'all': {}}}
+    db.save_analysis_team('100', collected)
+    db.save_analysis_seed({'100': {'updated_at': 'old'}, '200': {'scopes': {}}})
+    db.save_analysis_seed({'200': {'updated_at': 'overwrite'}})
+    assert db.get_analysis_teams() == {'100': collected, '200': {'scopes': {}}}
+    with pytest.raises(TypeError):
+        db.save_analysis_seed({'300': {}, '400': {'invalid': object()}})
+    assert '300' not in db.get_analysis_teams()
 
-def test_sync_status():
-    init_db()
-    save_team_data("100", "PRX", {"Ascent": {"w": 1, "l": 0}})
-    set_sync_status("completed", {"synced": 44})
-    status = get_sync_status()
-    assert status["status"] == "completed"
-    assert status["details"]["synced"] == 44
-    assert status["synced_teams_count"] >= 1
 
-def test_sync_status_api(client):
-    res = client.get("/api/sync/status")
-    assert res.status_code == 200
-    data = res.json()
-    assert "status" in data
-    assert "synced_teams_count" in data
+def test_metadata_distinguishes_explicit_failed_success_and_missing_timestamp():
+    now = datetime.now(timezone.utc).isoformat()
+    db.save_analysis_team('100', {'updated_at': now, 'scopes': {'all': {}}})
+    db.save_analysis_team('200', {'updated_at': now, 'last_success_at': None,
+                                 'last_error': 'failed', 'scopes': {}})
+    db.save_analysis_team('300', {'updated_at': now})
+    metadata, count = db.get_analysis_metadata(['100', '200', 'missing'])
+    assert count == 3 and set(metadata) == {'100', '200'}
+    assert metadata['100']['last_success_at'] == now
+    assert metadata['200']['last_success_at'] is None
+    assert analysis_status([]) == {'teams': 3, 'stored_teams': 3, 'failed_teams': 1,
+                                   'pending_teams': 2, 'stale_teams': 1}
+    assert db.get_analysis_metadata([]) == ({}, 3)
+
+
+def test_status_never_loads_full_player_payloads(monkeypatch):
+    from app import analysis
+    db.save_analysis_team('100', {'scopes': {'all': {}}})
+    def forbidden(*args):
+        raise AssertionError('Status must only read metadata')
+    monkeypatch.setattr(analysis, 'get_analysis_teams', forbidden)
+    monkeypatch.setattr(analysis, 'get_catalog_snapshot', forbidden)
+    assert analysis.analysis_status([])['teams'] == 1
+
+
+def test_sync_status_counts_prepared_teams(client):
+    db.save_analysis_team('100', {'scopes': {'all': {}}})
+    db.set_sync_status('completed', {'synced': 1})
+    assert db.get_sync_status()['synced_teams_count'] == 1
+    assert db.get_sync_status()['details']['synced'] == 1
+    response = client.get('/api/sync/status')
+    assert response.status_code == 200
+    assert response.json()['synced_teams_count'] == 1

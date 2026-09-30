@@ -2,6 +2,7 @@
 import argparse
 import json
 import logging
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -23,6 +24,18 @@ def write_snapshot(path):
     return payload
 
 
+class SnapshotCheckpoint:
+    """Keep a recoverable checkpoint at most once per minute during collection."""
+    def __init__(self, path):
+        self.path = path
+        self.last_written = time.monotonic()
+
+    def __call__(self, _progress):
+        if time.monotonic() - self.last_written >= 60:
+            write_snapshot(self.path)
+            self.last_written = time.monotonic()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -37,10 +50,11 @@ def main():
     payload = build_snapshot(get_catalog_snapshot())
     save_catalog_snapshot(payload)
     # Preserve a publishable catalog even if the runner reaches its time budget
-    # during analysis. Each completed team updates this file atomically.
+    # during analysis. Periodic checkpoints avoid rewriting every team payload
+    # after each individual team; the final snapshot always includes all results.
     write_snapshot(args.output)
     result = refresh_analysis(payload['matches'], force=True,
-                              on_progress=lambda _: write_snapshot(args.output))
+                              on_progress=SnapshotCheckpoint(args.output))
     write_snapshot(args.output)
     logging.info('Catalog: %s; analysis: %s', payload['updated_at'], result)
 

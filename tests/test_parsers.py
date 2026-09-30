@@ -1,4 +1,3 @@
-import pytest
 from app.scraper.parsers import (
     clean_text, safe_int, safe_float, parse_live_score
 )

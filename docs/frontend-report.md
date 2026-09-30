@@ -73,7 +73,7 @@ Export failure restores the button and supports retry.
   restore, one analysis request, stale response rejection, live polling, career
   values/coverage, comparison rows, missing data, escaping, report states and
   export clone/error handling.
-- 137 Python tests, including real HTML ID contracts, label/anchor destinations
+- 120 current Python tests after retiring obsolete synchronization paths, including real HTML ID contracts, label/anchor destinations
   and static asset delivery.
 - Local jsdom integration against the preview API and real HTML: Nongshim
   RedForce vs NRG, 13 aligned map rows, five recent matches, Dambi ACS 229.8 and

@@ -97,22 +97,6 @@ def test_new_hour_does_not_reuse_sources_from_previous_cycle(monkeypatch):
     assert sources.source('hour-test',lambda: {'value':'new'}) != old
 
 
-def test_event_leaderboard_parser_uses_rounds_totals_and_agent_usage():
-    html='''<table class="st-table"><tbody><tr><td><a href="/player/7/test">P</a></td>
-    <td data-col="rnd">100</td><td data-col="acs">250</td><td data-col="k">123</td><td data-col="d">80</td>
-    <td data-col="fk">20</td><td data-col="fd">10</td><td data-col="agents"><span class="st-agent"><img src="/jett.png">60%</span></td>
-    </tr></tbody></table>'''
-    p=sources.parse_event_players(BeautifulSoup(html,'html.parser'))['7']
-    assert p['weighted_acs'] == 25000
-    assert p['kills'] == 123
-    assert p['agents']['jett'] == 60
-    assert sources.parse_event_players(BeautifulSoup('No stats available','html.parser')) == {'_unavailable':True}
-    with pytest.raises(ValueError):
-        sources.parse_event_players(BeautifulSoup('Server error','html.parser'))
-    with pytest.raises(ValueError):
-        sources.parse_event_players(BeautifulSoup('<table class="st-table"><tbody></tbody></table>','html.parser'))
-
-
 def test_current_player_table_and_staff_without_stats():
     cells = ['<img alt="Jett">','50%',100,'1.0',250,1,70,100,1,1,1,120,80,30,20,10]
     headers = ['Agent','Use','Rnd','R','ACS','K:D','KAST','ADR','KPR','APR','FK:FD','K','D','A','FK','FD']

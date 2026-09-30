@@ -174,8 +174,7 @@ async function runAnalysis() {
         renderFormBadges('team-a-form', data.form_a);
         renderFormBadges('team-b-form', data.form_b);
         renderAcsTrendChart(data.form_a, data.form_b);
-        renderMapsTable('team-a-maps-table', data.maps_a);
-        renderMapsTable('team-b-maps-table', data.maps_b);
+        renderMapsComparison(data.maps_a, data.maps_b);
         renderBanPickResults(data.simulation);
         renderAgentBadges('team-a-agents', data.ace_a.agents);
         renderAgentBadges('team-b-agents', data.ace_b.agents);
@@ -208,8 +207,7 @@ async function runAnalysis() {
         if (err.name !== 'AbortError' && !signal.aborted && selectedMatch === analysisMatch) {
             setReportState('error');
             document.getElementById('match-selection-panel').open = true;
-            renderEmptyTable('team-a-maps-table');
-            renderEmptyTable('team-b-maps-table');
+            renderMapsComparison({}, {});
             renderFormBadges('team-a-form', []);
             renderFormBadges('team-b-form', []);
             renderAcsTrendChart([], []);
