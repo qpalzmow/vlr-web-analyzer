@@ -37,6 +37,7 @@ def get_matches(strict=False):
             if strict:
                 res_results.raise_for_status()
             for m in parse_matches_list(res_results.text, s_keywords, a_keywords):
+                m['status_code'] = 'final'
                 if m['id'] not in seen_ids:
                     seen_ids.add(m['id'])
                     combined.append(m)

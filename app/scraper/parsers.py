@@ -1,4 +1,6 @@
 import re
+from datetime import datetime, timedelta, timezone
+from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 from app.config import ALL_KNOWN_MAPS
 
@@ -6,6 +8,74 @@ def clean_text(text: str) -> str:
     if not text:
         return ""
     return re.sub(r'\s+', ' ', text).strip()
+
+
+def source_link(value, kind=None):
+    """Only publish links to the original site's numeric resource routes."""
+    parsed = urlparse(urljoin('https://www.vlr.gg/', value or ''))
+    pattern = rf'^/{kind}/\d+(?:/|$)' if kind else r'^/\d+(?:/|$)'
+    if parsed.scheme == 'https' and parsed.hostname in ('www.vlr.gg', 'vlr.gg') and re.match(pattern, parsed.path):
+        return 'https://www.vlr.gg' + parsed.path
+    return None
+
+
+def logo_link(value):
+    parsed = urlparse(urljoin('https://www.vlr.gg/', value or ''))
+    if parsed.scheme == 'https' and parsed.hostname in ('owcdn.net', 'www.vlr.gg', 'vlr.gg') and parsed.path.startswith('/img/'):
+        return parsed.geturl()
+    return None
+
+
+def parse_scheduled_time(soup):
+    """Read the explicitly labelled clock, not the misleading legacy utc-ts name.
+
+    VLR's naive data-utc-ts currently differs from its UTC display. The visible
+    time and timezone are authoritative; an unlabelled time stays unknown.
+    """
+    nodes = soup.select('.match-header-date .moment-tz-convert')
+    offsets = {'UTC': 0, 'GMT': 0, 'KST': 9, 'JST': 9, 'EDT': -4, 'EST': -5,
+               'PDT': -7, 'PST': -8, 'CEST': 2, 'CET': 1, 'BST': 1,
+               'CDT': -5, 'AEST': 10, 'AEDT': 11}
+    # Ambiguous abbreviations such as CST / IST are deliberately unsupported.
+    day_text = next((clean_text(n.get_text()) for n in nodes if 'dddd' in n.get('data-moment-format', '')), '')
+    for node in nodes:
+        clock = re.search(r'\b(\d{1,2}):(\d{2})\s*(AM|PM)\s+([A-Z]{2,5})\b', clean_text(node.get_text()), re.I)
+        if not clock or clock[4].upper() not in offsets:
+            continue
+        try:
+            anchor = datetime.fromisoformat(node.get('data-utc-ts', '').replace('Z', '+00:00'))
+            day = re.search(r'\b([A-Za-z]+)\s+(\d{1,2})(?:,\s*(20\d{2}))?', day_text)
+            if not day:
+                continue
+            years = [int(day[3])] if day[3] else [anchor.year - 1, anchor.year, anchor.year + 1]
+            dates = [datetime.strptime(f'{day[1]} {day[2]} {year}', '%B %d %Y') for year in years]
+            date = min(dates, key=lambda d: abs((d.date() - anchor.date()).days))
+            hour, minute = int(clock[1]), int(clock[2])
+            if not 1 <= hour <= 12 or not 0 <= minute <= 59:
+                continue
+            hour = hour % 12 + (12 if clock[3].upper() == 'PM' else 0)
+            zone = clock[4].upper()
+            date = date.replace(hour=hour, minute=minute, tzinfo=timezone(timedelta(hours=offsets[zone])))
+            return {'scheduled_at': date.astimezone(timezone.utc).isoformat(), 'schedule_source_zone': zone}
+        except (ValueError, TypeError):
+            continue
+    return {'scheduled_at': None, 'schedule_source_zone': None}
+
+
+def parse_match_context(soup):
+    notes = [clean_text(n.get_text()) for n in soup.select('.match-header-vs-note')]
+    match_format = next((n.upper() for n in notes if re.fullmatch(r'Bo\d+', n, re.I)), None)
+    veto = []
+    for note in soup.select('.match-header-note'):
+        for part in clean_text(note.get_text()).split(';'):
+            action = re.fullmatch(r'(.+?)\s+(ban|pick)\s+(.+)', part.strip(), re.I)
+            remaining = re.fullmatch(r'(.+?)\s+remains', part.strip(), re.I)
+            raw_map = action[3] if action else remaining[1] if remaining else ''
+            map_name = next((m for m in ALL_KNOWN_MAPS if m.lower() == raw_map.lower()), None)
+            if map_name:
+                veto.append({'team': action[1] if action else None,
+                             'action': action[2].lower() if action else 'remaining', 'map': map_name})
+    return {**parse_scheduled_time(soup), 'match_format': match_format, 'actual_veto': veto}
 
 def safe_int(s, default: int = 0) -> int:
     if s is None:
@@ -279,7 +349,11 @@ def parse_match_details(html_text: str, match_url: str) -> dict:
         "team_a_name": team_a_name,
         "team_b_id": team_b_id,
         "team_b_name": team_b_name,
-        "event_id": event_id
+        "event_id": event_id,
+        **parse_match_context(soup),
+        'live_score': parse_live_score(html_text),
+        **{f'team_{side}_logo': logo_link(link.find('img').get('src')) if link.find('img') else None
+           for side, link in zip(('a', 'b'), team_links[:2])}
     }
 
 def parse_live_score(html_text: str) -> dict:
@@ -348,5 +422,6 @@ def parse_live_score(html_text: str) -> dict:
         "series_score_a": score_left,
         "series_score_b": score_right,
         "status": status,
-        "maps": maps_played
+        "maps": maps_played,
+        **parse_match_context(soup)
     }

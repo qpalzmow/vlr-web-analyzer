@@ -40,6 +40,7 @@ function setup(search = '') {
         }
         addEventListener(name, callback) { this[name] = callback; }
         setAttribute(key, value) { this.attributes[key] = value; }
+        removeAttribute(key) { delete this.attributes[key]; }
         click() { this.clicked = true; }
         focus() { this.focused = true; }
         remove() { this.removed = true; }
@@ -77,7 +78,7 @@ function setup(search = '') {
         fetch: async () => { throw new Error('Unexpected fetch'); },
     };
     vm.createContext(context);
-    for (const file of ['constants.js', 'charts.js', 'ui.js', 'api.js']) {
+    for (const file of ['constants.js', 'match-context.js', 'charts.js', 'ui.js', 'api.js']) {
         vm.runInContext(fs.readFileSync(path.join(__dirname, '../public', file), 'utf8'), context);
     }
     return {
@@ -698,4 +699,81 @@ test('unstarted placeholder maps do not become a scoreboard but live zero scores
     h.run("selectedMatch.live_score={status:'final',series_score_a:'2',series_score_b:'1',maps:[{map:'Haven',score_a:'13',score_b:'7'}]};updateLiveScoreboard()");
     assert.equal(h.elements.get('live-scoreboard-panel').classList.contains('hidden'),false);
     assert.match(h.elements.get('live-maps-grid').children[0].innerHTML,/13 – 7/);
+});
+
+test('match clocks use KST across midnight and never reuse unlabelled legacy clocks', () => {
+    const h=setup();
+    assert.equal(h.run("matchClock({scheduled_at:'2026-09-30T09:00:00Z'})"),'18:00');
+    assert.equal(h.run("matchDay({scheduled_at:'2026-09-30T16:00:00Z'})"),'2026-10-01');
+    assert.equal(h.run("matchClock({date:'Wed, September 30, 2026 Today',time:'3:00 AM'})"),'시간 확인 중');
+    assert.doesNotMatch(h.run("formatMatchSchedule({date:'Wed, September 30, 2026 Today',time:'3:00 AM'})"), /3:00 AM|Today/);
+});
+
+test('search and status browsing stay local and selecting a row still requires Analyze', async () => {
+    const h=setup();
+    const a=readyMatch(),b=readyMatch('2');
+    a.status_code='live'; b.status_code='final';
+    a.scheduled_at=b.scheduled_at='2026-09-30T09:00:00Z';
+    h.context.matches=[a,b];
+    h.run("tierSelect.value='All';regionSelect.value='All';allMatches=matches;populateEventsDropdown();selectedMatchStatus='final';renderMatchBrowser()");
+    let requests=0;
+    h.context.fetch=async()=>{requests++;throw new Error('Network forbidden');};
+    const rows=h.elements.get('match-browser').children.filter(e=>e.tag==='button');
+    assert.equal(rows.length,1);
+    await rows[0].click();
+    assert.equal(requests,0);
+    assert.equal(h.read('selectedMatch.id'),'2');
+    assert.equal(h.read('analyzeBtn.disabled'),false);
+    assert.match(rows[0].innerHTML,/종료/);
+    h.run("matchSearchQuery='absent';populateEventsDropdown(true)");
+    assert.equal(h.read('filteredMatches.length'),0);
+    assert.equal(requests,0);
+});
+
+test('an unmatched search preserves a finished report, its filters and export snapshot', async () => {
+    const h=setup();h.context.matches=[readyMatch()];
+    h.run("tierSelect.value='All';regionSelect.value='All';allMatches=matches;populateEventsDropdown();matchSelect.value='0'");
+    await h.run('handleMatchSelection()');
+    h.context.result=analysisResult();
+    h.run("renderReportSummary(result,selectedMatch,['8']);globalThis.original=reportSnapshot;matchSearchQuery='no such team';populateEventsDropdown(true)");
+    assert.equal(h.read('reportSnapshot===original'),true);
+    assert.equal(h.elements.get('match-report').classList.contains('hidden'),false);
+    assert.equal(h.read('analyzeBtn.disabled'),false);
+});
+
+test('complete roster preserves all members, missing records, sorting and escaped source links', () => {
+    const h=setup();h.context.match=readyMatch();
+    h.context.a=[{...careerPlayer('Low <svg>',200),player_id:'7'},{...careerPlayer('High',250),player_id:'8'},
+        {nickname:'Newcomer',available:false,player_id:'9',acs:null,rounds:null}];
+    h.context.b=[{...careerPlayer('Other',240),player_id:'10'}];
+    h.run("selectedMatch=match;renderCareerRoster(a,b)");
+    const rows=h.elements.get('career-roster-body').children;
+    assert.equal(rows.length,4);
+    assert.match(rows[0].innerHTML,/High/);
+    assert.match(rows[1].innerHTML,/&lt;svg&gt;/);
+    assert.match(rows[2].innerHTML,/커리어 기록 없음/);
+    assert.match(rows[2].innerHTML,/—/);
+    h.run("careerSort='acs';renderRosterTable()");
+    assert.match(h.elements.get('career-roster-body').children[1].innerHTML,/Other/);
+    assert.doesNotMatch(h.run("sourceAnchor('<img>', 'javascript:alert(1)')"),/<a|<img/);
+    assert.doesNotMatch(h.run("sourceAnchor('x', 'https://www.vlr.gg.evil.test/1')"),/<a/);
+});
+
+test('actual veto and final score take priority and polling respects an expanded recommendation', () => {
+    const h=setup(); h.context.match=readyMatch();
+    h.run("selectedMatch=match;selectedMatch.live_score={status:'final',series_score_a:'2',series_score_b:'0',match_format:'BO3',actual_veto:[{team:'ONE',action:'pick',map:'Ascent'}]};renderFixtureContext()");
+    assert.equal(h.elements.get('match-summary-score').textContent,'2 : 0');
+    assert.equal(h.elements.get('match-summary-format').textContent,'BO3');
+    assert.equal(h.elements.get('confirmed-veto').hidden,false);
+    assert.equal(h.elements.get('map-outlook').open,false);
+    h.run("document.getElementById('map-outlook').open=true;renderFixtureContext()");
+    assert.equal(h.elements.get('map-outlook').open,true);
+});
+
+test('three-map perfect results do not outrank established maps and stay labelled in the table', () => {
+    const h=setup();h.context.match=readyMatch(); h.context.data=analysisResult();
+    h.run("selectedMatch=match;selectedMatch.map_pool=['Ascent','Summit'];data.maps_a={Summit:{played:3,w:3,l:0},Ascent:{played:20,w:12,l:8}};renderMapsComparison(data.maps_a,{});renderReportSummary(data,selectedMatch,[])");
+    assert.match(h.elements.get('summary-a-map').textContent,/Ascent/);
+    const rows=h.elements.get('maps-comparison-body').children;
+    assert.match(rows.find(row=>row.innerHTML.includes('Summit')).innerHTML,/표본 부족/);
 });

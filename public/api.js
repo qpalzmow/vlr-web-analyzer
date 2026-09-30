@@ -74,6 +74,9 @@ async function restoreSharedSelection() {
     sharedSelectionRestored = true;
     tierSelect.value = 'All';
     regionSelect.value = 'All';
+    matchSearchQuery = '';
+    selectedMatchStatus = 'all';
+    document.getElementById('match-search').value = '';
     selectedTournamentCategory = 'all';
     populateEventsDropdown();
     eventSelect.value = getTournamentKey(match);
@@ -121,7 +124,9 @@ async function handleMatchSelection(restoredEventIds = [], autoAnalyze = false) 
     drawTournamentChecklist();
     setTournamentSelection(restoredEventIds);
     requestMatch.details_ready = true;
+    document.getElementById('match-selection-hint').textContent = `${requestMatch.team_a} vs ${requestMatch.team_b}`;
     analyzeBtn.disabled = false;
+    renderMatchBrowser();
     progressBarContainer.classList.add('hidden');
     updateStatus('success', '분석 준비 완료.', data.stale
         ? '이 경기의 최신 수집이 지연되어 이전 데이터를 표시합니다.'
@@ -171,9 +176,11 @@ async function runAnalysis() {
         if (!response.ok) throw new Error(data.detail || `분석 조회 실패: ${response.status}`);
         if (signal.aborted || selectedMatch !== analysisMatch) return;
         // Paint one consistent response in the same task; no per-panel requests.
-        renderFormBadges('team-a-form', data.form_a);
-        renderFormBadges('team-b-form', data.form_b);
-        renderAcsTrendChart(data.form_a, data.form_b);
+        const formA = data.recent_a?.length ? data.recent_a : data.form_a;
+        const formB = data.recent_b?.length ? data.recent_b : data.form_b;
+        renderFormBadges('team-a-form', formA);
+        renderFormBadges('team-b-form', formB);
+        renderAcsTrendChart(formA, formB);
         renderMapsComparison(data.maps_a, data.maps_b);
         renderBanPickResults(data.simulation);
         renderAgentBadges('team-a-agents', data.ace_a.agents);
@@ -181,6 +188,7 @@ async function runAnalysis() {
         populateAceCard('a', data.ace_a);
         populateAceCard('b', data.ace_b);
         renderCareerAcsChart(data.ace_a, data.ace_b);
+        renderCareerRoster(data.roster_a, data.roster_b);
         if (data.probability) {
             updateWinProbabilityBar(data.probability.a, data.probability.b);
         } else {

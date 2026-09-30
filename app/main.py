@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import FastAPI, HTTPException, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 
 from app.config import PUBLIC_DIR, PUBLIC_DIR_NORM
 from app.schemas import TeamAnalysisPayload, FullAnalysisPayload, BanPickPayload, HealthResponse, UpstreamHealthResponse
@@ -23,6 +23,7 @@ from app.db import init_db, get_sync_status, get_catalog_snapshot
 from app.catalog import (start_catalog_scheduler, stop_catalog_scheduler, refresh_catalog,
                          read_catalog, read_selection)
 from app.analysis import bootstrap_analysis, full_analysis, AnalysisNotReady
+from app.logos import team_logo
 
 if hasattr(sys.stdout, 'reconfigure'):
     try:
@@ -114,6 +115,33 @@ def api_get_catalog():
 @app.get("/api/matches")
 def api_get_matches():
     return JSONResponse(content=(get_catalog_snapshot() or {}).get("matches", []), headers={"Cache-Control": "no-store"})
+
+
+@app.get('/api/team-logo/{team_id}')
+def api_team_logo(team_id: str):
+    if not team_id.isdigit() or len(team_id) > 12:
+        raise HTTPException(status_code=400, detail='Invalid team ID')
+    from app.db import get_analysis_teams
+    logo = get_analysis_teams([team_id]).get(team_id, {}).get('logo')
+    if not logo:
+        for match in (get_catalog_snapshot() or {}).get('matches', []):
+            details = (match.get('selection_data') or {}).get('details', {})
+            for side in ('a', 'b'):
+                if str(details.get(f'team_{side}_id')) == team_id:
+                    logo = details.get(f'team_{side}_logo')
+                    if logo:
+                        break
+            if logo:
+                break
+    if not logo:
+        raise HTTPException(status_code=404, detail='Team logo unavailable')
+    try:
+        body, mime = team_logo(logo)
+    except Exception as exc:
+        logger.warning('Team logo unavailable for %s: %s', team_id, type(exc).__name__)
+        raise HTTPException(status_code=502, detail='Team logo temporarily unavailable')
+    return Response(body, media_type=mime, headers={'Cache-Control': 'public, max-age=3600',
+                                                   'X-Content-Type-Options': 'nosniff'})
 
 
 @app.get("/api/match-details")

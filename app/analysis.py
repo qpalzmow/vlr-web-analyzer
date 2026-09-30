@@ -89,7 +89,8 @@ def prepare_team(team_id, events, previous=None):
             logger.warning('Analysis event %s/%s: %s', team_id, event_id, exc)
             failed.append(event_id)
     data = {'schema_version': SCHEMA_VERSION, 'team_id': team_id, 'team_name': profile['name'],
-            'form': profile['form'], 'available_events': sorted(available), 'scopes': scopes,
+            'form': profile['form'], 'recent_matches': profile.get('recent_matches', []),
+            'logo': profile.get('logo'), 'available_events': sorted(available), 'scopes': scopes,
             'updated_at': now_iso(), 'failed_scopes': failed,
             'last_attempt_at': now_iso(), 'last_success_at': previous.get('last_success_at', previous.get('updated_at')) if failed else now_iso(),
             'last_error': 'scope_collection_failed' if failed else None}
@@ -208,10 +209,25 @@ def aggregate_team(data, event_ids=None):
     dates.append(ace['collected_at'])
     valid_dates = [stamp for stamp in dates if stamp]
     return {'form': data.get('form', []), 'maps': maps, 'ace': ace,
+            'recent_matches': data.get('recent_matches', []),
+            'roster': career_roster(data),
             'advanced': advanced, 'updated_at': min(valid_dates) if valid_dates else data.get('updated_at'),
             'stale': bool(data.get('last_error')) or any(expired(d) for d in dates)
                      or any(key in data.get('failed_scopes', []) for key in set(keys) | {'all'}),
             'event_ids': keys, 'players_available': ace['available']}
+
+
+def career_roster(data):
+    scope = data.get('scopes', {}).get('all', {})
+    if not scope.get('career_roster_verified'):
+        return []
+    rows = []
+    for pid, player in scope.get('players', {}).items():
+        has_stats = player.get('rounds', 0) > 0
+        stats = find_ace_player_from_stats([{**player, 'player_id': pid}])
+        rows.append({**stats, 'nickname': player.get('name', pid), 'player_id': pid,
+                     'available': has_stats, 'scope': 'career', 'collected_at': scope.get('collected_at')})
+    return sorted(rows, key=lambda p: (not p['available'], -(p['acs'] or 0), -(p['rounds'] or 0), p['player_id']))
 
 
 def full_analysis(team_a_id, team_b_id, event_ids, map_pool):
@@ -222,6 +238,9 @@ def full_analysis(team_a_id, team_b_id, event_ids, map_pool):
     b = aggregate_team(records[team_b_id], event_ids)
     probability = None
     return {'form_a': a['form'], 'form_b': b['form'], 'maps_a': a['maps'], 'maps_b': b['maps'],
+            'recent_a': a['recent_matches'], 'recent_b': b['recent_matches'],
+            'roster_a': a['roster'], 'roster_b': b['roster'],
+            'logo_a': records[team_a_id].get('logo'), 'logo_b': records[team_b_id].get('logo'),
             'ace_a': a['ace'], 'ace_b': b['ace'], 'adv_a': a['advanced'], 'adv_b': b['advanced'],
             'simulation': simulate_banpick(a['maps'], b['maps'], map_pool) if a['advanced']['total_played'] and b['advanced']['total_played'] else {'bans': [], 'picks': []}, 'probability': probability,
             'updated_at': min(a['updated_at'], b['updated_at']), 'stale': a['stale'] or b['stale'],

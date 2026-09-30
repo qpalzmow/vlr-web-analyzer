@@ -2,6 +2,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     initReportNavigation();
     fetchMatches();
+    document.getElementById('match-search').addEventListener('input', event => {
+        matchSearchQuery = event.target.value;
+        populateEventsDropdown(true);
+    });
+    document.querySelectorAll('#roster-sort button').forEach(button => button.addEventListener('click', () => {
+        careerSort = button.dataset.sort;
+        renderRosterTable();
+    }));
     document.getElementById('export-link-btn').addEventListener('click', generateShareableLink);
     document.getElementById('export-img-btn').addEventListener('click', exportReportImage);
 

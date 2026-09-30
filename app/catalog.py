@@ -80,6 +80,9 @@ def build_snapshot(previous=None):
     for m in matches:
         prior = previous_matches.get(m["id"], {}).get("selection_data")
         d = details.get(m["url"])
+        if d:
+            m['scheduled_at'] = d.get('scheduled_at')
+            m['status_code'] = d.get('live_score', {}).get('status', 'upcoming')
         a, b = (str(d.get("team_a_id") or ""), str(d.get("team_b_id") or "")) if d else ("", "")
         if d and a and b and a in menus and b in menus:
             event_id = str(d.get("event_id") or "")
@@ -87,7 +90,7 @@ def build_snapshot(previous=None):
             m["selection_data"] = {
                 "details": d, "team_a_events": menus[a][:12], "team_b_events": menus[b][:12],
                 "map_pool": pools.get(event_id) or old_pool,
-                "live_score": None, "cached": True, "collected_at": collected_at, "stale": False,
+                "live_score": d.get('live_score'), "cached": True, "collected_at": collected_at, "stale": False,
             }
         elif prior and (not d or (a == str(prior["details"].get("team_a_id")) and
                                   b == str(prior["details"].get("team_b_id")))):

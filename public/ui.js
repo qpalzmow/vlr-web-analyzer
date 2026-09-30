@@ -96,7 +96,7 @@ function updateTournamentSummary() {
         summary.textContent = '선택한 등급·지역에 해당하는 대회가 없습니다.';
         return;
     }
-    const matches = group.matches.filter(matchesSelectionFilters);
+    const matches = group.matches.filter(matchesSelectionFilters).filter(matchesSearch);
     const ready = matches.filter(match => match.selection_data).length;
     summary.textContent = `${tournamentDisplayName(group.name)} · ${matches.length}경기 / 분석 가능 ${ready}경기`;
 }
@@ -105,7 +105,7 @@ function updateTournamentSummary() {
 function populateEventsDropdown(preserveSelection = false) {
     const previousTournament = eventSelect.value;
     tournamentGroups = buildTournamentGroups(allMatches);
-    const groups = tournamentGroups.map(group => ({ ...group, matches: group.matches.filter(matchesSelectionFilters) }))
+    const groups = tournamentGroups.map(group => ({ ...group, matches: group.matches.filter(matchesSelectionFilters).filter(matchesSearch) }))
         .filter(group => group.matches.length);
     const activeKey = preserveSelection && selectedMatch ? getTournamentKey(selectedMatch) : previousTournament;
     const activeGroup = groups.find(group => group.key === activeKey);
@@ -118,9 +118,13 @@ function populateEventsDropdown(preserveSelection = false) {
         eventSelect.disabled = true;
         matchSelect.innerHTML = '<option>매치가 없습니다.</option>';
         matchSelect.disabled = true;
-        analyzeBtn.disabled = true;
-        selectedMatch = null;
-        clearDashboard();
+        if (!preserveSelection || !selectedMatch) {
+            analyzeBtn.disabled = true;
+            selectedMatch = null;
+            clearDashboard();
+        }
+        filteredMatches = [];
+        renderMatchBrowser();
         updateTournamentSummary();
         return;
     }
@@ -171,7 +175,7 @@ function matchRoundLabel(match) {
 function populateMatchesDropdown(preserveSelection = false) {
     const activeMatch = preserveSelection ? selectedMatch : null;
     const selectedTournament = eventSelect.value;
-    filteredMatches = allMatches.filter(m => matchesSelectionFilters(m) && getTournamentKey(m) === selectedTournament);
+    filteredMatches = allMatches.filter(m => matchesSelectionFilters(m) && matchesSearch(m) && getTournamentKey(m) === selectedTournament);
     updateTournamentSummary();
     const activeIndex = activeMatch ? filteredMatches.findIndex(m => m.id === activeMatch.id) : -1;
     // selectedMatch remains the displayed snapshot; dropdown entries always stay current.
@@ -181,9 +185,12 @@ function populateMatchesDropdown(preserveSelection = false) {
     if (filteredMatches.length === 0) {
         matchSelect.innerHTML = '<option value="">매치가 없습니다.</option>';
         matchSelect.disabled = true;
-        analyzeBtn.disabled = true;
-        selectedMatch = null;
-        clearDashboard();
+        if (!preserveSelection || !selectedMatch) {
+            analyzeBtn.disabled = true;
+            selectedMatch = null;
+            clearDashboard();
+        }
+        renderMatchBrowser();
         return;
     }
     
@@ -221,7 +228,7 @@ function populateMatchesDropdown(preserveSelection = false) {
             opt.value = globalIdx;
             const round = matchRoundLabel(m);
             const roundTag = round ? `[${round}] ` : '';
-            const timeDate = m.time || m.date ? ` (${[m.time, m.date].filter(Boolean).join(' | ')})` : '';
+            const timeDate = ` (${formatMatchSchedule(m)})`;
             opt.textContent = `${roundTag}${m.team_a} vs ${m.team_b}${timeDate}`;
             opt.disabled = !m.selection_data;
             if (opt.disabled) opt.textContent += m.selection_status === 'unassigned' ? ' · 대진 미정' : ' · 업데이트 대기';
@@ -231,13 +238,16 @@ function populateMatchesDropdown(preserveSelection = false) {
     });
 
     matchSelect.disabled = false;
+    renderMatchBrowser();
     if (activeIndex >= 0) {
         matchSelect.value = String(activeIndex);
         return;
     }
+    if (activeMatch) return;
     analyzeBtn.disabled = true;
     selectedMatch = null;
     clearDashboard();
+    renderMatchBrowser();
     updateStatus('info', '경기 준비 완료.', '분석을 진행할 매치를 선택해주세요.', 0);
 }
 
@@ -556,7 +566,7 @@ function renderMapComparison() {
     const cells = (s, team) => {
         if (!s || !(s.played > 0)) return '<td class="team-start muted">—</td><td class="muted">—</td><td class="muted">—</td>';
         const width = Math.max(0, Math.min(100, s.w / s.played * 100));
-        return `<td class="team-start"><div class="map-record"><b>${percent(s.w, s.played)}</b><small>${escapeHTML(s.w)}–${escapeHTML(s.l)}</small></div><span class="map-rate team-${team}" aria-hidden="true"><span style="width:${width}%"></span></span></td><td>${percent(s.atk_won, s.atk_total)}</td><td>${percent(s.def_won, s.def_total)}</td>`;
+        return `<td class="team-start"><div class="map-record"><b>${percent(s.w, s.played)}</b><small>${escapeHTML(s.w)}–${escapeHTML(s.l)}</small></div><span class="map-rate team-${team}" aria-hidden="true"><span style="width:${width}%"></span></span>${s.played < MIN_MAP_SAMPLE ? '<span class="map-note">표본 부족</span>' : ''}</td><td>${percent(s.atk_won, s.atk_total)}</td><td>${percent(s.def_won, s.def_total)}</td>`;
     };
     names.forEach(name => {
         const row = document.createElement('tr');
@@ -598,6 +608,8 @@ function populateAceCard(teamLetter, aceData) {
 }
 
 function clearAceCompare(message = '전력 분석 후 커리어를 표시합니다.') {
+    careerRows = [];
+    renderRosterTable();
     for (const team of ['a', 'b']) {
         for (const field of ['nickname', 'acs', 'kd', 'kd-ratio', 'rounds']) document.getElementById(`ace-${team}-${field}`).textContent = '—';
         document.getElementById(`ace-${team}-coverage`).textContent = message;
@@ -672,7 +684,8 @@ function renderReportSummary(data, match, events) {
     syncReportTeamNames();
     reportSnapshot = { match: { ...match }, events: [...(events || [])] };
     document.getElementById('report-event').textContent = tournamentDisplayName(cleanTournamentName(match));
-    document.getElementById('report-fixture').textContent = [matchRoundLabel(match), match.date, match.time].filter(Boolean).join(' · ');
+    renderFixtureContext(match);
+    renderTeamLogos(data, match);
     document.getElementById('selection-caption').textContent = `${match.team_a} vs ${match.team_b}`;
     const pool = match.map_pool?.length ? match.map_pool : FALLBACK_MAP_POOL;
     for (const team of ['a', 'b']) {
@@ -682,10 +695,11 @@ function renderReportSummary(data, match, events) {
         const losses = maps.reduce((sum, [, s]) => sum + (s.l || 0), 0);
         document.getElementById(`summary-${team}-rate`).textContent = percent(wins, total);
         document.getElementById(`summary-${team}-record`).textContent = total ? `${wins}승 ${losses}패` : '기록 없음';
-        const strongest = maps.filter(([name, s]) => pool.includes(name) && s.played > 0)
+        const strongest = maps.filter(([name, s]) => pool.includes(name) && s.played >= MIN_MAP_SAMPLE)
             .sort(([, x], [, y]) => y.w / y.played - x.w / x.played || y.played - x.played)[0];
         document.getElementById(`summary-${team}-map`).textContent = strongest
-            ? `${strongest[0]} · ${percent(strongest[1].w, strongest[1].played)} (${strongest[1].played}맵)` : '기록 없음';
+            ? `${strongest[0]} · ${percent(strongest[1].w, strongest[1].played)} (${strongest[1].played}맵)`
+            : maps.some(([name, s]) => pool.includes(name) && s.played > 0) ? '표본 부족 · 5맵 이상 기록 필요' : '기록 없음';
         const ace = data[`ace_${team}`];
         document.getElementById(`summary-${team}-player`).textContent = hasCareerPlayerStats(ace)
             ? `${ace.nickname} · 커리어 ACS ${ace.acs.toFixed(1)}` : '현역 선수 커리어 확인 불가';
@@ -695,7 +709,7 @@ function renderReportSummary(data, match, events) {
     document.getElementById('report-scope').textContent = `맵 기록 범위: ${filterNames.length ? filterNames.join(' / ') : '수집된 전체 대회'}. 표시된 맵 승률은 과거 기록이며 이 경기의 예측 승률이 아닙니다.`;
     const date = new Date(data.updated_at);
     document.getElementById('report-updated').textContent = `통계 수집: ${Number.isFinite(date.getTime()) ? date.toLocaleString('ko-KR') : '시각 확인 불가'}${data.stale ? ' · 갱신 지연으로 이전 데이터 사용' : ''}`;
-    document.getElementById('map-pool-note').textContent = `${match.map_pool?.length ? '확인된 대회 맵 풀' : '대회 맵 풀 미확인 · 기본 풀'}을 먼저 표시합니다. ‘풀 외’는 이 풀에 포함되지 않는 과거 맵입니다. 기록이 없는 값은 —로 표시합니다.`;
+    document.getElementById('map-pool-note').textContent = `${match.map_pool?.length ? '확인된 대회 맵 풀' : '대회 맵 풀 미확인 · 기본 풀'}을 먼저 표시합니다. ‘풀 외’는 이 풀에 포함되지 않는 과거 맵입니다. 5맵 미만은 ‘표본 부족’으로 표시하며 주요 맵 선정에서 제외합니다. 기록이 없는 값은 —로 표시합니다.`;
     setReportState('ready');
     document.getElementById('match-selection-panel').open = false;
     document.getElementById('advanced-filters').open = false;
@@ -714,6 +728,7 @@ function clearDashboard() {
     setReportState('idle');
     document.getElementById('match-selection-panel').open = true;
     document.getElementById('selection-caption').textContent = '';
+    document.getElementById('match-selection-hint').textContent = '목록에서 경기를 고른 뒤 분석하세요.';
     mapComparison = { a: {}, b: {} };
     renderMapComparison();
     renderFormBadges('team-a-form', []);
@@ -738,7 +753,11 @@ function renderBanPickResults(simData) {
         entries.forEach(item => {
             const row = document.createElement('div');
             row.className = 'outlook-row';
-            const note = isPick ? (Number.isFinite(item.win_pct) ? `기록상 승률 ${item.win_pct}%` : '') : item.reason;
+            const side = item.team === 'Team A' ? 'a' : 'b';
+            const played = mapComparison[side]?.[item.map]?.played || 0;
+            const opponentPlayed = mapComparison[side === 'a' ? 'b' : 'a']?.[item.map]?.played || 0;
+            const baseNote = isPick ? (Number.isFinite(item.win_pct) && played ? `기록상 승률 ${item.win_pct}%` : '기록 없음') : String(item.reason || '').replace('Disadvantage:', '상대 대비 차이:');
+            const note = `${baseNote} · ${played}맵${!isPick ? ` / 상대 ${opponentPlayed}맵` : ''}${played < MIN_MAP_SAMPLE || (!isPick && opponentPlayed < MIN_MAP_SAMPLE) ? ' · 표본 부족' : ''}`;
             row.innerHTML = `<span>${escapeHTML(resolveTeam(item.team))}</span><strong>${escapeHTML(item.map)}</strong><small>${escapeHTML(note)}</small>`;
             el.appendChild(row);
         });
@@ -763,6 +782,7 @@ function updateStatus(type, title, desc, progressVal) {
 }
 
 function updateLiveScoreboard() {
+    renderFixtureContext();
     const panel = document.getElementById('live-scoreboard-panel');
     const score = selectedMatch?.live_score;
     const maps = score?.maps || [];

@@ -7,7 +7,8 @@ from bs4 import BeautifulSoup
 from app.db import get_analysis_source, save_analysis_source
 from app.scraper.http import request_with_retry
 from app.scraper.parsers import (clean_text, safe_int, safe_float,
-                                 parse_column_indices_from_header, parse_player_column_indices_from_header)
+                                 parse_column_indices_from_header, parse_player_column_indices_from_header,
+                                 source_link, logo_link)
 from app.scraper.metrics import team_matches
 from app.config import ALL_KNOWN_MAPS
 
@@ -127,12 +128,30 @@ def parse_profile(soup):
             own, other, opponent = sb, sa, a
         else:
             continue
-        form.append(f"{'W' if own > other else 'L'} ({own}-{other}) vs {opponent}")
-    return {'name': name, 'roster': roster, 'form': form[:5]}
+        date = match.select_one('.m-item-date')
+        day = re.search(r'\b(20\d{2})/(\d{2})/(\d{2})\b', clean_text(date.get_text()) if date else '')
+        date_iso = None
+        if day:
+            try:
+                from datetime import date as calendar_date
+                date_iso = calendar_date(*map(int, day.groups())).isoformat()
+            except ValueError:
+                pass
+        event = match.select_one('.m-item-event')
+        form.append({'result': 'W' if own > other else 'L' if own < other else 'D',
+                     'score': f'{own}-{other}', 'opponent': opponent,
+                     'date': date_iso, 'event': clean_text(event.get_text(' ')) if event else None,
+                     'url': source_link(match.get('href'))})
+    image = soup.select_one('.team-header-logo img, img.team-header-logo')
+    recent = form[:5]
+    return {'name': name, 'roster': roster,
+            'form': [f"{m['result']} ({m['score']}) vs {m['opponent']}" for m in recent],
+            'recent_matches': recent,
+            'logo': logo_link(image.get('src')) if image else None}
 
 
 def team_profile(team_id):
-    return source(f'profile-v3:{team_id}', lambda: parse_profile(page(f'https://www.vlr.gg/team/{team_id}')))
+    return source(f'profile-v4:{team_id}', lambda: parse_profile(page(f'https://www.vlr.gg/team/{team_id}')))
 
 
 def empty_player():
