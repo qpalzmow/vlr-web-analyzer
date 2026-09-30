@@ -94,9 +94,10 @@ function renderMatchBrowser() {
     body.innerHTML = '';
     const matches = filteredMatches.filter(m => selectedMatchStatus === 'all' || matchStatus(m) === selectedMatchStatus);
     const priority = { live: 0, upcoming: 1, final: 2, unknown: 3 };
+    const sortStamp = match => matchTimestamp(match)?.getTime() || Date.parse(`${matchDay(match)}T00:00:00+09:00`) || 0;
     matches.sort((a, b) => priority[matchStatus(a)] - priority[matchStatus(b)] ||
-        (matchStatus(a) === 'final' ? (matchTimestamp(b)?.getTime() || 0) - (matchTimestamp(a)?.getTime() || 0) :
-            (matchTimestamp(a)?.getTime() || 0) - (matchTimestamp(b)?.getTime() || 0)) || String(a.id).localeCompare(String(b.id), 'en', {numeric:true}));
+        (matchStatus(a) === 'final' ? sortStamp(b) - sortStamp(a) : sortStamp(a) - sortStamp(b)) ||
+        String(a.id).localeCompare(String(b.id), 'en', {numeric:true}));
     let lastHeading = '';
     for (const match of matches) {
         const headingText = `${MATCH_STATUSES[matchStatus(match)]} · ${formatDay(matchDay(match), true)}`;

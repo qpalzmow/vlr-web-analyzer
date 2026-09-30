@@ -709,6 +709,27 @@ test('match clocks use KST across midnight and never reuse unlabelled legacy clo
     assert.doesNotMatch(h.run("formatMatchSchedule({date:'Wed, September 30, 2026 Today',time:'3:00 AM'})"), /3:00 AM|Today/);
 });
 
+test('international quick filters exclude regional Champions Tour and preserve Challengers stage identity', () => {
+    const h=setup();
+    assert.equal(h.run("categorizeTournament('Champions Tour 2024: Americas Stage 2').type"),'vct');
+    assert.equal(h.run("categorizeTournament('Champions Tour 2024: Masters Madrid').type"),'global');
+    assert.equal(h.run("categorizeTournament('Valorant Champions 2026').type"),'global');
+    assert.equal(h.run("categorizeTournament('Challengers 2026: Korea Stage 2').type"),'challengers');
+});
+
+test('date groups stay chronological even when legacy clocks have no timezone', () => {
+    const h=setup();
+    const a=readyMatch('1'),b=readyMatch('2'),c=readyMatch('3');
+    a.date='Wed, September 30, 2026';b.date='Thu, October 1, 2026';c.date=a.date;
+    a.status_code=b.status_code=c.status_code='upcoming';
+    h.context.matches=[b,a,c];
+    h.run('filteredMatches=matches;renderMatchBrowser()');
+    const dates=h.elements.get('match-browser').children.filter(e=>e.tag==='h3');
+    assert.equal(dates.length,2);
+    assert.match(dates[0].textContent,/9월 30일/);
+    assert.match(dates[1].textContent,/10월 1일/);
+});
+
 test('search and status browsing stay local and selecting a row still requires Analyze', async () => {
     const h=setup();
     const a=readyMatch(),b=readyMatch('2');

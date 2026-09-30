@@ -257,12 +257,15 @@ function categorizeTournament(name) {
         return { type: 'game-changers', badgeText: '게임 체인저스',
             order: 1 };
     }
-    if (/\b(champions|masters|world cup|ewc)\b/i.test(lower)) {
+    if (/\bchampions\b(?!\s+tour\b)|\b(masters|world cup|ewc)\b/i.test(lower)) {
         return {
             type: 'global',
             badgeText: '국제대회',
             order: 1
         };
+    }
+    if (/\b(challengers|ascension|vcl)\b/i.test(lower)) {
+        return { type: 'challengers', badgeText: '챌린저스', order: 6 };
     }
     if (/\b(kickoff)\b/i.test(lower)) {
         return {
@@ -285,18 +288,11 @@ function categorizeTournament(name) {
             order: 4
         };
     }
-    if (/\b(vct\s*\d{4})\b/i.test(lower)) {
+    if (/\b(vct\s*\d{4}|champions\s+tour)\b/i.test(lower)) {
         return {
             type: 'vct',
             badgeText: 'VCT 정규',
             order: 5
-        };
-    }
-    if (/\b(challengers|ascension|vcl)\b/i.test(lower)) {
-        return {
-            type: 'challengers',
-            badgeText: '챌린저스',
-            order: 6
         };
     }
     return {
