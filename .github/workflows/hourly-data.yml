@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 55
     env:
-      VLR_DATA_DIR: ${{ runner.temp }}/vlr-data
+      VLR_DATA_DIR: ${{ github.workspace }}/.collector-data
       VLR_REFRESH_MODE: local
     steps:
       - uses: actions/checkout@v4
