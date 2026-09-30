@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
+    inputs:
+      check_source:
+        description: 'Check public match clock parsing without publishing data'
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -23,7 +28,21 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install -r requirements.txt
+      - name: Check source clock
+        if: ${{ inputs.check_source == true }}
+        run: |
+          python - <<'PY'
+          from bs4 import BeautifulSoup
+          from app.scraper.http import request_with_retry
+          from app.scraper.parsers import parse_scheduled_time
+          response = request_with_retry('https://www.vlr.gg/753451')
+          response.raise_for_status()
+          soup = BeautifulSoup(response.text, 'html.parser')
+          print(soup.select_one('.match-header-date'))
+          print(parse_scheduled_time(soup))
+          PY
       - name: Restore previous published generation
+        if: ${{ inputs.check_source != true }}
         shell: bash
         run: |
           if git ls-remote --exit-code --heads origin catalog-data; then
@@ -34,6 +53,7 @@ jobs:
             git -C "$RUNNER_TEMP/published" init -b catalog-data
           fi
       - name: Collect catalog and analysis
+        if: ${{ inputs.check_source != true }}
         shell: bash
         run: |
           set +e
@@ -46,6 +66,7 @@ jobs:
             exit "$code"
           fi
       - name: Publish atomically on the data branch
+        if: ${{ inputs.check_source != true }}
         shell: bash
         run: |
           cp "$RUNNER_TEMP/snapshot.json" "$RUNNER_TEMP/published/snapshot.json"
@@ -62,4 +83,5 @@ jobs:
             git -C "$GITHUB_WORKSPACE" push origin FETCH_HEAD:catalog-data
           fi
       - name: Request web import
+        if: ${{ inputs.check_source != true }}
         run: curl --fail --retry 2 --max-time 90 https://vlr-web-analyzer.onrender.com/api/catalog --output /dev/null
