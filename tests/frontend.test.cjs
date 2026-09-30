@@ -62,6 +62,7 @@ function setup(search = '') {
         window: { location: { search, href: 'https://analyzer.test/' + search }, isSecureContext: true },
         navigator: { clipboard: { async writeText(text) { context.copied = text; } } },
         document: {
+            querySelectorAll() { return []; },
             hidden: false, body: new Element(),
             getElementById(id) {
                 if (!elements.has(id)) elements.set(id, new Element(id.endsWith('-select') ? 'select' : 'div'));

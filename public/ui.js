@@ -617,6 +617,35 @@ function syncReportTeamNames() {
     }
 }
 
+function updateReportNavigation() {
+    const links = Array.from(document.querySelectorAll('.report-nav a'));
+    if (!links.length) return;
+    let current = '#overview';
+    if (!document.getElementById('match-report').classList.contains('hidden')) {
+        const offset = parseFloat(getComputedStyle(document.getElementById('overview')).scrollMarginTop) + 16;
+        for (const link of links) {
+            if (document.querySelector(link.getAttribute('href')).getBoundingClientRect().top <= offset) current = link.getAttribute('href');
+        }
+        if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) current = '#form';
+    }
+    for (const link of links) {
+        if (link.getAttribute('href') === current) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+    }
+}
+
+function initReportNavigation() {
+    let queued = false;
+    const refresh = () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => { queued = false; updateReportNavigation(); });
+    };
+    window.addEventListener('scroll', refresh, { passive: true });
+    window.addEventListener('resize', refresh);
+    updateReportNavigation();
+}
+
 function setReportState(state) {
     const ready = state === 'ready';
     document.getElementById('match-report').classList[ready ? 'remove' : 'add']('hidden');
@@ -624,6 +653,7 @@ function setReportState(state) {
     document.getElementById('match-report').setAttribute('aria-busy', String(state === 'loading'));
     analyzeBtn.textContent = state === 'loading' ? '분석 중…' : ready ? '다시 분석' : '경기 분석';
     if (!ready) reportSnapshot = null;
+    updateReportNavigation();
 }
 
 function beginReport() {

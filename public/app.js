@@ -1,5 +1,6 @@
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
+    initReportNavigation();
     fetchMatches();
     document.getElementById('export-link-btn').addEventListener('click', generateShareableLink);
     document.getElementById('export-img-btn').addEventListener('click', exportReportImage);
