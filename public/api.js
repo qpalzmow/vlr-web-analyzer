@@ -2,12 +2,14 @@
 function renderCatalogStatus(data) {
     const badge = document.getElementById('sync-badge-text');
     const updated = data.updated_at ? new Date(data.updated_at).toLocaleString('ko-KR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    const age = Date.now() - new Date(data.updated_at).getTime();
+    const delayed = Number.isFinite(age) && age >= 2 * 60 * 60 * 1000 ? ' · 갱신 지연' : '';
     const refreshing = data.sync_status === 'running' ? ' · 갱신 중' : '';
     const failed = data.sync_status === 'error' ? ' · 이전 데이터 유지' : '';
     const analytics = data.analytics_status?.stale_teams ? ` · 분석 갱신 대기 ${data.analytics_status.stale_teams}팀` : '';
     if (badge) badge.title = data.updated_at || '';
     if (badge) badge.textContent = updated
-        ? `1시간마다 업데이트 · ${updated} 기준${refreshing}${failed}${analytics}`
+        ? `1시간마다 업데이트 · ${updated} 기준${delayed}${refreshing}${failed}${analytics}`
         : '첫 경기 목록을 준비하고 있습니다';
 }
 

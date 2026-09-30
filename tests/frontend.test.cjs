@@ -4,6 +4,17 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
+test('catalog status exposes delayed data even when the last import completed', () => {
+    const h = setup();
+    h.context.data = {updated_at:'2020-01-01T00:00:00Z',sync_status:'completed',analytics_status:{stale_teams:2}};
+    h.run('renderCatalogStatus(data)');
+    assert.match(h.elements.get('sync-badge-text').textContent, /갱신 지연/);
+    assert.match(h.elements.get('sync-badge-text').textContent, /분석 갱신 대기 2팀/);
+    h.context.data.updated_at = new Date().toISOString();
+    h.run('renderCatalogStatus(data)');
+    assert.doesNotMatch(h.elements.get('sync-badge-text').textContent, /갱신 지연/);
+});
+
 function setup(search = '') {
     class Element {
         constructor(tag = 'div') {
@@ -674,4 +685,16 @@ test('form and recommendation rendering never interpret team or opponent names a
     const ban=h.elements.get('ai-ban-list').children[0].innerHTML;
     assert.match(ban,/&lt;img/);assert.doesNotMatch(ban,/<img/);
     assert.match(h.elements.get('acs-trend-chart').children[0].innerHTML,/&lt;img&gt;/);
+});
+
+test('unstarted placeholder maps do not become a scoreboard but live zero scores remain visible', () => {
+    const h=setup();
+    h.run("selectedMatch={team_a:'One',team_b:'Two',live_score:{status:'upcoming',series_score_a:'0',series_score_b:'0',maps:[{map:'Map',score_a:'0',score_b:'0'},{map:'TBD',score_a:'-',score_b:'-'}]}};updateLiveScoreboard()");
+    assert.equal(h.elements.get('live-scoreboard-panel').classList.contains('hidden'),true);
+    h.run("selectedMatch.live_score.status='live';updateLiveScoreboard()");
+    assert.equal(h.elements.get('live-scoreboard-panel').classList.contains('hidden'),false);
+    assert.match(h.elements.get('live-series-score').textContent,/0 : 0/);
+    h.run("selectedMatch.live_score={status:'final',series_score_a:'2',series_score_b:'1',maps:[{map:'Haven',score_a:'13',score_b:'7'}]};updateLiveScoreboard()");
+    assert.equal(h.elements.get('live-scoreboard-panel').classList.contains('hidden'),false);
+    assert.match(h.elements.get('live-maps-grid').children[0].innerHTML,/13 – 7/);
 });

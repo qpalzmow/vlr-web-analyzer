@@ -1,0 +1,65 @@
+name: Hourly VLR data
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hourly-vlr-data
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      VLR_DATA_DIR: ${{ runner.temp }}/vlr-data
+      VLR_REFRESH_MODE: local
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -r requirements.txt
+      - name: Restore previous published generation
+        shell: bash
+        run: |
+          if git ls-remote --exit-code --heads origin catalog-data; then
+            git fetch origin catalog-data
+            git worktree add --detach "$RUNNER_TEMP/published" FETCH_HEAD
+          else
+            mkdir -p "$RUNNER_TEMP/published"
+            git -C "$RUNNER_TEMP/published" init -b catalog-data
+          fi
+      - name: Collect catalog and analysis
+        shell: bash
+        run: |
+          set +e
+          timeout 45m python -m app.snapshot_export --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json"
+          code=$?
+          set -e
+          if [ "$code" -eq 124 ] && [ -s "$RUNNER_TEMP/snapshot.json" ]; then
+            echo "::warning::Collection time budget reached; publishing completed teams with the new catalog."
+          elif [ "$code" -ne 0 ]; then
+            exit "$code"
+          fi
+      - name: Publish atomically on the data branch
+        shell: bash
+        run: |
+          cp "$RUNNER_TEMP/snapshot.json" "$RUNNER_TEMP/published/snapshot.json"
+          cd "$RUNNER_TEMP/published"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add snapshot.json
+          git commit -m "Update hourly VLR data"
+          if git remote get-url origin >/dev/null 2>&1; then
+            git push origin HEAD:catalog-data
+          else
+            # Use checkout's existing scoped credential configuration.
+            git -C "$GITHUB_WORKSPACE" fetch "$RUNNER_TEMP/published" catalog-data
+            git -C "$GITHUB_WORKSPACE" push origin FETCH_HEAD:catalog-data
+          fi
+      - name: Request web import
+        run: curl --fail --retry 2 --max-time 90 https://vlr-web-analyzer.onrender.com/api/catalog --output /dev/null

@@ -119,6 +119,7 @@ def read_catalog():
     status = get_sync_status()
     snapshot["sync_status"] = status.get("status", "pending")
     snapshot["next_refresh_at"] = status.get("details", {}).get("next_refresh_at")
+    snapshot['sync_details'] = status.get('details', {})
     return snapshot
 
 
@@ -178,6 +179,17 @@ def refresh_catalog():
                 "next_refresh_at": (started + timedelta(seconds=INTERVAL_SECONDS)).isoformat()}
         set_sync_status("running", meta)
         try:
+            from app import snapshot_feed
+            if snapshot_feed.enabled():
+                imported = snapshot_feed.refresh()
+                meta.update(imported, source='github_hourly', completed_at=utcnow().isoformat(),
+                            next_refresh_at=(utcnow() + timedelta(minutes=5)).isoformat())
+                stale = utcnow() - datetime.fromisoformat(imported['catalog_updated_at']) >= timedelta(hours=2)
+                status = 'degraded' if stale else 'completed'
+                if stale:
+                    meta['last_error'] = 'snapshot_outdated'
+                set_sync_status(status, meta)
+                return {'status': status, 'details': meta}
             payload = build_snapshot(get_catalog_snapshot())
             save_catalog_snapshot(payload)
             meta.update({"ready_count": payload["ready_count"], "pending_count": payload["pending_count"],
@@ -186,8 +198,9 @@ def refresh_catalog():
             set_sync_status(status, meta)
             queue_analytics(payload["matches"])
             return {"status": status, "details": meta}
-        except Exception:
+        except Exception as exc:
             logger.exception("Catalog refresh failed; previous snapshot remains available")
+            meta['last_error'] = type(exc).__name__
             meta["next_refresh_at"] = (utcnow() + timedelta(minutes=5)).isoformat()
             set_sync_status("error", meta)
             return {"status": "error", "details": meta}
@@ -221,6 +234,11 @@ def start_catalog_scheduler():
     bootstrap_snapshot()
     if _worker is None or not _worker.is_alive():
         _stop.clear()
+        from app.snapshot_feed import enabled
+        if enabled():
+            # On a cold start, load the persisted external generation before
+            # accepting requests instead of exposing a weeks-old bundled seed.
+            refresh_catalog()
         _worker = threading.Thread(target=_scheduler_loop, daemon=True, name="VLRHourlyCatalog")
         _worker.start()
 

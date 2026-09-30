@@ -756,7 +756,13 @@ function updateLiveScoreboard() {
     const panel = document.getElementById('live-scoreboard-panel');
     const score = selectedMatch?.live_score;
     const maps = score?.maps || [];
-    if (!score || (!maps.length && String(score.series_score_a) === '0' && String(score.series_score_b) === '0' && score.status !== 'live')) {
+    const placeholdersOnly = maps.every(map =>
+        /^(?:map|tbd|unknown)?$/i.test(String(map.map || '').trim()) &&
+        ['0', '', '—', '-'].includes(String(map.score_a ?? '')) &&
+        ['0', '', '—', '-'].includes(String(map.score_b ?? '')));
+    const unstarted = score?.status === 'upcoming' && placeholdersOnly &&
+        String(score.series_score_a) === '0' && String(score.series_score_b) === '0';
+    if (!score || unstarted || (!maps.length && String(score.series_score_a) === '0' && String(score.series_score_b) === '0' && score.status !== 'live')) {
         panel.classList.add('hidden'); return;
     }
     panel.classList.remove('hidden');

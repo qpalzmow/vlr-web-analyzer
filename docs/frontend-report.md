@@ -69,7 +69,7 @@ Export failure restores the button and supports retry.
 
 ## Verification
 
-- 40 frontend regression tests: selection, tournament grouping, filters, shared
+- 42 frontend regression tests: selection, tournament grouping, filters, shared
   restore, one analysis request, stale response rejection, live polling, career
   values/coverage, comparison rows, missing data, escaping, report states and
   export clone/error handling.
@@ -84,9 +84,13 @@ Export failure restores the button and supports retry.
 - Second source cleanup removed repeated status prose from the top of the
   report, fixed long player/team header wrapping and documented fallback pools.
 
-**Outstanding visual verification:** the browser-control environment returned no
-available browsers, including the in-app and Chrome entry points. Actual
-390/768/1280/1440px screenshots, 320px overflow inspection, and the rendered PNG
-have not been inspected. DOM tests and CSS review are not substitutes for those
-checks. The local preview is at `http://127.0.0.1:8770` while the preview process
-is running.
+- Browser verification completed at 390, 768, 1280 and 1440px; 320px was also
+  inspected for page overflow. Tables remain inside their scroll regions. Mobile
+  matchup percentages and form rows were aligned even when one team name wraps.
+- A second visual cleanup pass hid upcoming placeholder 0–0 map rows while
+  retaining real live 0–0 scores. Keyboard table scrolling and report anchors
+  were exercised, and the application console had no errors.
+- The actual html2canvas output was viewed at 1680px wide. All map, player and
+  recent-result columns were visible in the PNG. After the placeholder-score
+  cleanup the export measured 1680 × 4365px. A temporary local export-inspection
+  harness was removed from the deployable public directory after verification.

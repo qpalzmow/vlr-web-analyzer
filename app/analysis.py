@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app import analysis_sources as sources
-from app.db import get_analysis_teams, save_analysis_team
+from app.db import get_analysis_teams, save_analysis_team, get_catalog_snapshot
 from app.scraper.metrics import calculate_advanced_metrics, find_ace_player_from_stats, simulate_banpick
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,12 @@ def expired(timestamp):
 
 def analysis_status():
     teams = get_analysis_teams()
+    active = requirements((get_catalog_snapshot() or {}).get('matches', []))
+    stored_count = len(teams)
+    if active:
+        teams = {tid: teams.get(tid, {}) for tid in active}
     return {'teams': len(teams), 'failed_teams': sum(bool(t.get('last_error')) for t in teams.values()),
+            'stored_teams': stored_count, 'pending_teams': sum(not t.get('scopes') for t in teams.values()),
             'stale_teams': sum(expired(t.get('last_success_at', t.get('updated_at'))) for t in teams.values())}
 
 
@@ -91,7 +96,7 @@ def prepare_team(team_id, events, previous=None):
     return data
 
 
-def refresh_analysis(matches, stop=None, force=False):
+def refresh_analysis(matches, stop=None, force=False, on_progress=None):
     sources.refresh_started_at = datetime.now(timezone.utc) if force else None
     previous = get_analysis_teams()
     todo = []
@@ -105,6 +110,10 @@ def refresh_analysis(matches, stop=None, force=False):
         if force or not fresh or old.get('schema_version') != SCHEMA_VERSION or old.get('failed_scopes') or not required <= old.get('scopes', {}).keys():
             todo.append((tid, events))
     results = {'updated': 0, 'failed': 0, 'total': len(todo)}
+    # A time-limited external run must not repeatedly refresh the same first teams
+    # while leaving the end of the queue untouched.
+    todo.sort(key=lambda item: previous.get(item[0], {}).get('last_success_at') or
+              previous.get(item[0], {}).get('updated_at') or '')
     with ThreadPoolExecutor(max_workers=4, thread_name_prefix='vlr-prepared-analysis') as pool:
         # Bounded batches make shutdown responsive without queueing thousands of requests.
         for i in range(0, len(todo), 4):
@@ -122,6 +131,8 @@ def refresh_analysis(matches, stop=None, force=False):
                     old.update(last_attempt_at=now_iso(), last_error='team_collection_failed')
                     save_analysis_team(tid, old)
                     logger.warning('Keeping previous analysis for team %s: %s', jobs[future], exc)
+                if on_progress:
+                    on_progress(results.copy())
     return results
 
 

@@ -102,6 +102,38 @@ def get_catalog_snapshot():
         conn.close()
 
 
+def install_prepared_snapshot(catalog, teams):
+    """Install one public generation atomically, without rolling newer data back."""
+    def stamp(value):
+        return datetime.fromisoformat(value)
+
+    conn = get_db_connection()
+    updated = 0
+    try:
+        with conn:
+            conn.execute("BEGIN IMMEDIATE")
+            row = conn.execute("SELECT payload_json FROM catalog_snapshot WHERE id = 1").fetchone()
+            previous = json.loads(row[0]) if row else None
+            catalog_changed = not previous or stamp(catalog['updated_at']) > stamp(previous['updated_at'])
+            if catalog_changed:
+                conn.execute("INSERT INTO catalog_snapshot VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET payload_json=excluded.payload_json",
+                             (json.dumps(catalog, ensure_ascii=False),))
+            for tid, payload in teams.items():
+                row = conn.execute("SELECT payload_json FROM analysis_teams WHERE team_id = ?", (tid,)).fetchone()
+                old = json.loads(row[0]) if row else {}
+                incoming = payload.get('last_attempt_at') or payload['updated_at']
+                incoming_date = stamp(incoming)
+                prior = old.get('last_attempt_at') or old.get('updated_at')
+                if prior and old.get('schema_version') == payload['schema_version'] and stamp(prior) >= incoming_date:
+                    continue
+                conn.execute("INSERT INTO analysis_teams VALUES (?, ?) ON CONFLICT(team_id) DO UPDATE SET payload_json=excluded.payload_json",
+                             (tid, json.dumps(payload, ensure_ascii=False)))
+                updated += 1
+        return {'catalog_changed': catalog_changed, 'updated_teams': updated}
+    finally:
+        conn.close()
+
+
 def save_catalog_snapshot(payload):
     # Readers see either the entire previous generation or the entire new one.
     encoded = json.dumps(payload, ensure_ascii=False)

@@ -19,6 +19,8 @@ def isolate_memory_state(monkeypatch):
     import app.main as main
     from app.cache import CACHE, LIVE_SCORE_CACHE, _cache_lock, _cache_timestamps
     monkeypatch.delenv("VLR_MAINTENANCE_TOKEN", raising=False)
+    monkeypatch.delenv("RENDER", raising=False)
+    monkeypatch.delenv("VLR_REFRESH_MODE", raising=False)
     monkeypatch.setattr(main, "_maintenance_last_started", None)
     with _cache_lock:
         for config in CACHE.values():
