@@ -45,7 +45,7 @@ def test_navigation_labels_assets_and_disclosures_are_valid():
 
 def test_new_stylesheet_is_served_without_old_theme_or_tiny_fonts(client):
     page = client.get("/").text
-    assert "report.css?v=20261001.1" in page
+    assert "report.css?v=20261001.2" in page
     assert all(name not in page for name in ["ios-theme.css", "tailwind", "lucide", "chart.js", "theme-btn"])
     response = client.get("/report.css")
     assert response.status_code == 200

@@ -12,13 +12,13 @@ summary { cursor: pointer; min-height: 44px; }
 .primary-fields, .secondary-fields { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); }
 .field { min-width: 0; }
 .field label { display: block; margin-bottom: var(--space-2); font-weight: 500; }
-.field label span { margin-right: var(--space-2); color: var(--muted); font-size: var(--type-meta); }
+.field label span { margin-right: var(--space-2); color: var(--accent); font-size: var(--type-meta); }
 .field p { margin-top: var(--space-2); color: var(--muted); font-size: var(--type-meta); overflow-wrap: anywhere; }
 .match-browser-panel { margin-top: var(--space-5); }
 .browser-heading { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
 .status-filters { display: flex; gap: var(--space-1); flex-wrap: wrap; }
 .status-filters button { border: 0; background: transparent; padding: var(--space-2) var(--space-3); color: var(--muted); font-size: 13px; }
-.status-filters button[aria-pressed="true"] { color: var(--text); background: var(--surface-elevated); }
+.status-filters button[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); }
 .match-browser { max-height: 324px; overflow-y: auto; scrollbar-gutter: stable; overscroll-behavior: contain; margin-top: var(--space-2); }
 .match-date-heading { padding: var(--space-4) var(--space-3) var(--space-2); font-size: var(--type-meta); color: var(--muted); font-weight: 400; }
 .match-row { width: 100%; display: grid; grid-template-columns: 104px minmax(0, 1fr) 88px; align-items: center; gap: var(--space-4); text-align: left; min-height: 68px; padding: var(--space-3); border: 0; border-radius: var(--radius-sm); background: transparent; font-weight: 400; }
@@ -39,7 +39,7 @@ summary { cursor: pointer; min-height: 44px; }
 .secondary-fields { gap: var(--space-4); margin: var(--space-2) 0 var(--space-3); }
 #tournament-category-filters, #tournament-quick-filters { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); }
 .tournament-category-button, #tournament-quick-filters button { border: 0; background: transparent; color: var(--muted); padding: var(--space-2) 10px; font-size: 13px; }
-.tournament-category-button[aria-pressed="true"] { color: var(--text); background: var(--surface-elevated); }
+.tournament-category-button[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); }
 #tournament-checklist { max-height: 260px; overflow-y: auto; margin: 10px 0; padding-right: var(--space-2); }
 .event-check { display: flex; gap: 10px; align-items: center; min-height: 44px; padding: var(--space-2) 0; cursor: pointer; }
 .event-check span { overflow-wrap: anywhere; }
@@ -73,12 +73,15 @@ summary { cursor: pointer; min-height: 44px; }
 .summary-stat { margin-top: var(--space-2); display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--space-2); }
 .matchup-side:last-child .summary-stat { justify-content: flex-end; }
 .summary-stat strong { font-size: 24px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
+#summary-a-rate { color: var(--a); }
+#summary-b-rate { color: var(--b); }
 .summary-stat span { color: var(--muted); font-size: 13px; }
 .hero-footer { margin-top: var(--space-6); }
 .hero-actions { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-top: var(--space-4); }
 .hero-actions p { max-width: 70%; }
 .insight-strip { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; gap: var(--space-8); margin: var(--space-8) 0; padding: 0 var(--space-2); }
 .insight-story h2 { font-size: 21px; line-height: 1.4; letter-spacing: -.4px; font-weight: 500; margin-bottom: var(--space-2); }
+#insight-kicker, .card-heading .eyebrow { color: var(--accent); }
 .insight-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-2) var(--space-5); }
 .form-summary { min-width: 0; }
 .form-summary > p:first-child { font-size: 13px; font-weight: 500; overflow-wrap: anywhere; }
@@ -87,6 +90,8 @@ summary { cursor: pointer; min-height: 44px; }
 .form-result { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; min-height: 28px; font-size: 14px; font-weight: 500; border-bottom: 2px solid currentColor; }
 .form-result.win, .form-detail .win { color: var(--positive); }
 .form-result.loss, .form-detail .loss { color: var(--negative); }
+.form-result.win { background: var(--positive-soft); }
+.form-result.loss { background: var(--negative-soft); }
 .forecast-list { list-style: none; padding: 0; margin: 0 0 var(--space-4); }
 .forecast-map { padding: var(--space-4) 0; border-top: 1px solid var(--line); }
 .forecast-map h4 { margin-bottom: var(--space-3); font-weight: 600; font-size: 16px; }
@@ -96,12 +101,15 @@ summary { cursor: pointer; min-height: 44px; }
 .forecast-line small { grid-column: 2 / 4; color: var(--muted); }
 .forecast-track { height: 3px; border-radius: 0; background: var(--line); position: relative; margin: 0 4px; }
 .forecast-track i { display: block; position: absolute; top: -3px; width: 9px; height: 9px; border-radius: 50%; background: currentColor; transform: translateX(-50%); }
+.team-a .forecast-track { background: var(--a-soft); }
+.team-b .forecast-track { background: var(--b-soft); }
 .map-differences { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); font-size: var(--type-meta); color: var(--muted); margin-top: var(--space-3); }
 .map-sample-notes { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); border-top: 1px solid var(--line); margin-top: var(--space-4); padding-top: var(--space-4); }
 .summary-note { font-size: 13px; min-width: 0; overflow-wrap: anywhere; }
 .summary-note b { font-weight: 500; }
 .summary-note p + p { margin-top: var(--space-2); }
 .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); margin-bottom: var(--space-5); }
+.impact-player { border-left: 3px solid currentColor; padding-left: var(--space-4); }
 .impact-player-name { margin-top: var(--space-1); font-size: 20px; font-weight: 500; }
 .impact-metric { display: flex; align-items: baseline; gap: var(--space-3); margin: var(--space-3) 0 var(--space-2); font-variant-numeric: tabular-nums; }
 .impact-metric strong { font-size: 40px; line-height: 1; font-weight: 600; letter-spacing: -1px; }

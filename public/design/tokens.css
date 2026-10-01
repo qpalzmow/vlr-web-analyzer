@@ -7,10 +7,17 @@
   --text: #f0f2f2;
   --muted: #a5afb9;
   --line: #323d47;
-  --a: #94c5de;
-  --b: #dfb086;
-  --positive: #a6c6b4;
-  --negative: #d4aba4;
+  --accent: #f08d7b;
+  --accent-hover: #ffa18f;
+  --accent-soft: #382a2b;
+  --a: #8dcbef;
+  --a-soft: #273b48;
+  --b: #f3b777;
+  --b-soft: #45372b;
+  --positive: #8dcea8;
+  --positive-soft: #25392f;
+  --negative: #eaa297;
+  --negative-soft: #3b2c2e;
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
@@ -62,10 +69,10 @@ input[type="checkbox"] { width: 18px; height: 18px; flex: 0 0 18px; accent-color
 .team-b { color: var(--b); }
 .eyebrow { color: var(--muted); font-size: var(--type-meta); font-weight: 500; margin-bottom: var(--space-2); }
 .analysis-card { background: var(--surface); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-card); min-width: 0; }
-.primary-button { border: 0; background: var(--text); color: var(--bg); font-weight: 600; min-width: 136px; }
-.primary-button:hover:not(:disabled) { background: #dce5e9; }
+.primary-button { border: 0; background: var(--accent); color: var(--bg); font-weight: 600; min-width: 136px; }
+.primary-button:hover:not(:disabled) { background: var(--accent-hover); }
 .primary-button:disabled { background: var(--surface-elevated); color: var(--muted); }
 .text-button { border: 0; background: transparent; color: var(--muted); font-size: 13px; }
-.detail-link { display: inline-flex; align-items: center; min-height: 44px; gap: var(--space-2); color: var(--muted); font-size: 13px; white-space: nowrap; }
+.detail-link { display: inline-flex; align-items: center; min-height: 44px; gap: var(--space-2); color: var(--accent); font-size: 13px; white-space: nowrap; }
 .skip-link { position: absolute; top: -100px; left: 16px; background: var(--text); color: var(--bg); padding: 12px; z-index: 10; }
 .skip-link:focus { top: 12px; }
