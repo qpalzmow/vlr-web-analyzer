@@ -1,10 +1,10 @@
 MatchUI.reorder = function(status) {
     const container = document.getElementById('report-modules');
     if (container.dataset.phase === status) return;
+    // Keep the two half-width map modules together; full-width cards cannot split their row.
     const order = status === 'upcoming' || status === 'unknown'
         ? ['map-preview-card', 'veto-card', 'player-impact-card', 'live-scoreboard-panel']
-        : status === 'live' ? ['live-scoreboard-panel', 'map-preview-card', 'player-impact-card', 'veto-card']
-        : ['live-scoreboard-panel', 'veto-card', 'map-preview-card', 'player-impact-card'];
+        : ['live-scoreboard-panel', 'map-preview-card', 'veto-card', 'player-impact-card'];
     for (const id of order) container.appendChild(document.getElementById(id));
     container.dataset.phase = status;
 };

@@ -835,9 +835,9 @@ test('live zero scores and phase changes update insight without replacing module
     const nodes=[...parent.children];
     h.run("match.live_score.status='live';MatchUI.refresh()");
     assert.match(h.elements.get('insight-title').textContent,/0 : 0.*동률/);
-    assert.equal(ids()[0],'live-scoreboard-panel');
+    assert.deepEqual(ids(),['live-scoreboard-panel','map-preview-card','veto-card','player-impact-card']);
     h.run("match.live_score={status:'final',series_score_a:'2',series_score_b:'1'};MatchUI.refresh();MatchUI.refresh()");
-    assert.deepEqual(ids(),['live-scoreboard-panel','veto-card','map-preview-card','player-impact-card']);
+    assert.deepEqual(ids(),['live-scoreboard-panel','map-preview-card','veto-card','player-impact-card']);
     assert.equal(new Set(parent.children).size,4);
     assert.ok(nodes.every(node=>parent.children.includes(node)));
     assert.equal(h.elements.get('impact-a-acs').textContent,'220.0');

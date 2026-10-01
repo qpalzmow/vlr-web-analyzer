@@ -93,6 +93,11 @@ summary { cursor: pointer; min-height: 44px; }
 .form-result.win { background: var(--positive-soft); }
 .form-result.loss { background: var(--negative-soft); }
 .forecast-list { list-style: none; padding: 0; margin: 0 0 var(--space-4); }
+:is(.map-preview, .veto-card) > .card-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 44px auto; row-gap: var(--space-1); align-items: center; margin-bottom: var(--space-4); }
+:is(.map-preview, .veto-card) > .card-heading > div { display: contents; }
+:is(.map-preview, .veto-card) > .card-heading .eyebrow { grid-column: 1; grid-row: 1; margin: 0; }
+:is(.map-preview, .veto-card) > .card-heading h3 { grid-column: 1 / -1; grid-row: 2; }
+.map-preview > .card-heading > .detail-link { grid-column: 2; grid-row: 1; }
 .forecast-map { padding: var(--space-4) 0; border-top: 1px solid var(--line); }
 .forecast-map h4 { margin-bottom: var(--space-3); font-weight: 600; font-size: 16px; }
 .forecast-line { display: grid; grid-template-columns: minmax(0, 108px) minmax(36px, 1fr) 40px; gap: 2px var(--space-3); align-items: center; margin-top: var(--space-2); }
