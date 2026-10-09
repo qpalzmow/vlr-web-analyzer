@@ -89,6 +89,8 @@ def main():
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--catalog-only', action='store_true', help='Refresh match context while preserving prepared team analysis')
     mode.add_argument('--analysis-only', action='store_true', help='Resume prepared team analysis without rebuilding the catalog')
+    parser.add_argument('--catalog-max-seconds', type=positive_seconds, default=600,
+                        help='Catalog request time budget; prior selections remain available at expiry')
     parser.add_argument('--max-seconds', type=positive_seconds, default=2400,
                         help='Analysis time budget; finished work is published when it expires')
     args = parser.parse_args()
@@ -106,12 +108,17 @@ def main():
     bootstrap_analysis()
     if args.previous and args.previous.exists():
         install(json.loads(args.previous.read_text(encoding='utf-8')))
+    from app.scraper.http import set_collection_deadline
     if args.analysis_only:
         payload = get_catalog_snapshot()
         if not payload or not payload.get('ready_count'):
             raise ValueError('Analysis-only collection requires a prepared catalog')
     else:
-        payload = build_snapshot(get_catalog_snapshot())
+        set_collection_deadline(args.catalog_max_seconds)
+        try:
+            payload = build_snapshot(get_catalog_snapshot())
+        finally:
+            set_collection_deadline(None)
         save_catalog_snapshot(payload)
     # Preserve a publishable catalog even if the runner reaches its time budget
     # during analysis. Periodic checkpoints avoid rewriting every team payload
@@ -123,7 +130,6 @@ def main():
         write_snapshot(args.output, collection)
         logging.info('Catalog-only refresh: %s', payload['updated_at'])
         return
-    from app.scraper.http import set_collection_deadline
     stop = Event()
     timer = Timer(args.max_seconds, stop.set)
     timer.daemon = True

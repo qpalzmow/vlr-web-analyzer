@@ -297,6 +297,40 @@ def test_budget_expiry_publishes_finished_work_and_cleans_deadline(monkeypatch, 
     assert deadline.call_args_list == [call(1.0), call(None)]
 
 
+@pytest.mark.parametrize('fails', [False, True])
+def test_catalog_request_budget_clears_on_publish_and_source_failure(monkeypatch, tmp_path, fails):
+    import json
+    import sys
+    from app import snapshot_export as export
+    from app.scraper import http
+    data = bundle()
+    monkeypatch.setattr(export, 'bootstrap_snapshot', lambda: None)
+    monkeypatch.setattr(export, 'bootstrap_analysis', lambda: None)
+    deadline = Mock()
+    monkeypatch.setattr(http, 'set_collection_deadline', deadline)
+    def build(previous):
+        assert previous == data['catalog']
+        deadline.assert_called_once_with(600)
+        if fails:
+            raise TimeoutError('match list request budget exhausted')
+        return {**previous, 'generation': 'catalog-deadline-published'}
+    monkeypatch.setattr(export, 'build_snapshot', build)
+    output = tmp_path / 'catalog.json'
+    monkeypatch.setattr(sys, 'argv', ['snapshot_export', '--catalog-only', '--output', str(output)])
+    if fails:
+        with pytest.raises(TimeoutError, match='match list request budget exhausted'):
+            export.main()
+        assert db.get_catalog_snapshot() == data['catalog']
+        assert not output.exists()
+    else:
+        export.main()
+        published = feed.validate(json.loads(output.read_text(encoding='utf-8')))
+        assert published['catalog']['generation'] == 'catalog-deadline-published'
+        assert published['analysis'] == data['analysis']
+        assert published['collection']['status'] == 'catalog_only'
+    assert deadline.call_args_list == [call(600), call(None)]
+
+
 def test_unexpected_analysis_error_still_writes_recoverable_final_checkpoint(monkeypatch, tmp_path):
     import json
     import sys

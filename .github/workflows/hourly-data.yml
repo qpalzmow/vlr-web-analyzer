@@ -120,7 +120,7 @@ jobs:
         if: ${{ steps.due.outputs.collect == 'true' }}
         shell: bash
         run: |
-          python -m app.snapshot_export --catalog-only --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json"
+          python -m app.snapshot_export --catalog-only --catalog-max-seconds 600 --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json"
       - name: Publish catalog before analysis
         if: ${{ steps.due.outputs.collect == 'true' }}
         shell: bash
