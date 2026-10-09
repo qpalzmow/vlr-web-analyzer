@@ -1,6 +1,6 @@
 import copy
 from datetime import datetime, timedelta, timezone
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 
 import pytest
 
@@ -114,7 +114,8 @@ def test_catalog_only_export_preserves_analysis_and_default_still_refreshes(monk
         refresh.assert_not_called()
     else:
         refresh.assert_called_once()
-        assert refresh.call_args.kwargs['force'] is True
+        assert refresh.call_args.kwargs['force'] is False
+        assert refresh.call_args.kwargs['stop'] is not None
 
 
 def test_export_checkpoints_are_throttled_and_failure_can_retry(monkeypatch, tmp_path):
@@ -177,3 +178,181 @@ def test_status_counts_current_catalog_teams_including_missing_ones():
     assert status['pending_teams'] == 2
     assert status['stale_teams'] == 2
     assert status['stored_teams'] > 2
+
+
+@pytest.mark.parametrize('age, expected', [(3599, False), (3600, True), (7200, True)])
+def test_collection_due_uses_catalog_clock_instead_of_checkpoint_publication(tmp_path, age, expected):
+    import json
+    from app.snapshot_export import collection_due
+    data = bundle()
+    now = datetime.now(timezone.utc)
+    data['catalog']['updated_at'] = (now - timedelta(seconds=age)).isoformat()
+    # A recent partial-analysis checkpoint must not postpone the next catalog update.
+    data['published_at'] = now.isoformat()
+    path = tmp_path / 'previous.json'
+    path.write_text(json.dumps(data), encoding='utf-8')
+    assert collection_due(path, now=now) is expected
+
+
+@pytest.mark.parametrize('previous_text', [None, 'invalid JSON', '{"schema_version":999}'])
+def test_due_check_recovers_missing_or_invalid_snapshot_without_db_or_network(monkeypatch, tmp_path, capsys, previous_text):
+    import sys
+    from app import snapshot_export as export
+    path = tmp_path / 'previous.json'
+    if previous_text is not None:
+        path.write_text(previous_text, encoding='utf-8')
+    forbidden = Mock(side_effect=AssertionError('Due check must only read the published file'))
+    for name in ('init_db', 'bootstrap_snapshot', 'bootstrap_analysis', 'build_snapshot', 'refresh_analysis'):
+        monkeypatch.setattr(export, name, forbidden)
+    monkeypatch.setattr(sys, 'argv', ['snapshot_export', '--check-due', '--previous', str(path)])
+    export.main()
+    assert capsys.readouterr().out == 'true\n'
+    forbidden.assert_not_called()
+
+
+def test_due_check_prints_false_for_valid_recent_generation_without_output(monkeypatch, tmp_path, capsys):
+    import json
+    import sys
+    from app import snapshot_export as export
+    data = bundle()
+    data['catalog']['updated_at'] = datetime.now(timezone.utc).isoformat()
+    path = tmp_path / 'previous.json'
+    path.write_text(json.dumps(data), encoding='utf-8')
+    monkeypatch.setattr(sys, 'argv', ['snapshot_export', '--check-due', '--previous', str(path)])
+    forbidden = Mock(side_effect=AssertionError('Due check must not initialize storage'))
+    monkeypatch.setattr(export, 'init_db', forbidden)
+    export.main()
+    assert capsys.readouterr().out == 'false\n'
+    forbidden.assert_not_called()
+
+
+def test_analysis_resume_restores_archived_teams_and_old_scopes_without_catalog_scrape(monkeypatch, tmp_path):
+    import json
+    import sys
+    from app import snapshot_export as export
+    data = bundle()
+    archived = copy.deepcopy(next(iter(data['analysis']['teams'].values())))
+    archived['team_id'] = '999999999'
+    data['analysis']['teams']['999999999'] = archived
+    previous = tmp_path / 'published.json'
+    previous.write_text(json.dumps(data), encoding='utf-8')
+    monkeypatch.setattr(db, 'DB_PATH', str(tmp_path / 'new_runner.db'))
+    monkeypatch.setattr(export, 'bootstrap_snapshot', lambda: None)
+    monkeypatch.setattr(export, 'bootstrap_analysis', lambda: None)
+    forbidden = Mock(side_effect=AssertionError('Analysis resume must keep the durable catalog'))
+    monkeypatch.setattr(export, 'build_snapshot', forbidden)
+    refreshed_tid = next(iter(data['analysis']['teams']))
+    def refresh(matches, **kwargs):
+        assert matches == data['catalog']['matches']
+        assert kwargs['force'] is False
+        team = db.get_analysis_teams([refreshed_tid])[refreshed_tid]
+        team.update(last_attempt_at=datetime.now(timezone.utc).isoformat(), last_error='scope_collection_failed')
+        db.save_analysis_team(refreshed_tid, team)
+        return {'updated': 1, 'failed': 0, 'total': 1}
+    monkeypatch.setattr(export, 'refresh_analysis', refresh)
+    output = tmp_path / 'resumed.json'
+    monkeypatch.setattr(sys, 'argv', ['snapshot_export', '--analysis-only', '--previous', str(previous), '--output', str(output)])
+    export.main()
+    restored = json.loads(output.read_text(encoding='utf-8'))
+    assert restored['catalog'] == data['catalog']
+    assert restored['analysis']['teams']['999999999'] == archived
+    assert restored['analysis']['teams'][refreshed_tid]['scopes'] == data['analysis']['teams'][refreshed_tid]['scopes']
+    assert restored['collection']['mode'] == 'analysis_only'
+    assert restored['collection']['status'] == 'partial'
+    forbidden.assert_not_called()
+
+
+def test_budget_expiry_publishes_finished_work_and_cleans_deadline(monkeypatch, tmp_path):
+    import json
+    import sys
+    from app import snapshot_export as export
+    from app.scraper import http
+    data = bundle()
+    monkeypatch.setattr(export, 'bootstrap_snapshot', lambda: None)
+    monkeypatch.setattr(export, 'bootstrap_analysis', lambda: None)
+    deadline = Mock()
+    monkeypatch.setattr(http, 'set_collection_deadline', deadline)
+    tid = next(iter(data['analysis']['teams']))
+    fresh = datetime.now(timezone.utc).isoformat()
+    def refresh(_matches, *, force, stop, on_progress):
+        assert force is False
+        team = db.get_analysis_teams([tid])[tid]
+        team.update(updated_at=fresh, last_attempt_at=fresh)
+        db.save_analysis_team(tid, team)
+        results = {'updated': 1, 'failed': 0, 'total': 2}
+        on_progress(results)
+        stop.set()
+        return results
+    monkeypatch.setattr(export, 'refresh_analysis', refresh)
+    output = tmp_path / 'checkpoint.json'
+    monkeypatch.setattr(sys, 'argv', ['snapshot_export', '--analysis-only', '--max-seconds', '1', '--output', str(output)])
+    export.main()
+    checkpoint = feed.validate(json.loads(output.read_text(encoding='utf-8')))
+    assert checkpoint['analysis']['teams'][tid]['updated_at'] == fresh
+    assert checkpoint['catalog'] == data['catalog']
+    assert checkpoint['collection']['status'] == 'partial'
+    assert checkpoint['collection']['budget_exhausted'] is True
+    assert checkpoint['collection']['remaining_teams'] == 1
+    assert checkpoint['collection']['completed_at']
+    assert deadline.call_args_list == [call(1.0), call(None)]
+
+
+def test_unexpected_analysis_error_still_writes_recoverable_final_checkpoint(monkeypatch, tmp_path):
+    import json
+    import sys
+    from app import snapshot_export as export
+    from app.scraper import http
+    data = bundle()
+    monkeypatch.setattr(export, 'bootstrap_snapshot', lambda: None)
+    monkeypatch.setattr(export, 'bootstrap_analysis', lambda: None)
+    deadline = Mock()
+    monkeypatch.setattr(http, 'set_collection_deadline', deadline)
+    def fail(_matches, **kwargs):
+        kwargs['on_progress']({'updated': 1, 'failed': 0, 'total': 2})
+        raise RuntimeError('collector failure')
+    monkeypatch.setattr(export, 'refresh_analysis', fail)
+    output = tmp_path / 'checkpoint.json'
+    monkeypatch.setattr(sys, 'argv', ['snapshot_export', '--analysis-only', '--output', str(output)])
+    with pytest.raises(RuntimeError, match='collector failure'):
+        export.main()
+    checkpoint = feed.validate(json.loads(output.read_text(encoding='utf-8')))
+    assert checkpoint['catalog'] == data['catalog']
+    assert checkpoint['analysis'] == data['analysis']
+    assert checkpoint['collection']['status'] == 'partial'
+    assert checkpoint['collection']['results']['updated'] == 1
+    assert checkpoint['collection']['error'] == 'RuntimeError'
+    deadline.assert_called_with(None)
+
+
+def test_render_cold_start_imports_durable_generation_into_empty_sqlite_before_serving(monkeypatch, tmp_path, client):
+    from threading import Event
+    data = bundle()
+    data['catalog'].update(updated_at=datetime.now(timezone.utc).isoformat(), generation='durable-cold-start')
+    monkeypatch.setattr(db, 'DB_PATH', str(tmp_path / 'empty_render.db'))
+    db.init_db()
+    assert db.get_catalog_snapshot() is None
+    assert db.get_analysis_teams() == {}
+    monkeypatch.setenv('RENDER', 'true')
+    monkeypatch.setattr(feed, 'download', lambda: data)
+    monkeypatch.setattr(catalog, 'bootstrap_snapshot', lambda: None)
+    monkeypatch.setattr(catalog, '_worker', None)
+    monkeypatch.setattr(catalog, '_stop', Event())
+    class IdleThread:
+        def __init__(self, **kwargs):
+            self.name = kwargs['name']
+        def start(self):
+            if self.name == 'VLRHourlyCatalog':
+                assert db.get_catalog_snapshot()['generation'] == 'durable-cold-start'
+        def is_alive(self):
+            return False
+        def join(self, timeout=None):
+            pass
+    monkeypatch.setattr(catalog.threading, 'Thread', IdleThread)
+    forbidden = Mock(side_effect=AssertionError('Render must import instead of scraping'))
+    monkeypatch.setattr(catalog, 'build_snapshot', forbidden)
+    monkeypatch.setattr(catalog, 'queue_analytics', forbidden)
+    catalog.start_catalog_scheduler()
+    assert client.get('/api/catalog').json()['generation'] == 'durable-cold-start'
+    assert db.get_analysis_teams() == data['analysis']['teams']
+    assert db.get_sync_status()['details']['source'] == 'github_hourly'
+    forbidden.assert_not_called()

@@ -60,7 +60,7 @@ def requirements(matches):
     return teams
 
 
-def prepare_team(team_id, events, previous=None):
+def prepare_team(team_id, events, previous=None, *, force=False):
     previous = previous or {}
     overview = sources.team_overview(team_id)
     profile = sources.team_profile(team_id)
@@ -69,16 +69,27 @@ def prepare_team(team_id, events, previous=None):
     old_scopes = previous.get('scopes', {})
     scopes = copy.deepcopy(old_scopes)
     failed = []
-    try:
-        players = {pid: {**sources.player_totals(pid), 'name': name}
-                   for pid, name in profile['roster'].items()}
-        scopes['all'] = {'maps': overview['maps'], 'players': players, 'collected_at': now_iso(),
-                         'career_roster_verified': True,
-                         'players_available': any(p['rounds'] > 0 for p in players.values())}
-    except Exception:
-        logger.exception('All-time player collection failed for %s', team_id)
-        failed.append('all')
+    def needs_scope(key):
+        return (force or previous.get('schema_version') != SCHEMA_VERSION
+                or key in previous.get('failed_scopes', [])
+                or expired(old_scopes.get(key, {}).get('collected_at')))
+
+    career = old_scopes.get('all', {})
+    roster_changed = (not career.get('career_roster_verified')
+                      or set(career.get('players', {})) != set(profile['roster']))
+    if needs_scope('all') or roster_changed:
+        try:
+            players = {pid: {**sources.player_totals(pid), 'name': name}
+                       for pid, name in profile['roster'].items()}
+            scopes['all'] = {'maps': overview['maps'], 'players': players, 'collected_at': now_iso(),
+                             'career_roster_verified': True,
+                             'players_available': any(p['rounds'] > 0 for p in players.values())}
+        except Exception:
+            logger.exception('All-time player collection failed for %s', team_id)
+            failed.append('all')
     for event_id in sorted(required):
+        if not needs_scope(event_id):
+            continue
         try:
             maps = sources.event_maps(team_id, event_id)
             # An event leaderboard does not identify a player's team for each match.
@@ -106,11 +117,10 @@ def refresh_analysis(matches, stop=None, force=False, on_progress=None):
     for tid, events in requirements(matches).items():
         old = previous.get(tid, {})
         required = (set(events) & set(old.get('available_events', []))) | {'all'}
-        try:
-            fresh = (datetime.now(timezone.utc) - datetime.fromisoformat(old['updated_at'])).total_seconds() < 3600
-        except (KeyError, ValueError, TypeError):
-            fresh = False
-        if force or not fresh or old.get('schema_version') != SCHEMA_VERSION or old.get('failed_scopes') or not required <= old.get('scopes', {}).keys():
+        scopes = old.get('scopes', {})
+        fresh = all(not expired(scopes.get(key, {}).get('collected_at')) for key in required)
+        if (force or not fresh or old.get('schema_version') != SCHEMA_VERSION
+                or old.get('last_error') or old.get('failed_scopes')):
             todo.append((tid, events))
     results = {'updated': 0, 'failed': 0, 'total': len(todo)}
     # A time-limited external run must not repeatedly refresh the same first teams
@@ -122,11 +132,13 @@ def refresh_analysis(matches, stop=None, force=False, on_progress=None):
         for i in range(0, len(todo), 4):
             if stop and stop.is_set():
                 break
-            jobs = {pool.submit(prepare_team, tid, events, previous.get(tid)): tid for tid, events in todo[i:i+4]}
+            jobs = {pool.submit(prepare_team, tid, events, previous.get(tid), force=force): tid
+                    for tid, events in todo[i:i+4]}
             for future in as_completed(jobs):
                 try:
-                    future.result()
-                    results['updated'] += 1
+                    prepared = future.result()
+                    # A returned record can still contain failed scopes and older data.
+                    results['failed' if prepared.get('last_error') else 'updated'] += 1
                 except Exception as exc:
                     results['failed'] += 1
                     tid = jobs[future]

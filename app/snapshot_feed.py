@@ -89,5 +89,8 @@ def download():
 def refresh():
     payload = download()
     installed = install(payload)
-    return {**installed, 'published_at': payload['published_at'],
-            'catalog_updated_at': payload['catalog']['updated_at']}
+    result = {**installed, 'published_at': payload['published_at'],
+              'catalog_updated_at': payload['catalog']['updated_at']}
+    if isinstance(payload.get('collection'), dict):
+        result['collection'] = payload['collection']
+    return result

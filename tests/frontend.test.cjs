@@ -6,13 +6,30 @@ const vm = require('node:vm');
 
 test('catalog status exposes delayed data even when the last import completed', () => {
     const h = setup();
-    h.context.data = {updated_at:'2020-01-01T00:00:00Z',sync_status:'completed',analytics_status:{stale_teams:2}};
+    h.context.data = {updated_at:'2020-01-01T00:00:00Z',sync_status:'completed',
+        sync_details:{source:'github_hourly',collection:{status:'partial'}},analytics_status:{stale_teams:2}};
     h.run('renderCatalogStatus(data)');
-    assert.match(h.elements.get('sync-badge-text').textContent, /갱신 지연/);
-    assert.match(h.elements.get('sync-badge-text').textContent, /분석 갱신 대기 2팀/);
+    const badge = h.elements.get('sync-badge-text');
+    assert.match(badge.textContent, /^외부 자동 수집 · .* 기준/);
+    assert.match(badge.textContent, /갱신 지연/);
+    assert.match(badge.textContent, /분석 일부 갱신/);
+    assert.match(badge.textContent, /분석 갱신 대기 2팀/);
+    assert.match(badge.title, /GitHub 실행 대기/);
+    assert.match(badge.title, /Render 서버는 시작할 때 저장된 데이터를 불러옵니다/);
+    assert.match(badge.title, /2020-01-01T00:00:00Z/);
+    h.context.data.sync_status = 'error';
+    h.run('renderCatalogStatus(data)');
+    assert.match(badge.textContent, /이전 데이터 유지/);
     h.context.data.updated_at = new Date().toISOString();
+    h.context.data.sync_status = 'completed';
+    h.context.data.sync_details = {source:'github_hourly'};
     h.run('renderCatalogStatus(data)');
-    assert.doesNotMatch(h.elements.get('sync-badge-text').textContent, /갱신 지연/);
+    assert.doesNotMatch(badge.textContent, /갱신 지연|분석 일부 갱신|이전 데이터 유지/);
+    assert.match(badge.textContent, /^외부 자동 수집/);
+    h.context.data.sync_details = {};
+    h.run('renderCatalogStatus(data)');
+    assert.match(badge.textContent, /^1시간마다 업데이트/);
+    assert.match(badge.title, /서버가 실행 중일 때/);
 });
 
 function setup(search = '') {

@@ -1,7 +1,14 @@
 name: Hourly VLR data
 on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/hourly-data.yml'
+      - 'app/**'
+      - 'requirements.txt'
+      - 'tier_config.json'
   schedule:
-    - cron: '17 * * * *'
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
     inputs:
       check_source:
@@ -24,6 +31,7 @@ jobs:
     env:
       VLR_DATA_DIR: ${{ github.workspace }}/.collector-data
       VLR_REFRESH_MODE: local
+      VLR_REQUEST_INTERVAL_SECONDS: '1.0'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,33 +64,50 @@ jobs:
             mkdir -p "$RUNNER_TEMP/published"
             git -C "$RUNNER_TEMP/published" init -b catalog-data
           fi
-      - name: Collect catalog and analysis
+      - name: Check whether collection is due
+        id: due
         if: ${{ inputs.check_source != true }}
         shell: bash
         env:
-          CATALOG_ONLY: ${{ inputs.catalog_only }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          args=()
-          if [ "$CATALOG_ONLY" = "true" ]; then args+=(--catalog-only); fi
-          set +e
-          timeout 45m python -m app.snapshot_export --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json" "${args[@]}"
-          code=$?
-          set -e
-          if [ "$code" -eq 124 ] && [ -s "$RUNNER_TEMP/snapshot.json" ]; then
-            echo "::warning::Collection time budget reached; publishing completed teams with the new catalog."
-          elif [ "$code" -ne 0 ]; then
-            exit "$code"
+          due=true
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            due=$(python -m app.snapshot_export --check-due --previous "$RUNNER_TEMP/published/snapshot.json")
           fi
-      - name: Publish atomically on the data branch
-        if: ${{ inputs.check_source != true }}
+          echo "collect=$due" >> "$GITHUB_OUTPUT"
+          if [ "$due" != "true" ]; then
+            echo "Published catalog is less than one hour old; collection skipped." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Restore collector cache
+        id: collector-cache
+        if: ${{ steps.due.outputs.collect == 'true' }}
+        continue-on-error: true
+        uses: actions/cache/restore@v4
+        with:
+          path: .collector-data
+          key: vlr-collector-v2-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            vlr-collector-v2-${{ runner.os }}-
+      - name: Prepare snapshot publisher
+        if: ${{ steps.due.outputs.collect == 'true' }}
         shell: bash
         run: |
+          cat > "$RUNNER_TEMP/publish-snapshot.sh" <<'BASH'
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from app.snapshot_feed import validate
+          validate(json.loads((Path(os.environ['RUNNER_TEMP']) / 'snapshot.json').read_text()))
+          PY
           cp "$RUNNER_TEMP/snapshot.json" "$RUNNER_TEMP/published/snapshot.json"
           cd "$RUNNER_TEMP/published"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add snapshot.json
-          git commit -m "Update hourly VLR data"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Update prepared VLR data"
           if git remote get-url origin >/dev/null 2>&1; then
             git push origin HEAD:catalog-data
           else
@@ -90,6 +115,59 @@ jobs:
             git -C "$GITHUB_WORKSPACE" fetch "$RUNNER_TEMP/published" catalog-data
             git -C "$GITHUB_WORKSPACE" push origin FETCH_HEAD:catalog-data
           fi
-      - name: Request web import
-        if: ${{ inputs.check_source != true }}
-        run: curl --fail --retry 2 --max-time 90 https://vlr-web-analyzer.onrender.com/api/catalog --output /dev/null
+          BASH
+      - name: Collect match catalog
+        if: ${{ steps.due.outputs.collect == 'true' }}
+        shell: bash
+        run: |
+          python -m app.snapshot_export --catalog-only --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json"
+      - name: Publish catalog before analysis
+        if: ${{ steps.due.outputs.collect == 'true' }}
+        shell: bash
+        run: |
+          bash "$RUNNER_TEMP/publish-snapshot.sh"
+          echo "New match catalog published; earlier prepared team records retained." >> "$GITHUB_STEP_SUMMARY"
+      - name: Collect incremental analysis
+        id: analysis
+        if: ${{ steps.due.outputs.collect == 'true' && inputs.catalog_only != true }}
+        shell: bash
+        run: |
+          set +e
+          timeout 45m python -m app.snapshot_export --analysis-only --max-seconds 2400 --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ]; then
+            echo "::warning::Analysis stopped with exit code $code; checking the last completed checkpoint."
+          fi
+      - name: Publish completed analysis or valid checkpoint
+        if: ${{ steps.due.outputs.collect == 'true' && inputs.catalog_only != true }}
+        shell: bash
+        env:
+          ANALYSIS_EXIT_CODE: ${{ steps.analysis.outputs.exit_code }}
+        run: |
+          bash "$RUNNER_TEMP/publish-snapshot.sh"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          payload = json.loads((Path(os.environ['RUNNER_TEMP']) / 'snapshot.json').read_text())
+          collection = payload.get('collection', {})
+          code = int(os.environ['ANALYSIS_EXIT_CODE'])
+          status = collection.get('status', 'unknown')
+          note = f"Catalog published: {payload['catalog']['updated_at']}\n\nAnalysis: {status}; results: {collection.get('results', {})}; exit code: {code}\n"
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write(note)
+          if status != 'completed' or code:
+              print('::warning::Analysis is partial; completed records were published and previous unavailable scopes were retained.')
+          PY
+          case "$ANALYSIS_EXIT_CODE" in
+            0|124|130|143) ;;
+            *) exit "$ANALYSIS_EXIT_CODE" ;;
+          esac
+      - name: Save reusable collector cache
+        if: ${{ always() && steps.due.outputs.collect == 'true' && steps.collector-cache.outcome == 'success' }}
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: .collector-data
+          key: vlr-collector-v2-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}

@@ -1,22 +1,30 @@
 // 1. Fetch matches from server
 function renderCatalogStatus(data) {
     const badge = document.getElementById('sync-badge-text');
-    const updated = data.updated_at ? new Date(data.updated_at).toLocaleString('ko-KR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-    const age = Date.now() - new Date(data.updated_at).getTime();
+    const collectedAt = data.updated_at ? new Date(data.updated_at) : null;
+    const updated = collectedAt && Number.isFinite(collectedAt.getTime())
+        ? collectedAt.toLocaleString('ko-KR', {timeZone:'Asia/Seoul',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    const age = collectedAt ? Date.now() - collectedAt.getTime() : NaN;
+    const external = data.sync_details?.source === 'github_hourly';
     const delayed = Number.isFinite(age) && age >= 2 * 60 * 60 * 1000 ? ' · 갱신 지연' : '';
     const refreshing = data.sync_status === 'running' ? ' · 갱신 중' : '';
     const failed = data.sync_status === 'error' ? ' · 이전 데이터 유지' : '';
+    const partial = external && data.sync_details?.collection?.status === 'partial' ? ' · 분석 일부 갱신' : '';
     const analytics = data.analytics_status?.stale_teams ? ` · 분석 갱신 대기 ${data.analytics_status.stale_teams}팀` : '';
-    if (badge) badge.title = data.updated_at || '';
+    if (badge) badge.title = [external
+        ? '외부 수집은 매시간 실행을 목표로 하며 GitHub 실행 대기나 수집 오류로 지연될 수 있습니다. Render 서버는 시작할 때 저장된 데이터를 불러옵니다.'
+        : '서버가 실행 중일 때 1시간 간격으로 수집합니다.',
+        updated ? `마지막 경기 목록 수집: ${data.updated_at} (표시 시간: KST)` : '아직 수집된 경기 목록이 없습니다.'
+    ].join('\n');
     if (badge) badge.textContent = updated
-        ? `1시간마다 업데이트 · ${updated} 기준${delayed}${refreshing}${failed}${analytics}`
+        ? `${external ? '외부 자동 수집' : '1시간마다 업데이트'} · ${updated} 기준${delayed}${refreshing}${failed}${partial}${analytics}`
         : '첫 경기 목록을 준비하고 있습니다';
 }
 
 async function fetchMatches(background = false) {
     if (catalogFetchRunning) return;
     catalogFetchRunning = true;
-    if (!background) updateStatus('info', '저장된 경기 목록을 불러오는 중...', '1시간마다 업데이트됩니다.', 0);
+    if (!background) updateStatus('info', '저장된 경기 목록을 불러오는 중...', '수집된 최신 저장 목록을 확인합니다.', 0);
     try {
         const response = await fetch('/api/catalog', { cache: 'no-store' });
         if (!response.ok) throw new Error(`서버 에러: ${response.status}`);
@@ -31,7 +39,7 @@ async function fetchMatches(background = false) {
             }
             populateEventsDropdown(background);
             if (!allMatches.length) {
-                updateStatus('info', '첫 경기 목록을 준비하고 있습니다.', '서버에서 수집이 끝나면 자동으로 표시됩니다.', 0);
+                updateStatus('info', '첫 경기 목록을 준비하고 있습니다.', '수집된 목록이 준비되면 자동으로 표시됩니다.', 0);
             } else if (!sharedSelectionRestored) {
                 await restoreSharedSelection();
             }

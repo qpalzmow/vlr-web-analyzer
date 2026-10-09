@@ -1,12 +1,68 @@
 import time
 import random
 import threading
+import os
 import urllib.parse as urlparse
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 import httpx
 from app.config import ALLOWED_VLR_HOSTS, USER_AGENTS
 
 _shared_client: httpx.Client = None
 _client_lock = threading.Lock()
+_rate_lock = threading.Lock()
+_next_request_at = 0.0
+_cooldown_until = 0.0
+_collection_deadline = None
+
+
+class CollectionBudgetExceeded(RuntimeError):
+    """Stop starting source requests; completed data can still be checkpointed."""
+
+
+def set_collection_deadline(seconds):
+    global _collection_deadline
+    with _rate_lock:
+        _collection_deadline = None if seconds is None else time.monotonic() + seconds
+
+
+def _wait_for_request():
+    global _next_request_at
+    interval = max(0.0, float(os.environ.get('VLR_REQUEST_INTERVAL_SECONDS', '0')))
+    while True:
+        with _rate_lock:
+            now = time.monotonic()
+            wait = max(0.0, _next_request_at - now, _cooldown_until - now)
+            if _collection_deadline is not None and now + wait >= _collection_deadline:
+                raise CollectionBudgetExceeded('Source collection time budget reached')
+            if wait == 0:
+                _next_request_at = now + interval
+                return
+        time.sleep(wait)
+
+
+def _rate_limit_wait(response):
+    value = response.headers.get('Retry-After', '')
+    try:
+        wait = float(value)
+    except ValueError:
+        try:
+            wait = (parsedate_to_datetime(value) - datetime.now(timezone.utc)).total_seconds()
+        except (ValueError, TypeError, OverflowError):
+            wait = 30
+    return max(1.0, min(wait, 300.0))
+
+
+def _defer_all_requests(seconds):
+    global _cooldown_until
+    with _rate_lock:
+        _cooldown_until = max(_cooldown_until, time.monotonic() + seconds)
+
+
+def _retry_sleep(seconds):
+    if _collection_deadline is not None and time.monotonic() + seconds >= _collection_deadline:
+        raise CollectionBudgetExceeded('Source collection time budget reached')
+    time.sleep(seconds)
 
 def get_httpx_client() -> httpx.Client:
     global _shared_client
@@ -62,6 +118,7 @@ def request_with_retry(url: str, max_retries: int = 3) -> httpx.Response:
     last_err = None
 
     for attempt in range(max_retries):
+        _wait_for_request()
         try:
             res = client.get(url, headers=_get_headers())
             if res.status_code == 200:
@@ -76,21 +133,28 @@ def request_with_retry(url: str, max_retries: int = 3) -> httpx.Response:
                 return res
             if res.status_code == 404:
                 raise httpx.HTTPStatusError(f"404 Not Found: {url}", request=res.request, response=res)
-            if res.status_code in (429, 502, 503, 504):
+            if res.status_code == 429:
+                # One worker being limited must pause every collector worker.
+                _defer_all_requests(_rate_limit_wait(res))
+                last_err = httpx.HTTPStatusError('VLR request rate limited', request=res.request, response=res)
+                continue
+            if res.status_code in (502, 503, 504):
                 last_err = Exception(f"Status {res.status_code}")
                 retry_after = res.headers.get('Retry-After')
                 if retry_after and retry_after.isdigit():
                     wait = min(int(retry_after), 60)
                 else:
                     wait = min(30, 2 ** attempt + random.uniform(0.1, 1.0))
-                time.sleep(wait)
+                _retry_sleep(wait)
                 continue
             return res
+        except CollectionBudgetExceeded:
+            raise
         except httpx.HTTPStatusError:
             raise
         except Exception as e:
             last_err = e
             wait = min(30, 2 ** attempt + random.uniform(0.1, 1.0))
-            time.sleep(wait)
+            _retry_sleep(wait)
 
     raise last_err if last_err else Exception(f"Request failed for {url}")
