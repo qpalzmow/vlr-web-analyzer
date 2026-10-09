@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "published_at": "2026-10-09T07:39:26.816304+00:00",
+  "published_at": "2026-10-09T07:39:29.907886+00:00",
   "catalog": {
     "schema_version": 1,
     "generation": "cce3a0048bf24ed489e5d24812d4481a",
@@ -63499,11 +63499,11 @@
             "unavailable_reason": "team_match_coverage_unverified"
           }
         },
-        "updated_at": "2026-10-09T07:16:41.543315+00:00",
+        "updated_at": "2026-10-09T07:39:29.837235+00:00",
         "failed_scopes": [
           "all"
         ],
-        "last_attempt_at": "2026-10-09T07:16:41.543317+00:00",
+        "last_attempt_at": "2026-10-09T07:39:29.837242+00:00",
         "last_success_at": "2026-09-22T00:32:01.254666+00:00",
         "last_error": "scope_collection_failed"
       },
@@ -184886,10 +184886,17 @@
     }
   },
   "collection": {
-    "status": "catalog_only",
-    "started_at": "2026-10-09T07:34:59.047971+00:00",
-    "completed_at": "2026-10-09T07:39:26.808950+00:00",
-    "mode": "catalog_only",
+    "status": "partial",
+    "started_at": "2026-10-09T07:39:29.134622+00:00",
+    "completed_at": "2026-10-09T07:39:29.907872+00:00",
+    "mode": "analysis_only",
+    "results": {
+      "updated": 0,
+      "failed": 1,
+      "total": 1
+    },
+    "budget_exhausted": false,
+    "remaining_teams": 0,
     "analytics": {
       "teams": 75,
       "failed_teams": 1,
