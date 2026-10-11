@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "published_at": "2026-10-10T23:02:25.064866+00:00",
+  "published_at": "2026-10-11T01:24:04.514598+00:00",
   "catalog": {
     "schema_version": 1,
-    "generation": "10b090993fe84717818c479c8f2f8f67",
-    "updated_at": "2026-10-10T22:43:48.842084+00:00",
+    "generation": "e869782cb5a94593aa6c6cd481ac289c",
+    "updated_at": "2026-10-11T01:24:04.230660+00:00",
     "refresh_interval_seconds": 3600,
     "matches": [
       {
@@ -19,7 +19,7 @@
         "round_name": "하위 2R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 10h 21m",
+        "status": "Upcoming 7h 41m",
         "time": "4:00 AM",
         "date": "Sun, October 11, 2026",
         "scheduled_at": "2026-10-11T09:00:00+00:00",
@@ -201,7 +201,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -218,7 +218,7 @@
         "round_name": "하위 2R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 13h 21m",
+        "status": "Upcoming 10h 41m",
         "time": "7:00 AM",
         "date": "Sun, October 11, 2026",
         "scheduled_at": "2026-10-11T12:00:00+00:00",
@@ -400,7 +400,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -417,7 +417,7 @@
         "round_name": "결승전",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Upcoming 4d 22h",
+        "status": "Upcoming 4d 19h",
         "time": "4:00 PM",
         "date": "Thu, October 15, 2026",
         "scheduled_at": "2026-10-15T21:00:00+00:00",
@@ -436,7 +436,7 @@
         "round_name": "상위 결승",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 5d 7h",
+        "status": "Upcoming 5d 4h",
         "time": "1:00 AM",
         "date": "Fri, October 16, 2026",
         "scheduled_at": "2026-10-16T06:00:00+00:00",
@@ -618,7 +618,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -635,7 +635,7 @@
         "round_name": "하위 3R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 5d 10h",
+        "status": "Upcoming 5d 7h",
         "time": "4:00 AM",
         "date": "Fri, October 16, 2026",
         "scheduled_at": "2026-10-16T09:00:00+00:00",
@@ -654,7 +654,7 @@
         "round_name": "하위 결승",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 6d 8h",
+        "status": "Upcoming 6d 5h",
         "time": "2:00 AM",
         "date": "Sat, October 17, 2026",
         "scheduled_at": "2026-10-17T07:00:00+00:00",
@@ -939,7 +939,7 @@
         "round_name": "상위 4강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 10h 39m",
+        "status": "Completed 13h 19m",
         "time": "7:00 AM",
         "date": "Sat, October 10, 2026 Today",
         "status_code": "final",
@@ -1219,7 +1219,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1236,7 +1236,7 @@
         "round_name": "상위 4강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 13h 39m",
+        "status": "Completed 16h 19m",
         "time": "4:00 AM",
         "date": "Sat, October 10, 2026 Today",
         "status_code": "final",
@@ -1526,7 +1526,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1543,7 +1543,7 @@
         "round_name": "하위 1R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1d 10h",
+        "status": "Completed 1d 13h",
         "time": "7:10 AM",
         "date": "Fri, October 9, 2026 Yesterday",
         "status_code": "final",
@@ -1833,7 +1833,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1850,7 +1850,7 @@
         "round_name": "하위 1R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1d 13h",
+        "status": "Completed 1d 16h",
         "time": "4:00 AM",
         "date": "Fri, October 9, 2026 Yesterday",
         "status_code": "final",
@@ -2140,7 +2140,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2157,7 +2157,7 @@
         "round_name": "상위 8강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2d 11h",
+        "status": "Completed 2d 13h",
         "time": "6:20 AM",
         "date": "Thu, October 8, 2026",
         "status_code": "final",
@@ -2447,7 +2447,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2464,7 +2464,7 @@
         "round_name": "상위 8강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2d 13h",
+        "status": "Completed 2d 16h",
         "time": "4:00 AM",
         "date": "Thu, October 8, 2026",
         "status_code": "final",
@@ -2744,7 +2744,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2761,7 +2761,7 @@
         "round_name": "상위 8강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 3d 11h",
+        "status": "Completed 3d 13h",
         "time": "6:30 AM",
         "date": "Wed, October 7, 2026",
         "status_code": "final",
@@ -3041,7 +3041,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3058,7 +3058,7 @@
         "round_name": "상위 8강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 3d 13h",
+        "status": "Completed 3d 16h",
         "time": "4:00 AM",
         "date": "Wed, October 7, 2026",
         "status_code": "final",
@@ -3338,7 +3338,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3355,7 +3355,7 @@
         "round_name": "Group Stage Decider (A) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 6d 11h",
+        "status": "Completed 6d 13h",
         "time": "6:25 AM",
         "date": "Sun, October 4, 2026",
         "status_code": "final",
@@ -3635,7 +3635,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3652,7 +3652,7 @@
         "round_name": "Group Stage Decider (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 6d 13h",
+        "status": "Completed 6d 16h",
         "time": "4:00 AM",
         "date": "Sun, October 4, 2026",
         "status_code": "final",
@@ -3932,7 +3932,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4239,7 +4239,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4536,7 +4536,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4843,7 +4843,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5140,7 +5140,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5437,7 +5437,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5744,7 +5744,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6041,7 +6041,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6338,7 +6338,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6645,7 +6645,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6952,7 +6952,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7249,7 +7249,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7546,7 +7546,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7843,7 +7843,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8150,7 +8150,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8447,7 +8447,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8744,7 +8744,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9041,7 +9041,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9348,7 +9348,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9605,7 +9605,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9895,7 +9895,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10144,7 +10144,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10434,7 +10434,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10685,7 +10685,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10911,7 +10911,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11128,7 +11128,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11424,7 +11424,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11744,7 +11744,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11993,7 +11993,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12243,7 +12243,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12472,7 +12472,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12694,7 +12694,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12941,7 +12941,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13209,7 +13209,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13456,7 +13456,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13680,7 +13680,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13932,7 +13932,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14151,7 +14151,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14421,7 +14421,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14642,7 +14642,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14886,7 +14886,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15162,7 +15162,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15399,7 +15399,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15655,7 +15655,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15874,7 +15874,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16102,7 +16102,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16419,7 +16419,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16638,7 +16638,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16855,7 +16855,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17182,7 +17182,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17423,7 +17423,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17612,7 +17612,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17871,7 +17871,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18188,7 +18188,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18377,7 +18377,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18668,7 +18668,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18933,7 +18933,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19260,7 +19260,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19541,7 +19541,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19838,7 +19838,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20145,7 +20145,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20419,7 +20419,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20676,7 +20676,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20805,7 +20805,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21080,7 +21080,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21377,7 +21377,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21607,7 +21607,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21917,7 +21917,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22245,7 +22245,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22526,7 +22526,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22823,7 +22823,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23151,7 +23151,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23479,7 +23479,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23634,7 +23634,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23913,7 +23913,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24220,7 +24220,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24538,7 +24538,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24836,7 +24836,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24993,7 +24993,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25291,7 +25291,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25462,7 +25462,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25727,7 +25727,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26013,7 +26013,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26320,7 +26320,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26628,7 +26628,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26840,7 +26840,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27082,7 +27082,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27379,7 +27379,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27676,7 +27676,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27944,7 +27944,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28166,7 +28166,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28244,6 +28244,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -28263,7 +28264,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28333,6 +28334,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -28352,7 +28354,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28422,6 +28424,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -28441,7 +28444,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28511,6 +28514,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -28530,7 +28534,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28604,6 +28608,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -28623,7 +28628,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28697,6 +28702,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -28716,7 +28722,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28786,6 +28792,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -28805,7 +28812,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28875,6 +28882,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -28894,7 +28902,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28968,6 +28976,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -28987,7 +28996,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29061,6 +29070,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -29080,7 +29090,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29150,6 +29160,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -29169,7 +29180,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29239,6 +29250,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -29258,7 +29270,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29332,6 +29344,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -29351,7 +29364,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29421,6 +29434,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -29440,7 +29454,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29514,6 +29528,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -29533,7 +29548,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29603,6 +29618,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -29622,7 +29638,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29639,7 +29655,7 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Division 1 Season 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 4h 39m",
+        "status": "Completed 7h 20m",
         "time": "1:00 PM",
         "date": "Sat, October 10, 2026 Today",
         "scheduled_at": "2026-10-10T18:00:00+00:00",
@@ -29696,6 +29712,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -29715,7 +29732,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29732,7 +29749,7 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Division 1 Season 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 3h 39m",
+        "status": "Completed 6h 20m",
         "time": "2:00 PM",
         "date": "Sat, October 10, 2026 Today",
         "scheduled_at": "2026-10-10T19:00:00+00:00",
@@ -29789,6 +29806,7 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
@@ -29808,7 +29826,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29825,11 +29843,11 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Division 1 Season 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "LIVE",
+        "status": "Completed 5h 20m",
         "time": "3:00 PM",
         "date": "Sat, October 10, 2026 Today",
         "scheduled_at": "2026-10-10T20:00:00+00:00",
-        "status_code": "live",
+        "status_code": "final",
         "selection_data": {
           "details": {
             "match_id": "771354",
@@ -29843,14 +29861,14 @@
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
-              "series_score_a": "0",
+              "series_score_a": "1",
               "series_score_b": "0",
-              "status": "live",
+              "status": "final",
               "maps": [
                 {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
+                  "map": "Haven",
+                  "score_a": "13",
+                  "score_b": "9"
                 }
               ],
               "scheduled_at": "2026-10-10T20:00:00+00:00",
@@ -29878,17 +29896,18 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
-            "series_score_a": "0",
+            "series_score_a": "1",
             "series_score_b": "0",
-            "status": "live",
+            "status": "final",
             "maps": [
               {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
+                "map": "Haven",
+                "score_a": "13",
+                "score_b": "9"
               }
             ],
             "scheduled_at": "2026-10-10T20:00:00+00:00",
@@ -29897,7 +29916,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29914,11 +29933,11 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Division 1 Season 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "LIVE",
+        "status": "Completed 4h 20m",
         "time": "4:00 PM",
         "date": "Sat, October 10, 2026 Today",
         "scheduled_at": "2026-10-10T21:00:00+00:00",
-        "status_code": "live",
+        "status_code": "final",
         "selection_data": {
           "details": {
             "match_id": "771355",
@@ -29933,13 +29952,13 @@
             "actual_veto": [],
             "live_score": {
               "series_score_a": "0",
-              "series_score_b": "0",
-              "status": "live",
+              "series_score_b": "1",
+              "status": "final",
               "maps": [
                 {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
+                  "map": "Summit",
+                  "score_a": "2",
+                  "score_b": "13"
                 }
               ],
               "scheduled_at": "2026-10-10T21:00:00+00:00",
@@ -29967,17 +29986,18 @@
             "Haven",
             "Lotus",
             "Split",
+            "Summit",
             "Sunset"
           ],
           "live_score": {
             "series_score_a": "0",
-            "series_score_b": "0",
-            "status": "live",
+            "series_score_b": "1",
+            "status": "final",
             "maps": [
               {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
+                "map": "Summit",
+                "score_a": "2",
+                "score_b": "13"
               }
             ],
             "scheduled_at": "2026-10-10T21:00:00+00:00",
@@ -29986,7 +30006,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-10T22:43:48.842084+00:00",
+          "collected_at": "2026-10-11T01:24:04.230660+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -185875,23 +185895,16 @@
     }
   },
   "collection": {
-    "status": "partial",
-    "started_at": "2026-10-10T22:43:51.534411+00:00",
-    "completed_at": "2026-10-10T23:02:25.064859+00:00",
-    "mode": "analysis_only",
-    "results": {
-      "updated": 73,
-      "failed": 1,
-      "total": 74
-    },
-    "budget_exhausted": false,
-    "remaining_teams": 0,
+    "status": "catalog_only",
+    "started_at": "2026-10-11T01:18:59.751001+00:00",
+    "completed_at": "2026-10-11T01:24:04.506162+00:00",
+    "mode": "catalog_only",
     "analytics": {
       "teams": 74,
       "failed_teams": 1,
       "stored_teams": 109,
       "pending_teams": 0,
-      "stale_teams": 1
+      "stale_teams": 74
     }
   }
 }
