@@ -1,410 +1,12 @@
 {
   "schema_version": 1,
-  "published_at": "2026-10-11T07:41:01.762353+00:00",
+  "published_at": "2026-10-11T14:11:24.949579+00:00",
   "catalog": {
     "schema_version": 1,
-    "generation": "5b3f58195b6b49c0a44444c57392a27b",
-    "updated_at": "2026-10-11T07:22:34.099126+00:00",
+    "generation": "62cb8ff1f56c4237a4f32d266e06aa68",
+    "updated_at": "2026-10-11T14:11:24.692667+00:00",
     "refresh_interval_seconds": 3600,
     "matches": [
-      {
-        "id": "754740",
-        "url": "https://www.vlr.gg/754740/nrg-vs-100-thieves-valorant-champions-2026-lr2",
-        "match_url": "https://www.vlr.gg/754740/nrg-vs-100-thieves-valorant-champions-2026-lr2",
-        "team_a": "NRG",
-        "team_b": "100 Thieves",
-        "event": "Playoffs–Lower Round 2 Valorant Champions 2026",
-        "tournament": "Playoffs–Lower Round 2 Valorant Champions 2026",
-        "stage": "🏆 플레이오프 (Playoffs)",
-        "round_name": "하위 2R",
-        "region": "Global",
-        "tier": "S-Tier",
-        "status": "Upcoming 1h 42m",
-        "time": "4:00 AM",
-        "date": "Sun, October 11, 2026 Today",
-        "scheduled_at": "2026-10-11T09:00:00+00:00",
-        "status_code": "upcoming",
-        "selection_data": {
-          "details": {
-            "match_id": "754740",
-            "team_a_id": "1034",
-            "team_a_name": "NRG",
-            "team_b_id": "120",
-            "team_b_name": "100 Thieves",
-            "event_id": "2766",
-            "scheduled_at": "2026-10-11T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
-            "match_format": "BO3",
-            "actual_veto": [],
-            "live_score": {
-              "series_score_a": "0",
-              "series_score_b": "0",
-              "status": "upcoming",
-              "maps": [
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                },
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                },
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                }
-              ],
-              "scheduled_at": "2026-10-11T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
-              "match_format": "BO3",
-              "actual_veto": []
-            },
-            "team_a_logo": "https://owcdn.net/img/6610f026c1a9e.png",
-            "team_b_logo": "https://owcdn.net/img/603c00d5c5a08.png"
-          },
-          "team_a_events": [
-            {
-              "id": "2766",
-              "name": "Valorant Champions 2026"
-            },
-            {
-              "id": "2977",
-              "name": "VCT 2026: Americas Stage 2"
-            },
-            {
-              "id": "2952",
-              "name": "Esports World Cup 2026"
-            },
-            {
-              "id": "2765",
-              "name": "Valorant Masters London 2026"
-            },
-            {
-              "id": "2953",
-              "name": "Esports World Cup 2026: Americas Qualifier"
-            },
-            {
-              "id": "2860",
-              "name": "VCT 2026: Americas Stage 1"
-            },
-            {
-              "id": "2760",
-              "name": "Valorant Masters Santiago 2026"
-            },
-            {
-              "id": "2682",
-              "name": "VCT 2026: Americas Kickoff"
-            },
-            {
-              "id": "2602",
-              "name": "Red Bull Home Ground 2025"
-            },
-            {
-              "id": "2283",
-              "name": "Valorant Champions 2025"
-            },
-            {
-              "id": "2501",
-              "name": "VCT 2025: Americas Stage 2"
-            },
-            {
-              "id": "2449",
-              "name": "Esports World Cup 2025"
-            }
-          ],
-          "team_b_events": [
-            {
-              "id": "2766",
-              "name": "Valorant Champions 2026"
-            },
-            {
-              "id": "2977",
-              "name": "VCT 2026: Americas Stage 2"
-            },
-            {
-              "id": "2952",
-              "name": "Esports World Cup 2026"
-            },
-            {
-              "id": "2953",
-              "name": "Esports World Cup 2026: Americas Qualifier"
-            },
-            {
-              "id": "2860",
-              "name": "VCT 2026: Americas Stage 1"
-            },
-            {
-              "id": "2682",
-              "name": "VCT 2026: Americas Kickoff"
-            },
-            {
-              "id": "2748",
-              "name": "Sentinels Invitational 2025"
-            },
-            {
-              "id": "2745",
-              "name": "FunhaverGG: Back to Basics 10"
-            },
-            {
-              "id": "2501",
-              "name": "VCT 2025: Americas Stage 2"
-            },
-            {
-              "id": "2449",
-              "name": "Esports World Cup 2025"
-            },
-            {
-              "id": "2347",
-              "name": "VCT 2025: Americas Stage 1"
-            },
-            {
-              "id": "2274",
-              "name": "VCT 2025: Americas Kickoff"
-            }
-          ],
-          "map_pool": [
-            "Abyss",
-            "Ascent",
-            "Haven",
-            "Lotus",
-            "Split",
-            "Summit",
-            "Sunset"
-          ],
-          "live_score": {
-            "series_score_a": "0",
-            "series_score_b": "0",
-            "status": "upcoming",
-            "maps": [
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              },
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              },
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              }
-            ],
-            "scheduled_at": "2026-10-11T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
-            "match_format": "BO3",
-            "actual_veto": []
-          },
-          "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
-          "stale": false
-        },
-        "selection_status": "ready"
-      },
-      {
-        "id": "754741",
-        "url": "https://www.vlr.gg/754741/g2-esports-vs-t1-valorant-champions-2026-lr2",
-        "match_url": "https://www.vlr.gg/754741/g2-esports-vs-t1-valorant-champions-2026-lr2",
-        "team_a": "G2 Esports",
-        "team_b": "T1",
-        "event": "Playoffs–Lower Round 2 Valorant Champions 2026",
-        "tournament": "Playoffs–Lower Round 2 Valorant Champions 2026",
-        "stage": "🏆 플레이오프 (Playoffs)",
-        "round_name": "하위 2R",
-        "region": "Global",
-        "tier": "S-Tier",
-        "status": "Upcoming 4h 42m",
-        "time": "7:00 AM",
-        "date": "Sun, October 11, 2026 Today",
-        "scheduled_at": "2026-10-11T12:00:00+00:00",
-        "status_code": "upcoming",
-        "selection_data": {
-          "details": {
-            "match_id": "754741",
-            "team_a_id": "11058",
-            "team_a_name": "G2 Esports",
-            "team_b_id": "14",
-            "team_b_name": "T1",
-            "event_id": "2766",
-            "scheduled_at": "2026-10-11T12:00:00+00:00",
-            "schedule_source_zone": "CDT",
-            "match_format": "BO3",
-            "actual_veto": [],
-            "live_score": {
-              "series_score_a": "0",
-              "series_score_b": "0",
-              "status": "upcoming",
-              "maps": [
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                },
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                },
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                }
-              ],
-              "scheduled_at": "2026-10-11T12:00:00+00:00",
-              "schedule_source_zone": "CDT",
-              "match_format": "BO3",
-              "actual_veto": []
-            },
-            "team_a_logo": "https://owcdn.net/img/633822848a741.png",
-            "team_b_logo": "https://owcdn.net/img/62fe0b8f6b084.png"
-          },
-          "team_a_events": [
-            {
-              "id": "2766",
-              "name": "Valorant Champions 2026"
-            },
-            {
-              "id": "2977",
-              "name": "VCT 2026: Americas Stage 2"
-            },
-            {
-              "id": "2952",
-              "name": "Esports World Cup 2026"
-            },
-            {
-              "id": "2765",
-              "name": "Valorant Masters London 2026"
-            },
-            {
-              "id": "2860",
-              "name": "VCT 2026: Americas Stage 1"
-            },
-            {
-              "id": "2760",
-              "name": "Valorant Masters Santiago 2026"
-            },
-            {
-              "id": "2682",
-              "name": "VCT 2026: Americas Kickoff"
-            },
-            {
-              "id": "2740",
-              "name": "Valorant Radiant International Invitational"
-            },
-            {
-              "id": "2602",
-              "name": "Red Bull Home Ground 2025"
-            },
-            {
-              "id": "2283",
-              "name": "Valorant Champions 2025"
-            },
-            {
-              "id": "2501",
-              "name": "VCT 2025: Americas Stage 2"
-            },
-            {
-              "id": "2449",
-              "name": "Esports World Cup 2025"
-            }
-          ],
-          "team_b_events": [
-            {
-              "id": "2766",
-              "name": "Valorant Champions 2026"
-            },
-            {
-              "id": "2776",
-              "name": "VCT 2026: Pacific Stage 2"
-            },
-            {
-              "id": "2955",
-              "name": "Esports World Cup 2026: Pacific Qualifier"
-            },
-            {
-              "id": "2775",
-              "name": "VCT 2026: Pacific Stage 1"
-            },
-            {
-              "id": "2760",
-              "name": "Valorant Masters Santiago 2026"
-            },
-            {
-              "id": "2683",
-              "name": "VCT 2026: Pacific Kickoff"
-            },
-            {
-              "id": "2656",
-              "name": "SOOP Valorant League 2025"
-            },
-            {
-              "id": "2602",
-              "name": "Red Bull Home Ground 2025"
-            },
-            {
-              "id": "2283",
-              "name": "Valorant Champions 2025"
-            },
-            {
-              "id": "2500",
-              "name": "VCT 2025: Pacific Stage 2"
-            },
-            {
-              "id": "2449",
-              "name": "Esports World Cup 2025"
-            },
-            {
-              "id": "2379",
-              "name": "VCT 2025: Pacific Stage 1"
-            }
-          ],
-          "map_pool": [
-            "Abyss",
-            "Ascent",
-            "Haven",
-            "Lotus",
-            "Split",
-            "Summit",
-            "Sunset"
-          ],
-          "live_score": {
-            "series_score_a": "0",
-            "series_score_b": "0",
-            "status": "upcoming",
-            "maps": [
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              },
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              },
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              }
-            ],
-            "scheduled_at": "2026-10-11T12:00:00+00:00",
-            "schedule_source_zone": "CDT",
-            "match_format": "BO3",
-            "actual_veto": []
-          },
-          "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
-          "stale": false
-        },
-        "selection_status": "ready"
-      },
       {
         "id": "744488",
         "url": "https://www.vlr.gg/744488/tbd-game-changers-2026-americas-last-chance-qualifier-gf",
@@ -417,7 +19,7 @@
         "round_name": "결승전",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Upcoming 4d 13h",
+        "status": "Upcoming 4d 6h",
         "time": "4:00 PM",
         "date": "Thu, October 15, 2026",
         "scheduled_at": "2026-10-15T21:00:00+00:00",
@@ -436,7 +38,7 @@
         "round_name": "상위 결승",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 4d 22h",
+        "status": "Upcoming 4d 15h",
         "time": "1:00 AM",
         "date": "Fri, October 16, 2026",
         "scheduled_at": "2026-10-16T06:00:00+00:00",
@@ -618,29 +220,209 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
       },
       {
         "id": "754742",
-        "url": "https://www.vlr.gg/754742/tbd-valorant-champions-2026-lr3",
-        "match_url": "https://www.vlr.gg/754742/tbd-valorant-champions-2026-lr3",
-        "team_a": "TBD",
-        "team_b": "TBD",
+        "url": "https://www.vlr.gg/754742/100-thieves-vs-g2-esports-valorant-champions-2026-lr3",
+        "match_url": "https://www.vlr.gg/754742/100-thieves-vs-g2-esports-valorant-champions-2026-lr3",
+        "team_a": "100 Thieves",
+        "team_b": "G2 Esports",
         "event": "Playoffs–Lower Round 3 Valorant Champions 2026",
         "tournament": "Playoffs–Lower Round 3 Valorant Champions 2026",
         "stage": "🏆 플레이오프 (Playoffs)",
         "round_name": "하위 3R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 5d 1h",
+        "status": "Upcoming 4d 18h",
         "time": "4:00 AM",
         "date": "Fri, October 16, 2026",
         "scheduled_at": "2026-10-16T09:00:00+00:00",
         "status_code": "upcoming",
-        "selection_status": "unassigned"
+        "selection_data": {
+          "details": {
+            "match_id": "754742",
+            "team_a_id": "120",
+            "team_a_name": "100 Thieves",
+            "team_b_id": "11058",
+            "team_b_name": "G2 Esports",
+            "event_id": "2766",
+            "scheduled_at": "2026-10-16T09:00:00+00:00",
+            "schedule_source_zone": "CDT",
+            "match_format": "BO3",
+            "actual_veto": [],
+            "live_score": {
+              "series_score_a": "0",
+              "series_score_b": "0",
+              "status": "upcoming",
+              "maps": [
+                {
+                  "map": "Map",
+                  "score_a": "0",
+                  "score_b": "0"
+                },
+                {
+                  "map": "Map",
+                  "score_a": "0",
+                  "score_b": "0"
+                },
+                {
+                  "map": "Map",
+                  "score_a": "0",
+                  "score_b": "0"
+                }
+              ],
+              "scheduled_at": "2026-10-16T09:00:00+00:00",
+              "schedule_source_zone": "CDT",
+              "match_format": "BO3",
+              "actual_veto": []
+            },
+            "team_a_logo": "https://owcdn.net/img/603c00d5c5a08.png",
+            "team_b_logo": "https://owcdn.net/img/633822848a741.png"
+          },
+          "team_a_events": [
+            {
+              "id": "2766",
+              "name": "Valorant Champions 2026"
+            },
+            {
+              "id": "2977",
+              "name": "VCT 2026: Americas Stage 2"
+            },
+            {
+              "id": "2952",
+              "name": "Esports World Cup 2026"
+            },
+            {
+              "id": "2953",
+              "name": "Esports World Cup 2026: Americas Qualifier"
+            },
+            {
+              "id": "2860",
+              "name": "VCT 2026: Americas Stage 1"
+            },
+            {
+              "id": "2682",
+              "name": "VCT 2026: Americas Kickoff"
+            },
+            {
+              "id": "2748",
+              "name": "Sentinels Invitational 2025"
+            },
+            {
+              "id": "2745",
+              "name": "FunhaverGG: Back to Basics 10"
+            },
+            {
+              "id": "2501",
+              "name": "VCT 2025: Americas Stage 2"
+            },
+            {
+              "id": "2449",
+              "name": "Esports World Cup 2025"
+            },
+            {
+              "id": "2347",
+              "name": "VCT 2025: Americas Stage 1"
+            },
+            {
+              "id": "2274",
+              "name": "VCT 2025: Americas Kickoff"
+            }
+          ],
+          "team_b_events": [
+            {
+              "id": "2766",
+              "name": "Valorant Champions 2026"
+            },
+            {
+              "id": "2977",
+              "name": "VCT 2026: Americas Stage 2"
+            },
+            {
+              "id": "2952",
+              "name": "Esports World Cup 2026"
+            },
+            {
+              "id": "2765",
+              "name": "Valorant Masters London 2026"
+            },
+            {
+              "id": "2860",
+              "name": "VCT 2026: Americas Stage 1"
+            },
+            {
+              "id": "2760",
+              "name": "Valorant Masters Santiago 2026"
+            },
+            {
+              "id": "2682",
+              "name": "VCT 2026: Americas Kickoff"
+            },
+            {
+              "id": "2740",
+              "name": "Valorant Radiant International Invitational"
+            },
+            {
+              "id": "2602",
+              "name": "Red Bull Home Ground 2025"
+            },
+            {
+              "id": "2283",
+              "name": "Valorant Champions 2025"
+            },
+            {
+              "id": "2501",
+              "name": "VCT 2025: Americas Stage 2"
+            },
+            {
+              "id": "2449",
+              "name": "Esports World Cup 2025"
+            }
+          ],
+          "map_pool": [
+            "Abyss",
+            "Ascent",
+            "Haven",
+            "Lotus",
+            "Split",
+            "Summit",
+            "Sunset"
+          ],
+          "live_score": {
+            "series_score_a": "0",
+            "series_score_b": "0",
+            "status": "upcoming",
+            "maps": [
+              {
+                "map": "Map",
+                "score_a": "0",
+                "score_b": "0"
+              },
+              {
+                "map": "Map",
+                "score_a": "0",
+                "score_b": "0"
+              },
+              {
+                "map": "Map",
+                "score_a": "0",
+                "score_b": "0"
+              }
+            ],
+            "scheduled_at": "2026-10-16T09:00:00+00:00",
+            "schedule_source_zone": "CDT",
+            "match_format": "BO3",
+            "actual_veto": []
+          },
+          "cached": true,
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
+          "stale": false
+        },
+        "selection_status": "ready"
       },
       {
         "id": "754743",
@@ -654,7 +436,7 @@
         "round_name": "하위 결승",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 5d 23h",
+        "status": "Upcoming 5d 16h",
         "time": "2:00 AM",
         "date": "Sat, October 17, 2026",
         "scheduled_at": "2026-10-17T07:00:00+00:00",
@@ -673,29 +455,10 @@
         "round_name": "결승전",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 6d 22h",
+        "status": "Upcoming 6d 15h",
         "time": "1:00 AM",
         "date": "Sun, October 18, 2026",
         "scheduled_at": "2026-10-18T06:00:00+00:00",
-        "status_code": "upcoming",
-        "selection_status": "unassigned"
-      },
-      {
-        "id": "769456",
-        "url": "https://www.vlr.gg/769456/tbd-project-blender-2026-group-b",
-        "match_url": "https://www.vlr.gg/769456/tbd-project-blender-2026-group-b",
-        "team_a": "TBD",
-        "team_b": "TBD",
-        "event": "Phase 2–Group B Project Blender 2026",
-        "tournament": "Phase 2–Group B Project Blender 2026",
-        "stage": "기타 스테이지",
-        "round_name": "Phase 2 Group B Project Blender 2026",
-        "region": "Other",
-        "tier": "Other",
-        "status": "TBD",
-        "time": "TBD",
-        "date": "Wed, October 21, 2026",
-        "scheduled_at": null,
         "status_code": "upcoming",
         "selection_status": "unassigned"
       },
@@ -757,9 +520,28 @@
         "selection_status": "unassigned"
       },
       {
-        "id": "769453",
-        "url": "https://www.vlr.gg/769453/tbd-project-blender-2026-group-a",
-        "match_url": "https://www.vlr.gg/769453/tbd-project-blender-2026-group-a",
+        "id": "769456",
+        "url": "https://www.vlr.gg/769456/tbd-project-blender-2026-group-b",
+        "match_url": "https://www.vlr.gg/769456/tbd-project-blender-2026-group-b",
+        "team_a": "TBD",
+        "team_b": "TBD",
+        "event": "Phase 2–Group B Project Blender 2026",
+        "tournament": "Phase 2–Group B Project Blender 2026",
+        "stage": "기타 스테이지",
+        "round_name": "Phase 2 Group B Project Blender 2026",
+        "region": "Other",
+        "tier": "Other",
+        "status": "TBD",
+        "time": "TBD",
+        "date": "Wed, October 21, 2026",
+        "scheduled_at": null,
+        "status_code": "upcoming",
+        "selection_status": "unassigned"
+      },
+      {
+        "id": "769454",
+        "url": "https://www.vlr.gg/769454/tbd-project-blender-2026-group-a",
+        "match_url": "https://www.vlr.gg/769454/tbd-project-blender-2026-group-a",
         "team_a": "TBD",
         "team_b": "TBD",
         "event": "Phase 2–Group A Project Blender 2026",
@@ -795,9 +577,9 @@
         "selection_status": "unassigned"
       },
       {
-        "id": "769454",
-        "url": "https://www.vlr.gg/769454/tbd-project-blender-2026-group-a",
-        "match_url": "https://www.vlr.gg/769454/tbd-project-blender-2026-group-a",
+        "id": "769453",
+        "url": "https://www.vlr.gg/769453/tbd-project-blender-2026-group-a",
+        "match_url": "https://www.vlr.gg/769453/tbd-project-blender-2026-group-a",
         "team_a": "TBD",
         "team_b": "TBD",
         "event": "Phase 2–Group A Project Blender 2026",
@@ -928,6 +710,610 @@
         "selection_status": "unassigned"
       },
       {
+        "id": "754741",
+        "url": "https://www.vlr.gg/754741/g2-esports-vs-t1-valorant-champions-2026-lr2",
+        "match_url": "https://www.vlr.gg/754741/g2-esports-vs-t1-valorant-champions-2026-lr2",
+        "team_a": "G2 Esports",
+        "team_b": "T1",
+        "event": "Playoffs–Lower Round 2 Valorant Champions 2026",
+        "tournament": "Playoffs–Lower Round 2 Valorant Champions 2026",
+        "stage": "🏆 플레이오프 (Playoffs)",
+        "round_name": "하위 2R",
+        "region": "Global",
+        "tier": "S-Tier",
+        "status": "Completed 2h 52m",
+        "time": "6:15 AM",
+        "date": "Sun, October 11, 2026 Today",
+        "status_code": "final",
+        "scheduled_at": "2026-10-11T11:15:00+00:00",
+        "selection_data": {
+          "details": {
+            "match_id": "754741",
+            "team_a_id": "11058",
+            "team_a_name": "G2 Esports",
+            "team_b_id": "14",
+            "team_b_name": "T1",
+            "event_id": "2766",
+            "scheduled_at": "2026-10-11T11:15:00+00:00",
+            "schedule_source_zone": "CDT",
+            "match_format": "BO3",
+            "actual_veto": [
+              {
+                "team": "T1",
+                "action": "ban",
+                "map": "Split"
+              },
+              {
+                "team": "G2",
+                "action": "ban",
+                "map": "Summit"
+              },
+              {
+                "team": "T1",
+                "action": "pick",
+                "map": "Lotus"
+              },
+              {
+                "team": "G2",
+                "action": "pick",
+                "map": "Abyss"
+              },
+              {
+                "team": "T1",
+                "action": "ban",
+                "map": "Haven"
+              },
+              {
+                "team": "G2",
+                "action": "ban",
+                "map": "Sunset"
+              },
+              {
+                "team": null,
+                "action": "remaining",
+                "map": "Ascent"
+              }
+            ],
+            "live_score": {
+              "series_score_a": "2",
+              "series_score_b": "1",
+              "status": "final",
+              "maps": [
+                {
+                  "map": "Lotus",
+                  "score_a": "13",
+                  "score_b": "11"
+                },
+                {
+                  "map": "Abyss",
+                  "score_a": "10",
+                  "score_b": "13"
+                },
+                {
+                  "map": "Ascent",
+                  "score_a": "13",
+                  "score_b": "6"
+                }
+              ],
+              "scheduled_at": "2026-10-11T11:15:00+00:00",
+              "schedule_source_zone": "CDT",
+              "match_format": "BO3",
+              "actual_veto": [
+                {
+                  "team": "T1",
+                  "action": "ban",
+                  "map": "Split"
+                },
+                {
+                  "team": "G2",
+                  "action": "ban",
+                  "map": "Summit"
+                },
+                {
+                  "team": "T1",
+                  "action": "pick",
+                  "map": "Lotus"
+                },
+                {
+                  "team": "G2",
+                  "action": "pick",
+                  "map": "Abyss"
+                },
+                {
+                  "team": "T1",
+                  "action": "ban",
+                  "map": "Haven"
+                },
+                {
+                  "team": "G2",
+                  "action": "ban",
+                  "map": "Sunset"
+                },
+                {
+                  "team": null,
+                  "action": "remaining",
+                  "map": "Ascent"
+                }
+              ]
+            },
+            "team_a_logo": "https://owcdn.net/img/633822848a741.png",
+            "team_b_logo": "https://owcdn.net/img/62fe0b8f6b084.png"
+          },
+          "team_a_events": [
+            {
+              "id": "2766",
+              "name": "Valorant Champions 2026"
+            },
+            {
+              "id": "2977",
+              "name": "VCT 2026: Americas Stage 2"
+            },
+            {
+              "id": "2952",
+              "name": "Esports World Cup 2026"
+            },
+            {
+              "id": "2765",
+              "name": "Valorant Masters London 2026"
+            },
+            {
+              "id": "2860",
+              "name": "VCT 2026: Americas Stage 1"
+            },
+            {
+              "id": "2760",
+              "name": "Valorant Masters Santiago 2026"
+            },
+            {
+              "id": "2682",
+              "name": "VCT 2026: Americas Kickoff"
+            },
+            {
+              "id": "2740",
+              "name": "Valorant Radiant International Invitational"
+            },
+            {
+              "id": "2602",
+              "name": "Red Bull Home Ground 2025"
+            },
+            {
+              "id": "2283",
+              "name": "Valorant Champions 2025"
+            },
+            {
+              "id": "2501",
+              "name": "VCT 2025: Americas Stage 2"
+            },
+            {
+              "id": "2449",
+              "name": "Esports World Cup 2025"
+            }
+          ],
+          "team_b_events": [
+            {
+              "id": "2766",
+              "name": "Valorant Champions 2026"
+            },
+            {
+              "id": "2776",
+              "name": "VCT 2026: Pacific Stage 2"
+            },
+            {
+              "id": "2955",
+              "name": "Esports World Cup 2026: Pacific Qualifier"
+            },
+            {
+              "id": "2775",
+              "name": "VCT 2026: Pacific Stage 1"
+            },
+            {
+              "id": "2760",
+              "name": "Valorant Masters Santiago 2026"
+            },
+            {
+              "id": "2683",
+              "name": "VCT 2026: Pacific Kickoff"
+            },
+            {
+              "id": "2656",
+              "name": "SOOP Valorant League 2025"
+            },
+            {
+              "id": "2602",
+              "name": "Red Bull Home Ground 2025"
+            },
+            {
+              "id": "2283",
+              "name": "Valorant Champions 2025"
+            },
+            {
+              "id": "2500",
+              "name": "VCT 2025: Pacific Stage 2"
+            },
+            {
+              "id": "2449",
+              "name": "Esports World Cup 2025"
+            },
+            {
+              "id": "2379",
+              "name": "VCT 2025: Pacific Stage 1"
+            }
+          ],
+          "map_pool": [
+            "Abyss",
+            "Ascent",
+            "Haven",
+            "Lotus",
+            "Split",
+            "Summit",
+            "Sunset"
+          ],
+          "live_score": {
+            "series_score_a": "2",
+            "series_score_b": "1",
+            "status": "final",
+            "maps": [
+              {
+                "map": "Lotus",
+                "score_a": "13",
+                "score_b": "11"
+              },
+              {
+                "map": "Abyss",
+                "score_a": "10",
+                "score_b": "13"
+              },
+              {
+                "map": "Ascent",
+                "score_a": "13",
+                "score_b": "6"
+              }
+            ],
+            "scheduled_at": "2026-10-11T11:15:00+00:00",
+            "schedule_source_zone": "CDT",
+            "match_format": "BO3",
+            "actual_veto": [
+              {
+                "team": "T1",
+                "action": "ban",
+                "map": "Split"
+              },
+              {
+                "team": "G2",
+                "action": "ban",
+                "map": "Summit"
+              },
+              {
+                "team": "T1",
+                "action": "pick",
+                "map": "Lotus"
+              },
+              {
+                "team": "G2",
+                "action": "pick",
+                "map": "Abyss"
+              },
+              {
+                "team": "T1",
+                "action": "ban",
+                "map": "Haven"
+              },
+              {
+                "team": "G2",
+                "action": "ban",
+                "map": "Sunset"
+              },
+              {
+                "team": null,
+                "action": "remaining",
+                "map": "Ascent"
+              }
+            ]
+          },
+          "cached": true,
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
+          "stale": false
+        },
+        "selection_status": "ready"
+      },
+      {
+        "id": "754740",
+        "url": "https://www.vlr.gg/754740/nrg-vs-100-thieves-valorant-champions-2026-lr2",
+        "match_url": "https://www.vlr.gg/754740/nrg-vs-100-thieves-valorant-champions-2026-lr2",
+        "team_a": "NRG",
+        "team_b": "100 Thieves",
+        "event": "Playoffs–Lower Round 2 Valorant Champions 2026",
+        "tournament": "Playoffs–Lower Round 2 Valorant Champions 2026",
+        "stage": "🏆 플레이오프 (Playoffs)",
+        "round_name": "하위 2R",
+        "region": "Global",
+        "tier": "S-Tier",
+        "status": "Completed 5h 7m",
+        "time": "4:00 AM",
+        "date": "Sun, October 11, 2026 Today",
+        "status_code": "final",
+        "scheduled_at": "2026-10-11T09:00:00+00:00",
+        "selection_data": {
+          "details": {
+            "match_id": "754740",
+            "team_a_id": "1034",
+            "team_a_name": "NRG",
+            "team_b_id": "120",
+            "team_b_name": "100 Thieves",
+            "event_id": "2766",
+            "scheduled_at": "2026-10-11T09:00:00+00:00",
+            "schedule_source_zone": "CDT",
+            "match_format": "BO3",
+            "actual_veto": [
+              {
+                "team": "100T",
+                "action": "ban",
+                "map": "Lotus"
+              },
+              {
+                "team": "NRG",
+                "action": "ban",
+                "map": "Ascent"
+              },
+              {
+                "team": "100T",
+                "action": "pick",
+                "map": "Sunset"
+              },
+              {
+                "team": "NRG",
+                "action": "pick",
+                "map": "Haven"
+              },
+              {
+                "team": "100T",
+                "action": "ban",
+                "map": "Abyss"
+              },
+              {
+                "team": "NRG",
+                "action": "ban",
+                "map": "Split"
+              },
+              {
+                "team": null,
+                "action": "remaining",
+                "map": "Summit"
+              }
+            ],
+            "live_score": {
+              "series_score_a": "0",
+              "series_score_b": "2",
+              "status": "final",
+              "maps": [
+                {
+                  "map": "Sunset",
+                  "score_a": "12",
+                  "score_b": "14"
+                },
+                {
+                  "map": "Haven",
+                  "score_a": "4",
+                  "score_b": "13"
+                }
+              ],
+              "scheduled_at": "2026-10-11T09:00:00+00:00",
+              "schedule_source_zone": "CDT",
+              "match_format": "BO3",
+              "actual_veto": [
+                {
+                  "team": "100T",
+                  "action": "ban",
+                  "map": "Lotus"
+                },
+                {
+                  "team": "NRG",
+                  "action": "ban",
+                  "map": "Ascent"
+                },
+                {
+                  "team": "100T",
+                  "action": "pick",
+                  "map": "Sunset"
+                },
+                {
+                  "team": "NRG",
+                  "action": "pick",
+                  "map": "Haven"
+                },
+                {
+                  "team": "100T",
+                  "action": "ban",
+                  "map": "Abyss"
+                },
+                {
+                  "team": "NRG",
+                  "action": "ban",
+                  "map": "Split"
+                },
+                {
+                  "team": null,
+                  "action": "remaining",
+                  "map": "Summit"
+                }
+              ]
+            },
+            "team_a_logo": "https://owcdn.net/img/6610f026c1a9e.png",
+            "team_b_logo": "https://owcdn.net/img/603c00d5c5a08.png"
+          },
+          "team_a_events": [
+            {
+              "id": "2766",
+              "name": "Valorant Champions 2026"
+            },
+            {
+              "id": "2977",
+              "name": "VCT 2026: Americas Stage 2"
+            },
+            {
+              "id": "2952",
+              "name": "Esports World Cup 2026"
+            },
+            {
+              "id": "2765",
+              "name": "Valorant Masters London 2026"
+            },
+            {
+              "id": "2953",
+              "name": "Esports World Cup 2026: Americas Qualifier"
+            },
+            {
+              "id": "2860",
+              "name": "VCT 2026: Americas Stage 1"
+            },
+            {
+              "id": "2760",
+              "name": "Valorant Masters Santiago 2026"
+            },
+            {
+              "id": "2682",
+              "name": "VCT 2026: Americas Kickoff"
+            },
+            {
+              "id": "2602",
+              "name": "Red Bull Home Ground 2025"
+            },
+            {
+              "id": "2283",
+              "name": "Valorant Champions 2025"
+            },
+            {
+              "id": "2501",
+              "name": "VCT 2025: Americas Stage 2"
+            },
+            {
+              "id": "2449",
+              "name": "Esports World Cup 2025"
+            }
+          ],
+          "team_b_events": [
+            {
+              "id": "2766",
+              "name": "Valorant Champions 2026"
+            },
+            {
+              "id": "2977",
+              "name": "VCT 2026: Americas Stage 2"
+            },
+            {
+              "id": "2952",
+              "name": "Esports World Cup 2026"
+            },
+            {
+              "id": "2953",
+              "name": "Esports World Cup 2026: Americas Qualifier"
+            },
+            {
+              "id": "2860",
+              "name": "VCT 2026: Americas Stage 1"
+            },
+            {
+              "id": "2682",
+              "name": "VCT 2026: Americas Kickoff"
+            },
+            {
+              "id": "2748",
+              "name": "Sentinels Invitational 2025"
+            },
+            {
+              "id": "2745",
+              "name": "FunhaverGG: Back to Basics 10"
+            },
+            {
+              "id": "2501",
+              "name": "VCT 2025: Americas Stage 2"
+            },
+            {
+              "id": "2449",
+              "name": "Esports World Cup 2025"
+            },
+            {
+              "id": "2347",
+              "name": "VCT 2025: Americas Stage 1"
+            },
+            {
+              "id": "2274",
+              "name": "VCT 2025: Americas Kickoff"
+            }
+          ],
+          "map_pool": [
+            "Abyss",
+            "Ascent",
+            "Haven",
+            "Lotus",
+            "Split",
+            "Summit",
+            "Sunset"
+          ],
+          "live_score": {
+            "series_score_a": "0",
+            "series_score_b": "2",
+            "status": "final",
+            "maps": [
+              {
+                "map": "Sunset",
+                "score_a": "12",
+                "score_b": "14"
+              },
+              {
+                "map": "Haven",
+                "score_a": "4",
+                "score_b": "13"
+              }
+            ],
+            "scheduled_at": "2026-10-11T09:00:00+00:00",
+            "schedule_source_zone": "CDT",
+            "match_format": "BO3",
+            "actual_veto": [
+              {
+                "team": "100T",
+                "action": "ban",
+                "map": "Lotus"
+              },
+              {
+                "team": "NRG",
+                "action": "ban",
+                "map": "Ascent"
+              },
+              {
+                "team": "100T",
+                "action": "pick",
+                "map": "Sunset"
+              },
+              {
+                "team": "NRG",
+                "action": "pick",
+                "map": "Haven"
+              },
+              {
+                "team": "100T",
+                "action": "ban",
+                "map": "Abyss"
+              },
+              {
+                "team": "NRG",
+                "action": "ban",
+                "map": "Split"
+              },
+              {
+                "team": null,
+                "action": "remaining",
+                "map": "Summit"
+              }
+            ]
+          },
+          "cached": true,
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
+          "stale": false
+        },
+        "selection_status": "ready"
+      },
+      {
         "id": "754734",
         "url": "https://www.vlr.gg/754734/g2-esports-vs-team-vitality-valorant-champions-2026-ubsf",
         "match_url": "https://www.vlr.gg/754734/g2-esports-vs-team-vitality-valorant-champions-2026-ubsf",
@@ -939,7 +1325,7 @@
         "round_name": "상위 4강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 19h 18m",
+        "status": "Completed 1d 2h",
         "time": "7:00 AM",
         "date": "Sat, October 10, 2026 Yesterday",
         "status_code": "final",
@@ -1219,7 +1605,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1236,7 +1622,7 @@
         "round_name": "상위 4강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 22h 18m",
+        "status": "Completed 1d 5h",
         "time": "4:00 AM",
         "date": "Sat, October 10, 2026 Yesterday",
         "status_code": "final",
@@ -1526,7 +1912,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1543,7 +1929,7 @@
         "round_name": "하위 1R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1d 19h",
+        "status": "Completed 2d 1h",
         "time": "7:10 AM",
         "date": "Fri, October 9, 2026",
         "status_code": "final",
@@ -1833,7 +2219,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1850,7 +2236,7 @@
         "round_name": "하위 1R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1d 22h",
+        "status": "Completed 2d 5h",
         "time": "4:00 AM",
         "date": "Fri, October 9, 2026",
         "status_code": "final",
@@ -2140,7 +2526,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2157,7 +2543,7 @@
         "round_name": "상위 8강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2d 19h",
+        "status": "Completed 3d 2h",
         "time": "6:20 AM",
         "date": "Thu, October 8, 2026",
         "status_code": "final",
@@ -2447,7 +2833,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2464,7 +2850,7 @@
         "round_name": "상위 8강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2d 22h",
+        "status": "Completed 3d 5h",
         "time": "4:00 AM",
         "date": "Thu, October 8, 2026",
         "status_code": "final",
@@ -2744,7 +3130,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2761,7 +3147,7 @@
         "round_name": "상위 8강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 3d 19h",
+        "status": "Completed 4d 2h",
         "time": "6:30 AM",
         "date": "Wed, October 7, 2026",
         "status_code": "final",
@@ -3041,7 +3427,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3058,7 +3444,7 @@
         "round_name": "상위 8강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 3d 22h",
+        "status": "Completed 4d 5h",
         "time": "4:00 AM",
         "date": "Wed, October 7, 2026",
         "status_code": "final",
@@ -3338,7 +3724,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3355,7 +3741,7 @@
         "round_name": "Group Stage Decider (A) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 6d 19h",
+        "status": "Completed 1w 0d",
         "time": "6:25 AM",
         "date": "Sun, October 4, 2026",
         "status_code": "final",
@@ -3635,7 +4021,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3652,7 +4038,7 @@
         "round_name": "Group Stage Decider (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 6d 22h",
+        "status": "Completed 1w 0d",
         "time": "4:00 AM",
         "date": "Sun, October 4, 2026",
         "status_code": "final",
@@ -3932,7 +4318,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3949,7 +4335,7 @@
         "round_name": "Group Stage Decider (D) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 0d",
+        "status": "Completed 1w 1d",
         "time": "6:30 AM",
         "date": "Sat, October 3, 2026",
         "status_code": "final",
@@ -4239,7 +4625,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4256,7 +4642,7 @@
         "round_name": "Group Stage Decider (C) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 0d",
+        "status": "Completed 1w 1d",
         "time": "4:00 AM",
         "date": "Sat, October 3, 2026",
         "status_code": "final",
@@ -4536,7 +4922,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4553,7 +4939,7 @@
         "round_name": "Group Stage Elimination (A) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 1d",
+        "status": "Completed 1w 2d",
         "time": "6:00 AM",
         "date": "Fri, October 2, 2026",
         "status_code": "final",
@@ -4843,7 +5229,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4860,7 +5246,7 @@
         "round_name": "Group Stage Elimination (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 1d",
+        "status": "Completed 1w 2d",
         "time": "4:00 AM",
         "date": "Fri, October 2, 2026",
         "status_code": "final",
@@ -5140,7 +5526,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5157,7 +5543,7 @@
         "round_name": "Group Stage Elimination (D) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 2d",
+        "status": "Completed 1w 3d",
         "time": "7:05 AM",
         "date": "Thu, October 1, 2026",
         "status_code": "final",
@@ -5437,7 +5823,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5454,7 +5840,7 @@
         "round_name": "Group Stage Elimination (C) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 2d",
+        "status": "Completed 1w 3d",
         "time": "4:00 AM",
         "date": "Thu, October 1, 2026",
         "status_code": "final",
@@ -5744,7 +6130,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5761,7 +6147,7 @@
         "round_name": "Group Stage Winner's (A) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 3d",
+        "status": "Completed 1w 4d",
         "time": "6:55 AM",
         "date": "Wed, September 30, 2026",
         "status_code": "final",
@@ -6041,7 +6427,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6058,7 +6444,7 @@
         "round_name": "Group Stage Winner's (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 3d",
+        "status": "Completed 1w 4d",
         "time": "4:00 AM",
         "date": "Wed, September 30, 2026",
         "status_code": "final",
@@ -6338,7 +6724,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6355,7 +6741,7 @@
         "round_name": "Group Stage Winner's (D) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 4d",
+        "status": "Completed 1w 5d",
         "time": "7:30 AM",
         "date": "Tue, September 29, 2026",
         "status_code": "final",
@@ -6645,7 +7031,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6662,7 +7048,7 @@
         "round_name": "Group Stage Winner's (C) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 4d",
+        "status": "Completed 1w 5d",
         "time": "4:00 AM",
         "date": "Tue, September 29, 2026",
         "status_code": "final",
@@ -6952,7 +7338,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6969,7 +7355,7 @@
         "round_name": "Group Stage Opening (A) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 6d",
+        "status": "Completed 2w 0d",
         "time": "6:35 AM",
         "date": "Sun, September 27, 2026",
         "status_code": "final",
@@ -7249,7 +7635,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7266,7 +7652,7 @@
         "round_name": "Group Stage Opening (A) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 6d",
+        "status": "Completed 2w 0d",
         "time": "4:00 AM",
         "date": "Sun, September 27, 2026",
         "status_code": "final",
@@ -7546,7 +7932,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7563,7 +7949,7 @@
         "round_name": "Group Stage Opening (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 0d",
+        "status": "Completed 2w 1d",
         "time": "7:30 AM",
         "date": "Sat, September 26, 2026",
         "status_code": "final",
@@ -7843,7 +8229,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7860,7 +8246,7 @@
         "round_name": "Group Stage Opening (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 0d",
+        "status": "Completed 2w 1d",
         "time": "4:00 AM",
         "date": "Sat, September 26, 2026",
         "status_code": "final",
@@ -8150,7 +8536,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8167,7 +8553,7 @@
         "round_name": "Group Stage Opening (D) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 1d",
+        "status": "Completed 2w 2d",
         "time": "6:25 AM",
         "date": "Fri, September 25, 2026",
         "status_code": "final",
@@ -8447,7 +8833,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8464,7 +8850,7 @@
         "round_name": "Group Stage Opening (D) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 1d",
+        "status": "Completed 2w 2d",
         "time": "4:00 AM",
         "date": "Fri, September 25, 2026",
         "status_code": "final",
@@ -8744,7 +9130,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8761,7 +9147,7 @@
         "round_name": "Group Stage Opening (C) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 2d",
+        "status": "Completed 2w 3d",
         "time": "7:25 AM",
         "date": "Thu, September 24, 2026",
         "status_code": "final",
@@ -9041,7 +9427,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9058,7 +9444,7 @@
         "round_name": "Group Stage Opening (C) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 2d",
+        "status": "Completed 2w 3d",
         "time": "4:00 AM",
         "date": "Thu, September 24, 2026",
         "status_code": "final",
@@ -9348,7 +9734,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9365,7 +9751,7 @@
         "round_name": "결승전",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 2w 6d",
+        "status": "Completed 3w 0d",
         "time": "4:00 AM",
         "date": "Sun, September 20, 2026",
         "status_code": "final",
@@ -9605,7 +9991,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9895,7 +10281,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9912,7 +10298,7 @@
         "round_name": "하위 결승",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 0d",
+        "status": "Completed 3w 1d",
         "time": "4:00 AM",
         "date": "Sat, September 19, 2026",
         "status_code": "final",
@@ -10144,7 +10530,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10434,7 +10820,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10451,7 +10837,7 @@
         "round_name": "하위 3R",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 1d",
+        "status": "Completed 3w 2d",
         "time": "5:30 AM",
         "date": "Fri, September 18, 2026",
         "status_code": "final",
@@ -10685,7 +11071,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10702,7 +11088,7 @@
         "round_name": "하위 3R",
         "region": "Pacific",
         "tier": "S-Tier",
-        "status": "Completed 3w 1d",
+        "status": "Completed 3w 2d",
         "time": "4:30 AM",
         "date": "Fri, September 18, 2026",
         "status_code": "final",
@@ -10911,7 +11297,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10928,7 +11314,7 @@
         "round_name": "상위 결승",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 1d",
+        "status": "Completed 3w 2d",
         "time": "4:00 AM",
         "date": "Fri, September 18, 2026",
         "status_code": "final",
@@ -11128,7 +11514,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11424,7 +11810,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11744,7 +12130,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11761,7 +12147,7 @@
         "round_name": "하위 2R",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 2d",
+        "status": "Completed 3w 3d",
         "time": "5:40 AM",
         "date": "Thu, September 17, 2026",
         "status_code": "final",
@@ -11993,7 +12379,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12010,7 +12396,7 @@
         "round_name": "하위 2R",
         "region": "Pacific",
         "tier": "S-Tier",
-        "status": "Completed 3w 2d",
+        "status": "Completed 3w 3d",
         "time": "5:00 AM",
         "date": "Thu, September 17, 2026",
         "status_code": "final",
@@ -12243,7 +12629,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12260,7 +12646,7 @@
         "round_name": "하위 2R",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 2d",
+        "status": "Completed 3w 3d",
         "time": "4:00 AM",
         "date": "Thu, September 17, 2026",
         "status_code": "final",
@@ -12472,7 +12858,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12694,7 +13080,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12711,7 +13097,7 @@
         "round_name": "상위 4강",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 3d",
+        "status": "Completed 3w 4d",
         "time": "7:00 AM",
         "date": "Wed, September 16, 2026",
         "status_code": "final",
@@ -12941,7 +13327,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12958,7 +13344,7 @@
         "round_name": "하위 1R",
         "region": "Pacific",
         "tier": "S-Tier",
-        "status": "Completed 3w 3d",
+        "status": "Completed 3w 4d",
         "time": "4:45 AM",
         "date": "Wed, September 16, 2026",
         "status_code": "final",
@@ -13209,7 +13595,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13226,7 +13612,7 @@
         "round_name": "상위 4강",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 3d",
+        "status": "Completed 3w 4d",
         "time": "4:00 AM",
         "date": "Wed, September 16, 2026",
         "status_code": "final",
@@ -13456,7 +13842,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13473,7 +13859,7 @@
         "round_name": "하위 1R",
         "region": "Pacific",
         "tier": "S-Tier",
-        "status": "Completed 3w 3d",
+        "status": "Completed 3w 4d",
         "time": "2:20 AM",
         "date": "Wed, September 16, 2026",
         "status_code": "final",
@@ -13680,7 +14066,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13932,7 +14318,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13949,7 +14335,7 @@
         "round_name": "하위 1R",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 4d",
+        "status": "Completed 3w 5d",
         "time": "6:00 AM",
         "date": "Tue, September 15, 2026",
         "status_code": "final",
@@ -14151,7 +14537,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14168,7 +14554,7 @@
         "round_name": "상위 4강",
         "region": "Pacific",
         "tier": "S-Tier",
-        "status": "Completed 3w 4d",
+        "status": "Completed 3w 5d",
         "time": "4:00 AM",
         "date": "Tue, September 15, 2026",
         "status_code": "final",
@@ -14421,7 +14807,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14438,7 +14824,7 @@
         "round_name": "하위 1R",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 4d",
+        "status": "Completed 3w 5d",
         "time": "4:00 AM",
         "date": "Tue, September 15, 2026",
         "status_code": "final",
@@ -14642,7 +15028,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14886,7 +15272,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15162,7 +15548,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15179,7 +15565,7 @@
         "round_name": "상위 8강",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 5d",
+        "status": "Completed 3w 6d",
         "time": "7:05 AM",
         "date": "Mon, September 14, 2026",
         "status_code": "final",
@@ -15399,7 +15785,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15416,7 +15802,7 @@
         "round_name": "상위 8강",
         "region": "Pacific",
         "tier": "S-Tier",
-        "status": "Completed 3w 5d",
+        "status": "Completed 3w 6d",
         "time": "4:00 AM",
         "date": "Mon, September 14, 2026",
         "status_code": "final",
@@ -15655,7 +16041,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15672,7 +16058,7 @@
         "round_name": "상위 8강",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 5d",
+        "status": "Completed 3w 6d",
         "time": "4:00 AM",
         "date": "Mon, September 14, 2026",
         "status_code": "final",
@@ -15874,7 +16260,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16102,7 +16488,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16419,7 +16805,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16436,7 +16822,7 @@
         "round_name": "결승전",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 3w 6d",
+        "status": "Completed 4w 0d",
         "time": "8:00 AM",
         "date": "Sun, September 13, 2026",
         "status_code": "final",
@@ -16638,7 +17024,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16655,7 +17041,7 @@
         "round_name": "상위 8강",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 6d",
+        "status": "Completed 4w 0d",
         "time": "4:35 AM",
         "date": "Sun, September 13, 2026",
         "status_code": "final",
@@ -16855,7 +17241,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16872,7 +17258,7 @@
         "round_name": "결승전",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 3w 6d",
+        "status": "Completed 4w 0d",
         "time": "4:00 AM",
         "date": "Sun, September 13, 2026",
         "status_code": "final",
@@ -17182,7 +17568,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17199,7 +17585,7 @@
         "round_name": "상위 8강",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 3w 6d",
+        "status": "Completed 4w 0d",
         "time": "3:00 AM",
         "date": "Sun, September 13, 2026",
         "status_code": "final",
@@ -17423,7 +17809,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17612,7 +17998,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17629,7 +18015,7 @@
         "round_name": "Main Event Consolation Final China Evolution Series 2026: Act 3",
         "region": "China",
         "tier": "Other",
-        "status": "Completed 4w 0d",
+        "status": "Completed 4w 1d",
         "time": "4:00 AM",
         "date": "Sat, September 12, 2026",
         "status_code": "final",
@@ -17871,7 +18257,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18188,7 +18574,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18377,7 +18763,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18394,7 +18780,7 @@
         "round_name": "Main Event Semifinals China Evolution Series 2026: Act 3",
         "region": "China",
         "tier": "Other",
-        "status": "Completed 4w 1d",
+        "status": "Completed 4w 2d",
         "time": "6:00 AM",
         "date": "Fri, September 11, 2026",
         "status_code": "final",
@@ -18668,7 +19054,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18685,7 +19071,7 @@
         "round_name": "Main Event Semifinals China Evolution Series 2026: Act 3",
         "region": "China",
         "tier": "Other",
-        "status": "Completed 4w 1d",
+        "status": "Completed 4w 2d",
         "time": "4:00 AM",
         "date": "Fri, September 11, 2026",
         "status_code": "final",
@@ -18933,7 +19319,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19260,7 +19646,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19541,7 +19927,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19838,7 +20224,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20145,7 +20531,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20419,7 +20805,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20676,7 +21062,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20805,7 +21191,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21080,7 +21466,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21377,7 +21763,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21607,7 +21993,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21917,7 +22303,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22245,7 +22631,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22526,7 +22912,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22823,7 +23209,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23151,7 +23537,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23479,7 +23865,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23634,7 +24020,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23913,7 +24299,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24220,7 +24606,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24538,7 +24924,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24836,7 +25222,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24993,7 +25379,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25291,7 +25677,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25462,7 +25848,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25727,7 +26113,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26013,7 +26399,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26320,7 +26706,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26628,7 +27014,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26840,7 +27226,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27082,7 +27468,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27379,7 +27765,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27676,497 +28062,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
-          "stale": false
-        },
-        "selection_status": "ready"
-      },
-      {
-        "id": "724900",
-        "url": "https://www.vlr.gg/724900/swimtrek-blue-vs-shopify-rebellion-gold-game-changers-2026-north-america-stage-2-playoffs-ubsf",
-        "match_url": "https://www.vlr.gg/724900/swimtrek-blue-vs-shopify-rebellion-gold-game-changers-2026-north-america-stage-2-playoffs-ubsf",
-        "team_a": "SwimTrek Blue",
-        "team_b": "Shopify Rebellion Gold",
-        "event": "Playoffs–Upper Semifinals Game Changers 2026: North America Stage 2",
-        "tournament": "Game Changers 2026: North America Stage 2",
-        "stage": "🏆 플레이오프 (Playoffs)",
-        "round_name": "상위 4강",
-        "region": "Americas",
-        "tier": "S-Tier",
-        "status": "Completed 1mo",
-        "time": "7:15 PM",
-        "date": "Wed, September 2, 2026",
-        "status_code": "final",
-        "scheduled_at": "2026-09-03T00:15:00+00:00",
-        "selection_data": {
-          "details": {
-            "match_id": "724900",
-            "team_a_id": "21711",
-            "team_a_name": "SwimTrek Blue",
-            "team_b_id": "14278",
-            "team_b_name": "Shopify Rebellion Gold",
-            "event_id": "3037",
-            "scheduled_at": "2026-09-03T00:15:00+00:00",
-            "schedule_source_zone": "CDT",
-            "match_format": "BO3",
-            "actual_veto": [
-              {
-                "team": "SRG",
-                "action": "ban",
-                "map": "Summit"
-              },
-              {
-                "team": "SWIM",
-                "action": "ban",
-                "map": "Split"
-              },
-              {
-                "team": "SRG",
-                "action": "pick",
-                "map": "Lotus"
-              },
-              {
-                "team": "SWIM",
-                "action": "pick",
-                "map": "Ascent"
-              },
-              {
-                "team": "SRG",
-                "action": "ban",
-                "map": "Haven"
-              },
-              {
-                "team": "SWIM",
-                "action": "ban",
-                "map": "Sunset"
-              },
-              {
-                "team": null,
-                "action": "remaining",
-                "map": "Abyss"
-              }
-            ],
-            "live_score": {
-              "series_score_a": "0",
-              "series_score_b": "2",
-              "status": "final",
-              "maps": [
-                {
-                  "map": "Lotus",
-                  "score_a": "5",
-                  "score_b": "13"
-                },
-                {
-                  "map": "Ascent",
-                  "score_a": "2",
-                  "score_b": "13"
-                }
-              ],
-              "scheduled_at": "2026-09-03T00:15:00+00:00",
-              "schedule_source_zone": "CDT",
-              "match_format": "BO3",
-              "actual_veto": [
-                {
-                  "team": "SRG",
-                  "action": "ban",
-                  "map": "Summit"
-                },
-                {
-                  "team": "SWIM",
-                  "action": "ban",
-                  "map": "Split"
-                },
-                {
-                  "team": "SRG",
-                  "action": "pick",
-                  "map": "Lotus"
-                },
-                {
-                  "team": "SWIM",
-                  "action": "pick",
-                  "map": "Ascent"
-                },
-                {
-                  "team": "SRG",
-                  "action": "ban",
-                  "map": "Haven"
-                },
-                {
-                  "team": "SWIM",
-                  "action": "ban",
-                  "map": "Sunset"
-                },
-                {
-                  "team": null,
-                  "action": "remaining",
-                  "map": "Abyss"
-                }
-              ]
-            },
-            "team_a_logo": "https://owcdn.net/img/6a5ff0450efba.png",
-            "team_b_logo": "https://owcdn.net/img/679314e3d25f4.png"
-          },
-          "team_a_events": [
-            {
-              "id": "3037",
-              "name": "Game Changers 2026: North America Stage 2"
-            },
-            {
-              "id": "3057",
-              "name": "FunhaverGG: Plain 2.0 #2"
-            },
-            {
-              "id": "3050",
-              "name": "Tenax Blitz Series 3"
-            },
-            {
-              "id": "2902",
-              "name": "Game Changers 2026: North America Stage 1"
-            }
-          ],
-          "team_b_events": [
-            {
-              "id": "3037",
-              "name": "Game Changers 2026: North America Stage 2"
-            },
-            {
-              "id": "3087",
-              "name": "FunhaverGG: Back to Basics 2.0 #1"
-            },
-            {
-              "id": "3078",
-              "name": "FunhaverGG: Mad Science - LOCKED"
-            },
-            {
-              "id": "3057",
-              "name": "FunhaverGG: Plain 2.0 #2"
-            },
-            {
-              "id": "2902",
-              "name": "Game Changers 2026: North America Stage 1"
-            },
-            {
-              "id": "2857",
-              "name": "Challengers 2026: North America ACE Stage 2"
-            },
-            {
-              "id": "2783",
-              "name": "Challengers 2026: North America ACE Stage 1"
-            },
-            {
-              "id": "2881",
-              "name": "FunhaverGG: 2026 WILD//WEST Qualifier 3"
-            },
-            {
-              "id": "2596",
-              "name": "Game Changers 2025: Championship Seoul"
-            },
-            {
-              "id": "2539",
-              "name": "Game Changers 2025: North America Stage 2"
-            },
-            {
-              "id": "2467",
-              "name": "Challengers 2025: North America ACE Stage 3"
-            },
-            {
-              "id": "2616",
-              "name": "FunhaverGG: Back to Basics 2"
-            }
-          ],
-          "map_pool": [
-            "Abyss",
-            "Ascent",
-            "Breeze",
-            "Fracture",
-            "Haven",
-            "Lotus",
-            "Pearl",
-            "Split",
-            "Summit",
-            "Sunset"
-          ],
-          "live_score": {
-            "series_score_a": "0",
-            "series_score_b": "2",
-            "status": "final",
-            "maps": [
-              {
-                "map": "Lotus",
-                "score_a": "5",
-                "score_b": "13"
-              },
-              {
-                "map": "Ascent",
-                "score_a": "2",
-                "score_b": "13"
-              }
-            ],
-            "scheduled_at": "2026-09-03T00:15:00+00:00",
-            "schedule_source_zone": "CDT",
-            "match_format": "BO3",
-            "actual_veto": [
-              {
-                "team": "SRG",
-                "action": "ban",
-                "map": "Summit"
-              },
-              {
-                "team": "SWIM",
-                "action": "ban",
-                "map": "Split"
-              },
-              {
-                "team": "SRG",
-                "action": "pick",
-                "map": "Lotus"
-              },
-              {
-                "team": "SWIM",
-                "action": "pick",
-                "map": "Ascent"
-              },
-              {
-                "team": "SRG",
-                "action": "ban",
-                "map": "Haven"
-              },
-              {
-                "team": "SWIM",
-                "action": "ban",
-                "map": "Sunset"
-              },
-              {
-                "team": null,
-                "action": "remaining",
-                "map": "Abyss"
-              }
-            ]
-          },
-          "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
-          "stale": false
-        },
-        "selection_status": "ready"
-      },
-      {
-        "id": "724904",
-        "url": "https://www.vlr.gg/724904/cloud9-gc-vs-himmers-game-changers-2026-north-america-stage-2-playoffs-lr1",
-        "match_url": "https://www.vlr.gg/724904/cloud9-gc-vs-himmers-game-changers-2026-north-america-stage-2-playoffs-lr1",
-        "team_a": "Cloud9 GC",
-        "team_b": "HIMMERS",
-        "event": "Playoffs–Lower Round 1 Game Changers 2026: North America Stage 2",
-        "tournament": "Game Changers 2026: North America Stage 2",
-        "stage": "🏆 플레이오프 (Playoffs)",
-        "round_name": "하위 1R",
-        "region": "Americas",
-        "tier": "S-Tier",
-        "status": "Completed 1mo",
-        "time": "6:30 PM",
-        "date": "Wed, September 2, 2026",
-        "status_code": "final",
-        "scheduled_at": "2026-09-02T23:30:00+00:00",
-        "selection_data": {
-          "details": {
-            "match_id": "724904",
-            "team_a_id": "22918",
-            "team_a_name": "Cloud9 GC",
-            "team_b_id": "22720",
-            "team_b_name": "HIMMERS",
-            "event_id": "3037",
-            "scheduled_at": "2026-09-02T23:30:00+00:00",
-            "schedule_source_zone": "CDT",
-            "match_format": "BO3",
-            "actual_veto": [
-              {
-                "team": "HER",
-                "action": "ban",
-                "map": "Haven"
-              },
-              {
-                "team": "C9",
-                "action": "ban",
-                "map": "Split"
-              },
-              {
-                "team": "HER",
-                "action": "pick",
-                "map": "Abyss"
-              },
-              {
-                "team": "C9",
-                "action": "pick",
-                "map": "Lotus"
-              },
-              {
-                "team": "HER",
-                "action": "ban",
-                "map": "Summit"
-              },
-              {
-                "team": "C9",
-                "action": "ban",
-                "map": "Sunset"
-              },
-              {
-                "team": null,
-                "action": "remaining",
-                "map": "Ascent"
-              }
-            ],
-            "live_score": {
-              "series_score_a": "1",
-              "series_score_b": "2",
-              "status": "final",
-              "maps": [
-                {
-                  "map": "Abyss",
-                  "score_a": "8",
-                  "score_b": "13"
-                },
-                {
-                  "map": "Lotus",
-                  "score_a": "13",
-                  "score_b": "7"
-                },
-                {
-                  "map": "Ascent",
-                  "score_a": "8",
-                  "score_b": "13"
-                }
-              ],
-              "scheduled_at": "2026-09-02T23:30:00+00:00",
-              "schedule_source_zone": "CDT",
-              "match_format": "BO3",
-              "actual_veto": [
-                {
-                  "team": "HER",
-                  "action": "ban",
-                  "map": "Haven"
-                },
-                {
-                  "team": "C9",
-                  "action": "ban",
-                  "map": "Split"
-                },
-                {
-                  "team": "HER",
-                  "action": "pick",
-                  "map": "Abyss"
-                },
-                {
-                  "team": "C9",
-                  "action": "pick",
-                  "map": "Lotus"
-                },
-                {
-                  "team": "HER",
-                  "action": "ban",
-                  "map": "Summit"
-                },
-                {
-                  "team": "C9",
-                  "action": "ban",
-                  "map": "Sunset"
-                },
-                {
-                  "team": null,
-                  "action": "remaining",
-                  "map": "Ascent"
-                }
-              ]
-            },
-            "team_a_logo": "https://owcdn.net/img/628addcbd509e.png",
-            "team_b_logo": "https://www.vlr.gg/img/vlr/tmp/vlr.png"
-          },
-          "team_a_events": [
-            {
-              "id": "3037",
-              "name": "Game Changers 2026: North America Stage 2"
-            }
-          ],
-          "team_b_events": [
-            {
-              "id": "3037",
-              "name": "Game Changers 2026: North America Stage 2"
-            }
-          ],
-          "map_pool": [
-            "Abyss",
-            "Ascent",
-            "Breeze",
-            "Fracture",
-            "Haven",
-            "Lotus",
-            "Pearl",
-            "Split",
-            "Summit",
-            "Sunset"
-          ],
-          "live_score": {
-            "series_score_a": "1",
-            "series_score_b": "2",
-            "status": "final",
-            "maps": [
-              {
-                "map": "Abyss",
-                "score_a": "8",
-                "score_b": "13"
-              },
-              {
-                "map": "Lotus",
-                "score_a": "13",
-                "score_b": "7"
-              },
-              {
-                "map": "Ascent",
-                "score_a": "8",
-                "score_b": "13"
-              }
-            ],
-            "scheduled_at": "2026-09-02T23:30:00+00:00",
-            "schedule_source_zone": "CDT",
-            "match_format": "BO3",
-            "actual_veto": [
-              {
-                "team": "HER",
-                "action": "ban",
-                "map": "Haven"
-              },
-              {
-                "team": "C9",
-                "action": "ban",
-                "map": "Split"
-              },
-              {
-                "team": "HER",
-                "action": "pick",
-                "map": "Abyss"
-              },
-              {
-                "team": "C9",
-                "action": "pick",
-                "map": "Lotus"
-              },
-              {
-                "team": "HER",
-                "action": "ban",
-                "map": "Summit"
-              },
-              {
-                "team": "C9",
-                "action": "ban",
-                "map": "Sunset"
-              },
-              {
-                "team": null,
-                "action": "remaining",
-                "map": "Ascent"
-              }
-            ]
-          },
-          "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28264,7 +28160,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28354,7 +28250,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28444,7 +28340,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28534,7 +28430,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28628,7 +28524,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28722,7 +28618,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28812,7 +28708,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28902,7 +28798,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28996,7 +28892,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29090,7 +28986,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29180,7 +29076,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29270,7 +29166,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29364,7 +29260,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29454,7 +29350,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29548,7 +29444,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29638,7 +29534,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29655,7 +29551,7 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Division 1 Season 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 13h 18m",
+        "status": "Completed 20h 7m",
         "time": "1:00 PM",
         "date": "Sat, October 10, 2026 Yesterday",
         "scheduled_at": "2026-10-10T18:00:00+00:00",
@@ -29732,7 +29628,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29749,7 +29645,7 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Division 1 Season 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 12h 18m",
+        "status": "Completed 19h 7m",
         "time": "2:00 PM",
         "date": "Sat, October 10, 2026 Yesterday",
         "scheduled_at": "2026-10-10T19:00:00+00:00",
@@ -29826,7 +29722,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29843,7 +29739,7 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Division 1 Season 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 11h 18m",
+        "status": "Completed 18h 7m",
         "time": "3:00 PM",
         "date": "Sat, October 10, 2026 Yesterday",
         "scheduled_at": "2026-10-10T20:00:00+00:00",
@@ -29916,7 +29812,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29933,7 +29829,7 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Division 1 Season 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 10h 18m",
+        "status": "Completed 17h 7m",
         "time": "4:00 PM",
         "date": "Sat, October 10, 2026 Yesterday",
         "scheduled_at": "2026-10-10T21:00:00+00:00",
@@ -30006,15 +29902,15 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-11T07:22:34.099126+00:00",
+          "collected_at": "2026-10-11T14:11:24.692667+00:00",
           "stale": false
         },
         "selection_status": "ready"
       }
     ],
-    "ready_count": 123,
+    "ready_count": 122,
     "pending_count": 0,
-    "unassigned_count": 17,
+    "unassigned_count": 16,
     "failures": []
   },
   "analysis": {
@@ -185932,23 +185828,16 @@
     }
   },
   "collection": {
-    "status": "partial",
-    "started_at": "2026-10-11T07:22:36.625885+00:00",
-    "completed_at": "2026-10-11T07:41:01.762342+00:00",
-    "mode": "analysis_only",
-    "results": {
-      "updated": 73,
-      "failed": 1,
-      "total": 74
-    },
-    "budget_exhausted": false,
-    "remaining_teams": 0,
+    "status": "catalog_only",
+    "started_at": "2026-10-11T14:06:36.087615+00:00",
+    "completed_at": "2026-10-11T14:11:24.941375+00:00",
+    "mode": "catalog_only",
     "analytics": {
-      "teams": 74,
+      "teams": 73,
       "failed_teams": 1,
       "stored_teams": 109,
       "pending_teams": 0,
-      "stale_teams": 1
+      "stale_teams": 73
     }
   }
 }
