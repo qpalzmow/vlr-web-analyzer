@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "published_at": "2026-10-15T23:36:47.048297+00:00",
+  "published_at": "2026-10-16T01:30:08.649655+00:00",
   "catalog": {
     "schema_version": 1,
-    "generation": "c493009c9c384d23b482a62e5f570ef0",
-    "updated_at": "2026-10-15T23:18:30.623240+00:00",
+    "generation": "f8f4ae383d3d4e46be84df862c6d8fb1",
+    "updated_at": "2026-10-16T01:30:08.375874+00:00",
     "refresh_interval_seconds": 3600,
     "matches": [
       {
@@ -20,7 +20,7 @@
         "region": "Americas",
         "tier": "S-Tier",
         "status": "LIVE",
-        "time": "4:00 PM",
+        "time": "2:00 PM",
         "date": "Thu, October 15, 2026 Today",
         "scheduled_at": "2026-10-15T21:00:00+00:00",
         "status_code": "live",
@@ -33,7 +33,7 @@
             "team_b_name": "MIBR GC",
             "event_id": "3099",
             "scheduled_at": "2026-10-15T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -89,13 +89,13 @@
                 },
                 {
                   "map": "Summit",
-                  "score_a": "0",
-                  "score_b": "0"
+                  "score_a": "5",
+                  "score_b": "13"
                 },
                 {
                   "map": "Split",
-                  "score_a": "0",
-                  "score_b": "0"
+                  "score_a": "13",
+                  "score_b": "8"
                 },
                 {
                   "map": "Sunset",
@@ -104,7 +104,7 @@
                 }
               ],
               "scheduled_at": "2026-10-15T21:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -273,13 +273,13 @@
               },
               {
                 "map": "Summit",
-                "score_a": "0",
-                "score_b": "0"
+                "score_a": "5",
+                "score_b": "13"
               },
               {
                 "map": "Split",
-                "score_a": "0",
-                "score_b": "0"
+                "score_a": "13",
+                "score_b": "8"
               },
               {
                 "map": "Sunset",
@@ -288,7 +288,7 @@
               }
             ],
             "scheduled_at": "2026-10-15T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -329,7 +329,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -346,9 +346,9 @@
         "round_name": "상위 결승",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 6h 46m",
-        "time": "1:00 AM",
-        "date": "Fri, October 16, 2026",
+        "status": "Upcoming 4h 34m",
+        "time": "11:00 PM",
+        "date": "Thu, October 15, 2026 Today",
         "scheduled_at": "2026-10-16T06:00:00+00:00",
         "status_code": "upcoming",
         "selection_data": {
@@ -360,7 +360,7 @@
             "team_b_name": "LOUD",
             "event_id": "2766",
             "scheduled_at": "2026-10-16T06:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [],
             "live_score": {
@@ -385,7 +385,7 @@
                 }
               ],
               "scheduled_at": "2026-10-16T06:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": []
             },
@@ -523,12 +523,12 @@
               }
             ],
             "scheduled_at": "2026-10-16T06:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -545,8 +545,8 @@
         "round_name": "하위 3R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 9h 46m",
-        "time": "4:00 AM",
+        "status": "Upcoming 7h 34m",
+        "time": "2:00 AM",
         "date": "Fri, October 16, 2026",
         "scheduled_at": "2026-10-16T09:00:00+00:00",
         "status_code": "upcoming",
@@ -559,7 +559,7 @@
             "team_b_name": "G2 Esports",
             "event_id": "2766",
             "scheduled_at": "2026-10-16T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [],
             "live_score": {
@@ -584,7 +584,7 @@
                 }
               ],
               "scheduled_at": "2026-10-16T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": []
             },
@@ -722,12 +722,12 @@
               }
             ],
             "scheduled_at": "2026-10-16T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -744,8 +744,8 @@
         "round_name": "하위 결승",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 1d 7h",
-        "time": "2:00 AM",
+        "status": "Upcoming 1d 5h",
+        "time": "12:00 AM",
         "date": "Sat, October 17, 2026",
         "scheduled_at": "2026-10-17T07:00:00+00:00",
         "status_code": "upcoming",
@@ -763,9 +763,9 @@
         "round_name": "결승전",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 2d 6h",
-        "time": "1:00 AM",
-        "date": "Sun, October 18, 2026",
+        "status": "Upcoming 2d 4h",
+        "time": "11:00 PM",
+        "date": "Sat, October 17, 2026",
         "scheduled_at": "2026-10-18T06:00:00+00:00",
         "status_code": "upcoming",
         "selection_status": "unassigned"
@@ -1029,8 +1029,8 @@
         "round_name": "Main Event Round Robin",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Completed 1d 0h",
-        "time": "6:00 PM",
+        "status": "Completed 1d 2h",
+        "time": "4:00 PM",
         "date": "Wed, October 14, 2026 Yesterday",
         "status_code": "final",
         "scheduled_at": "2026-10-14T23:00:00+00:00",
@@ -1043,7 +1043,7 @@
             "team_b_name": "MIBR GC",
             "event_id": "3099",
             "scheduled_at": "2026-10-14T23:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -1099,7 +1099,7 @@
                 }
               ],
               "scheduled_at": "2026-10-14T23:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -1268,7 +1268,7 @@
               }
             ],
             "scheduled_at": "2026-10-14T23:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -1309,7 +1309,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1326,8 +1326,8 @@
         "round_name": "Main Event Round Robin",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Completed 1d 2h",
-        "time": "4:00 PM",
+        "status": "Completed 1d 4h",
+        "time": "2:00 PM",
         "date": "Wed, October 14, 2026 Yesterday",
         "status_code": "final",
         "scheduled_at": "2026-10-14T21:00:00+00:00",
@@ -1340,7 +1340,7 @@
             "team_b_name": "MIBR GC",
             "event_id": "3099",
             "scheduled_at": "2026-10-14T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -1396,7 +1396,7 @@
                 }
               ],
               "scheduled_at": "2026-10-14T21:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -1565,7 +1565,7 @@
               }
             ],
             "scheduled_at": "2026-10-14T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -1606,7 +1606,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1623,8 +1623,8 @@
         "round_name": "Main Event Round Robin",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Completed 1d 5h",
-        "time": "1:00 PM",
+        "status": "Completed 1d 7h",
+        "time": "11:00 AM",
         "date": "Wed, October 14, 2026 Yesterday",
         "status_code": "final",
         "scheduled_at": "2026-10-14T18:00:00+00:00",
@@ -1637,7 +1637,7 @@
             "team_b_name": "Akave Esports GC",
             "event_id": "3099",
             "scheduled_at": "2026-10-14T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -1698,7 +1698,7 @@
                 }
               ],
               "scheduled_at": "2026-10-14T18:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -1872,7 +1872,7 @@
               }
             ],
             "scheduled_at": "2026-10-14T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -1913,7 +1913,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1930,8 +1930,8 @@
         "round_name": "하위 결승",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 3d 8h",
-        "time": "9:30 AM",
+        "status": "Completed 3d 10h",
+        "time": "7:30 AM",
         "date": "Mon, October 12, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-12T14:30:00+00:00",
@@ -1944,7 +1944,7 @@
             "team_b_name": "Misa Esports",
             "event_id": "3112",
             "scheduled_at": "2026-10-12T14:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -2005,7 +2005,7 @@
                 }
               ],
               "scheduled_at": "2026-10-12T14:30:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -2175,7 +2175,7 @@
               }
             ],
             "scheduled_at": "2026-10-12T14:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -2216,7 +2216,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2233,8 +2233,8 @@
         "round_name": "하위 2R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 4d 11h",
-        "time": "6:15 AM",
+        "status": "Completed 4d 14h",
+        "time": "4:15 AM",
         "date": "Sun, October 11, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-11T11:15:00+00:00",
@@ -2247,7 +2247,7 @@
             "team_b_name": "T1",
             "event_id": "2766",
             "scheduled_at": "2026-10-11T11:15:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -2308,7 +2308,7 @@
                 }
               ],
               "scheduled_at": "2026-10-11T11:15:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -2482,7 +2482,7 @@
               }
             ],
             "scheduled_at": "2026-10-11T11:15:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -2523,7 +2523,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2540,8 +2540,8 @@
         "round_name": "하위 2R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 4d 14h",
-        "time": "4:00 AM",
+        "status": "Completed 4d 16h",
+        "time": "2:00 AM",
         "date": "Sun, October 11, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-11T09:00:00+00:00",
@@ -2554,7 +2554,7 @@
             "team_b_name": "100 Thieves",
             "event_id": "2766",
             "scheduled_at": "2026-10-11T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -2610,7 +2610,7 @@
                 }
               ],
               "scheduled_at": "2026-10-11T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -2779,7 +2779,7 @@
               }
             ],
             "scheduled_at": "2026-10-11T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -2820,7 +2820,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2837,8 +2837,8 @@
         "round_name": "상위 4강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 5d 11h",
-        "time": "7:00 AM",
+        "status": "Completed 5d 13h",
+        "time": "5:00 AM",
         "date": "Sat, October 10, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-10T12:00:00+00:00",
@@ -2851,7 +2851,7 @@
             "team_b_name": "Team Vitality",
             "event_id": "2766",
             "scheduled_at": "2026-10-10T12:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -2907,7 +2907,7 @@
                 }
               ],
               "scheduled_at": "2026-10-10T12:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -3076,7 +3076,7 @@
               }
             ],
             "scheduled_at": "2026-10-10T12:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -3117,7 +3117,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3134,8 +3134,8 @@
         "round_name": "상위 4강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 5d 14h",
-        "time": "4:00 AM",
+        "status": "Completed 5d 16h",
+        "time": "2:00 AM",
         "date": "Sat, October 10, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-10T09:00:00+00:00",
@@ -3148,7 +3148,7 @@
             "team_b_name": "LOUD",
             "event_id": "2766",
             "scheduled_at": "2026-10-10T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -3209,7 +3209,7 @@
                 }
               ],
               "scheduled_at": "2026-10-10T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -3383,7 +3383,7 @@
               }
             ],
             "scheduled_at": "2026-10-10T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -3424,7 +3424,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3441,8 +3441,8 @@
         "round_name": "하위 1R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 6d 11h",
-        "time": "7:10 AM",
+        "status": "Completed 6d 13h",
+        "time": "5:10 AM",
         "date": "Fri, October 9, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-09T12:10:00+00:00",
@@ -3455,7 +3455,7 @@
             "team_b_name": "Nongshim RedForce",
             "event_id": "2766",
             "scheduled_at": "2026-10-09T12:10:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -3516,7 +3516,7 @@
                 }
               ],
               "scheduled_at": "2026-10-09T12:10:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -3690,7 +3690,7 @@
               }
             ],
             "scheduled_at": "2026-10-09T12:10:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -3731,7 +3731,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3748,8 +3748,8 @@
         "round_name": "하위 1R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 6d 14h",
-        "time": "4:00 AM",
+        "status": "Completed 6d 16h",
+        "time": "2:00 AM",
         "date": "Fri, October 9, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-09T09:00:00+00:00",
@@ -3762,7 +3762,7 @@
             "team_b_name": "Paper Rex",
             "event_id": "2766",
             "scheduled_at": "2026-10-09T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -3823,7 +3823,7 @@
                 }
               ],
               "scheduled_at": "2026-10-09T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -3997,7 +3997,7 @@
               }
             ],
             "scheduled_at": "2026-10-09T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -4038,7 +4038,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4056,7 +4056,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 1w 0d",
-        "time": "6:20 AM",
+        "time": "4:20 AM",
         "date": "Thu, October 8, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-08T11:20:00+00:00",
@@ -4069,7 +4069,7 @@
             "team_b_name": "Nongshim RedForce",
             "event_id": "2766",
             "scheduled_at": "2026-10-08T11:20:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -4130,7 +4130,7 @@
                 }
               ],
               "scheduled_at": "2026-10-08T11:20:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -4304,7 +4304,7 @@
               }
             ],
             "scheduled_at": "2026-10-08T11:20:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -4345,7 +4345,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4363,7 +4363,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 1w 0d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Thu, October 8, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-08T09:00:00+00:00",
@@ -4376,7 +4376,7 @@
             "team_b_name": "G2 Esports",
             "event_id": "2766",
             "scheduled_at": "2026-10-08T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -4432,7 +4432,7 @@
                 }
               ],
               "scheduled_at": "2026-10-08T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -4601,7 +4601,7 @@
               }
             ],
             "scheduled_at": "2026-10-08T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -4642,7 +4642,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4660,7 +4660,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 1w 1d",
-        "time": "6:30 AM",
+        "time": "4:30 AM",
         "date": "Wed, October 7, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-07T11:30:00+00:00",
@@ -4673,7 +4673,7 @@
             "team_b_name": "LOUD",
             "event_id": "2766",
             "scheduled_at": "2026-10-07T11:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -4729,7 +4729,7 @@
                 }
               ],
               "scheduled_at": "2026-10-07T11:30:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -4898,7 +4898,7 @@
               }
             ],
             "scheduled_at": "2026-10-07T11:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -4939,7 +4939,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4957,7 +4957,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 1w 1d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Wed, October 7, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-07T09:00:00+00:00",
@@ -4970,7 +4970,7 @@
             "team_b_name": "T1",
             "event_id": "2766",
             "scheduled_at": "2026-10-07T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -5026,7 +5026,7 @@
                 }
               ],
               "scheduled_at": "2026-10-07T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -5195,7 +5195,7 @@
               }
             ],
             "scheduled_at": "2026-10-07T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -5236,7 +5236,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5254,7 +5254,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 1w 4d",
-        "time": "6:25 AM",
+        "time": "4:25 AM",
         "date": "Sun, October 4, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-04T11:25:00+00:00",
@@ -5267,7 +5267,7 @@
             "team_b_name": "T1",
             "event_id": "2766",
             "scheduled_at": "2026-10-04T11:25:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -5323,7 +5323,7 @@
                 }
               ],
               "scheduled_at": "2026-10-04T11:25:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -5492,7 +5492,7 @@
               }
             ],
             "scheduled_at": "2026-10-04T11:25:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -5533,7 +5533,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5551,7 +5551,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 1w 4d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Sun, October 4, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-04T09:00:00+00:00",
@@ -5564,7 +5564,7 @@
             "team_b_name": "Global Esports",
             "event_id": "2766",
             "scheduled_at": "2026-10-04T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -5620,7 +5620,7 @@
                 }
               ],
               "scheduled_at": "2026-10-04T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -5789,7 +5789,7 @@
               }
             ],
             "scheduled_at": "2026-10-04T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -5830,7 +5830,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5848,7 +5848,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 1w 5d",
-        "time": "6:30 AM",
+        "time": "4:30 AM",
         "date": "Sat, October 3, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-03T11:30:00+00:00",
@@ -5861,7 +5861,7 @@
             "team_b_name": "Nongshim RedForce",
             "event_id": "2766",
             "scheduled_at": "2026-10-03T11:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -5922,7 +5922,7 @@
                 }
               ],
               "scheduled_at": "2026-10-03T11:30:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -6096,7 +6096,7 @@
               }
             ],
             "scheduled_at": "2026-10-03T11:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -6137,7 +6137,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6155,7 +6155,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 1w 5d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Sat, October 3, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-03T09:00:00+00:00",
@@ -6168,7 +6168,7 @@
             "team_b_name": "Team Liquid",
             "event_id": "2766",
             "scheduled_at": "2026-10-03T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -6224,7 +6224,7 @@
                 }
               ],
               "scheduled_at": "2026-10-03T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -6393,7 +6393,7 @@
               }
             ],
             "scheduled_at": "2026-10-03T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -6434,7 +6434,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6452,7 +6452,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 1w 6d",
-        "time": "6:00 AM",
+        "time": "4:00 AM",
         "date": "Fri, October 2, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-02T11:00:00+00:00",
@@ -6465,7 +6465,7 @@
             "team_b_name": "JD Gaming",
             "event_id": "2766",
             "scheduled_at": "2026-10-02T11:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -6526,7 +6526,7 @@
                 }
               ],
               "scheduled_at": "2026-10-02T11:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -6700,7 +6700,7 @@
               }
             ],
             "scheduled_at": "2026-10-02T11:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -6741,7 +6741,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6759,7 +6759,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 1w 6d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Fri, October 2, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-02T09:00:00+00:00",
@@ -6772,7 +6772,7 @@
             "team_b_name": "EDward Gaming",
             "event_id": "2766",
             "scheduled_at": "2026-10-02T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -6828,7 +6828,7 @@
                 }
               ],
               "scheduled_at": "2026-10-02T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -6997,7 +6997,7 @@
               }
             ],
             "scheduled_at": "2026-10-02T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -7038,7 +7038,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7056,7 +7056,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 0d",
-        "time": "7:05 AM",
+        "time": "5:05 AM",
         "date": "Thu, October 1, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-01T12:05:00+00:00",
@@ -7069,7 +7069,7 @@
             "team_b_name": "Nongshim RedForce",
             "event_id": "2766",
             "scheduled_at": "2026-10-01T12:05:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -7125,7 +7125,7 @@
                 }
               ],
               "scheduled_at": "2026-10-01T12:05:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -7294,7 +7294,7 @@
               }
             ],
             "scheduled_at": "2026-10-01T12:05:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -7335,7 +7335,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7353,7 +7353,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 0d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Thu, October 1, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-01T09:00:00+00:00",
@@ -7366,7 +7366,7 @@
             "team_b_name": "Team Liquid",
             "event_id": "2766",
             "scheduled_at": "2026-10-01T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -7427,7 +7427,7 @@
                 }
               ],
               "scheduled_at": "2026-10-01T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -7601,7 +7601,7 @@
               }
             ],
             "scheduled_at": "2026-10-01T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -7642,7 +7642,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7660,7 +7660,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 1d",
-        "time": "6:55 AM",
+        "time": "4:55 AM",
         "date": "Wed, September 30, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-30T11:55:00+00:00",
@@ -7673,7 +7673,7 @@
             "team_b_name": "FUT Esports",
             "event_id": "2766",
             "scheduled_at": "2026-09-30T11:55:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -7729,7 +7729,7 @@
                 }
               ],
               "scheduled_at": "2026-09-30T11:55:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -7898,7 +7898,7 @@
               }
             ],
             "scheduled_at": "2026-09-30T11:55:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -7939,7 +7939,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7957,7 +7957,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 1d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Wed, September 30, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-30T09:00:00+00:00",
@@ -7970,7 +7970,7 @@
             "team_b_name": "LOUD",
             "event_id": "2766",
             "scheduled_at": "2026-09-30T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -8026,7 +8026,7 @@
                 }
               ],
               "scheduled_at": "2026-09-30T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -8195,7 +8195,7 @@
               }
             ],
             "scheduled_at": "2026-09-30T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -8236,7 +8236,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8254,7 +8254,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 2d",
-        "time": "7:30 AM",
+        "time": "5:30 AM",
         "date": "Tue, September 29, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-29T12:30:00+00:00",
@@ -8267,7 +8267,7 @@
             "team_b_name": "NRG",
             "event_id": "2766",
             "scheduled_at": "2026-09-29T12:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -8328,7 +8328,7 @@
                 }
               ],
               "scheduled_at": "2026-09-29T12:30:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -8502,7 +8502,7 @@
               }
             ],
             "scheduled_at": "2026-09-29T12:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -8543,7 +8543,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8561,7 +8561,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 2d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Tue, September 29, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-29T09:00:00+00:00",
@@ -8574,7 +8574,7 @@
             "team_b_name": "Paper Rex",
             "event_id": "2766",
             "scheduled_at": "2026-09-29T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -8635,7 +8635,7 @@
                 }
               ],
               "scheduled_at": "2026-09-29T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -8809,7 +8809,7 @@
               }
             ],
             "scheduled_at": "2026-09-29T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -8850,7 +8850,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8868,7 +8868,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 4d",
-        "time": "6:35 AM",
+        "time": "4:35 AM",
         "date": "Sun, September 27, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-27T11:35:00+00:00",
@@ -8881,7 +8881,7 @@
             "team_b_name": "FUT Esports",
             "event_id": "2766",
             "scheduled_at": "2026-09-27T11:35:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -8937,7 +8937,7 @@
                 }
               ],
               "scheduled_at": "2026-09-27T11:35:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -9106,7 +9106,7 @@
               }
             ],
             "scheduled_at": "2026-09-27T11:35:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -9147,7 +9147,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9165,7 +9165,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 4d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Sun, September 27, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-27T09:00:00+00:00",
@@ -9178,7 +9178,7 @@
             "team_b_name": "T1",
             "event_id": "2766",
             "scheduled_at": "2026-09-27T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -9234,7 +9234,7 @@
                 }
               ],
               "scheduled_at": "2026-09-27T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -9403,7 +9403,7 @@
               }
             ],
             "scheduled_at": "2026-09-27T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -9444,7 +9444,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9462,7 +9462,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 5d",
-        "time": "7:30 AM",
+        "time": "5:30 AM",
         "date": "Sat, September 26, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-26T12:30:00+00:00",
@@ -9475,7 +9475,7 @@
             "team_b_name": "EDward Gaming",
             "event_id": "2766",
             "scheduled_at": "2026-09-26T12:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -9531,7 +9531,7 @@
                 }
               ],
               "scheduled_at": "2026-09-26T12:30:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -9700,7 +9700,7 @@
               }
             ],
             "scheduled_at": "2026-09-26T12:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -9741,7 +9741,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9759,7 +9759,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 5d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Sat, September 26, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-26T09:00:00+00:00",
@@ -9772,7 +9772,7 @@
             "team_b_name": "Team Vitality",
             "event_id": "2766",
             "scheduled_at": "2026-09-26T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -9833,7 +9833,7 @@
                 }
               ],
               "scheduled_at": "2026-09-26T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -10007,7 +10007,7 @@
               }
             ],
             "scheduled_at": "2026-09-26T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -10048,7 +10048,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10066,7 +10066,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 6d",
-        "time": "6:25 AM",
+        "time": "4:25 AM",
         "date": "Fri, September 25, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-25T11:25:00+00:00",
@@ -10079,7 +10079,7 @@
             "team_b_name": "Xi Lai Gaming",
             "event_id": "2766",
             "scheduled_at": "2026-09-25T11:25:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -10135,7 +10135,7 @@
                 }
               ],
               "scheduled_at": "2026-09-25T11:25:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -10304,7 +10304,7 @@
               }
             ],
             "scheduled_at": "2026-09-25T11:25:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -10345,7 +10345,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10363,7 +10363,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 2w 6d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Fri, September 25, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-25T09:00:00+00:00",
@@ -10376,7 +10376,7 @@
             "team_b_name": "NRG",
             "event_id": "2766",
             "scheduled_at": "2026-09-25T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -10432,7 +10432,7 @@
                 }
               ],
               "scheduled_at": "2026-09-25T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -10601,7 +10601,7 @@
               }
             ],
             "scheduled_at": "2026-09-25T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -10642,7 +10642,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10660,7 +10660,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 3w 0d",
-        "time": "7:25 AM",
+        "time": "5:25 AM",
         "date": "Thu, September 24, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-24T12:25:00+00:00",
@@ -10673,7 +10673,7 @@
             "team_b_name": "G2 Esports",
             "event_id": "2766",
             "scheduled_at": "2026-09-24T12:25:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -10729,7 +10729,7 @@
                 }
               ],
               "scheduled_at": "2026-09-24T12:25:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -10898,7 +10898,7 @@
               }
             ],
             "scheduled_at": "2026-09-24T12:25:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -10939,7 +10939,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10957,7 +10957,7 @@
         "region": "Global",
         "tier": "S-Tier",
         "status": "Completed 3w 0d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Thu, September 24, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-24T09:00:00+00:00",
@@ -10970,7 +10970,7 @@
             "team_b_name": "Paper Rex",
             "event_id": "2766",
             "scheduled_at": "2026-09-24T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -11031,7 +11031,7 @@
                 }
               ],
               "scheduled_at": "2026-09-24T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -11205,7 +11205,7 @@
               }
             ],
             "scheduled_at": "2026-09-24T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -11246,7 +11246,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11264,7 +11264,7 @@
         "region": "China",
         "tier": "S-Tier",
         "status": "Completed 3w 4d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Sun, September 20, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-20T09:00:00+00:00",
@@ -11277,7 +11277,7 @@
             "team_b_name": "Nova Esports GC",
             "event_id": "3129",
             "scheduled_at": "2026-09-20T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -11343,7 +11343,7 @@
                 }
               ],
               "scheduled_at": "2026-09-20T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -11462,7 +11462,7 @@
               }
             ],
             "scheduled_at": "2026-09-20T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -11503,7 +11503,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11521,7 +11521,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 3w 4d",
-        "time": "2:00 AM",
+        "time": "12:00 AM",
         "date": "Sun, September 20, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-20T07:00:00+00:00",
@@ -11534,7 +11534,7 @@
             "team_b_name": "Gen.G GC",
             "event_id": "3065",
             "scheduled_at": "2026-09-20T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -11605,7 +11605,7 @@
                 }
               ],
               "scheduled_at": "2026-09-20T07:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -11752,7 +11752,7 @@
               }
             ],
             "scheduled_at": "2026-09-20T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -11793,7 +11793,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11811,7 +11811,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 3w 5d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Sat, September 19, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-19T09:00:00+00:00",
@@ -11824,7 +11824,7 @@
             "team_b_name": "Nova Esports GC",
             "event_id": "3129",
             "scheduled_at": "2026-09-19T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -11890,7 +11890,7 @@
                 }
               ],
               "scheduled_at": "2026-09-19T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -12001,7 +12001,7 @@
               }
             ],
             "scheduled_at": "2026-09-19T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -12042,7 +12042,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12060,7 +12060,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 3w 5d",
-        "time": "2:00 AM",
+        "time": "12:00 AM",
         "date": "Sat, September 19, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-19T07:00:00+00:00",
@@ -12073,7 +12073,7 @@
             "team_b_name": "Gen.G GC",
             "event_id": "3065",
             "scheduled_at": "2026-09-19T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -12144,7 +12144,7 @@
                 }
               ],
               "scheduled_at": "2026-09-19T07:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -12291,7 +12291,7 @@
               }
             ],
             "scheduled_at": "2026-09-19T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -12332,7 +12332,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12350,7 +12350,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 3w 6d",
-        "time": "5:30 AM",
+        "time": "3:30 AM",
         "date": "Fri, September 18, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-18T10:30:00+00:00",
@@ -12363,7 +12363,7 @@
             "team_b_name": "Nova Esports GC",
             "event_id": "3129",
             "scheduled_at": "2026-09-18T10:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -12424,7 +12424,7 @@
                 }
               ],
               "scheduled_at": "2026-09-18T10:30:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -12542,7 +12542,7 @@
               }
             ],
             "scheduled_at": "2026-09-18T10:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -12583,7 +12583,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12601,7 +12601,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 3w 6d",
-        "time": "4:30 AM",
+        "time": "2:30 AM",
         "date": "Fri, September 18, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-18T09:30:00+00:00",
@@ -12614,7 +12614,7 @@
             "team_b_name": "Gen.G GC",
             "event_id": "3065",
             "scheduled_at": "2026-09-18T09:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -12675,7 +12675,7 @@
                 }
               ],
               "scheduled_at": "2026-09-18T09:30:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -12768,7 +12768,7 @@
               }
             ],
             "scheduled_at": "2026-09-18T09:30:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -12809,7 +12809,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12827,7 +12827,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 3w 6d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Fri, September 18, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-18T09:00:00+00:00",
@@ -12840,7 +12840,7 @@
             "team_b_name": "Yew Reign Gaming",
             "event_id": "3129",
             "scheduled_at": "2026-09-18T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -12896,7 +12896,7 @@
                 }
               ],
               "scheduled_at": "2026-09-18T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -12985,7 +12985,7 @@
               }
             ],
             "scheduled_at": "2026-09-18T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -13026,7 +13026,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13044,7 +13044,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 3w 6d",
-        "time": "2:00 AM",
+        "time": "12:00 AM",
         "date": "Fri, September 18, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-18T07:00:00+00:00",
@@ -13057,7 +13057,7 @@
             "team_b_name": "Team Falcons Vega",
             "event_id": "3065",
             "scheduled_at": "2026-09-18T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -13113,7 +13113,7 @@
                 }
               ],
               "scheduled_at": "2026-09-18T07:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -13281,7 +13281,7 @@
               }
             ],
             "scheduled_at": "2026-09-18T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -13322,7 +13322,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13340,7 +13340,7 @@
         "region": "Americas",
         "tier": "S-Tier",
         "status": "Completed 4w 0d",
-        "time": "4:00 PM",
+        "time": "2:00 PM",
         "date": "Thu, September 17, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-17T21:00:00+00:00",
@@ -13353,7 +13353,7 @@
             "team_b_name": "FlyQuest RED",
             "event_id": "3037",
             "scheduled_at": "2026-09-17T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -13419,7 +13419,7 @@
                 }
               ],
               "scheduled_at": "2026-09-17T21:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -13601,7 +13601,7 @@
               }
             ],
             "scheduled_at": "2026-09-17T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -13642,7 +13642,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13660,7 +13660,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 4w 0d",
-        "time": "5:40 AM",
+        "time": "3:40 AM",
         "date": "Thu, September 17, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-17T10:40:00+00:00",
@@ -13673,7 +13673,7 @@
             "team_b_name": "Victory No Limits Gaming GC",
             "event_id": "3129",
             "scheduled_at": "2026-09-17T10:40:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -13729,7 +13729,7 @@
                 }
               ],
               "scheduled_at": "2026-09-17T10:40:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -13850,7 +13850,7 @@
               }
             ],
             "scheduled_at": "2026-09-17T10:40:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -13891,7 +13891,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13909,7 +13909,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 4w 0d",
-        "time": "5:00 AM",
+        "time": "3:00 AM",
         "date": "Thu, September 17, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-17T10:00:00+00:00",
@@ -13922,7 +13922,7 @@
             "team_b_name": "swaglord9000",
             "event_id": "3065",
             "scheduled_at": "2026-09-17T10:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -13983,7 +13983,7 @@
                 }
               ],
               "scheduled_at": "2026-09-17T10:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -14100,7 +14100,7 @@
               }
             ],
             "scheduled_at": "2026-09-17T10:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -14141,7 +14141,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14159,7 +14159,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 4w 0d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Thu, September 17, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-17T09:00:00+00:00",
@@ -14172,7 +14172,7 @@
             "team_b_name": "Quguanghao Gaming",
             "event_id": "3129",
             "scheduled_at": "2026-09-17T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -14228,7 +14228,7 @@
                 }
               ],
               "scheduled_at": "2026-09-17T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -14329,7 +14329,7 @@
               }
             ],
             "scheduled_at": "2026-09-17T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -14370,7 +14370,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14388,7 +14388,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 4w 0d",
-        "time": "2:00 AM",
+        "time": "12:00 AM",
         "date": "Thu, September 17, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-17T07:00:00+00:00",
@@ -14401,7 +14401,7 @@
             "team_b_name": "wiwiwi",
             "event_id": "3065",
             "scheduled_at": "2026-09-17T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -14462,7 +14462,7 @@
                 }
               ],
               "scheduled_at": "2026-09-17T07:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -14551,7 +14551,7 @@
               }
             ],
             "scheduled_at": "2026-09-17T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -14592,7 +14592,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14610,7 +14610,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 4w 1d",
-        "time": "7:00 AM",
+        "time": "5:00 AM",
         "date": "Wed, September 16, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-16T12:00:00+00:00",
@@ -14623,7 +14623,7 @@
             "team_b_name": "101 Outlaws",
             "event_id": "3129",
             "scheduled_at": "2026-09-16T12:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -14684,7 +14684,7 @@
                 }
               ],
               "scheduled_at": "2026-09-16T12:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -14798,7 +14798,7 @@
               }
             ],
             "scheduled_at": "2026-09-16T12:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -14839,7 +14839,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14857,7 +14857,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 4w 1d",
-        "time": "4:45 AM",
+        "time": "2:45 AM",
         "date": "Wed, September 16, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-16T09:45:00+00:00",
@@ -14870,7 +14870,7 @@
             "team_b_name": "Sasanqua",
             "event_id": "3065",
             "scheduled_at": "2026-09-16T09:45:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -14926,7 +14926,7 @@
                 }
               ],
               "scheduled_at": "2026-09-16T09:45:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -15066,7 +15066,7 @@
               }
             ],
             "scheduled_at": "2026-09-16T09:45:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -15107,7 +15107,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15125,7 +15125,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 4w 1d",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Wed, September 16, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-16T09:00:00+00:00",
@@ -15138,7 +15138,7 @@
             "team_b_name": "Havoc & Yonder GC",
             "event_id": "3129",
             "scheduled_at": "2026-09-16T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -15199,7 +15199,7 @@
                 }
               ],
               "scheduled_at": "2026-09-16T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -15313,7 +15313,7 @@
               }
             ],
             "scheduled_at": "2026-09-16T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -15354,7 +15354,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15372,7 +15372,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 4w 1d",
-        "time": "2:20 AM",
+        "time": "12:20 AM",
         "date": "Wed, September 16, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-16T07:20:00+00:00",
@@ -15385,7 +15385,7 @@
             "team_b_name": "wiwiwi",
             "event_id": "3065",
             "scheduled_at": "2026-09-16T07:20:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -15441,7 +15441,7 @@
                 }
               ],
               "scheduled_at": "2026-09-16T07:20:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -15537,7 +15537,7 @@
               }
             ],
             "scheduled_at": "2026-09-16T07:20:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -15578,7 +15578,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15596,8 +15596,8 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 4w 1d",
-        "time": "12:00 AM",
-        "date": "Wed, September 16, 2026",
+        "time": "10:00 PM",
+        "date": "Tue, September 15, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-16T05:00:00+00:00",
         "selection_data": {
@@ -15609,7 +15609,7 @@
             "team_b_name": "FULL SENSE SISU",
             "event_id": "3065",
             "scheduled_at": "2026-09-16T05:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -15665,7 +15665,7 @@
                 }
               ],
               "scheduled_at": "2026-09-16T05:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -15789,7 +15789,7 @@
               }
             ],
             "scheduled_at": "2026-09-16T05:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -15830,7 +15830,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15848,7 +15848,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 1mo",
-        "time": "6:00 AM",
+        "time": "4:00 AM",
         "date": "Tue, September 15, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-15T11:00:00+00:00",
@@ -15861,7 +15861,7 @@
             "team_b_name": "Tidal Legends Gaming",
             "event_id": "3129",
             "scheduled_at": "2026-09-15T11:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -15922,7 +15922,7 @@
                 }
               ],
               "scheduled_at": "2026-09-15T11:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -16008,7 +16008,7 @@
               }
             ],
             "scheduled_at": "2026-09-15T11:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -16049,7 +16049,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16067,7 +16067,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Tue, September 15, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-15T09:00:00+00:00",
@@ -16080,7 +16080,7 @@
             "team_b_name": "FENNEL GC",
             "event_id": "3065",
             "scheduled_at": "2026-09-15T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -16141,7 +16141,7 @@
                 }
               ],
               "scheduled_at": "2026-09-15T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -16278,7 +16278,7 @@
               }
             ],
             "scheduled_at": "2026-09-15T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -16319,7 +16319,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16337,7 +16337,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Tue, September 15, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-15T09:00:00+00:00",
@@ -16350,7 +16350,7 @@
             "team_b_name": "LNG Esports GC",
             "event_id": "3129",
             "scheduled_at": "2026-09-15T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -16406,7 +16406,7 @@
                 }
               ],
               "scheduled_at": "2026-09-15T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -16499,7 +16499,7 @@
               }
             ],
             "scheduled_at": "2026-09-15T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -16540,7 +16540,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16558,7 +16558,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "2:00 AM",
+        "time": "12:00 AM",
         "date": "Tue, September 15, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-15T07:00:00+00:00",
@@ -16571,7 +16571,7 @@
             "team_b_name": "Sasanqua",
             "event_id": "3065",
             "scheduled_at": "2026-09-15T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -16627,7 +16627,7 @@
                 }
               ],
               "scheduled_at": "2026-09-15T07:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -16743,7 +16743,7 @@
               }
             ],
             "scheduled_at": "2026-09-15T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -16784,7 +16784,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16802,8 +16802,8 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "12:00 AM",
-        "date": "Tue, September 15, 2026",
+        "time": "10:00 PM",
+        "date": "Mon, September 14, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-15T05:00:00+00:00",
         "selection_data": {
@@ -16815,7 +16815,7 @@
             "team_b_name": "swaglord9000",
             "event_id": "3065",
             "scheduled_at": "2026-09-15T05:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -16871,7 +16871,7 @@
                 }
               ],
               "scheduled_at": "2026-09-15T05:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -17019,7 +17019,7 @@
               }
             ],
             "scheduled_at": "2026-09-15T05:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -17060,7 +17060,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17078,7 +17078,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 1mo",
-        "time": "7:05 AM",
+        "time": "5:05 AM",
         "date": "Mon, September 14, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-14T12:05:00+00:00",
@@ -17091,7 +17091,7 @@
             "team_b_name": "101 Outlaws",
             "event_id": "3129",
             "scheduled_at": "2026-09-14T12:05:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -17147,7 +17147,7 @@
                 }
               ],
               "scheduled_at": "2026-09-14T12:05:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -17256,7 +17256,7 @@
               }
             ],
             "scheduled_at": "2026-09-14T12:05:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -17297,7 +17297,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17315,7 +17315,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Mon, September 14, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-14T09:00:00+00:00",
@@ -17328,7 +17328,7 @@
             "team_b_name": "wiwiwi",
             "event_id": "3065",
             "scheduled_at": "2026-09-14T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -17384,7 +17384,7 @@
                 }
               ],
               "scheduled_at": "2026-09-14T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -17512,7 +17512,7 @@
               }
             ],
             "scheduled_at": "2026-09-14T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -17553,7 +17553,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17571,7 +17571,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Mon, September 14, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-14T09:00:00+00:00",
@@ -17584,7 +17584,7 @@
             "team_b_name": "Quguanghao Gaming",
             "event_id": "3129",
             "scheduled_at": "2026-09-14T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -17645,7 +17645,7 @@
                 }
               ],
               "scheduled_at": "2026-09-14T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -17731,7 +17731,7 @@
               }
             ],
             "scheduled_at": "2026-09-14T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -17772,7 +17772,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17790,7 +17790,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "2:00 AM",
+        "time": "12:00 AM",
         "date": "Mon, September 14, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-14T07:00:00+00:00",
@@ -17803,7 +17803,7 @@
             "team_b_name": "Rising Esports GC",
             "event_id": "3065",
             "scheduled_at": "2026-09-14T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -17859,7 +17859,7 @@
                 }
               ],
               "scheduled_at": "2026-09-14T07:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -17959,7 +17959,7 @@
               }
             ],
             "scheduled_at": "2026-09-14T07:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -18000,7 +18000,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18018,7 +18018,7 @@
         "region": "Americas",
         "tier": "A-Tier",
         "status": "Completed 1mo",
-        "time": "5:00 PM",
+        "time": "3:00 PM",
         "date": "Sun, September 13, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-13T22:00:00+00:00",
@@ -18031,7 +18031,7 @@
             "team_b_name": "KRÜ BLAZE",
             "event_id": "3082",
             "scheduled_at": "2026-09-13T22:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -18097,7 +18097,7 @@
                 }
               ],
               "scheduled_at": "2026-09-13T22:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -18276,7 +18276,7 @@
               }
             ],
             "scheduled_at": "2026-09-13T22:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -18317,7 +18317,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18335,7 +18335,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "8:00 AM",
+        "time": "6:00 AM",
         "date": "Sun, September 13, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-13T13:00:00+00:00",
@@ -18348,7 +18348,7 @@
             "team_b_name": "Twisted Saints Esports",
             "event_id": "3077",
             "scheduled_at": "2026-09-13T13:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [],
             "live_score": {
@@ -18383,7 +18383,7 @@
                 }
               ],
               "scheduled_at": "2026-09-13T13:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": []
             },
@@ -18531,12 +18531,12 @@
               }
             ],
             "scheduled_at": "2026-09-13T13:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18554,7 +18554,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 1mo",
-        "time": "4:35 AM",
+        "time": "2:35 AM",
         "date": "Sun, September 13, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-13T09:35:00+00:00",
@@ -18567,7 +18567,7 @@
             "team_b_name": "LNG Esports GC",
             "event_id": "3129",
             "scheduled_at": "2026-09-13T09:35:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -18623,7 +18623,7 @@
                 }
               ],
               "scheduled_at": "2026-09-13T09:35:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -18712,7 +18712,7 @@
               }
             ],
             "scheduled_at": "2026-09-13T09:35:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -18753,7 +18753,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18771,7 +18771,7 @@
         "region": "China",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Sun, September 13, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-13T09:00:00+00:00",
@@ -18784,7 +18784,7 @@
             "team_b_name": "FunPlus Phoenix",
             "event_id": "3105",
             "scheduled_at": "2026-09-13T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -18855,7 +18855,7 @@
                 }
               ],
               "scheduled_at": "2026-09-13T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -19039,7 +19039,7 @@
               }
             ],
             "scheduled_at": "2026-09-13T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -19080,7 +19080,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19098,7 +19098,7 @@
         "region": "China",
         "tier": "A-Tier",
         "status": "Completed 1mo",
-        "time": "3:00 AM",
+        "time": "1:00 AM",
         "date": "Sun, September 13, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-13T08:00:00+00:00",
@@ -19111,7 +19111,7 @@
             "team_b_name": "Victory No Limits Gaming GC",
             "event_id": "3129",
             "scheduled_at": "2026-09-13T08:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -19167,7 +19167,7 @@
                 }
               ],
               "scheduled_at": "2026-09-13T08:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -19280,7 +19280,7 @@
               }
             ],
             "scheduled_at": "2026-09-13T08:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -19321,7 +19321,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19339,7 +19339,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "10:00 AM",
+        "time": "8:00 AM",
         "date": "Sat, September 12, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-12T15:00:00+00:00",
@@ -19352,7 +19352,7 @@
             "team_b_name": "RIZON",
             "event_id": "3077",
             "scheduled_at": "2026-09-12T15:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [],
             "live_score": {
@@ -19372,7 +19372,7 @@
                 }
               ],
               "scheduled_at": "2026-09-12T15:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": []
             },
@@ -19505,12 +19505,12 @@
               }
             ],
             "scheduled_at": "2026-09-12T15:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19528,7 +19528,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Sat, September 12, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-12T09:00:00+00:00",
@@ -19541,7 +19541,7 @@
             "team_b_name": "Any Questions Gaming",
             "event_id": "3105",
             "scheduled_at": "2026-09-12T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -19602,7 +19602,7 @@
                 }
               ],
               "scheduled_at": "2026-09-12T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -19728,7 +19728,7 @@
               }
             ],
             "scheduled_at": "2026-09-12T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -19769,7 +19769,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19787,7 +19787,7 @@
         "region": "Americas",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "3:00 PM",
+        "time": "1:00 PM",
         "date": "Fri, September 11, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-11T20:00:00+00:00",
@@ -19800,7 +19800,7 @@
             "team_b_name": "Evil Geniuses GC",
             "event_id": "3086",
             "scheduled_at": "2026-09-11T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -19866,7 +19866,7 @@
                 }
               ],
               "scheduled_at": "2026-09-11T20:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -20045,7 +20045,7 @@
               }
             ],
             "scheduled_at": "2026-09-11T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -20086,7 +20086,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20104,7 +20104,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "10:00 AM",
+        "time": "8:00 AM",
         "date": "Fri, September 11, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-11T15:00:00+00:00",
@@ -20117,7 +20117,7 @@
             "team_b_name": "Twisted Saints Esports",
             "event_id": "3077",
             "scheduled_at": "2026-09-11T15:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [],
             "live_score": {
@@ -20137,7 +20137,7 @@
                 }
               ],
               "scheduled_at": "2026-09-11T15:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": []
             },
@@ -20270,12 +20270,12 @@
               }
             ],
             "scheduled_at": "2026-09-11T15:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20293,7 +20293,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "6:00 AM",
+        "time": "4:00 AM",
         "date": "Fri, September 11, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-11T11:00:00+00:00",
@@ -20306,7 +20306,7 @@
             "team_b_name": "Any Questions Gaming",
             "event_id": "3105",
             "scheduled_at": "2026-09-11T11:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -20367,7 +20367,7 @@
                 }
               ],
               "scheduled_at": "2026-09-11T11:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -20525,7 +20525,7 @@
               }
             ],
             "scheduled_at": "2026-09-11T11:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -20566,7 +20566,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20584,7 +20584,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Fri, September 11, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-11T09:00:00+00:00",
@@ -20597,7 +20597,7 @@
             "team_b_name": "Unsettled Resentment",
             "event_id": "3105",
             "scheduled_at": "2026-09-11T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -20653,7 +20653,7 @@
                 }
               ],
               "scheduled_at": "2026-09-11T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -20790,7 +20790,7 @@
               }
             ],
             "scheduled_at": "2026-09-11T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -20831,7 +20831,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20849,7 +20849,7 @@
         "region": "Americas",
         "tier": "A-Tier",
         "status": "Completed 1mo",
-        "time": "3:00 PM",
+        "time": "1:00 PM",
         "date": "Thu, September 10, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-10T20:00:00+00:00",
@@ -20862,7 +20862,7 @@
             "team_b_name": "Evil Geniuses GC",
             "event_id": "3086",
             "scheduled_at": "2026-09-10T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -20933,7 +20933,7 @@
                 }
               ],
               "scheduled_at": "2026-09-10T20:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -21117,7 +21117,7 @@
               }
             ],
             "scheduled_at": "2026-09-10T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -21158,7 +21158,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21176,7 +21176,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "6:00 AM",
+        "time": "4:00 AM",
         "date": "Thu, September 10, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-10T11:00:00+00:00",
@@ -21189,7 +21189,7 @@
             "team_b_name": "Any Questions Gaming",
             "event_id": "3105",
             "scheduled_at": "2026-09-10T11:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -21245,7 +21245,7 @@
                 }
               ],
               "scheduled_at": "2026-09-10T11:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -21398,7 +21398,7 @@
               }
             ],
             "scheduled_at": "2026-09-10T11:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -21439,7 +21439,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21457,7 +21457,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Thu, September 10, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-10T09:00:00+00:00",
@@ -21470,7 +21470,7 @@
             "team_b_name": "FunPlus Phoenix",
             "event_id": "3105",
             "scheduled_at": "2026-09-10T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -21526,7 +21526,7 @@
                 }
               ],
               "scheduled_at": "2026-09-10T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -21695,7 +21695,7 @@
               }
             ],
             "scheduled_at": "2026-09-10T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -21736,7 +21736,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21754,7 +21754,7 @@
         "region": "Americas",
         "tier": "A-Tier",
         "status": "Completed 1mo",
-        "time": "6:00 PM",
+        "time": "4:00 PM",
         "date": "Wed, September 9, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-09T23:00:00+00:00",
@@ -21767,7 +21767,7 @@
             "team_b_name": "Team Liquid Brazil",
             "event_id": "3086",
             "scheduled_at": "2026-09-09T23:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -21828,7 +21828,7 @@
                 }
               ],
               "scheduled_at": "2026-09-09T23:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -22002,7 +22002,7 @@
               }
             ],
             "scheduled_at": "2026-09-09T23:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -22043,7 +22043,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22061,7 +22061,7 @@
         "region": "Americas",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "4:00 PM",
+        "time": "2:00 PM",
         "date": "Wed, September 9, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-09T21:00:00+00:00",
@@ -22074,7 +22074,7 @@
             "team_b_name": "The Spiders",
             "event_id": "3037",
             "scheduled_at": "2026-09-09T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -22135,7 +22135,7 @@
                 }
               ],
               "scheduled_at": "2026-09-09T21:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -22276,7 +22276,7 @@
               }
             ],
             "scheduled_at": "2026-09-09T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -22317,7 +22317,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22335,7 +22335,7 @@
         "region": "Americas",
         "tier": "A-Tier",
         "status": "Completed 1mo",
-        "time": "3:00 PM",
+        "time": "1:00 PM",
         "date": "Wed, September 9, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-09T20:00:00+00:00",
@@ -22348,7 +22348,7 @@
             "team_b_name": "Ushiras",
             "event_id": "3086",
             "scheduled_at": "2026-09-09T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -22404,7 +22404,7 @@
                 }
               ],
               "scheduled_at": "2026-09-09T20:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -22533,7 +22533,7 @@
               }
             ],
             "scheduled_at": "2026-09-09T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -22574,7 +22574,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22592,7 +22592,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "11:00 AM",
+        "time": "9:00 AM",
         "date": "Wed, September 9, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-09T16:00:00+00:00",
@@ -22605,7 +22605,7 @@
             "team_b_name": "HooK Esport",
             "event_id": "3077",
             "scheduled_at": "2026-09-09T16:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [],
             "live_score": {
@@ -22625,7 +22625,7 @@
                 }
               ],
               "scheduled_at": "2026-09-09T16:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": []
             },
@@ -22698,12 +22698,12 @@
               }
             ],
             "scheduled_at": "2026-09-09T16:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22721,7 +22721,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "6:20 AM",
+        "time": "4:20 AM",
         "date": "Wed, September 9, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-09T11:20:00+00:00",
@@ -22734,7 +22734,7 @@
             "team_b_name": "Unsettled Resentment",
             "event_id": "3105",
             "scheduled_at": "2026-09-09T11:20:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -22795,7 +22795,7 @@
                 }
               ],
               "scheduled_at": "2026-09-09T11:20:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -22937,7 +22937,7 @@
               }
             ],
             "scheduled_at": "2026-09-09T11:20:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -22978,7 +22978,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22996,7 +22996,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Wed, September 9, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-09T09:00:00+00:00",
@@ -23009,7 +23009,7 @@
             "team_b_name": "KeepBest Gaming",
             "event_id": "3105",
             "scheduled_at": "2026-09-09T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -23065,7 +23065,7 @@
                 }
               ],
               "scheduled_at": "2026-09-09T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -23234,7 +23234,7 @@
               }
             ],
             "scheduled_at": "2026-09-09T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -23275,7 +23275,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23293,7 +23293,7 @@
         "region": "Americas",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "7:00 PM",
+        "time": "5:00 PM",
         "date": "Tue, September 8, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-09T00:00:00+00:00",
@@ -23306,7 +23306,7 @@
             "team_b_name": "HIMMERS",
             "event_id": "3037",
             "scheduled_at": "2026-09-09T00:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -23367,7 +23367,7 @@
                 }
               ],
               "scheduled_at": "2026-09-09T00:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -23464,7 +23464,7 @@
               }
             ],
             "scheduled_at": "2026-09-09T00:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -23505,7 +23505,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23523,7 +23523,7 @@
         "region": "Americas",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "4:00 PM",
+        "time": "2:00 PM",
         "date": "Tue, September 8, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-08T21:00:00+00:00",
@@ -23536,7 +23536,7 @@
             "team_b_name": "Shopify Rebellion Gold",
             "event_id": "3037",
             "scheduled_at": "2026-09-08T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -23597,7 +23597,7 @@
                 }
               ],
               "scheduled_at": "2026-09-08T21:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -23774,7 +23774,7 @@
               }
             ],
             "scheduled_at": "2026-09-08T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -23815,7 +23815,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23833,7 +23833,7 @@
         "region": "Americas",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "12:00 PM",
+        "time": "10:00 AM",
         "date": "Sun, September 6, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-06T17:00:00+00:00",
@@ -23846,7 +23846,7 @@
             "team_b_name": "LOUD",
             "event_id": "2977",
             "scheduled_at": "2026-09-06T17:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -23917,7 +23917,7 @@
                 }
               ],
               "scheduled_at": "2026-09-06T17:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -24102,7 +24102,7 @@
               }
             ],
             "scheduled_at": "2026-09-06T17:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -24143,7 +24143,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24161,7 +24161,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "5:45 AM",
+        "time": "3:45 AM",
         "date": "Sun, September 6, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-06T10:45:00+00:00",
@@ -24174,7 +24174,7 @@
             "team_b_name": "Any Questions Gaming",
             "event_id": "3105",
             "scheduled_at": "2026-09-06T10:45:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -24230,7 +24230,7 @@
                 }
               ],
               "scheduled_at": "2026-09-06T10:45:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -24383,7 +24383,7 @@
               }
             ],
             "scheduled_at": "2026-09-06T10:45:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -24424,7 +24424,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24442,7 +24442,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Sun, September 6, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-06T09:00:00+00:00",
@@ -24455,7 +24455,7 @@
             "team_b_name": "JD Gaming",
             "event_id": "3105",
             "scheduled_at": "2026-09-06T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -24511,7 +24511,7 @@
                 }
               ],
               "scheduled_at": "2026-09-06T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -24680,7 +24680,7 @@
               }
             ],
             "scheduled_at": "2026-09-06T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -24721,7 +24721,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24739,7 +24739,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "3:00 AM",
+        "time": "1:00 AM",
         "date": "Sun, September 6, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-06T08:00:00+00:00",
@@ -24752,7 +24752,7 @@
             "team_b_name": "Global Esports",
             "event_id": "2776",
             "scheduled_at": "2026-09-06T08:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -24823,7 +24823,7 @@
                 }
               ],
               "scheduled_at": "2026-09-06T08:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -25008,7 +25008,7 @@
               }
             ],
             "scheduled_at": "2026-09-06T08:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -25049,7 +25049,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25067,7 +25067,7 @@
         "region": "Americas",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "1:00 PM",
+        "time": "11:00 AM",
         "date": "Sat, September 5, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-05T18:00:00+00:00",
@@ -25080,7 +25080,7 @@
             "team_b_name": "LOUD",
             "event_id": "2977",
             "scheduled_at": "2026-09-05T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -25151,7 +25151,7 @@
                 }
               ],
               "scheduled_at": "2026-09-05T18:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -25336,7 +25336,7 @@
               }
             ],
             "scheduled_at": "2026-09-05T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -25377,7 +25377,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25395,7 +25395,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "10:00 AM",
+        "time": "8:00 AM",
         "date": "Sat, September 5, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-05T15:00:00+00:00",
@@ -25408,7 +25408,7 @@
             "team_b_name": "BERG",
             "event_id": "3077",
             "scheduled_at": "2026-09-05T15:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [],
             "live_score": {
@@ -25433,7 +25433,7 @@
                 }
               ],
               "scheduled_at": "2026-09-05T15:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": []
             },
@@ -25527,12 +25527,12 @@
               }
             ],
             "scheduled_at": "2026-09-05T15:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25550,7 +25550,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "7:00 AM",
+        "time": "5:00 AM",
         "date": "Sat, September 5, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-05T12:00:00+00:00",
@@ -25563,7 +25563,7 @@
             "team_b_name": "A Team",
             "event_id": "3105",
             "scheduled_at": "2026-09-05T12:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -25624,7 +25624,7 @@
                 }
               ],
               "scheduled_at": "2026-09-05T12:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -25770,7 +25770,7 @@
               }
             ],
             "scheduled_at": "2026-09-05T12:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -25811,7 +25811,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25829,7 +25829,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Sat, September 5, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-05T09:00:00+00:00",
@@ -25842,7 +25842,7 @@
             "team_b_name": "EDward Gaming",
             "event_id": "3105",
             "scheduled_at": "2026-09-05T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -25903,7 +25903,7 @@
                 }
               ],
               "scheduled_at": "2026-09-05T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -26077,7 +26077,7 @@
               }
             ],
             "scheduled_at": "2026-09-05T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -26118,7 +26118,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26136,7 +26136,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "3:00 AM",
+        "time": "1:00 AM",
         "date": "Sat, September 5, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-05T08:00:00+00:00",
@@ -26149,7 +26149,7 @@
             "team_b_name": "T1",
             "event_id": "2776",
             "scheduled_at": "2026-09-05T08:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -26215,7 +26215,7 @@
                 }
               ],
               "scheduled_at": "2026-09-05T08:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO5",
               "actual_veto": [
                 {
@@ -26395,7 +26395,7 @@
               }
             ],
             "scheduled_at": "2026-09-05T08:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO5",
             "actual_veto": [
               {
@@ -26436,7 +26436,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26454,7 +26454,7 @@
         "region": "Americas",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "2:05 PM",
+        "time": "12:05 PM",
         "date": "Fri, September 4, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-04T19:05:00+00:00",
@@ -26467,7 +26467,7 @@
             "team_b_name": "LOUD",
             "event_id": "2977",
             "scheduled_at": "2026-09-04T19:05:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -26523,7 +26523,7 @@
                 }
               ],
               "scheduled_at": "2026-09-04T19:05:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -26693,7 +26693,7 @@
               }
             ],
             "scheduled_at": "2026-09-04T19:05:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -26734,7 +26734,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26752,7 +26752,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "1:00 PM",
+        "time": "11:00 AM",
         "date": "Fri, September 4, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-04T18:00:00+00:00",
@@ -26765,7 +26765,7 @@
             "team_b_name": "CGN Esports",
             "event_id": "3077",
             "scheduled_at": "2026-09-04T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [],
             "live_score": {
@@ -26785,7 +26785,7 @@
                 }
               ],
               "scheduled_at": "2026-09-04T18:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": []
             },
@@ -26886,12 +26886,12 @@
               }
             ],
             "scheduled_at": "2026-09-04T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26909,7 +26909,7 @@
         "region": "Americas",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "12:00 PM",
+        "time": "10:00 AM",
         "date": "Fri, September 4, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-04T17:00:00+00:00",
@@ -26922,7 +26922,7 @@
             "team_b_name": "100 Thieves",
             "event_id": "2977",
             "scheduled_at": "2026-09-04T17:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -26978,7 +26978,7 @@
                 }
               ],
               "scheduled_at": "2026-09-04T17:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -27148,7 +27148,7 @@
               }
             ],
             "scheduled_at": "2026-09-04T17:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -27189,7 +27189,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27207,7 +27207,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "10:00 AM",
+        "time": "8:00 AM",
         "date": "Fri, September 4, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-04T15:00:00+00:00",
@@ -27220,7 +27220,7 @@
             "team_b_name": "HooK Esport",
             "event_id": "3077",
             "scheduled_at": "2026-09-04T15:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [],
             "live_score": {
@@ -27245,7 +27245,7 @@
                 }
               ],
               "scheduled_at": "2026-09-04T15:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": []
             },
@@ -27355,12 +27355,12 @@
               }
             ],
             "scheduled_at": "2026-09-04T15:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27378,7 +27378,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "7:00 AM",
+        "time": "5:00 AM",
         "date": "Fri, September 4, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-04T12:00:00+00:00",
@@ -27391,7 +27391,7 @@
             "team_b_name": "Unsettled Resentment",
             "event_id": "3105",
             "scheduled_at": "2026-09-04T12:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -27447,7 +27447,7 @@
                 }
               ],
               "scheduled_at": "2026-09-04T12:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -27584,7 +27584,7 @@
               }
             ],
             "scheduled_at": "2026-09-04T12:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -27625,7 +27625,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27643,7 +27643,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "6:00 AM",
+        "time": "4:00 AM",
         "date": "Fri, September 4, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-04T11:00:00+00:00",
@@ -27656,7 +27656,7 @@
             "team_b_name": "T1",
             "event_id": "2776",
             "scheduled_at": "2026-09-04T11:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -27712,7 +27712,7 @@
                 }
               ],
               "scheduled_at": "2026-09-04T11:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -27870,7 +27870,7 @@
               }
             ],
             "scheduled_at": "2026-09-04T11:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -27911,7 +27911,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27929,7 +27929,7 @@
         "region": "China",
         "tier": "Other",
         "status": "Completed 1mo",
-        "time": "4:00 AM",
+        "time": "2:00 AM",
         "date": "Fri, September 4, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-04T09:00:00+00:00",
@@ -27942,7 +27942,7 @@
             "team_b_name": "TYLOO",
             "event_id": "3105",
             "scheduled_at": "2026-09-04T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -28003,7 +28003,7 @@
                 }
               ],
               "scheduled_at": "2026-09-04T09:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -28177,7 +28177,7 @@
               }
             ],
             "scheduled_at": "2026-09-04T09:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -28218,7 +28218,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28236,7 +28236,7 @@
         "region": "Pacific",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "3:00 AM",
+        "time": "1:00 AM",
         "date": "Fri, September 4, 2026",
         "status_code": "final",
         "scheduled_at": "2026-09-04T08:00:00+00:00",
@@ -28249,7 +28249,7 @@
             "team_b_name": "Global Esports",
             "event_id": "2776",
             "scheduled_at": "2026-09-04T08:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -28310,7 +28310,7 @@
                 }
               ],
               "scheduled_at": "2026-09-04T08:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO3",
               "actual_veto": [
                 {
@@ -28485,7 +28485,7 @@
               }
             ],
             "scheduled_at": "2026-09-04T08:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO3",
             "actual_veto": [
               {
@@ -28526,7 +28526,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28544,7 +28544,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "1:00 PM",
+        "time": "11:00 AM",
         "date": "Sat, September 12, 2026",
         "scheduled_at": "2026-09-12T18:00:00+00:00",
         "status_code": "final",
@@ -28557,7 +28557,7 @@
             "team_b_name": "NBL esports",
             "event_id": "3128",
             "scheduled_at": "2026-09-12T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -28572,7 +28572,7 @@
                 }
               ],
               "scheduled_at": "2026-09-12T18:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -28619,12 +28619,12 @@
               }
             ],
             "scheduled_at": "2026-09-12T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28642,7 +28642,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "2:00 PM",
+        "time": "12:00 PM",
         "date": "Sat, September 12, 2026",
         "scheduled_at": "2026-09-12T19:00:00+00:00",
         "status_code": "final",
@@ -28655,7 +28655,7 @@
             "team_b_name": "DPL Esports",
             "event_id": "3128",
             "scheduled_at": "2026-09-12T19:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -28670,7 +28670,7 @@
                 }
               ],
               "scheduled_at": "2026-09-12T19:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -28709,12 +28709,12 @@
               }
             ],
             "scheduled_at": "2026-09-12T19:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28732,7 +28732,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "3:00 PM",
+        "time": "1:00 PM",
         "date": "Sat, September 12, 2026",
         "scheduled_at": "2026-09-12T20:00:00+00:00",
         "status_code": "final",
@@ -28745,7 +28745,7 @@
             "team_b_name": "Argea",
             "event_id": "3128",
             "scheduled_at": "2026-09-12T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -28760,7 +28760,7 @@
                 }
               ],
               "scheduled_at": "2026-09-12T20:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -28799,12 +28799,12 @@
               }
             ],
             "scheduled_at": "2026-09-12T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28822,7 +28822,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1mo",
-        "time": "4:00 PM",
+        "time": "2:00 PM",
         "date": "Sat, September 12, 2026",
         "scheduled_at": "2026-09-12T21:00:00+00:00",
         "status_code": "final",
@@ -28835,7 +28835,7 @@
             "team_b_name": "ALLIANCE ESP",
             "event_id": "3128",
             "scheduled_at": "2026-09-12T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -28850,7 +28850,7 @@
                 }
               ],
               "scheduled_at": "2026-09-12T21:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -28889,12 +28889,12 @@
               }
             ],
             "scheduled_at": "2026-09-12T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28912,7 +28912,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 3w 5d",
-        "time": "1:00 PM",
+        "time": "11:00 AM",
         "date": "Sat, September 19, 2026",
         "scheduled_at": "2026-09-19T18:00:00+00:00",
         "status_code": "final",
@@ -28925,7 +28925,7 @@
             "team_b_name": "Atlas Legacy",
             "event_id": "3128",
             "scheduled_at": "2026-09-19T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -28940,7 +28940,7 @@
                 }
               ],
               "scheduled_at": "2026-09-19T18:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -28983,12 +28983,12 @@
               }
             ],
             "scheduled_at": "2026-09-19T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29006,7 +29006,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 3w 5d",
-        "time": "2:00 PM",
+        "time": "12:00 PM",
         "date": "Sat, September 19, 2026",
         "scheduled_at": "2026-09-19T19:00:00+00:00",
         "status_code": "final",
@@ -29019,7 +29019,7 @@
             "team_b_name": "NBL esports",
             "event_id": "3128",
             "scheduled_at": "2026-09-19T19:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29034,7 +29034,7 @@
                 }
               ],
               "scheduled_at": "2026-09-19T19:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29077,12 +29077,12 @@
               }
             ],
             "scheduled_at": "2026-09-19T19:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29100,7 +29100,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 3w 5d",
-        "time": "3:00 PM",
+        "time": "1:00 PM",
         "date": "Sat, September 19, 2026",
         "scheduled_at": "2026-09-19T20:00:00+00:00",
         "status_code": "final",
@@ -29113,7 +29113,7 @@
             "team_b_name": "USMA E-SPORTS",
             "event_id": "3128",
             "scheduled_at": "2026-09-19T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29128,7 +29128,7 @@
                 }
               ],
               "scheduled_at": "2026-09-19T20:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29167,12 +29167,12 @@
               }
             ],
             "scheduled_at": "2026-09-19T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29190,7 +29190,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 3w 5d",
-        "time": "4:00 PM",
+        "time": "2:00 PM",
         "date": "Sat, September 19, 2026",
         "scheduled_at": "2026-09-19T21:00:00+00:00",
         "status_code": "final",
@@ -29203,7 +29203,7 @@
             "team_b_name": "DPL Esports",
             "event_id": "3128",
             "scheduled_at": "2026-09-19T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29218,7 +29218,7 @@
                 }
               ],
               "scheduled_at": "2026-09-19T21:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29257,12 +29257,12 @@
               }
             ],
             "scheduled_at": "2026-09-19T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29280,7 +29280,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 2w 5d",
-        "time": "1:00 PM",
+        "time": "11:00 AM",
         "date": "Sat, September 26, 2026",
         "scheduled_at": "2026-09-26T18:00:00+00:00",
         "status_code": "final",
@@ -29293,7 +29293,7 @@
             "team_b_name": "NBL esports",
             "event_id": "3128",
             "scheduled_at": "2026-09-26T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29308,7 +29308,7 @@
                 }
               ],
               "scheduled_at": "2026-09-26T18:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29351,12 +29351,12 @@
               }
             ],
             "scheduled_at": "2026-09-26T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29374,7 +29374,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 2w 5d",
-        "time": "2:00 PM",
+        "time": "12:00 PM",
         "date": "Sat, September 26, 2026",
         "scheduled_at": "2026-09-26T19:00:00+00:00",
         "status_code": "final",
@@ -29387,7 +29387,7 @@
             "team_b_name": "Atlas Legacy",
             "event_id": "3128",
             "scheduled_at": "2026-09-26T19:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29402,7 +29402,7 @@
                 }
               ],
               "scheduled_at": "2026-09-26T19:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29445,12 +29445,12 @@
               }
             ],
             "scheduled_at": "2026-09-26T19:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29468,7 +29468,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 2w 5d",
-        "time": "3:00 PM",
+        "time": "1:00 PM",
         "date": "Sat, September 26, 2026",
         "scheduled_at": "2026-09-26T20:00:00+00:00",
         "status_code": "final",
@@ -29481,7 +29481,7 @@
             "team_b_name": "DPL Esports",
             "event_id": "3128",
             "scheduled_at": "2026-09-26T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29496,7 +29496,7 @@
                 }
               ],
               "scheduled_at": "2026-09-26T20:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29535,12 +29535,12 @@
               }
             ],
             "scheduled_at": "2026-09-26T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29558,7 +29558,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 2w 5d",
-        "time": "4:00 PM",
+        "time": "2:00 PM",
         "date": "Sat, September 26, 2026",
         "scheduled_at": "2026-09-26T21:00:00+00:00",
         "status_code": "final",
@@ -29571,7 +29571,7 @@
             "team_b_name": "Argea",
             "event_id": "3128",
             "scheduled_at": "2026-09-26T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29586,7 +29586,7 @@
                 }
               ],
               "scheduled_at": "2026-09-26T21:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29625,12 +29625,12 @@
               }
             ],
             "scheduled_at": "2026-09-26T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29648,7 +29648,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1w 5d",
-        "time": "1:00 PM",
+        "time": "11:00 AM",
         "date": "Sat, October 3, 2026",
         "scheduled_at": "2026-10-03T18:00:00+00:00",
         "status_code": "final",
@@ -29661,7 +29661,7 @@
             "team_b_name": "NBL esports",
             "event_id": "3128",
             "scheduled_at": "2026-10-03T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29676,7 +29676,7 @@
                 }
               ],
               "scheduled_at": "2026-10-03T18:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29719,12 +29719,12 @@
               }
             ],
             "scheduled_at": "2026-10-03T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29742,7 +29742,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1w 5d",
-        "time": "2:00 PM",
+        "time": "12:00 PM",
         "date": "Sat, October 3, 2026",
         "scheduled_at": "2026-10-03T19:00:00+00:00",
         "status_code": "final",
@@ -29755,7 +29755,7 @@
             "team_b_name": "USMA E-SPORTS",
             "event_id": "3128",
             "scheduled_at": "2026-10-03T19:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29770,7 +29770,7 @@
                 }
               ],
               "scheduled_at": "2026-10-03T19:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29809,12 +29809,12 @@
               }
             ],
             "scheduled_at": "2026-10-03T19:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29832,7 +29832,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1w 5d",
-        "time": "3:00 PM",
+        "time": "1:00 PM",
         "date": "Sat, October 3, 2026",
         "scheduled_at": "2026-10-03T20:00:00+00:00",
         "status_code": "final",
@@ -29845,7 +29845,7 @@
             "team_b_name": "Atlas Legacy",
             "event_id": "3128",
             "scheduled_at": "2026-10-03T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29860,7 +29860,7 @@
                 }
               ],
               "scheduled_at": "2026-10-03T20:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29903,12 +29903,12 @@
               }
             ],
             "scheduled_at": "2026-10-03T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29926,7 +29926,7 @@
         "region": "Other",
         "tier": "S-Tier",
         "status": "Completed 1w 5d",
-        "time": "4:00 PM",
+        "time": "2:00 PM",
         "date": "Sat, October 3, 2026",
         "scheduled_at": "2026-10-03T21:00:00+00:00",
         "status_code": "final",
@@ -29939,7 +29939,7 @@
             "team_b_name": "MCA Esports",
             "event_id": "3128",
             "scheduled_at": "2026-10-03T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -29954,7 +29954,7 @@
                 }
               ],
               "scheduled_at": "2026-10-03T21:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -29993,12 +29993,12 @@
               }
             ],
             "scheduled_at": "2026-10-03T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30015,8 +30015,8 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 5d 5h",
-        "time": "1:00 PM",
+        "status": "Completed 5d 7h",
+        "time": "11:00 AM",
         "date": "Sat, October 10, 2026",
         "scheduled_at": "2026-10-10T18:00:00+00:00",
         "status_code": "final",
@@ -30029,7 +30029,7 @@
             "team_b_name": "NBL esports",
             "event_id": "3128",
             "scheduled_at": "2026-10-10T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -30044,7 +30044,7 @@
                 }
               ],
               "scheduled_at": "2026-10-10T18:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -30087,12 +30087,12 @@
               }
             ],
             "scheduled_at": "2026-10-10T18:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30109,8 +30109,8 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 5d 4h",
-        "time": "2:00 PM",
+        "status": "Completed 5d 6h",
+        "time": "12:00 PM",
         "date": "Sat, October 10, 2026",
         "scheduled_at": "2026-10-10T19:00:00+00:00",
         "status_code": "final",
@@ -30123,7 +30123,7 @@
             "team_b_name": "USMA E-SPORTS",
             "event_id": "3128",
             "scheduled_at": "2026-10-10T19:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -30138,7 +30138,7 @@
                 }
               ],
               "scheduled_at": "2026-10-10T19:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -30181,12 +30181,12 @@
               }
             ],
             "scheduled_at": "2026-10-10T19:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30203,8 +30203,8 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 5d 3h",
-        "time": "3:00 PM",
+        "status": "Completed 5d 5h",
+        "time": "1:00 PM",
         "date": "Sat, October 10, 2026",
         "scheduled_at": "2026-10-10T20:00:00+00:00",
         "status_code": "final",
@@ -30217,7 +30217,7 @@
             "team_b_name": "NUTHERS ESPORTS",
             "event_id": "3128",
             "scheduled_at": "2026-10-10T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -30232,7 +30232,7 @@
                 }
               ],
               "scheduled_at": "2026-10-10T20:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -30271,12 +30271,12 @@
               }
             ],
             "scheduled_at": "2026-10-10T20:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30293,8 +30293,8 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 5d 2h",
-        "time": "4:00 PM",
+        "status": "Completed 5d 4h",
+        "time": "2:00 PM",
         "date": "Sat, October 10, 2026",
         "scheduled_at": "2026-10-10T21:00:00+00:00",
         "status_code": "final",
@@ -30307,7 +30307,7 @@
             "team_b_name": "MCA Esports",
             "event_id": "3128",
             "scheduled_at": "2026-10-10T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": [],
             "live_score": {
@@ -30322,7 +30322,7 @@
                 }
               ],
               "scheduled_at": "2026-10-10T21:00:00+00:00",
-              "schedule_source_zone": "CDT",
+              "schedule_source_zone": "MST",
               "match_format": "BO1",
               "actual_veto": []
             },
@@ -30361,12 +30361,12 @@
               }
             ],
             "scheduled_at": "2026-10-10T21:00:00+00:00",
-            "schedule_source_zone": "CDT",
+            "schedule_source_zone": "MST",
             "match_format": "BO1",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-15T23:18:30.623240+00:00",
+          "collected_at": "2026-10-16T01:30:08.375874+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -188510,23 +188510,16 @@
     }
   },
   "collection": {
-    "status": "partial",
-    "started_at": "2026-10-15T23:18:33.236623+00:00",
-    "completed_at": "2026-10-15T23:36:47.048280+00:00",
-    "mode": "analysis_only",
-    "results": {
-      "updated": 71,
-      "failed": 1,
-      "total": 72
-    },
-    "budget_exhausted": false,
-    "remaining_teams": 0,
+    "status": "catalog_only",
+    "started_at": "2026-10-16T01:25:26.921152+00:00",
+    "completed_at": "2026-10-16T01:30:08.641429+00:00",
+    "mode": "catalog_only",
     "analytics": {
       "teams": 72,
       "failed_teams": 1,
       "stored_teams": 110,
       "pending_teams": 0,
-      "stale_teams": 1
+      "stale_teams": 72
     }
   }
 }
