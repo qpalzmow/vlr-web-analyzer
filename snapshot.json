@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "published_at": "2026-10-18T05:03:08.342709+00:00",
+  "published_at": "2026-10-18T09:13:50.976078+00:00",
   "catalog": {
     "schema_version": 1,
-    "generation": "11339c9c68724311933dd7b639879aeb",
-    "updated_at": "2026-10-18T04:45:51.353842+00:00",
+    "generation": "6d7cf9c73b384100907cf4932f3e19d6",
+    "updated_at": "2026-10-18T09:13:50.676442+00:00",
     "refresh_interval_seconds": 3600,
     "matches": [
       {
@@ -19,11 +19,11 @@
         "round_name": "결승전",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Upcoming 1h 19m",
+        "status": "LIVE",
         "time": "11:00 PM",
-        "date": "Sat, October 17, 2026 Today",
+        "date": "Sat, October 17, 2026 Yesterday",
         "scheduled_at": "2026-10-18T06:00:00+00:00",
-        "status_code": "upcoming",
+        "status_code": "live",
         "selection_data": {
           "details": {
             "match_id": "754737",
@@ -35,34 +35,70 @@
             "scheduled_at": "2026-10-18T06:00:00+00:00",
             "schedule_source_zone": "PDT",
             "match_format": "BO5",
-            "actual_veto": [],
+            "actual_veto": [
+              {
+                "team": "LOUD",
+                "action": "ban",
+                "map": "Ascent"
+              },
+              {
+                "team": "LOUD",
+                "action": "ban",
+                "map": "Split"
+              },
+              {
+                "team": "LOUD",
+                "action": "pick",
+                "map": "Summit"
+              },
+              {
+                "team": "VIT",
+                "action": "pick",
+                "map": "Lotus"
+              },
+              {
+                "team": "LOUD",
+                "action": "pick",
+                "map": "Sunset"
+              },
+              {
+                "team": "VIT",
+                "action": "pick",
+                "map": "Haven"
+              },
+              {
+                "team": null,
+                "action": "remaining",
+                "map": "Abyss"
+              }
+            ],
             "live_score": {
               "series_score_a": "0",
               "series_score_b": "0",
-              "status": "upcoming",
+              "status": "live",
               "maps": [
                 {
-                  "map": "Map",
+                  "map": "Summit",
+                  "score_a": "13",
+                  "score_b": "11"
+                },
+                {
+                  "map": "Lotus",
+                  "score_a": "8",
+                  "score_b": "13"
+                },
+                {
+                  "map": "Sunset",
+                  "score_a": "5",
+                  "score_b": "5"
+                },
+                {
+                  "map": "Haven",
                   "score_a": "0",
                   "score_b": "0"
                 },
                 {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                },
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                },
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                },
-                {
-                  "map": "Map",
+                  "map": "Abyss",
                   "score_a": "0",
                   "score_b": "0"
                 }
@@ -70,7 +106,43 @@
               "scheduled_at": "2026-10-18T06:00:00+00:00",
               "schedule_source_zone": "PDT",
               "match_format": "BO5",
-              "actual_veto": []
+              "actual_veto": [
+                {
+                  "team": "LOUD",
+                  "action": "ban",
+                  "map": "Ascent"
+                },
+                {
+                  "team": "LOUD",
+                  "action": "ban",
+                  "map": "Split"
+                },
+                {
+                  "team": "LOUD",
+                  "action": "pick",
+                  "map": "Summit"
+                },
+                {
+                  "team": "VIT",
+                  "action": "pick",
+                  "map": "Lotus"
+                },
+                {
+                  "team": "LOUD",
+                  "action": "pick",
+                  "map": "Sunset"
+                },
+                {
+                  "team": "VIT",
+                  "action": "pick",
+                  "map": "Haven"
+                },
+                {
+                  "team": null,
+                  "action": "remaining",
+                  "map": "Abyss"
+                }
+              ]
             },
             "team_a_logo": "https://owcdn.net/img/62bbec8dc1b9f.png",
             "team_b_logo": "https://owcdn.net/img/6466d79e1ed40.png"
@@ -187,30 +259,30 @@
           "live_score": {
             "series_score_a": "0",
             "series_score_b": "0",
-            "status": "upcoming",
+            "status": "live",
             "maps": [
               {
-                "map": "Map",
+                "map": "Summit",
+                "score_a": "13",
+                "score_b": "11"
+              },
+              {
+                "map": "Lotus",
+                "score_a": "8",
+                "score_b": "13"
+              },
+              {
+                "map": "Sunset",
+                "score_a": "5",
+                "score_b": "5"
+              },
+              {
+                "map": "Haven",
                 "score_a": "0",
                 "score_b": "0"
               },
               {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              },
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              },
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              },
-              {
-                "map": "Map",
+                "map": "Abyss",
                 "score_a": "0",
                 "score_b": "0"
               }
@@ -218,10 +290,46 @@
             "scheduled_at": "2026-10-18T06:00:00+00:00",
             "schedule_source_zone": "PDT",
             "match_format": "BO5",
-            "actual_veto": []
+            "actual_veto": [
+              {
+                "team": "LOUD",
+                "action": "ban",
+                "map": "Ascent"
+              },
+              {
+                "team": "LOUD",
+                "action": "ban",
+                "map": "Split"
+              },
+              {
+                "team": "LOUD",
+                "action": "pick",
+                "map": "Summit"
+              },
+              {
+                "team": "VIT",
+                "action": "pick",
+                "map": "Lotus"
+              },
+              {
+                "team": "LOUD",
+                "action": "pick",
+                "map": "Sunset"
+              },
+              {
+                "team": "VIT",
+                "action": "pick",
+                "map": "Haven"
+              },
+              {
+                "team": null,
+                "action": "remaining",
+                "map": "Abyss"
+              }
+            ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -428,7 +536,7 @@
         "round_name": "상위 1R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 4d 12h",
+        "status": "Upcoming 4d 7h",
         "time": "10:00 AM",
         "date": "Thu, October 22, 2026",
         "scheduled_at": "2026-10-22T17:00:00+00:00",
@@ -602,7 +710,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -619,7 +727,7 @@
         "round_name": "상위 1R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 4d 15h",
+        "status": "Upcoming 4d 10h",
         "time": "1:00 PM",
         "date": "Thu, October 22, 2026",
         "scheduled_at": "2026-10-22T20:00:00+00:00",
@@ -769,7 +877,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -786,7 +894,7 @@
         "round_name": "상위 8강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 5d 12h",
+        "status": "Upcoming 5d 7h",
         "time": "10:00 AM",
         "date": "Fri, October 23, 2026",
         "scheduled_at": "2026-10-23T17:00:00+00:00",
@@ -924,7 +1032,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -941,7 +1049,7 @@
         "round_name": "상위 8강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 5d 15h",
+        "status": "Upcoming 5d 10h",
         "time": "1:00 PM",
         "date": "Fri, October 23, 2026",
         "scheduled_at": "2026-10-23T20:00:00+00:00",
@@ -1079,7 +1187,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1134,7 +1242,7 @@
         "round_name": "상위 8강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 6d 12h",
+        "status": "Upcoming 6d 7h",
         "time": "10:00 AM",
         "date": "Sat, October 24, 2026",
         "scheduled_at": "2026-10-24T17:00:00+00:00",
@@ -1153,7 +1261,7 @@
         "round_name": "상위 8강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 6d 15h",
+        "status": "Upcoming 6d 10h",
         "time": "1:00 PM",
         "date": "Sat, October 24, 2026",
         "scheduled_at": "2026-10-24T20:00:00+00:00",
@@ -1419,9 +1527,9 @@
         "round_name": "하위 결승",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 21h 41m",
+        "status": "Completed 1d 2h",
         "time": "12:00 AM",
-        "date": "Sat, October 17, 2026 Today",
+        "date": "Sat, October 17, 2026 Yesterday",
         "status_code": "final",
         "scheduled_at": "2026-10-17T07:00:00+00:00",
         "selection_data": {
@@ -1719,7 +1827,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1736,9 +1844,9 @@
         "round_name": "하위 3R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1d 18h",
+        "status": "Completed 1d 22h",
         "time": "3:10 AM",
-        "date": "Fri, October 16, 2026 Yesterday",
+        "date": "Fri, October 16, 2026",
         "status_code": "final",
         "scheduled_at": "2026-10-16T10:10:00+00:00",
         "selection_data": {
@@ -2026,7 +2134,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2043,7 +2151,7 @@
         "round_name": "상위 결승",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1d 22h",
+        "status": "Completed 2d 3h",
         "time": "11:00 PM",
         "date": "Thu, October 15, 2026",
         "status_code": "final",
@@ -2333,7 +2441,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2350,7 +2458,7 @@
         "round_name": "결승전",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Completed 2d 7h",
+        "status": "Completed 2d 12h",
         "time": "2:00 PM",
         "date": "Thu, October 15, 2026",
         "status_code": "final",
@@ -2660,7 +2768,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2677,7 +2785,7 @@
         "round_name": "Main Event Round Robin",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Completed 3d 5h",
+        "status": "Completed 3d 10h",
         "time": "4:00 PM",
         "date": "Wed, October 14, 2026",
         "status_code": "final",
@@ -2957,7 +3065,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2974,7 +3082,7 @@
         "round_name": "Main Event Round Robin",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Completed 3d 7h",
+        "status": "Completed 3d 12h",
         "time": "2:00 PM",
         "date": "Wed, October 14, 2026",
         "status_code": "final",
@@ -3254,7 +3362,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3271,7 +3379,7 @@
         "round_name": "Main Event Round Robin",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Completed 3d 10h",
+        "status": "Completed 3d 15h",
         "time": "11:00 AM",
         "date": "Wed, October 14, 2026",
         "status_code": "final",
@@ -3561,7 +3669,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3578,7 +3686,7 @@
         "round_name": "하위 결승",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 5d 14h",
+        "status": "Completed 5d 18h",
         "time": "7:30 AM",
         "date": "Mon, October 12, 2026",
         "status_code": "final",
@@ -3864,7 +3972,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3881,7 +3989,7 @@
         "round_name": "하위 2R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 6d 17h",
+        "status": "Completed 6d 21h",
         "time": "4:15 AM",
         "date": "Sun, October 11, 2026",
         "status_code": "final",
@@ -4171,7 +4279,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4188,7 +4296,7 @@
         "round_name": "하위 2R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 6d 19h",
+        "status": "Completed 1w 0d",
         "time": "2:00 AM",
         "date": "Sun, October 11, 2026",
         "status_code": "final",
@@ -4468,7 +4576,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4765,7 +4873,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4782,7 +4890,7 @@
         "round_name": "상위 4강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 0d",
+        "status": "Completed 1w 1d",
         "time": "2:00 AM",
         "date": "Sat, October 10, 2026",
         "status_code": "final",
@@ -5072,7 +5180,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5379,7 +5487,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5396,7 +5504,7 @@
         "round_name": "하위 1R",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 1d",
+        "status": "Completed 1w 2d",
         "time": "2:00 AM",
         "date": "Fri, October 9, 2026",
         "status_code": "final",
@@ -5686,7 +5794,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5993,7 +6101,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6010,7 +6118,7 @@
         "round_name": "상위 8강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 2d",
+        "status": "Completed 1w 3d",
         "time": "2:00 AM",
         "date": "Thu, October 8, 2026",
         "status_code": "final",
@@ -6290,7 +6398,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6587,7 +6695,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6604,7 +6712,7 @@
         "round_name": "상위 8강",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 3d",
+        "status": "Completed 1w 4d",
         "time": "2:00 AM",
         "date": "Wed, October 7, 2026",
         "status_code": "final",
@@ -6884,7 +6992,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7181,7 +7289,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7198,7 +7306,7 @@
         "round_name": "Group Stage Decider (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 1w 6d",
+        "status": "Completed 2w 0d",
         "time": "2:00 AM",
         "date": "Sun, October 4, 2026",
         "status_code": "final",
@@ -7478,7 +7586,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7785,7 +7893,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7802,7 +7910,7 @@
         "round_name": "Group Stage Decider (C) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 0d",
+        "status": "Completed 2w 1d",
         "time": "2:00 AM",
         "date": "Sat, October 3, 2026",
         "status_code": "final",
@@ -8082,7 +8190,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8389,7 +8497,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8406,7 +8514,7 @@
         "round_name": "Group Stage Elimination (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 1d",
+        "status": "Completed 2w 2d",
         "time": "2:00 AM",
         "date": "Fri, October 2, 2026",
         "status_code": "final",
@@ -8686,7 +8794,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8983,7 +9091,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9000,7 +9108,7 @@
         "round_name": "Group Stage Elimination (C) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 2d",
+        "status": "Completed 2w 3d",
         "time": "2:00 AM",
         "date": "Thu, October 1, 2026",
         "status_code": "final",
@@ -9290,7 +9398,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9587,7 +9695,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9604,7 +9712,7 @@
         "round_name": "Group Stage Winner's (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 3d",
+        "status": "Completed 2w 4d",
         "time": "2:00 AM",
         "date": "Wed, September 30, 2026",
         "status_code": "final",
@@ -9884,7 +9992,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10191,7 +10299,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10208,7 +10316,7 @@
         "round_name": "Group Stage Winner's (C) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 4d",
+        "status": "Completed 2w 5d",
         "time": "2:00 AM",
         "date": "Tue, September 29, 2026",
         "status_code": "final",
@@ -10498,7 +10606,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10795,7 +10903,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10812,7 +10920,7 @@
         "round_name": "Group Stage Opening (A) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 2w 6d",
+        "status": "Completed 3w 0d",
         "time": "2:00 AM",
         "date": "Sun, September 27, 2026",
         "status_code": "final",
@@ -11092,7 +11200,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11389,7 +11497,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11406,7 +11514,7 @@
         "round_name": "Group Stage Opening (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 3w 0d",
+        "status": "Completed 3w 1d",
         "time": "2:00 AM",
         "date": "Sat, September 26, 2026",
         "status_code": "final",
@@ -11696,7 +11804,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11993,7 +12101,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12010,7 +12118,7 @@
         "round_name": "Group Stage Opening (D) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 3w 1d",
+        "status": "Completed 3w 2d",
         "time": "2:00 AM",
         "date": "Fri, September 25, 2026",
         "status_code": "final",
@@ -12290,7 +12398,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12587,7 +12695,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12604,7 +12712,7 @@
         "round_name": "Group Stage Opening (C) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 3w 2d",
+        "status": "Completed 3w 3d",
         "time": "2:00 AM",
         "date": "Thu, September 24, 2026",
         "status_code": "final",
@@ -12894,7 +13002,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12911,7 +13019,7 @@
         "round_name": "결승전",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 3w 6d",
+        "status": "Completed 4w 0d",
         "time": "2:00 AM",
         "date": "Sun, September 20, 2026",
         "status_code": "final",
@@ -13151,7 +13259,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13168,7 +13276,7 @@
         "round_name": "결승전",
         "region": "Pacific",
         "tier": "S-Tier",
-        "status": "Completed 3w 6d",
+        "status": "Completed 4w 0d",
         "time": "12:00 AM",
         "date": "Sun, September 20, 2026",
         "status_code": "final",
@@ -13441,7 +13549,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13458,7 +13566,7 @@
         "round_name": "하위 결승",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 4w 0d",
+        "status": "Completed 4w 1d",
         "time": "2:00 AM",
         "date": "Sat, September 19, 2026",
         "status_code": "final",
@@ -13690,7 +13798,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13707,7 +13815,7 @@
         "round_name": "하위 결승",
         "region": "Pacific",
         "tier": "S-Tier",
-        "status": "Completed 4w 0d",
+        "status": "Completed 4w 1d",
         "time": "12:00 AM",
         "date": "Sat, September 19, 2026",
         "status_code": "final",
@@ -13980,7 +14088,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14231,7 +14339,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14457,7 +14565,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14474,7 +14582,7 @@
         "round_name": "상위 결승",
         "region": "China",
         "tier": "A-Tier",
-        "status": "Completed 4w 1d",
+        "status": "Completed 4w 2d",
         "time": "2:00 AM",
         "date": "Fri, September 18, 2026",
         "status_code": "final",
@@ -14674,7 +14782,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14691,7 +14799,7 @@
         "round_name": "상위 결승",
         "region": "Pacific",
         "tier": "S-Tier",
-        "status": "Completed 4w 1d",
+        "status": "Completed 4w 2d",
         "time": "12:00 AM",
         "date": "Fri, September 18, 2026",
         "status_code": "final",
@@ -14970,7 +15078,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14987,7 +15095,7 @@
         "round_name": "결승전",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Completed 4w 2d",
+        "status": "Completed 1mo",
         "time": "2:00 PM",
         "date": "Thu, September 17, 2026",
         "status_code": "final",
@@ -15290,7 +15398,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15539,7 +15647,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15789,7 +15897,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16018,7 +16126,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16240,7 +16348,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16487,7 +16595,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16755,7 +16863,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17002,7 +17110,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17226,7 +17334,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17478,7 +17586,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17697,7 +17805,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17967,7 +18075,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18188,7 +18296,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18432,7 +18540,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18708,7 +18816,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18945,7 +19053,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19201,7 +19309,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19420,7 +19528,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19648,7 +19756,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19965,7 +20073,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20184,7 +20292,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20401,7 +20509,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20728,7 +20836,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20969,7 +21077,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21158,7 +21266,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21417,7 +21525,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21734,7 +21842,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21923,7 +22031,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22214,7 +22322,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22479,7 +22587,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22806,7 +22914,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23087,7 +23195,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23384,7 +23492,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23691,7 +23799,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23965,7 +24073,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24222,7 +24330,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24351,7 +24459,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24626,7 +24734,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24923,7 +25031,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25153,7 +25261,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25463,7 +25571,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25791,7 +25899,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26072,7 +26180,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26369,7 +26477,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26697,7 +26805,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27025,7 +27133,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27180,7 +27288,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27459,7 +27567,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27766,7 +27874,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28084,7 +28192,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28382,7 +28490,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28539,7 +28647,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28837,7 +28945,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29008,7 +29116,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29106,7 +29214,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29196,7 +29304,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29286,7 +29394,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29376,7 +29484,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29470,7 +29578,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29564,7 +29672,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29654,7 +29762,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29744,7 +29852,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29838,7 +29946,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29932,7 +30040,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30022,7 +30130,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30112,7 +30220,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30206,7 +30314,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30296,7 +30404,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30390,7 +30498,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30480,7 +30588,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30574,7 +30682,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30668,7 +30776,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30758,7 +30866,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30848,7 +30956,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30865,9 +30973,9 @@
         "round_name": "Round 6 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 10h 41m",
+        "status": "Completed 15h 9m",
         "time": "11:00 AM",
-        "date": "Sat, October 17, 2026 Today",
+        "date": "Sat, October 17, 2026 Yesterday",
         "scheduled_at": "2026-10-17T18:00:00+00:00",
         "status_code": "final",
         "selection_data": {
@@ -30938,7 +31046,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30955,9 +31063,9 @@
         "round_name": "Round 6 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 9h 41m",
+        "status": "Completed 14h 9m",
         "time": "12:00 PM",
-        "date": "Sat, October 17, 2026 Today",
+        "date": "Sat, October 17, 2026 Yesterday",
         "scheduled_at": "2026-10-17T19:00:00+00:00",
         "status_code": "final",
         "selection_data": {
@@ -31032,7 +31140,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31049,9 +31157,9 @@
         "round_name": "Round 6 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 8h 41m",
+        "status": "Completed 13h 9m",
         "time": "1:00 PM",
-        "date": "Sat, October 17, 2026 Today",
+        "date": "Sat, October 17, 2026 Yesterday",
         "scheduled_at": "2026-10-17T20:00:00+00:00",
         "status_code": "final",
         "selection_data": {
@@ -31122,7 +31230,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31139,9 +31247,9 @@
         "round_name": "Round 6 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 7h 41m",
+        "status": "Completed 12h 9m",
         "time": "2:00 PM",
-        "date": "Sat, October 17, 2026 Today",
+        "date": "Sat, October 17, 2026 Yesterday",
         "scheduled_at": "2026-10-17T21:00:00+00:00",
         "status_code": "final",
         "selection_data": {
@@ -31216,7 +31324,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-18T04:45:51.353842+00:00",
+          "collected_at": "2026-10-18T09:13:50.676442+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -191246,23 +191354,16 @@
     }
   },
   "collection": {
-    "status": "partial",
-    "started_at": "2026-10-18T04:45:54.179789+00:00",
-    "completed_at": "2026-10-18T05:03:08.342696+00:00",
-    "mode": "analysis_only",
-    "results": {
-      "updated": 66,
-      "failed": 6,
-      "total": 72
-    },
-    "budget_exhausted": false,
-    "remaining_teams": 0,
+    "status": "catalog_only",
+    "started_at": "2026-10-18T09:08:16.296712+00:00",
+    "completed_at": "2026-10-18T09:13:50.967495+00:00",
+    "mode": "catalog_only",
     "analytics": {
       "teams": 72,
       "failed_teams": 6,
       "stored_teams": 111,
       "pending_teams": 0,
-      "stale_teams": 6
+      "stale_teams": 72
     }
   }
 }
