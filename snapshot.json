@@ -1,211 +1,12 @@
 {
   "schema_version": 1,
-  "published_at": "2026-10-26T14:29:58.877947+00:00",
+  "published_at": "2026-10-26T19:57:16.949696+00:00",
   "catalog": {
     "schema_version": 1,
-    "generation": "1b55c4adcc554faea6503ba555daae77",
-    "updated_at": "2026-10-26T14:11:37.841632+00:00",
+    "generation": "7cafcadfe9dc45889d7f1579b999d81b",
+    "updated_at": "2026-10-26T19:57:16.590701+00:00",
     "refresh_interval_seconds": 3600,
     "matches": [
-      {
-        "id": "773440",
-        "url": "https://www.vlr.gg/773440/sk-nebula-vs-fennel-gc-game-changers-2026-championship-s-o-paulo-lr2",
-        "match_url": "https://www.vlr.gg/773440/sk-nebula-vs-fennel-gc-game-changers-2026-championship-s-o-paulo-lr2",
-        "team_a": "SK Nebula",
-        "team_b": "FENNEL GC",
-        "event": "Main Event–Lower Round 2 Game Changers 2026: Championship São Paulo",
-        "tournament": "Game Changers 2026: Championship São Paulo",
-        "stage": "기타 스테이지",
-        "round_name": "하위 2R",
-        "region": "Other",
-        "tier": "S-Tier",
-        "status": "Upcoming 3h 53m",
-        "time": "2:00 PM",
-        "date": "Mon, October 26, 2026 Today",
-        "scheduled_at": "2026-10-26T18:00:00+00:00",
-        "status_code": "upcoming",
-        "selection_data": {
-          "details": {
-            "match_id": "773440",
-            "team_a_id": "15832",
-            "team_a_name": "SK Nebula",
-            "team_b_id": "9516",
-            "team_b_name": "FENNEL GC",
-            "event_id": "3134",
-            "scheduled_at": "2026-10-26T18:00:00+00:00",
-            "schedule_source_zone": "EDT",
-            "match_format": "BO3",
-            "actual_veto": [],
-            "live_score": {
-              "series_score_a": "0",
-              "series_score_b": "0",
-              "status": "upcoming",
-              "maps": [
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                },
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                },
-                {
-                  "map": "Map",
-                  "score_a": "0",
-                  "score_b": "0"
-                }
-              ],
-              "scheduled_at": "2026-10-26T18:00:00+00:00",
-              "schedule_source_zone": "EDT",
-              "match_format": "BO3",
-              "actual_veto": []
-            },
-            "team_a_logo": "https://owcdn.net/img/659ecda9c6382.png",
-            "team_b_logo": "https://owcdn.net/img/60d3986152cd4.png"
-          },
-          "team_a_events": [
-            {
-              "id": "3134",
-              "name": "Game Changers 2026: Championship São Paulo"
-            },
-            {
-              "id": "3028",
-              "name": "Game Changers 2026: EMEA Stage 3"
-            },
-            {
-              "id": "2840",
-              "name": "Game Changers 2026: EMEA Stage 2"
-            },
-            {
-              "id": "2893",
-              "name": "Game Changers 2026: EMEA Stage 1 - Promotion/Relegation"
-            },
-            {
-              "id": "2879",
-              "name": "Game Changers 2026: EMEA Cash Cup March"
-            },
-            {
-              "id": "2789",
-              "name": "Game Changers 2026: EMEA Stage 1"
-            },
-            {
-              "id": "2788",
-              "name": "Game Changers 2026: EMEA Kickoff"
-            },
-            {
-              "id": "2773",
-              "name": "Challengers 2025: DACH Evolution Stage 3 Relegation"
-            },
-            {
-              "id": "2595",
-              "name": "Game Changers 2025: EMEA Stage 3"
-            },
-            {
-              "id": "2533",
-              "name": "Equal Esports Queens 2025: Split 3"
-            },
-            {
-              "id": "2520",
-              "name": "Project V: 2025 Split 2 - Relegation"
-            },
-            {
-              "id": "2481",
-              "name": "Game Changers 2025: EMEA Stage 2"
-            }
-          ],
-          "team_b_events": [
-            {
-              "id": "3134",
-              "name": "Game Changers 2026: Championship São Paulo"
-            },
-            {
-              "id": "3065",
-              "name": "Game Changers 2026: Pacific"
-            },
-            {
-              "id": "3035",
-              "name": "Game Changers 2026: Japan Split 2"
-            },
-            {
-              "id": "2909",
-              "name": "Game Changers 2026: Japan Split 1"
-            },
-            {
-              "id": "2548",
-              "name": "Game Changers 2025: Pacific"
-            },
-            {
-              "id": "2419",
-              "name": "Game Changers 2025: Japan Split 2"
-            },
-            {
-              "id": "2418",
-              "name": "Game Changers 2025: Japan Split 1"
-            },
-            {
-              "id": "2018",
-              "name": "Game Changers 2024 Pacific"
-            },
-            {
-              "id": "2017",
-              "name": "Game Changers 2024 Japan: Split 2"
-            },
-            {
-              "id": "2016",
-              "name": "Game Changers 2024 Japan: Split 1"
-            },
-            {
-              "id": "1764",
-              "name": "Game Changers 2023 East Asia"
-            },
-            {
-              "id": "1766",
-              "name": "Game Changers 2023 Japan: Split 2"
-            }
-          ],
-          "map_pool": [
-            "Abyss",
-            "Ascent",
-            "Haven",
-            "Lotus",
-            "Split",
-            "Summit",
-            "Sunset"
-          ],
-          "live_score": {
-            "series_score_a": "0",
-            "series_score_b": "0",
-            "status": "upcoming",
-            "maps": [
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              },
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              },
-              {
-                "map": "Map",
-                "score_a": "0",
-                "score_b": "0"
-              }
-            ],
-            "scheduled_at": "2026-10-26T18:00:00+00:00",
-            "schedule_source_zone": "EDT",
-            "match_format": "BO3",
-            "actual_veto": []
-          },
-          "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
-          "stale": false
-        },
-        "selection_status": "ready"
-      },
       {
         "id": "773439",
         "url": "https://www.vlr.gg/773439/g2-gozen-vs-team-liquid-brazil-game-changers-2026-championship-s-o-paulo-lr2",
@@ -218,10 +19,10 @@
         "round_name": "하위 2R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 6h 53m",
-        "time": "5:00 PM",
+        "status": "Upcoming 17m",
+        "time": "4:10 PM",
         "date": "Mon, October 26, 2026 Today",
-        "scheduled_at": "2026-10-26T21:00:00+00:00",
+        "scheduled_at": "2026-10-26T20:10:00+00:00",
         "status_code": "upcoming",
         "selection_data": {
           "details": {
@@ -231,7 +32,7 @@
             "team_b_id": "7055",
             "team_b_name": "Team Liquid Brazil",
             "event_id": "3134",
-            "scheduled_at": "2026-10-26T21:00:00+00:00",
+            "scheduled_at": "2026-10-26T20:10:00+00:00",
             "schedule_source_zone": "EDT",
             "match_format": "BO3",
             "actual_veto": [],
@@ -256,7 +57,7 @@
                   "score_b": "0"
                 }
               ],
-              "scheduled_at": "2026-10-26T21:00:00+00:00",
+              "scheduled_at": "2026-10-26T20:10:00+00:00",
               "schedule_source_zone": "EDT",
               "match_format": "BO3",
               "actual_veto": []
@@ -394,13 +195,13 @@
                 "score_b": "0"
               }
             ],
-            "scheduled_at": "2026-10-26T21:00:00+00:00",
+            "scheduled_at": "2026-10-26T20:10:00+00:00",
             "schedule_source_zone": "EDT",
             "match_format": "BO3",
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -417,7 +218,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 18h 53m",
+        "status": "Upcoming 13h 7m",
         "time": "5:00 AM",
         "date": "Tue, October 27, 2026",
         "scheduled_at": "2026-10-27T09:00:00+00:00",
@@ -531,7 +332,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -548,7 +349,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 20h 53m",
+        "status": "Upcoming 15h 7m",
         "time": "7:00 AM",
         "date": "Tue, October 27, 2026",
         "scheduled_at": "2026-10-27T11:00:00+00:00",
@@ -698,7 +499,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -715,7 +516,7 @@
         "round_name": "상위 4강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 1d 3h",
+        "status": "Upcoming 22h 7m",
         "time": "2:00 PM",
         "date": "Tue, October 27, 2026",
         "scheduled_at": "2026-10-27T18:00:00+00:00",
@@ -865,7 +666,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -882,7 +683,7 @@
         "round_name": "상위 4강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 1d 6h",
+        "status": "Upcoming 1d 1h",
         "time": "5:00 PM",
         "date": "Tue, October 27, 2026",
         "scheduled_at": "2026-10-27T21:00:00+00:00",
@@ -1064,7 +865,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1081,7 +882,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 1d 18h",
+        "status": "Upcoming 1d 13h",
         "time": "5:00 AM",
         "date": "Wed, October 28, 2026",
         "scheduled_at": "2026-10-28T09:00:00+00:00",
@@ -1235,7 +1036,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1252,7 +1053,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 1d 20h",
+        "status": "Upcoming 1d 15h",
         "time": "7:00 AM",
         "date": "Wed, October 28, 2026",
         "scheduled_at": "2026-10-28T11:00:00+00:00",
@@ -1422,24 +1223,24 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
       },
       {
         "id": "773442",
-        "url": "https://www.vlr.gg/773442/tbd-game-changers-2026-championship-s-o-paulo-lr3",
-        "match_url": "https://www.vlr.gg/773442/tbd-game-changers-2026-championship-s-o-paulo-lr3",
+        "url": "https://www.vlr.gg/773442/sk-nebula-vs-tbd-game-changers-2026-championship-s-o-paulo-lr3",
+        "match_url": "https://www.vlr.gg/773442/sk-nebula-vs-tbd-game-changers-2026-championship-s-o-paulo-lr3",
         "team_a": "TBD",
-        "team_b": "TBD",
+        "team_b": "SK Nebula",
         "event": "Main Event–Lower Round 3 Game Changers 2026: Championship São Paulo",
         "tournament": "Game Changers 2026: Championship São Paulo",
         "stage": "기타 스테이지",
         "round_name": "하위 3R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 2d 3h",
+        "status": "Upcoming 1d 22h",
         "time": "2:00 PM",
         "date": "Wed, October 28, 2026",
         "scheduled_at": "2026-10-28T18:00:00+00:00",
@@ -1458,7 +1259,7 @@
         "round_name": "하위 3R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 2d 6h",
+        "status": "Upcoming 2d 1h",
         "time": "5:00 PM",
         "date": "Wed, October 28, 2026",
         "scheduled_at": "2026-10-28T21:00:00+00:00",
@@ -1477,7 +1278,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 2d 18h",
+        "status": "Upcoming 2d 13h",
         "time": "5:00 AM",
         "date": "Thu, October 29, 2026",
         "scheduled_at": "2026-10-29T09:00:00+00:00",
@@ -1496,7 +1297,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 2d 20h",
+        "status": "Upcoming 2d 15h",
         "time": "7:00 AM",
         "date": "Thu, October 29, 2026",
         "scheduled_at": "2026-10-29T11:00:00+00:00",
@@ -1515,7 +1316,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 3d 18h",
+        "status": "Upcoming 3d 13h",
         "time": "5:00 AM",
         "date": "Fri, October 30, 2026",
         "scheduled_at": "2026-10-30T09:00:00+00:00",
@@ -1534,7 +1335,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 3d 20h",
+        "status": "Upcoming 3d 15h",
         "time": "7:00 AM",
         "date": "Fri, October 30, 2026",
         "scheduled_at": "2026-10-30T11:00:00+00:00",
@@ -1553,7 +1354,7 @@
         "round_name": "상위 결승",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 4d 3h",
+        "status": "Upcoming 3d 22h",
         "time": "2:00 PM",
         "date": "Fri, October 30, 2026",
         "scheduled_at": "2026-10-30T18:00:00+00:00",
@@ -1572,7 +1373,7 @@
         "round_name": "Main Event Lower Round 4",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 4d 6h",
+        "status": "Upcoming 4d 1h",
         "time": "5:00 PM",
         "date": "Fri, October 30, 2026",
         "scheduled_at": "2026-10-30T21:00:00+00:00",
@@ -1591,7 +1392,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 4d 18h",
+        "status": "Upcoming 4d 13h",
         "time": "5:00 AM",
         "date": "Sat, October 31, 2026",
         "scheduled_at": "2026-10-31T09:00:00+00:00",
@@ -1610,7 +1411,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 4d 20h",
+        "status": "Upcoming 4d 15h",
         "time": "7:00 AM",
         "date": "Sat, October 31, 2026",
         "scheduled_at": "2026-10-31T11:00:00+00:00",
@@ -1629,7 +1430,7 @@
         "round_name": "하위 결승",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 5d 3h",
+        "status": "Upcoming 4d 22h",
         "time": "2:00 PM",
         "date": "Sat, October 31, 2026",
         "scheduled_at": "2026-10-31T18:00:00+00:00",
@@ -1648,7 +1449,7 @@
         "round_name": "결승전",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Upcoming 5d 18h",
+        "status": "Upcoming 5d 13h",
         "time": "4:00 AM",
         "date": "Sun, November 1, 2026",
         "scheduled_at": "2026-11-01T09:00:00+00:00",
@@ -1667,12 +1468,309 @@
         "round_name": "결승전",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Upcoming 6d 3h",
+        "status": "Upcoming 5d 22h",
         "time": "1:00 PM",
         "date": "Sun, November 1, 2026",
         "scheduled_at": "2026-11-01T18:00:00+00:00",
         "status_code": "upcoming",
         "selection_status": "unassigned"
+      },
+      {
+        "id": "773440",
+        "url": "https://www.vlr.gg/773440/sk-nebula-vs-fennel-gc-game-changers-2026-championship-s-o-paulo-lr2",
+        "match_url": "https://www.vlr.gg/773440/sk-nebula-vs-fennel-gc-game-changers-2026-championship-s-o-paulo-lr2",
+        "team_a": "SK Nebula",
+        "team_b": "FENNEL GC",
+        "event": "Main Event–Lower Round 2 Game Changers 2026: Championship São Paulo",
+        "tournament": "Game Changers 2026: Championship São Paulo",
+        "stage": "기타 스테이지",
+        "round_name": "하위 2R",
+        "region": "Other",
+        "tier": "S-Tier",
+        "status": "Completed 1h 53m",
+        "time": "2:00 PM",
+        "date": "Mon, October 26, 2026 Today",
+        "status_code": "final",
+        "scheduled_at": "2026-10-26T18:00:00+00:00",
+        "selection_data": {
+          "details": {
+            "match_id": "773440",
+            "team_a_id": "15832",
+            "team_a_name": "SK Nebula",
+            "team_b_id": "9516",
+            "team_b_name": "FENNEL GC",
+            "event_id": "3134",
+            "scheduled_at": "2026-10-26T18:00:00+00:00",
+            "schedule_source_zone": "EDT",
+            "match_format": "BO3",
+            "actual_veto": [
+              {
+                "team": "FLGC",
+                "action": "ban",
+                "map": "Split"
+              },
+              {
+                "team": "SKN",
+                "action": "ban",
+                "map": "Abyss"
+              },
+              {
+                "team": "FLGC",
+                "action": "pick",
+                "map": "Lotus"
+              },
+              {
+                "team": "SKN",
+                "action": "pick",
+                "map": "Sunset"
+              },
+              {
+                "team": "FLGC",
+                "action": "ban",
+                "map": "Summit"
+              },
+              {
+                "team": "SKN",
+                "action": "ban",
+                "map": "Ascent"
+              },
+              {
+                "team": null,
+                "action": "remaining",
+                "map": "Haven"
+              }
+            ],
+            "live_score": {
+              "series_score_a": "2",
+              "series_score_b": "0",
+              "status": "final",
+              "maps": [
+                {
+                  "map": "Lotus",
+                  "score_a": "13",
+                  "score_b": "5"
+                },
+                {
+                  "map": "Sunset",
+                  "score_a": "13",
+                  "score_b": "11"
+                }
+              ],
+              "scheduled_at": "2026-10-26T18:00:00+00:00",
+              "schedule_source_zone": "EDT",
+              "match_format": "BO3",
+              "actual_veto": [
+                {
+                  "team": "FLGC",
+                  "action": "ban",
+                  "map": "Split"
+                },
+                {
+                  "team": "SKN",
+                  "action": "ban",
+                  "map": "Abyss"
+                },
+                {
+                  "team": "FLGC",
+                  "action": "pick",
+                  "map": "Lotus"
+                },
+                {
+                  "team": "SKN",
+                  "action": "pick",
+                  "map": "Sunset"
+                },
+                {
+                  "team": "FLGC",
+                  "action": "ban",
+                  "map": "Summit"
+                },
+                {
+                  "team": "SKN",
+                  "action": "ban",
+                  "map": "Ascent"
+                },
+                {
+                  "team": null,
+                  "action": "remaining",
+                  "map": "Haven"
+                }
+              ]
+            },
+            "team_a_logo": "https://owcdn.net/img/659ecda9c6382.png",
+            "team_b_logo": "https://owcdn.net/img/60d3986152cd4.png"
+          },
+          "team_a_events": [
+            {
+              "id": "3134",
+              "name": "Game Changers 2026: Championship São Paulo"
+            },
+            {
+              "id": "3028",
+              "name": "Game Changers 2026: EMEA Stage 3"
+            },
+            {
+              "id": "2840",
+              "name": "Game Changers 2026: EMEA Stage 2"
+            },
+            {
+              "id": "2893",
+              "name": "Game Changers 2026: EMEA Stage 1 - Promotion/Relegation"
+            },
+            {
+              "id": "2879",
+              "name": "Game Changers 2026: EMEA Cash Cup March"
+            },
+            {
+              "id": "2789",
+              "name": "Game Changers 2026: EMEA Stage 1"
+            },
+            {
+              "id": "2788",
+              "name": "Game Changers 2026: EMEA Kickoff"
+            },
+            {
+              "id": "2773",
+              "name": "Challengers 2025: DACH Evolution Stage 3 Relegation"
+            },
+            {
+              "id": "2595",
+              "name": "Game Changers 2025: EMEA Stage 3"
+            },
+            {
+              "id": "2533",
+              "name": "Equal Esports Queens 2025: Split 3"
+            },
+            {
+              "id": "2520",
+              "name": "Project V: 2025 Split 2 - Relegation"
+            },
+            {
+              "id": "2481",
+              "name": "Game Changers 2025: EMEA Stage 2"
+            }
+          ],
+          "team_b_events": [
+            {
+              "id": "3134",
+              "name": "Game Changers 2026: Championship São Paulo"
+            },
+            {
+              "id": "3065",
+              "name": "Game Changers 2026: Pacific"
+            },
+            {
+              "id": "3035",
+              "name": "Game Changers 2026: Japan Split 2"
+            },
+            {
+              "id": "2909",
+              "name": "Game Changers 2026: Japan Split 1"
+            },
+            {
+              "id": "2548",
+              "name": "Game Changers 2025: Pacific"
+            },
+            {
+              "id": "2419",
+              "name": "Game Changers 2025: Japan Split 2"
+            },
+            {
+              "id": "2418",
+              "name": "Game Changers 2025: Japan Split 1"
+            },
+            {
+              "id": "2018",
+              "name": "Game Changers 2024 Pacific"
+            },
+            {
+              "id": "2017",
+              "name": "Game Changers 2024 Japan: Split 2"
+            },
+            {
+              "id": "2016",
+              "name": "Game Changers 2024 Japan: Split 1"
+            },
+            {
+              "id": "1764",
+              "name": "Game Changers 2023 East Asia"
+            },
+            {
+              "id": "1766",
+              "name": "Game Changers 2023 Japan: Split 2"
+            }
+          ],
+          "map_pool": [
+            "Abyss",
+            "Ascent",
+            "Haven",
+            "Lotus",
+            "Split",
+            "Summit",
+            "Sunset"
+          ],
+          "live_score": {
+            "series_score_a": "2",
+            "series_score_b": "0",
+            "status": "final",
+            "maps": [
+              {
+                "map": "Lotus",
+                "score_a": "13",
+                "score_b": "5"
+              },
+              {
+                "map": "Sunset",
+                "score_a": "13",
+                "score_b": "11"
+              }
+            ],
+            "scheduled_at": "2026-10-26T18:00:00+00:00",
+            "schedule_source_zone": "EDT",
+            "match_format": "BO3",
+            "actual_veto": [
+              {
+                "team": "FLGC",
+                "action": "ban",
+                "map": "Split"
+              },
+              {
+                "team": "SKN",
+                "action": "ban",
+                "map": "Abyss"
+              },
+              {
+                "team": "FLGC",
+                "action": "pick",
+                "map": "Lotus"
+              },
+              {
+                "team": "SKN",
+                "action": "pick",
+                "map": "Sunset"
+              },
+              {
+                "team": "FLGC",
+                "action": "ban",
+                "map": "Summit"
+              },
+              {
+                "team": "SKN",
+                "action": "ban",
+                "map": "Ascent"
+              },
+              {
+                "team": null,
+                "action": "remaining",
+                "map": "Haven"
+              }
+            ]
+          },
+          "cached": true,
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
+          "stale": false
+        },
+        "selection_status": "ready"
       },
       {
         "id": "773437",
@@ -1686,7 +1784,7 @@
         "round_name": "하위 1R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 17h 22m",
+        "status": "Completed 23h 8m",
         "time": "4:45 PM",
         "date": "Sun, October 25, 2026 Yesterday",
         "status_code": "final",
@@ -1946,7 +2044,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1963,7 +2061,7 @@
         "round_name": "하위 1R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 20h 7m",
+        "status": "Completed 1d 1h",
         "time": "2:00 PM",
         "date": "Sun, October 25, 2026 Yesterday",
         "status_code": "final",
@@ -2221,7 +2319,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2238,7 +2336,7 @@
         "round_name": "결승전",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1d 2h",
+        "status": "Completed 1d 8h",
         "time": "7:30 AM",
         "date": "Sun, October 25, 2026 Yesterday",
         "status_code": "final",
@@ -2539,7 +2637,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2556,7 +2654,7 @@
         "round_name": "결승전",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 1d 5h",
+        "status": "Completed 1d 10h",
         "time": "5:00 AM",
         "date": "Sun, October 25, 2026 Yesterday",
         "status_code": "final",
@@ -2846,7 +2944,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2863,7 +2961,7 @@
         "round_name": "상위 8강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1d 17h",
+        "status": "Completed 1d 23h",
         "time": "4:35 PM",
         "date": "Sat, October 24, 2026",
         "status_code": "final",
@@ -3143,7 +3241,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3160,7 +3258,7 @@
         "round_name": "상위 8강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1d 20h",
+        "status": "Completed 2d 1h",
         "time": "2:00 PM",
         "date": "Sat, October 24, 2026",
         "status_code": "final",
@@ -3440,7 +3538,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3457,7 +3555,7 @@
         "round_name": "Main Event Semifinals Monsters Reloaded 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 2d 0h",
+        "status": "Completed 2d 6h",
         "time": "9:30 AM",
         "date": "Sat, October 24, 2026",
         "status_code": "final",
@@ -3748,7 +3846,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3765,7 +3863,7 @@
         "round_name": "결승전",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 2d 1h",
+        "status": "Completed 2d 6h",
         "time": "9:00 AM",
         "date": "Sat, October 24, 2026",
         "status_code": "final",
@@ -4045,7 +4143,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4062,7 +4160,7 @@
         "round_name": "1주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 2d 3h",
+        "status": "Completed 2d 8h",
         "time": "7:00 AM",
         "date": "Sat, October 24, 2026",
         "status_code": "final",
@@ -4342,7 +4440,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4359,7 +4457,7 @@
         "round_name": "Main Event Semifinals Monsters Reloaded 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 2d 3h",
+        "status": "Completed 2d 9h",
         "time": "6:30 AM",
         "date": "Sat, October 24, 2026",
         "status_code": "final",
@@ -4640,7 +4738,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4657,7 +4755,7 @@
         "round_name": "1주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 2d 5h",
+        "status": "Completed 2d 10h",
         "time": "5:00 AM",
         "date": "Sat, October 24, 2026",
         "status_code": "final",
@@ -4937,7 +5035,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4954,7 +5052,7 @@
         "round_name": "상위 8강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 2d 17h",
+        "status": "Completed 2d 23h",
         "time": "4:35 PM",
         "date": "Fri, October 23, 2026",
         "status_code": "final",
@@ -5212,7 +5310,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5229,7 +5327,7 @@
         "round_name": "상위 8강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 2d 20h",
+        "status": "Completed 3d 1h",
         "time": "2:00 PM",
         "date": "Fri, October 23, 2026",
         "status_code": "final",
@@ -5477,7 +5575,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5494,7 +5592,7 @@
         "round_name": "Phase 2 Semifinals Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 3d 1h",
+        "status": "Completed 3d 6h",
         "time": "9:00 AM",
         "date": "Fri, October 23, 2026",
         "status_code": "final",
@@ -5784,7 +5882,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5801,7 +5899,7 @@
         "round_name": "1주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 3d 2h",
+        "status": "Completed 3d 8h",
         "time": "7:20 AM",
         "date": "Fri, October 23, 2026",
         "status_code": "final",
@@ -6091,7 +6189,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6108,7 +6206,7 @@
         "round_name": "Phase 2 Semifinals Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 3d 5h",
+        "status": "Completed 3d 10h",
         "time": "5:00 AM",
         "date": "Fri, October 23, 2026",
         "status_code": "final",
@@ -6368,7 +6466,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6385,7 +6483,7 @@
         "round_name": "1주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 3d 5h",
+        "status": "Completed 3d 10h",
         "time": "5:00 AM",
         "date": "Fri, October 23, 2026",
         "status_code": "final",
@@ -6637,7 +6735,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6654,7 +6752,7 @@
         "round_name": "상위 1R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 3d 18h",
+        "status": "Completed 3d 23h",
         "time": "4:00 PM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -6914,7 +7012,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6931,7 +7029,7 @@
         "round_name": "상위 1R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 3d 20h",
+        "status": "Completed 4d 1h",
         "time": "2:00 PM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -7211,7 +7309,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7228,7 +7326,7 @@
         "round_name": "Phase 2 Group B Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 3d 21h",
+        "status": "Completed 4d 3h",
         "time": "12:30 PM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -7480,7 +7578,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7497,7 +7595,7 @@
         "round_name": "Phase 2 Group B Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 3d 22h",
+        "status": "Completed 4d 3h",
         "time": "12:00 PM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -7723,7 +7821,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7740,7 +7838,7 @@
         "round_name": "Phase 2 Group A Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 3d 23h",
+        "status": "Completed 4d 5h",
         "time": "10:10 AM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -8004,7 +8102,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8021,7 +8119,7 @@
         "round_name": "Phase 2 Group A Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 4d 1h",
+        "status": "Completed 4d 7h",
         "time": "8:25 AM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -8311,7 +8409,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8328,7 +8426,7 @@
         "round_name": "Phase 2 Group B Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 4d 2h",
+        "status": "Completed 4d 8h",
         "time": "7:40 AM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -8588,7 +8686,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8605,7 +8703,7 @@
         "round_name": "1주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 4d 2h",
+        "status": "Completed 4d 8h",
         "time": "7:25 AM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -8883,7 +8981,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8900,7 +8998,7 @@
         "round_name": "Phase 2 Group B Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 4d 4h",
+        "status": "Completed 4d 9h",
         "time": "6:00 AM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -9108,7 +9206,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9125,7 +9223,7 @@
         "round_name": "1주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 4d 5h",
+        "status": "Completed 4d 10h",
         "time": "5:00 AM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -9405,7 +9503,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9422,7 +9520,7 @@
         "round_name": "Phase 2 Group A Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 4d 6h",
+        "status": "Completed 4d 11h",
         "time": "4:00 AM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -9712,7 +9810,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9729,7 +9827,7 @@
         "round_name": "Phase 2 Group A Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 4d 6h",
+        "status": "Completed 4d 11h",
         "time": "4:00 AM",
         "date": "Thu, October 22, 2026",
         "status_code": "final",
@@ -9993,7 +10091,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10010,7 +10108,7 @@
         "round_name": "Phase 2 Group B Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 4d 19h",
+        "status": "Completed 5d 1h",
         "time": "2:30 PM",
         "date": "Wed, October 21, 2026",
         "status_code": "final",
@@ -10242,7 +10340,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10259,7 +10357,7 @@
         "round_name": "Phase 2 Group B Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 4d 19h",
+        "status": "Completed 5d 1h",
         "time": "2:30 PM",
         "date": "Wed, October 21, 2026",
         "status_code": "final",
@@ -10495,7 +10593,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10512,7 +10610,7 @@
         "round_name": "Phase 2 Group A Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 4d 22h",
+        "status": "Completed 5d 3h",
         "time": "12:00 PM",
         "date": "Wed, October 21, 2026",
         "status_code": "final",
@@ -10792,7 +10890,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10809,7 +10907,7 @@
         "round_name": "Phase 2 Group A Project Blender 2026",
         "region": "Other",
         "tier": "Other",
-        "status": "Completed 4d 22h",
+        "status": "Completed 5d 3h",
         "time": "12:00 PM",
         "date": "Wed, October 21, 2026",
         "status_code": "final",
@@ -11073,7 +11171,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11090,7 +11188,7 @@
         "round_name": "1주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 5d 3h",
+        "status": "Completed 5d 9h",
         "time": "6:50 AM",
         "date": "Wed, October 21, 2026",
         "status_code": "final",
@@ -11370,7 +11468,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11387,7 +11485,7 @@
         "round_name": "1주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 5d 5h",
+        "status": "Completed 5d 10h",
         "time": "5:00 AM",
         "date": "Wed, October 21, 2026",
         "status_code": "final",
@@ -11635,7 +11733,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11652,7 +11750,7 @@
         "round_name": "1주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 5d 7h",
+        "status": "Completed 5d 13h",
         "time": "2:20 AM",
         "date": "Wed, October 21, 2026",
         "status_code": "final",
@@ -11888,7 +11986,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11905,7 +12003,7 @@
         "round_name": "1주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 5d 10h",
+        "status": "Completed 5d 15h",
         "time": "12:00 AM",
         "date": "Wed, October 21, 2026",
         "status_code": "final",
@@ -12161,7 +12259,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12478,7 +12576,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12795,7 +12893,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13102,7 +13200,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13409,7 +13507,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13736,7 +13834,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14033,7 +14131,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14330,7 +14428,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14347,7 +14445,7 @@
         "round_name": "Main Event Round Robin",
         "region": "Americas",
         "tier": "S-Tier",
-        "status": "Completed 1w 4d",
+        "status": "Completed 1w 5d",
         "time": "2:00 PM",
         "date": "Wed, October 14, 2026",
         "status_code": "final",
@@ -14637,7 +14735,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14654,7 +14752,7 @@
         "round_name": "하위 결승",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1w 6d",
+        "status": "Completed 2w 0d",
         "time": "10:30 AM",
         "date": "Mon, October 12, 2026",
         "status_code": "final",
@@ -14945,7 +15043,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15252,7 +15350,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15549,7 +15647,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15846,7 +15944,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16153,7 +16251,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16460,7 +16558,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16767,7 +16865,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17074,7 +17172,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17371,7 +17469,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17668,7 +17766,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17965,7 +18063,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18262,7 +18360,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18559,7 +18657,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18866,7 +18964,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19163,7 +19261,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19470,7 +19568,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19767,7 +19865,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20064,7 +20162,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20371,7 +20469,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20668,7 +20766,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20965,7 +21063,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21272,7 +21370,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21579,7 +21677,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21876,7 +21974,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22173,7 +22271,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22470,7 +22568,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22487,7 +22585,7 @@
         "round_name": "Group Stage Opening (B) Valorant Champions 2026",
         "region": "Global",
         "tier": "S-Tier",
-        "status": "Completed 4w 2d",
+        "status": "Completed 1mo",
         "time": "5:00 AM",
         "date": "Sat, September 26, 2026",
         "status_code": "final",
@@ -22777,7 +22875,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23074,7 +23172,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23371,7 +23469,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23668,7 +23766,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23975,7 +24073,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24236,7 +24334,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24530,7 +24628,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24783,7 +24881,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25077,7 +25175,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25324,7 +25422,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25554,7 +25652,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25771,7 +25869,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26067,7 +26165,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26387,7 +26485,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26628,7 +26726,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26882,7 +26980,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27115,7 +27213,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27337,7 +27435,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27584,7 +27682,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27852,7 +27950,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28103,7 +28201,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28327,7 +28425,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28579,7 +28677,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28798,7 +28896,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29072,7 +29170,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29285,7 +29383,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29529,7 +29627,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29805,244 +29903,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
-          "stale": false
-        },
-        "selection_status": "ready"
-      },
-      {
-        "id": "755367",
-        "url": "https://www.vlr.gg/755367/tidal-legends-gaming-vs-101-outlaws-game-changers-2026-china-ubqf",
-        "match_url": "https://www.vlr.gg/755367/tidal-legends-gaming-vs-101-outlaws-game-changers-2026-china-ubqf",
-        "team_a": "Tidal Legends Gaming",
-        "team_b": "101 Outlaws",
-        "event": "Main Event–Upper Quarterfinals Game Changers 2026: China",
-        "tournament": "Game Changers 2026: China",
-        "stage": "기타 스테이지",
-        "round_name": "상위 8강",
-        "region": "China",
-        "tier": "A-Tier",
-        "status": "Completed 1mo",
-        "time": "8:05 AM",
-        "date": "Mon, September 14, 2026",
-        "status_code": "final",
-        "scheduled_at": "2026-09-14T12:05:00+00:00",
-        "selection_data": {
-          "details": {
-            "match_id": "755367",
-            "team_a_id": "23399",
-            "team_a_name": "Tidal Legends Gaming",
-            "team_b_id": "17105",
-            "team_b_name": "101 Outlaws",
-            "event_id": "3129",
-            "scheduled_at": "2026-09-14T12:05:00+00:00",
-            "schedule_source_zone": "EDT",
-            "match_format": "BO3",
-            "actual_veto": [
-              {
-                "team": "101",
-                "action": "ban",
-                "map": "Sunset"
-              },
-              {
-                "team": "TLG",
-                "action": "ban",
-                "map": "Abyss"
-              },
-              {
-                "team": "101",
-                "action": "pick",
-                "map": "Lotus"
-              },
-              {
-                "team": "TLG",
-                "action": "pick",
-                "map": "Ascent"
-              },
-              {
-                "team": "101",
-                "action": "ban",
-                "map": "Summit"
-              },
-              {
-                "team": "TLG",
-                "action": "ban",
-                "map": "Split"
-              },
-              {
-                "team": null,
-                "action": "remaining",
-                "map": "Haven"
-              }
-            ],
-            "live_score": {
-              "series_score_a": "0",
-              "series_score_b": "2",
-              "status": "final",
-              "maps": [
-                {
-                  "map": "Lotus",
-                  "score_a": "12",
-                  "score_b": "14"
-                },
-                {
-                  "map": "Ascent",
-                  "score_a": "9",
-                  "score_b": "13"
-                }
-              ],
-              "scheduled_at": "2026-09-14T12:05:00+00:00",
-              "schedule_source_zone": "EDT",
-              "match_format": "BO3",
-              "actual_veto": [
-                {
-                  "team": "101",
-                  "action": "ban",
-                  "map": "Sunset"
-                },
-                {
-                  "team": "TLG",
-                  "action": "ban",
-                  "map": "Abyss"
-                },
-                {
-                  "team": "101",
-                  "action": "pick",
-                  "map": "Lotus"
-                },
-                {
-                  "team": "TLG",
-                  "action": "pick",
-                  "map": "Ascent"
-                },
-                {
-                  "team": "101",
-                  "action": "ban",
-                  "map": "Summit"
-                },
-                {
-                  "team": "TLG",
-                  "action": "ban",
-                  "map": "Split"
-                },
-                {
-                  "team": null,
-                  "action": "remaining",
-                  "map": "Haven"
-                }
-              ]
-            },
-            "team_a_logo": "https://www.vlr.gg/img/vlr/tmp/vlr.png",
-            "team_b_logo": "https://www.vlr.gg/img/vlr/tmp/vlr.png"
-          },
-          "team_a_events": [
-            {
-              "id": "3129",
-              "name": "Game Changers 2026: China"
-            }
-          ],
-          "team_b_events": [
-            {
-              "id": "3129",
-              "name": "Game Changers 2026: China"
-            },
-            {
-              "id": "3081",
-              "name": "Peak of Legends 2026"
-            },
-            {
-              "id": "2630",
-              "name": "CCCE City Cup 2025"
-            },
-            {
-              "id": "2511",
-              "name": "SOOP Elite Cup 2025: Season 2"
-            },
-            {
-              "id": "2444",
-              "name": "Game Changers 2025: China Stage 1"
-            },
-            {
-              "id": "2371",
-              "name": "Game Changers 2025: Southeast Asia Split 1"
-            },
-            {
-              "id": "2362",
-              "name": "SOOP Elite Cup 2025: Season 1"
-            },
-            {
-              "id": "2299",
-              "name": "SOOP Elite Cup 2024"
-            }
-          ],
-          "map_pool": [
-            "Abyss",
-            "Ascent",
-            "Haven",
-            "Lotus",
-            "Split",
-            "Summit",
-            "Sunset"
-          ],
-          "live_score": {
-            "series_score_a": "0",
-            "series_score_b": "2",
-            "status": "final",
-            "maps": [
-              {
-                "map": "Lotus",
-                "score_a": "12",
-                "score_b": "14"
-              },
-              {
-                "map": "Ascent",
-                "score_a": "9",
-                "score_b": "13"
-              }
-            ],
-            "scheduled_at": "2026-09-14T12:05:00+00:00",
-            "schedule_source_zone": "EDT",
-            "match_format": "BO3",
-            "actual_veto": [
-              {
-                "team": "101",
-                "action": "ban",
-                "map": "Sunset"
-              },
-              {
-                "team": "TLG",
-                "action": "ban",
-                "map": "Abyss"
-              },
-              {
-                "team": "101",
-                "action": "pick",
-                "map": "Lotus"
-              },
-              {
-                "team": "TLG",
-                "action": "pick",
-                "map": "Ascent"
-              },
-              {
-                "team": "101",
-                "action": "ban",
-                "map": "Summit"
-              },
-              {
-                "team": "TLG",
-                "action": "ban",
-                "map": "Split"
-              },
-              {
-                "team": null,
-                "action": "remaining",
-                "map": "Haven"
-              }
-            ]
-          },
-          "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30140,7 +30001,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30230,7 +30091,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30320,7 +30181,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30410,7 +30271,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30504,7 +30365,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30598,7 +30459,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30688,7 +30549,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30778,7 +30639,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30795,7 +30656,7 @@
         "round_name": "Round 3 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 4w 1d",
+        "status": "Completed 4w 2d",
         "time": "2:00 PM",
         "date": "Sat, September 26, 2026",
         "scheduled_at": "2026-09-26T18:00:00+00:00",
@@ -30872,7 +30733,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30889,7 +30750,7 @@
         "round_name": "Round 3 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 4w 1d",
+        "status": "Completed 4w 2d",
         "time": "3:00 PM",
         "date": "Sat, September 26, 2026",
         "scheduled_at": "2026-09-26T19:00:00+00:00",
@@ -30966,7 +30827,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31056,7 +30917,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31146,7 +31007,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31163,7 +31024,7 @@
         "round_name": "Round 4 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 3w 1d",
+        "status": "Completed 3w 2d",
         "time": "2:00 PM",
         "date": "Sat, October 3, 2026",
         "scheduled_at": "2026-10-03T18:00:00+00:00",
@@ -31240,7 +31101,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31257,7 +31118,7 @@
         "round_name": "Round 4 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 3w 1d",
+        "status": "Completed 3w 2d",
         "time": "3:00 PM",
         "date": "Sat, October 3, 2026",
         "scheduled_at": "2026-10-03T19:00:00+00:00",
@@ -31330,7 +31191,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31424,7 +31285,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31514,7 +31375,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31531,7 +31392,7 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 2w 1d",
+        "status": "Completed 2w 2d",
         "time": "2:00 PM",
         "date": "Sat, October 10, 2026",
         "scheduled_at": "2026-10-10T18:00:00+00:00",
@@ -31608,7 +31469,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31625,7 +31486,7 @@
         "round_name": "Round 5 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 2w 1d",
+        "status": "Completed 2w 2d",
         "time": "3:00 PM",
         "date": "Sat, October 10, 2026",
         "scheduled_at": "2026-10-10T19:00:00+00:00",
@@ -31702,7 +31563,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31792,7 +31653,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31882,7 +31743,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31899,7 +31760,7 @@
         "round_name": "Round 6 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1w 1d",
+        "status": "Completed 1w 2d",
         "time": "2:00 PM",
         "date": "Sat, October 17, 2026",
         "scheduled_at": "2026-10-17T18:00:00+00:00",
@@ -31972,7 +31833,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31989,7 +31850,7 @@
         "round_name": "Round 6 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1w 1d",
+        "status": "Completed 1w 2d",
         "time": "3:00 PM",
         "date": "Sat, October 17, 2026",
         "scheduled_at": "2026-10-17T19:00:00+00:00",
@@ -32066,7 +31927,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32156,7 +32017,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32250,13 +32111,13 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-10-26T14:11:37.841632+00:00",
+          "collected_at": "2026-10-26T19:57:16.590701+00:00",
           "stale": false
         },
         "selection_status": "ready"
       }
     ],
-    "ready_count": 132,
+    "ready_count": 131,
     "pending_count": 0,
     "unassigned_count": 13,
     "failures": []
@@ -211886,23 +211747,16 @@
     }
   },
   "collection": {
-    "status": "partial",
-    "started_at": "2026-10-26T14:11:41.470905+00:00",
-    "completed_at": "2026-10-26T14:29:58.877933+00:00",
-    "mode": "analysis_only",
-    "results": {
-      "updated": 72,
-      "failed": 2,
-      "total": 74
-    },
-    "budget_exhausted": false,
-    "remaining_teams": 0,
+    "status": "catalog_only",
+    "started_at": "2026-10-26T19:52:12.556554+00:00",
+    "completed_at": "2026-10-26T19:57:16.940708+00:00",
+    "mode": "catalog_only",
     "analytics": {
       "teams": 74,
       "failed_teams": 2,
       "stored_teams": 123,
       "pending_teams": 0,
-      "stale_teams": 2
+      "stale_teams": 74
     }
   }
 }
