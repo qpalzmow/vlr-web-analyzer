@@ -4,6 +4,7 @@ from threading import Event
 from unittest.mock import Mock
 
 import pytest
+import httpx
 import app.catalog as catalog
 import app.db as db
 import app.scraper.vlr as vlr
@@ -93,20 +94,27 @@ def test_failed_refresh_preserves_data_and_retries(monkeypatch):
 
 def test_partial_failure_reuses_only_the_same_matchup(monkeypatch):
     mock_sources(monkeypatch)
-    monkeypatch.setattr(catalog, "get_team_events", Mock(side_effect=RuntimeError("offline")))
+    monkeypatch.setattr(catalog, "get_team_events", Mock(side_effect=httpx.ConnectError("offline")))
     result = catalog.build_snapshot(snapshot())
     assert result["matches"][0]["selection_data"]["stale"] is True
     assert result["matches"][1]["selection_status"] == "pending"
     monkeypatch.setattr(catalog, "get_match_details", lambda _: {"team_a_id": "3", "team_b_id": "2"})
     prior = snapshot()
-    prior["ready_count"] = 0
-    assert "selection_data" not in catalog.build_snapshot(prior)["matches"][0]
+    retained = catalog.build_snapshot(prior)
+    assert retained["generation"] == "old"
+    assert retained["updated_at"] == prior["updated_at"]
+    assert retained["collection"]["status"] == "retained_previous"
+    assert retained["matches"] == prior["matches"]
 
 
 def test_empty_upstream_cannot_wipe_catalog(monkeypatch):
     monkeypatch.setattr(catalog, "get_matches", lambda **_: [])
-    with pytest.raises(ValueError):
-        catalog.build_snapshot(snapshot())
+    retained = catalog.build_snapshot(snapshot())
+    assert retained["generation"] == "old"
+    assert retained["updated_at"] == snapshot()["updated_at"]
+    assert retained["collection"]["status"] == "retained_previous"
+    with pytest.raises(catalog.CatalogCollectionError):
+        catalog.build_snapshot()
 
 
 def test_hourly_deadline_is_based_on_start_not_completion():
@@ -139,7 +147,7 @@ def test_strict_events_distinguish_failed_scrape_from_empty_menu(monkeypatch):
 def test_static_assets_revalidate_after_deployment(client):
     assert client.get("/").headers["cache-control"] == "no-cache"
     assert client.get("/api/catalog").headers["cache-control"] == "no-store"
-    assert 'api.js?v=20261009.1' in client.get("/").text
+    assert 'api.js?v=20261101.1' in client.get("/").text
 
 
 def test_catalog_source_failure_is_not_a_successful_empty_or_partial_result(monkeypatch):

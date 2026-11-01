@@ -1,16 +1,19 @@
 import re
 import logging
+from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
 
 from app.config import load_tier_config
-from app.scraper.http import request_with_retry
+from app.scraper.http import request_with_retry, check_collection_budget, CollectionBudgetExceeded
 from app.scraper.parsers import (
     clean_text, parse_matches_list,
     parse_match_details, parse_live_score, parse_tournament_and_stage
 )
-def get_matches(strict=False):
+def get_matches(strict=False, with_sources=False):
+    if with_sources:
+        return _get_matches_with_sources()
     s_keywords, a_keywords = load_tier_config()
     seen_ids = set()
     combined = []
@@ -109,6 +112,112 @@ def get_matches(strict=False):
 
     return combined
 
+
+def _parse_match_source(html, s_keywords, a_keywords):
+    soup = BeautifulSoup(html, 'html.parser')
+    if not soup.select_one('.match-item, .wf-card, .matches-container, .wf-label'):
+        raise ValueError('Match list page structure missing')
+    return parse_matches_list(html, s_keywords, a_keywords)
+
+
+def _discover_major_events(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    if not soup.select_one('.event-item, .events-container, .event-filter, .events-subnav'):
+        raise ValueError('Event list page structure missing')
+    events = {}
+    for card in soup.find_all(class_='event-item'):
+        anchor = card if card.name == 'a' else card.find('a', href=True)
+        if not anchor or not anchor.get('href'):
+            continue
+        title_node = card.find(class_='event-item-title') or card.find(class_='wf-title')
+        title = clean_text((title_node or anchor).get_text())
+        status_node = card.find(class_='event-item-desc-item-status')
+        status = clean_text(status_node.get_text()).lower() if status_node else ''
+        event_id = re.match(r'^/event/(\d+)(?:/|$)', anchor['href'])
+        if event_id and re.search(r'vct|champions|masters', title, re.I) and 'ongoing' in status:
+            events[event_id[1]] = {'id': event_id[1], 'title': title}
+    return list(events.values())
+
+
+def _event_match_rows(html, event, s_keywords, a_keywords):
+    rows = _parse_match_source(html, s_keywords, a_keywords)
+    region = 'Other'
+    for pattern, value in ((r'\b(champions|masters)\b', 'Global'),
+                           (r'\b(pacific|korea|japan|apac)\b', 'Pacific'),
+                           (r'\b(emea|europe)\b', 'EMEA'),
+                           (r'\b(americas|north america|brazil|latam)\b', 'Americas'),
+                           (r'\b(china|cn)\b', 'China')):
+        if re.search(pattern, event['title'], re.I):
+            region = value
+            break
+    for row in rows:
+        row['tier'], row['region'], row['tournament'] = 'S-Tier', region, event['title']
+        if event['title'] not in row['event']:
+            row['event'] = f"{row['event']} {event['title']}".strip()
+        _, row['stage'], row['round_name'] = parse_tournament_and_stage(row['event'])
+    return rows
+
+
+def _get_matches_with_sources():
+    """Collect provenance without discarding required lists on a later failure.
+
+    This does not decide whether partial data is publishable. The catalog uses
+    required-source completeness and previous ownership to make that decision.
+    """
+    s_keywords, a_keywords = load_tier_config()
+    sources, failures, combined = {}, [], {}
+
+    def collect(source_id, url, parser, *, required=False, owns_matches=True):
+        source = {'required': required, 'status': 'failed', 'match_ids': [], 'collected_at': None}
+        sources[source_id] = source
+        try:
+            check_collection_budget()
+            response = request_with_retry(url)
+            response.raise_for_status()
+        except Exception as error:
+            reason = 'budget_exceeded' if isinstance(error, CollectionBudgetExceeded) else 'http_error'
+        else:
+            try:
+                result = parser(response.text)
+                check_collection_budget()
+            except Exception as error:
+                reason = 'budget_exceeded' if isinstance(error, CollectionBudgetExceeded) else 'parse_error'
+            else:
+                source.update(status='completed', collected_at=datetime.now(timezone.utc).isoformat())
+                if owns_matches:
+                    source['match_ids'] = list(dict.fromkeys(str(row['id']) for row in result))
+                    for row in result:
+                        match_id = str(row['id'])
+                        if match_id not in combined:
+                            combined[match_id] = {**row, 'source_ids': []}
+                        if source_id not in combined[match_id]['source_ids']:
+                            combined[match_id]['source_ids'].append(source_id)
+                else:
+                    source['event_ids'] = [str(event['id']) for event in result]
+                return result
+        source['reason'] = reason
+        failures.append({'kind': 'source', 'source': source_id, 'id': source_id, 'reason': reason})
+        logger.warning('Match source %s failed: %s', source_id, reason)
+        return []
+
+    parse_rows = lambda html: _parse_match_source(html, s_keywords, a_keywords)
+    collect('upcoming', 'https://www.vlr.gg/matches', parse_rows, required=True)
+    for page in (1, 2):
+        url = 'https://www.vlr.gg/matches/results' + (f'/?page={page}' if page > 1 else '')
+        def parse_results(html):
+            rows = parse_rows(html)
+            for row in rows:
+                row['status_code'] = 'final'
+            return rows
+        collect(f'results:{page}', url, parse_results, required=True)
+    events = collect('events', 'https://www.vlr.gg/events', _discover_major_events, owns_matches=False)
+    for event in events:
+        collect(f"event:{event['id']}", f"https://www.vlr.gg/event/matches/{event['id']}/?series_id=all",
+                lambda html, event=event: _event_match_rows(html, event, s_keywords, a_keywords))
+    return {'matches': list(combined.values()), 'sources': sources, 'failures': failures,
+            'required_complete': all(sources[key]['status'] == 'completed'
+                                     for key in ('upcoming', 'results:1', 'results:2'))}
+
 def get_match_details(match_url):
     res = request_with_retry(match_url)
     res.raise_for_status()
@@ -117,7 +226,7 @@ def get_match_details(match_url):
         raise ValueError('Match page structure missing')
     return parse_match_details(res.text, match_url)
 
-def get_event_map_pool(event_id):
+def get_event_map_pool(event_id, strict=False):
     if not event_id:
         return []
     url = f"https://www.vlr.gg/event/agents/{event_id}"
@@ -125,15 +234,26 @@ def get_event_map_pool(event_id):
         res = request_with_retry(url)
     except Exception as e:
         logger.warning('get_event_map_pool request failed: %s', e)
+        if strict:
+            raise
         return []
     if res.status_code != 200:
+        if strict:
+            res.raise_for_status()
+            raise ValueError(f'Event map pool returned HTTP {res.status_code}')
         return []
 
     from app.config import ALL_KNOWN_MAPS
     soup = BeautifulSoup(res.text, 'html.parser')
     detected = set()
 
-    for container in soup.find_all(class_=['mod-agents', 'vm-stats-container', 'mod-team-maps', 'mod-map-pool']):
+    containers = soup.find_all(class_=['mod-agents', 'vm-stats-container', 'mod-team-maps', 'mod-map-pool'])
+    # The public event-agents page uses a global pick-rate table. Restrict this
+    # fallback to that table rather than treating map names anywhere as data.
+    containers.extend(soup.select('table.mod-pr-global'))
+    if strict and not containers:
+        raise ValueError('Event map pool page structure missing')
+    for container in containers:
         for cell in container.find_all(['th', 'td', 'div', 'span']):
             cell_text = clean_text(cell.get_text())
             if not cell_text:
@@ -142,7 +262,7 @@ def get_event_map_pool(event_id):
                 if m not in detected and re.search(r'\b' + re.escape(m) + r'\b', cell_text, re.I):
                     detected.add(m)
 
-    if not detected:
+    if not detected and not strict:
         page_text = soup.get_text(' ')
         for m in ALL_KNOWN_MAPS:
             if re.search(r'\b' + re.escape(m) + r'\b', page_text, re.I):
@@ -163,6 +283,7 @@ def get_team_events(team_id, strict=False):
         return []
     if res.status_code != 200:
         if strict:
+            res.raise_for_status()
             raise ValueError(f"Team events returned HTTP {res.status_code}")
         return []
 

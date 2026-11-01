@@ -5,29 +5,29 @@ MatchUI.buildMatchSummary = function(data, match) {
     const advantage = comparable.filter(row => Math.abs(row.delta) >= 10).sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
     const meanDelta = comparable.length >= 2 ? comparable.reduce((sum, row) => sum + row.delta, 0) / comparable.length : null;
     const balance = meanDelta === null ? 'unknown' : Math.abs(meanDelta) <= 5 ? 'close' : meanDelta > 10 ? 'a' : meanDelta < -10 ? 'b' : 'balanced';
-    const model = {status, balance, maps, comparable, score, kicker: '기록을 보는 관점', title: '', detail: ''};
-    if (status === 'final') {
-        model.kicker = '확정 결과';
-        model.title = !score || score.a + score.b === 0 ? '최종 스코어를 확인하고 있습니다.' : score.a === score.b
-            ? `${match.team_a}와 ${match.team_b}, ${score.a} : ${score.b}로 종료.`
-            : `${score.a > score.b ? match.team_a : match.team_b} 승리. 최종 스코어는 ${Math.max(score.a, score.b)} : ${Math.min(score.a, score.b)}입니다.`;
-        model.detail = '맵별 결과와 공개된 밴픽을 먼저 확인하세요. 아래 맵 승률과 선수 ACS는 과거 기록·전체 커리어 기준입니다.';
-    } else if (status === 'live') {
-        model.kicker = '현재 스코어';
-        model.title = !score ? '경기가 진행 중입니다.' : score.a === score.b ? `현재 ${score.a} : ${score.b}, 동률입니다.`
-            : `현재 스코어 ${score.a} : ${score.b}. ${score.a > score.b ? match.team_a : match.team_b} 우세입니다.`;
-        model.detail = '라이브 스코어를 먼저 표시합니다. 맵 기록과 커리어 수치는 이 경기의 실시간 선수 성적이 아닙니다.';
-    } else if (advantage.length) {
+    const model = {status, balance, maps, comparable, score, kicker: '기록 비교', title: '', detail: ''};
+    const formA = MatchUI.recent(data, 'a'), formB = MatchUI.recent(data, 'b');
+    const formLeader = formA.count >= 3 && formA.count === formB.count && formA.wins !== formB.wins
+        ? formA.wins > formB.wins ? 'a' : 'b' : null;
+    // Match status and the actual score belong to the hero. This paragraph
+    // adds historical context using the same minimum samples for every phase.
+    if (advantage.length) {
         const top = advantage[0];
-        const team = top.delta > 0 ? match.team_a : match.team_b;
+        const side = top.delta > 0 ? 'a' : 'b', team = match[`team_${side}`];
         model.title = `${team}는 ${top.name}의 과거 맵 승률에서 앞섭니다.`;
-        model.detail = `${top.name}의 기록 차이는 ${MatchUI.number(Math.abs(top.delta), 1)}%p입니다. 양 팀 모두 5맵 이상 기록이 있는 맵만 비교합니다.`;
+        model.detail = `${top.name}에서 ${MatchUI.number(Math.abs(top.delta), 1)}%p 차이 · 양 팀 각각 ${top.a.played}맵 / ${top.b.played}맵 기록.`;
+        if (formLeader && formLeader !== side) {
+            model.detail += ` 최근 ${formA.count}경기에서는 ${match[`team_${formLeader}`]}의 승수가 더 많습니다.`;
+        }
     } else if (comparable.length) {
         model.title = '비교 가능한 맵의 기록 차이가 크지 않습니다.';
-        model.detail = `${comparable.length}개 맵에서 양 팀 표본을 확인했습니다. 공수 기록과 최근 상대팀을 함께 살펴보세요.`;
+        model.detail = `양 팀 모두 ${MIN_MAP_SAMPLE}맵 이상 기록이 있는 ${comparable.length}개 맵의 승률 차이가 10%p 미만입니다.`;
+        if (formLeader && Math.abs(formA.wins - formB.wins) >= 2) {
+            model.detail += ` 최근 ${formA.count}경기에서는 ${match[`team_${formLeader}`]}의 승수가 더 많습니다.`;
+        }
     } else {
         model.title = '맵별 표본을 먼저 확인하세요.';
-        model.detail = '양 팀 모두 5맵 이상 기록이 있는 공통 맵이 부족합니다. 수집된 기록을 표시하되 우세팀이나 승부를 추정하지 않습니다.';
+        model.detail = `양 팀 모두 ${MIN_MAP_SAMPLE}맵 이상 기록이 있는 공통 맵이 없습니다. 작은 표본의 승률은 우위 비교에서 제외합니다.`;
     }
     return model;
 };

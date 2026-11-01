@@ -85,7 +85,7 @@ def test_actual_match_status_fragment_and_stage_names():
     assert parsers.parse_live_score((FIXTURES/'match-upcoming.html').read_text(encoding='utf-8'))['status'] == 'upcoming'
 
 
-def test_forbidden_match_does_not_become_tbd_or_remove_previous_selection(monkeypatch):
+def test_forbidden_match_cannot_attach_unverified_previous_selection(monkeypatch):
     request = httpx.Request('GET', 'https://www.vlr.gg/1')
     monkeypatch.setattr(vlr, 'request_with_retry', lambda _: httpx.Response(403, text='<html>Forbidden</html>', request=request))
     with pytest.raises(httpx.HTTPStatusError):
@@ -102,8 +102,10 @@ def test_forbidden_match_does_not_become_tbd_or_remove_previous_selection(monkey
     monkeypatch.setattr(catalog, 'get_match_details', details)
     monkeypatch.setattr(catalog, 'get_team_events', lambda *a, **kw: [])
     result = catalog.build_snapshot(previous)
-    assert result['ready_count'] == 2
-    assert result['matches'][0]['selection_data']['stale'] is True
+    assert result['ready_count'] == 1
+    assert result['matches'][0]['selection_status'] == 'pending'
+    assert 'selection_data' not in result['matches'][0]
+    assert result['matches'][1]['selection_data']['details']['team_a_id'] == '3'
 
 
 def test_parsing_corruption_cannot_overwrite_good_data(monkeypatch):

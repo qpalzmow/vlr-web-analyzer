@@ -105,7 +105,7 @@ def test_catalog_only_export_preserves_analysis_and_default_still_refreshes(monk
     monkeypatch.setattr(sys, 'argv', ['snapshot_export', '--output', str(path)] + (['--catalog-only'] if catalog_only else []))
     monkeypatch.setattr(export, 'bootstrap_snapshot', lambda: None)
     monkeypatch.setattr(export, 'bootstrap_analysis', lambda: None)
-    monkeypatch.setattr(export, 'build_snapshot', lambda _: data['catalog'])
+    monkeypatch.setattr(export, 'build_snapshot', lambda _, **kwargs: data['catalog'])
     refresh = Mock(return_value={'updated': 1})
     monkeypatch.setattr(export, 'refresh_analysis', refresh)
     export.main()
@@ -308,8 +308,9 @@ def test_catalog_request_budget_clears_on_publish_and_source_failure(monkeypatch
     monkeypatch.setattr(export, 'bootstrap_analysis', lambda: None)
     deadline = Mock()
     monkeypatch.setattr(http, 'set_collection_deadline', deadline)
-    def build(previous):
+    def build(previous, *, on_checkpoint=None):
         assert previous == data['catalog']
+        assert callable(on_checkpoint)
         deadline.assert_called_once_with(600)
         if fails:
             raise TimeoutError('match list request budget exhausted')
@@ -321,7 +322,10 @@ def test_catalog_request_budget_clears_on_publish_and_source_failure(monkeypatch
         with pytest.raises(TimeoutError, match='match list request budget exhausted'):
             export.main()
         assert db.get_catalog_snapshot() == data['catalog']
-        assert not output.exists()
+        checkpoint = feed.validate(json.loads(output.read_text(encoding='utf-8')))
+        assert checkpoint['catalog']['generation'] == data['catalog']['generation']
+        assert checkpoint['catalog']['updated_at'] == data['catalog']['updated_at']
+        assert checkpoint['catalog']['collection']['status'] == 'retained_previous'
     else:
         export.main()
         published = feed.validate(json.loads(output.read_text(encoding='utf-8')))

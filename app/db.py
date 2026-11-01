@@ -1,3 +1,4 @@
+import copy
 import os
 import json
 import sqlite3
@@ -79,6 +80,17 @@ def install_prepared_snapshot(catalog, teams):
             if catalog_changed:
                 conn.execute("INSERT INTO catalog_snapshot VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET payload_json=excluded.payload_json",
                              (json.dumps(catalog, ensure_ascii=False),))
+            elif (previous and catalog.get('generation') == previous.get('generation')
+                  and catalog['updated_at'] == previous['updated_at'] and catalog.get('collection')):
+                phase = catalog['collection']
+                old_phase = previous.get('collection', {})
+                attempt = phase.get('completed_at') or phase.get('started_at')
+                old_attempt = old_phase.get('completed_at') or old_phase.get('started_at')
+                if attempt and (not old_attempt or stamp(attempt) > stamp(old_attempt)):
+                    metadata_update = copy.deepcopy(previous)
+                    metadata_update['collection'] = copy.deepcopy(phase)
+                    conn.execute('UPDATE catalog_snapshot SET payload_json=? WHERE id=1',
+                                 (json.dumps(metadata_update, ensure_ascii=False),))
             for tid, payload in teams.items():
                 row = conn.execute("SELECT payload_json FROM analysis_teams WHERE team_id = ?", (tid,)).fetchone()
                 old = json.loads(row[0]) if row else {}
@@ -103,6 +115,52 @@ def save_catalog_snapshot(payload):
         with conn:
             conn.execute("INSERT INTO catalog_snapshot (id, payload_json) VALUES (1, ?) "
                          "ON CONFLICT(id) DO UPDATE SET payload_json = excluded.payload_json", (encoded,))
+    finally:
+        conn.close()
+
+
+def merge_analysis_records(previous, incoming):
+    """Collector recovery preserves newer team metadata and each newer scope."""
+    def stamp(record, *keys):
+        for key in keys:
+            value = record.get(key)
+            if value:
+                return datetime.fromisoformat(value)
+        return datetime.min.replace(tzinfo=timezone.utc)
+
+    merged = copy.deepcopy(previous)
+    for tid, item in incoming.items():
+        old = merged.get(tid, {})
+        if not old or old.get('schema_version') != item.get('schema_version'):
+            merged[tid] = copy.deepcopy(item)
+            continue
+        newer = stamp(item, 'last_attempt_at', 'updated_at') >= stamp(old, 'last_attempt_at', 'updated_at')
+        chosen = copy.deepcopy(item if newer else old)
+        scopes = copy.deepcopy(chosen.get('scopes', {}))
+        for key, scope in (old if newer else item).get('scopes', {}).items():
+            if key not in scopes or stamp(scope, 'collected_at') > stamp(scopes[key], 'collected_at'):
+                scopes[key] = copy.deepcopy(scope)
+        if scopes:
+            chosen['scopes'] = scopes
+        merged[tid] = chosen
+    return merged
+
+
+def restore_collector_snapshot(catalog, teams):
+    """Restore a validated file's catalog; never relax normal server import guards."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute('BEGIN IMMEDIATE')
+            existing = {row[0]: json.loads(row[1]) for row in conn.execute(
+                'SELECT team_id, payload_json FROM analysis_teams').fetchall()}
+            merged = merge_analysis_records(existing, teams)
+            conn.execute('INSERT INTO catalog_snapshot VALUES (1, ?) '
+                         'ON CONFLICT(id) DO UPDATE SET payload_json=excluded.payload_json',
+                         (json.dumps(catalog, ensure_ascii=False),))
+            conn.executemany('INSERT INTO analysis_teams VALUES (?, ?) '
+                             'ON CONFLICT(team_id) DO UPDATE SET payload_json=excluded.payload_json',
+                             [(tid, json.dumps(team, ensure_ascii=False)) for tid, team in merged.items()])
     finally:
         conn.close()
 

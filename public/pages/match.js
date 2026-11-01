@@ -32,14 +32,10 @@ MatchUI.render = function(data, match) {
 
 MatchUI.onReportState = function(state) {
     document.getElementById('match-report').dataset.reportState = state;
-    if (state !== 'ready') { MatchUI.analysis = null; MatchUI.matchId = null; }
-    const button = document.getElementById('hero-analyze-btn');
-    button.disabled = state === 'loading' || !selectedMatch?.details_ready;
-    button.textContent = state === 'loading' ? '기록을 비교하는 중…' : state === 'ready' ? '다시 분석' : state === 'error' ? '분석 다시 시도' : '매치업 분석';
-    MatchUI.text('hero-action-note', state === 'loading' ? '저장된 맵·선수·최근 기록을 한 번에 불러옵니다.'
-        : state === 'ready' ? '대회 범위는 위의 경기 선택 메뉴에서 변경할 수 있습니다.'
-        : state === 'error' ? '통계를 불러오지 못했습니다. 다시 시도하거나 경기를 변경하세요.'
-        : '선택한 경기의 맵·선수·최근 기록을 비교합니다.');
+    if (!['ready', 'refreshing', 'refresh-error'].includes(state)) {
+        MatchUI.analysis = null;
+        MatchUI.matchId = null;
+    }
 };
 
 MatchUI.preview = function(match) {
@@ -50,5 +46,4 @@ MatchUI.preview = function(match) {
     renderTeamLogos({}, match);
     setReportState('preview');
     MatchUI.refresh(match);
-    document.getElementById('match-selection-panel').open = false;
 };

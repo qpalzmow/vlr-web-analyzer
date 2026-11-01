@@ -26,6 +26,28 @@ def set_collection_deadline(seconds):
         _collection_deadline = None if seconds is None else time.monotonic() + seconds
 
 
+def remaining_collection_seconds():
+    """Read the shared deadline, including from collector executor threads."""
+    with _rate_lock:
+        deadline = _collection_deadline
+    return None if deadline is None else max(0.0, deadline - time.monotonic())
+
+
+def check_collection_budget():
+    remaining = remaining_collection_seconds()
+    if remaining is not None and remaining <= 0:
+        raise CollectionBudgetExceeded('Source collection time budget reached')
+    return remaining
+
+
+def _request_timeout():
+    # HTTPX timeouts bound each I/O operation, not total response duration.
+    # The collector supervisor separately bounds the whole process.
+    remaining = check_collection_budget()
+    return httpx.Timeout(15.0 if remaining is None else min(15.0, remaining),
+                         connect=5.0 if remaining is None else min(5.0, remaining))
+
+
 def _wait_for_request():
     global _next_request_at
     interval = max(0.0, float(os.environ.get('VLR_REQUEST_INTERVAL_SECONDS', '0')))
@@ -60,9 +82,11 @@ def _defer_all_requests(seconds):
 
 
 def _retry_sleep(seconds):
-    if _collection_deadline is not None and time.monotonic() + seconds >= _collection_deadline:
+    remaining = check_collection_budget()
+    if remaining is not None and seconds >= remaining:
         raise CollectionBudgetExceeded('Source collection time budget reached')
     time.sleep(seconds)
+    check_collection_budget()
 
 def get_httpx_client() -> httpx.Client:
     global _shared_client
@@ -120,7 +144,14 @@ def request_with_retry(url: str, max_retries: int = 3) -> httpx.Response:
     for attempt in range(max_retries):
         _wait_for_request()
         try:
-            res = client.get(url, headers=_get_headers())
+            res = client.get(url, headers=_get_headers(), timeout=_request_timeout())
+            if res.status_code == 429:
+                # Preserve the server's limit even if this response spent the
+                # last collection seconds. Clearing a deadline is not a reset.
+                _defer_all_requests(_rate_limit_wait(res))
+            # An I/O timeout is per operation; a response can finish after the
+            # cooperative deadline, including a redirect with a slow body.
+            check_collection_budget()
             if res.status_code == 200:
                 return res
             if res.status_code in (301, 302, 307, 308):
@@ -135,11 +166,11 @@ def request_with_retry(url: str, max_retries: int = 3) -> httpx.Response:
                 raise httpx.HTTPStatusError(f"404 Not Found: {url}", request=res.request, response=res)
             if res.status_code == 429:
                 # One worker being limited must pause every collector worker.
-                _defer_all_requests(_rate_limit_wait(res))
                 last_err = httpx.HTTPStatusError('VLR request rate limited', request=res.request, response=res)
                 continue
             if res.status_code in (502, 503, 504):
-                last_err = Exception(f"Status {res.status_code}")
+                last_err = httpx.HTTPStatusError(f"VLR returned HTTP {res.status_code}",
+                                                 request=res.request, response=res)
                 retry_after = res.headers.get('Retry-After')
                 if retry_after and retry_after.isdigit():
                     wait = min(int(retry_after), 60)
@@ -151,10 +182,13 @@ def request_with_retry(url: str, max_retries: int = 3) -> httpx.Response:
         except CollectionBudgetExceeded:
             raise
         except httpx.HTTPStatusError:
+            check_collection_budget()
             raise
         except Exception as e:
+            check_collection_budget()
             last_err = e
             wait = min(30, 2 ** attempt + random.uniform(0.1, 1.0))
             _retry_sleep(wait)
 
+    check_collection_budget()
     raise last_err if last_err else Exception(f"Request failed for {url}")

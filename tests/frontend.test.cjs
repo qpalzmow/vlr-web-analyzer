@@ -32,6 +32,85 @@ test('catalog status exposes delayed data even when the last import completed', 
     assert.match(badge.title, /서버가 실행 중일 때/);
 });
 
+test('catalog and analysis outcomes stay distinct through partial retention and recovery', () => {
+    const h = setup();
+    const retry = '2026-10-23T12:15:00+00:00';
+    const phase = (status, extra = {}) => ({
+        status, catalog_generation: 'current', failures: [], budget_exhausted: false,
+        next_retry_at: null, ...extra,
+    });
+    h.context.data = {
+        generation: 'current', updated_at: new Date().toISOString(), sync_status: 'degraded',
+        sync_details: {source: 'github_hourly', collection: {
+            catalog: phase('partial', {budget_exhausted: true, next_retry_at: retry,
+                failures: [{kind: 'pool', id: '20', reason: 'http_error'},
+                           {kind: 'match', id: '2', reason: 'budget_exceeded'}]}),
+            analysis: phase('completed'),
+        }},
+    };
+    h.run('renderCatalogStatus(data)');
+    const badge = h.elements.get('sync-badge-text');
+    assert.match(badge.textContent, /목록 일부 갱신/);
+    assert.doesNotMatch(badge.textContent, /분석 일부 갱신|이전 목록 유지/);
+    assert.match(badge.title, /목록 수집: 일부 갱신/);
+    assert.match(badge.title, /목록 수집 예산 소진/);
+    assert.match(badge.title, /목록 실패 원인: http_error, budget_exceeded/);
+    assert.ok(badge.title.includes(`목록 재시도 목표: ${retry}`));
+
+    h.context.data.sync_details.collection.catalog.status = 'retained_previous';
+    h.run('renderCatalogStatus(data)');
+    assert.match(badge.textContent, /이전 목록 유지/);
+    assert.doesNotMatch(badge.textContent, /목록 일부 갱신|분석 일부 갱신/);
+    assert.match(badge.title, /목록 수집: 이전 목록 유지/);
+    assert.match(badge.title, /목록 실패 원인: http_error, budget_exceeded/);
+
+    h.context.data.sync_details.collection.catalog = phase('completed');
+    h.context.data.sync_details.collection.analysis = phase('partial', {
+        budget_exhausted: true, next_retry_at: retry,
+        failures: [{kind: 'analysis', id: 'collector', reason: 'budget_exceeded'}],
+    });
+    h.run('renderCatalogStatus(data)');
+    assert.match(badge.textContent, /분석 일부 갱신/);
+    assert.doesNotMatch(badge.textContent, /목록 일부 갱신|이전 목록 유지/);
+    assert.match(badge.title, /목록 수집: 완료/);
+    assert.match(badge.title, /분석 수집 예산 소진/);
+    assert.match(badge.title, /분석 실패 원인: budget_exceeded/);
+    assert.ok(badge.title.includes(`분석 재시도 목표: ${retry}`));
+    assert.doesNotMatch(badge.title, /목록 실패 원인|목록 재시도 목표/);
+
+    h.context.data.sync_status = 'completed';
+    h.context.data.sync_details.collection.analysis = phase('completed');
+    h.run('renderCatalogStatus(data)');
+    assert.doesNotMatch(badge.textContent, /일부 갱신|이전 목록 유지|수집 실패/);
+    assert.doesNotMatch(badge.title, /예산 소진|실패 원인|재시도 목표|http_error|budget_exceeded/);
+    assert.match(badge.title, /목록 수집: 완료/);
+    assert.match(badge.title, /분석 수집: 완료/);
+});
+
+test('status ignores collection outcomes belonging to another catalog generation', () => {
+    const h = setup();
+    const failed = {status: 'partial', catalog_generation: 'superseded', budget_exhausted: true,
+        failures: [{kind: 'source', id: 'events', reason: 'http_error'}],
+        next_retry_at: '2026-10-23T12:15:00+00:00'};
+    h.context.data = {
+        generation: 'current', updated_at: new Date().toISOString(), sync_status: 'completed',
+        collection: {status: 'completed', catalog_generation: 'current'},
+        sync_details: {source: 'github_hourly', collection: {
+            status: 'partial', catalog: failed, analysis: failed,
+        }},
+    };
+    h.run('renderCatalogStatus(data)');
+    const badge = h.elements.get('sync-badge-text');
+    assert.doesNotMatch(badge.textContent, /일부 갱신|이전 목록 유지|수집 실패/);
+    assert.match(badge.title, /목록 수집: 완료/);
+    assert.doesNotMatch(badge.title, /분석 수집|예산 소진|실패 원인|재시도 목표|http_error/);
+
+    h.context.data.collection = {...failed, status: 'retained_previous'};
+    h.run('renderCatalogStatus(data)');
+    assert.doesNotMatch(badge.textContent, /일부 갱신|이전 목록 유지|수집 실패/);
+    assert.doesNotMatch(badge.title, /(?:^|\n)(?:목록 수집:|분석 수집:)|예산 소진|실패 원인|재시도 목표/);
+});
+
 function setup(search = '') {
     class Element {
         constructor(tag = 'div') {
@@ -42,7 +121,8 @@ function setup(search = '') {
             this.style = {};
             this.classes = new Set();
             this.classList = { add: (...names) => names.forEach(n => this.classes.add(n)),
-                remove: (...names) => names.forEach(n => this.classes.delete(n)), contains: n => this.classes.has(n) };
+                remove: (...names) => names.forEach(n => this.classes.delete(n)), contains: n => this.classes.has(n),
+                toggle: (name, force) => { const add = force ?? !this.classes.has(name); if (add) this.classes.add(name); else this.classes.delete(name); return add; } };
             this.attributes = {};
         }
         set innerHTML(value) {
@@ -59,6 +139,7 @@ function setup(search = '') {
         }
         addEventListener(name, callback) { this[name] = callback; }
         setAttribute(key, value) { this.attributes[key] = value; }
+        getAttribute(key) { return this.attributes[key] ?? null; }
         removeAttribute(key) { delete this.attributes[key]; }
         click() { this.clicked = true; }
         focus() { this.focused = true; }
@@ -195,7 +276,8 @@ test('stale and unavailable statistics are both explained', async () => {
         ace_b:{nickname:'N/A',acs:null,available:false,agents:[],unavailable_reason:'roster_unverified'}});
     await h.run("handleMatchSelection(['8'],true)");
     assert.match(h.elements.get('sub-status-text').textContent,/갱신 지연/);
-    assert.match(h.elements.get('report-integrity-note').textContent,/미표시/);
+    assert.match(h.elements.get('report-integrity-note').textContent,/갱신 지연.*커리어 비교 불가/);
+    assert.equal(h.elements.get('report-integrity-note').hidden,false);
     assert.match(h.elements.get('report-integrity-note').textContent,/Two:/);
     assert.doesNotMatch(h.elements.get('report-integrity-note').textContent,/One:/);
     assert.equal(h.elements.get('ace-a-nickname').textContent,'Player A');
@@ -266,6 +348,65 @@ test('hourly snapshot refresh preserves active analysis and filters, updates oth
     assert.equal(h.read('teamAEvents[0].id'), '9');
 });
 
+test('later checkpoint in the same generation updates browsing and preserves the current report', async () => {
+    const h = setup();
+    h.run("tierSelect.value='All';regionSelect.value='All';startLiveScorePolling=()=>{}");
+    h.context.fetch = async () => response({generation: 'checkpoint', updated_at: '2026-10-23T12:00:00Z',
+        matches: [readyMatch(), readyMatch('2')]});
+    await h.run('fetchMatches()');
+    h.run("matchSelect.value='0'");
+    h.context.fetch = async () => response(analysisResult());
+    await h.run("handleMatchSelection(['8'],true)");
+    h.run('globalThis.active=selectedMatch;globalThis.activeReport=reportSnapshot;globalThis.activeData=MatchUI.analysis');
+    const displayed = h.elements.get('ace-a-acs').textContent;
+    const newer = readyMatch('2');
+    newer.selection_data.team_a_events = [{id: '9', name: 'New Event'}];
+    const freshCurrent = readyMatch();
+    freshCurrent.selection_data.map_pool = ['Abyss'];
+    h.context.fetch = async () => response({generation: 'checkpoint', updated_at: '2026-10-23T12:01:00Z',
+        matches: [freshCurrent, newer, readyMatch('3')]});
+    await h.run('fetchMatches(true)');
+
+    assert.equal(h.read('catalogGeneration'), 'checkpoint');
+    assert.equal(h.read('catalogUpdatedAt'), '2026-10-23T12:01:00Z');
+    assert.deepEqual(h.read('allMatches.map(match=>match.id)'), ['1', '2', '3']);
+    assert.equal(h.read('selectedMatch===active'), true);
+    assert.equal(h.read('reportSnapshot===activeReport'), true);
+    assert.equal(h.read('MatchUI.analysis===activeData'), true);
+    assert.deepEqual(h.read('[...selectedEvents]'), ['8']);
+    assert.deepEqual(h.read('selectedMatch.map_pool'), ['Bind', 'Icebox']);
+    assert.deepEqual(h.read('allMatches[0].selection_data.map_pool'), ['Abyss']);
+    assert.equal(h.elements.get('match-report').dataset.reportState, 'ready');
+    assert.equal(h.elements.get('ace-a-acs').textContent, displayed);
+    h.run("matchSelect.value='1'");
+    await h.run('handleMatchSelection()');
+    assert.equal(h.read('teamAEvents[0].id'), '9');
+});
+
+test('unchanged generation and clock refresh status without rebuilding match controls', async () => {
+    const h = setup();
+    h.run("tierSelect.value='All';regionSelect.value='All'");
+    const stamp = new Date().toISOString();
+    h.context.fetch = async () => response({generation: 'unchanged', updated_at: stamp, matches: [readyMatch()]});
+    await h.run('fetchMatches()');
+    h.run("matchSelect.value='0'");
+    await h.run("handleMatchSelection(['8'])");
+    h.run(`globalThis.priorMatches=allMatches;globalThis.active=selectedMatch;
+        globalThis.rebuildCalls=0;globalThis.originalPopulate=populateEventsDropdown;
+        populateEventsDropdown=(...args)=>{rebuildCalls++;return originalPopulate(...args)};`);
+    h.context.fetch = async () => response({generation: 'unchanged', updated_at: stamp,
+        matches: [readyMatch('2')], sync_details: {source: 'github_hourly', collection: {
+            catalog: {status: 'retained_previous', catalog_generation: 'unchanged'},
+        }}});
+    await h.run('fetchMatches(true)');
+    assert.equal(h.read('rebuildCalls'), 0);
+    assert.equal(h.read('allMatches===priorMatches'), true);
+    assert.equal(h.read('selectedMatch===active'), true);
+    assert.deepEqual(h.read('[...selectedEvents]'), ['8']);
+    assert.deepEqual(h.read('allMatches.map(match=>match.id)'), ['1']);
+    assert.match(h.elements.get('sync-badge-text').textContent, /이전 목록 유지/);
+});
+
 test('first startup polls only the stored catalog until a generation is published', async () => {
     const h = setup();
     h.run("tierSelect.value='All';regionSelect.value='All'");
@@ -309,7 +450,8 @@ test('one analysis request sends filters and pool and paints every panel togethe
     assert.equal(h.elements.get('ace-a-rounds').textContent,'100');
     assert.equal(h.elements.get('ace-a-acs').textContent,'220.0');
     assert.equal(h.elements.get('ace-b-acs').textContent,'200.0');
-    assert.match(h.elements.get('report-integrity-note').textContent,/커리어 비교는 대회 필터와 무관/);
+    assert.match(h.elements.get('report-scope').textContent,/커리어 비교는 대회 필터와 무관/);
+    assert.equal(h.elements.get('report-integrity-note').hidden,true);
     assert.equal(h.elements.get('status-text').textContent,'전력 분석 완료.');
     assert.equal(h.read('analysisRunning'),false);
     assert.equal(h.read('analyzeBtn.disabled'),false);
@@ -342,24 +484,33 @@ test('unprepared scope reports the reason without per-panel fallback requests', 
     assert.equal(h.elements.get('career-acs-chart').hidden,false);
 });
 
-test('re-analysis clears prior career statistics and comparison state while the new request is pending', async () => {
+test('same-match reanalysis preserves all completed data while pending and replaces it on success', async () => {
     const h=setup();let finish;
     h.context.match=readyMatch();
     h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
     h.context.fetch=async()=>response(analysisResult());
     await h.run('handleMatchSelection([],true)');
+    h.run('globalThis.previousSnapshot=reportSnapshot;globalThis.previousAnalysis=MatchUI.analysis');
     h.context.fetch=()=>new Promise(resolve=>{finish=resolve;});
     const pending=h.run('runAnalysis()');
-    for (const field of ['nickname','acs','kd','kd-ratio','rounds']) {
-        assert.equal(h.elements.get(`ace-a-${field}`).textContent,'—');
-    }
-    assert.equal(h.elements.get('ace-a-collected').textContent,'');
-    assert.equal(h.elements.get('career-acs-chart').hidden,false);
-    assert.equal(h.elements.get('career-acs-empty').hidden,false);
-    assert.match(h.elements.get('career-acs-empty').textContent,/불러오는 중/);
-    finish(response(analysisResult()));await pending;
     assert.equal(h.elements.get('ace-a-nickname').textContent,'Player A');
+    assert.equal(h.elements.get('ace-a-acs').textContent,'220.0');
+    assert.equal(h.elements.get('ace-a-rounds').textContent,'100');
+    assert.equal(h.read('reportSnapshot === previousSnapshot'),true);
+    assert.equal(h.read('MatchUI.analysis === previousAnalysis'),true);
+    assert.equal(h.elements.get('match-report').dataset.reportState,'refreshing');
+    assert.match(h.elements.get('report-refresh-status').textContent,/갱신 중/);
+    assert.equal(h.elements.get('report-toolbar').classList.contains('hidden'),false);
+    assert.equal(h.elements.get('export-img-btn').disabled,true);
     assert.equal(h.elements.get('career-acs-chart').hidden,false);
+    assert.equal(h.elements.get('career-acs-empty').hidden,true);
+    const fresh=analysisResult();fresh.ace_a.nickname='New Player';
+    finish(response(fresh));await pending;
+    assert.equal(h.elements.get('ace-a-nickname').textContent,'New Player');
+    assert.equal(h.elements.get('career-acs-chart').hidden,false);
+    assert.equal(h.elements.get('match-report').dataset.reportState,'ready');
+    assert.equal(h.elements.get('report-refresh-status').hidden,true);
+    assert.equal(h.elements.get('export-img-btn').disabled,false);
 });
 
 test('cache without score is fetched immediately and final score stops polling', async () => {
@@ -371,6 +522,120 @@ test('cache without score is fetched immediately and final score stops polling',
     assert.equal(calls, 1);
     assert.equal(h.read('selectedMatch.live_score.status'), 'final');
     assert.equal(h.timers.size, 0);
+});
+
+test('failed reanalysis keeps the completed report, applied scope and share link', async () => {
+    const h=setup();h.context.match=readyMatch();let finish;
+    h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
+    h.context.fetch=async()=>response(analysisResult());
+    await h.run("handleMatchSelection(['8'],true)");
+    h.run('globalThis.previousSnapshot=reportSnapshot;globalThis.previousAnalysis=MatchUI.analysis;setTournamentSelection([])');
+    assert.equal(h.elements.get('filter-apply-status').hidden,false);
+    assert.match(h.elements.get('filter-apply-status').textContent,/변경사항 미적용/);
+    assert.match(h.elements.get('applied-scope').textContent,/Event Eight/);
+    assert.match(h.elements.get('selection-scope').textContent,/전체 대회/);
+    h.context.fetch=()=>new Promise(resolve=>{finish=resolve;});
+    const pending=h.run('runAnalysis()');
+    h.run('generateShareableLink()');await flush();
+    assert.equal(new URL(h.context.copied).searchParams.get('events'),'8');
+    finish({ok:false,status:503,json:async()=>({detail:'Temporary outage'})});await pending;
+    assert.equal(h.read('reportSnapshot === previousSnapshot'),true);
+    assert.equal(h.read('MatchUI.analysis === previousAnalysis'),true);
+    assert.equal(h.elements.get('ace-a-nickname').textContent,'Player A');
+    assert.equal(h.elements.get('match-report').dataset.reportState,'refresh-error');
+    assert.equal(h.elements.get('match-report').attributes['aria-busy'],'false');
+    assert.match(h.elements.get('report-refresh-status').textContent,/이전 분석 결과를 유지/);
+    assert.equal(h.elements.get('report-toolbar').classList.contains('hidden'),false);
+    assert.equal(h.elements.get('export-img-btn').disabled,false);
+    assert.equal(h.elements.get('filter-apply-status').hidden,false);
+    h.run("setTournamentSelection(['8'])");
+    assert.equal(h.elements.get('filter-apply-status').hidden,true);
+});
+
+test('scope edited during analysis stays unapplied without closing controls or stealing focus', async () => {
+    const h=setup();h.context.match=readyMatch();let finish;
+    h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
+    await h.run("handleMatchSelection(['8'])");
+    h.run("document.getElementById('advanced-filters').open=true;document.getElementById('tournament-explorer').open=true");
+    h.context.fetch=()=>new Promise(resolve=>{finish=resolve;});
+    const pending=h.run('runAnalysis()');
+    h.run('setTournamentSelection([])');
+    finish(response(analysisResult()));await pending;
+    assert.deepEqual(h.read('reportSnapshot.events'),['8']);
+    assert.deepEqual(h.read('Array.from(selectedEvents)'),[]);
+    assert.equal(h.elements.get('match-selection-panel').open,true);
+    assert.equal(h.elements.get('advanced-filters').open,true);
+    assert.equal(h.elements.get('tournament-explorer').open,true);
+    assert.notEqual(h.elements.get('overview')?.focused,true);
+    assert.equal(h.elements.get('filter-apply-status').hidden,false);
+    h.context.fetch=async()=>response(analysisResult());
+    await h.run('runAnalysis()');
+    assert.deepEqual(h.read('reportSnapshot.events'),[]);
+    assert.equal(h.elements.get('filter-apply-status').hidden,true);
+    assert.equal(h.elements.get('match-selection-panel').open,false);
+});
+
+test('clicking the selected row again keeps its report and draft filters', async () => {
+    const h=setup();h.context.match=readyMatch();
+    h.run("filteredMatches=[match];matchSelect.value='0';startLiveScorePolling=()=>{}");
+    h.context.fetch=async()=>response(analysisResult());
+    await h.run('handleMatchSelection([],true)');
+    h.run("globalThis.original=reportSnapshot;setTournamentSelection(['8'])");
+    h.elements.get('match-selection-panel').open=true;
+    await h.run('handleMatchSelection()');
+    assert.equal(h.read('reportSnapshot === original'),true);
+    assert.deepEqual(h.read('Array.from(selectedEvents)'),['8']);
+    assert.equal(h.elements.get('match-selection-panel').open,true);
+    assert.equal(h.elements.get('filter-apply-status').hidden,false);
+});
+
+test('changing match during a refresh clears the old report and rejects its late failure', async () => {
+    const h=setup();let finish;
+    h.context.matches=[readyMatch(),readyMatch('2')];
+    h.run("filteredMatches=matches;matchSelect.value='0';startLiveScorePolling=()=>{}");
+    h.context.fetch=async()=>response(analysisResult());
+    await h.run('handleMatchSelection([],true)');
+    h.context.fetch=()=>new Promise(resolve=>{finish=resolve;});
+    const pending=h.run('runAnalysis()');
+    assert.equal(h.elements.get('match-report').dataset.reportState,'refreshing');
+    h.run("matchSelect.value='1'");await h.run('handleMatchSelection()');
+    assert.equal(h.read('reportSnapshot'),null);
+    assert.equal(h.read('MatchUI.analysis'),null);
+    assert.equal(h.elements.get('ace-a-nickname').textContent,'—');
+    assert.equal(h.elements.get('report-toolbar').classList.contains('hidden'),true);
+    finish({ok:false,status:503,json:async()=>({detail:'Old match failure'})});await pending;
+    assert.equal(h.elements.get('match-report').dataset.reportState,'preview');
+    assert.equal(h.elements.get('report-refresh-status').hidden,true);
+    assert.equal(h.elements.get('status-text').textContent,'분석 준비 완료.');
+    assert.equal(h.read('selectedMatch.id'),'2');
+    assert.equal(h.read('analyzeBtn.disabled'),false);
+});
+
+test('mobile detail controls expose their state and reset scroll when closing', () => {
+    const h=setup();
+    const create=h.context.document.createElement;
+    const mapButton=create('button'),playerButton=create('button');
+    mapButton.dataset.tableDetails='maps';playerButton.dataset.tableDetails='players';
+    for (const button of [mapButton,playerButton]) button.setAttribute('aria-expanded','false');
+    const mapSection=h.context.document.getElementById('maps');
+    const playerSection=h.context.document.getElementById('players');
+    const scrollers=[create('div'),create('div')];scrollers.forEach(item=>{item.scrollLeft=200;});
+    mapSection.querySelectorAll=()=>[scrollers[0]];playerSection.querySelectorAll=()=>[scrollers[1]];
+    h.context.document.querySelectorAll=selector=>selector==='[data-table-details]' ? [mapButton,playerButton] : [];
+    h.run('initTableDetails()');
+    mapButton.click();playerButton.click();
+    assert.equal(mapSection.classList.contains('show-details'),true);
+    assert.equal(playerSection.classList.contains('show-details'),true);
+    assert.equal(mapButton.getAttribute('aria-expanded'),'true');
+    assert.equal(playerButton.getAttribute('aria-expanded'),'true');
+    assert.equal(mapButton.textContent,'공격·수비 접기');
+    assert.equal(playerButton.textContent,'라운드·요원 접기');
+    mapButton.click();playerButton.click();
+    assert.equal(mapSection.classList.contains('show-details'),false);
+    assert.equal(playerSection.classList.contains('show-details'),false);
+    assert.equal(mapButton.getAttribute('aria-expanded'),'false');
+    assert.equal(playerButton.getAttribute('aria-expanded'),'false');
+    assert.deepEqual(scrollers.map(item=>item.scrollLeft),[0,0]);
 });
 
 test('upcoming transitions to live and retries errors without losing the last score', async () => {
@@ -610,7 +875,9 @@ test('map rows align both teams, distinguish missing rounds from losses, and esc
     assert.match(rows[0].innerHTML,/Haven/);
     assert.match(rows[0].innerHTML,/75%/);
     assert.match(rows[0].innerHTML,/50%/);
-    assert.match(rows[0].innerHTML,/<td>—<\/td><td>0%<\/td>/);
+    const rates=[...rows[0].innerHTML.matchAll(/<td class="detail-column number">(.*?)<\/td>/g)].map(match=>match[1]);
+    assert.deepEqual(rates,['—','50%','0%','50%']);
+    assert.match(rows[0].innerHTML,/<b class="team-a">75%<\/b>[\s\S]*<b class="team-b">50%<\/b>[\s\S]*detail-column/);
     assert.match(rows[1].innerHTML,/&lt;script&gt;/);
     assert.doesNotMatch(rows[1].innerHTML,/<script>/);
     assert.match(rows[1].innerHTML,/풀 외/);
@@ -632,7 +899,7 @@ test('a complete report shows honest map rates and keeps the applied filter snap
     assert.equal(h.elements.get('win-probability-section').classList.contains('hidden'),true);
     assert.equal(h.elements.get('match-report').classList.contains('hidden'),false);
     assert.equal(h.elements.get('match-selection-panel').open,false);
-    assert.equal(h.elements.get('overview').focused,true);
+    assert.notEqual(h.elements.get('overview')?.focused,true);
     h.run("setTournamentSelection(['9']);generateShareableLink()");await flush();
     assert.equal(new URL(h.context.copied).searchParams.get('events'),'8');
     assert.deepEqual(h.read('reportSnapshot.events'),['8']);
@@ -686,9 +953,15 @@ test('export captures only the full-width report and restores its button after e
     assert.equal(options.windowWidth,1280);
     assert.equal(options.scale,1.5);
     const report=create('article'),body=create('body');
+    const detail=create('details'),refreshNotice=create('p');
+    detail.open=false;refreshNotice.hidden=false;
+    report.querySelectorAll=selector=>{assert.equal(selector,'details');return [detail];};
+    report.querySelector=selector=>{assert.equal(selector,'#report-refresh-status');return refreshNotice;};
     options.onclone({getElementById:id=>{assert.equal(id,'match-report');return report;},body});
     assert.deepEqual(body.children,[report]);
     assert.equal(report.classList.contains('export-report'),true);
+    assert.equal(detail.open,true);
+    assert.equal(refreshNotice.hidden,true);
     assert.equal(links[0].download,'One-vs-Two-report.png');
     assert.equal(links[0].clicked,true);
     assert.equal(links[0].removed,true);
@@ -832,15 +1105,17 @@ test('match narrative excludes small samples and never turns map history into an
     assert.match(h.read('MatchUI.buildMatchSummary(data,match)').title,/표본/);
 });
 
-test('final result uses the actual winner even when historical maps and reference indicator favor the loser', () => {
+test('final score stays authoritative while the insight adds historical context rather than repeating it', () => {
     const h=setup();h.context.match=readyMatch();h.context.data=analysisResult();
-    h.run("match.live_score={status:'final',series_score_a:'0',series_score_b:'2'};data.maps_a={Bind:{played:20,w:20}};data.maps_b={Bind:{played:20,w:0}};data.probability={a:90,b:10}");
+    h.run("match.map_pool=['Bind'];match.live_score={status:'final',series_score_a:'0',series_score_b:'2'};data.maps_a={Bind:{played:20,w:20}};data.maps_b={Bind:{played:20,w:0}};data.probability={a:90,b:10}");
     const result=h.read('MatchUI.buildMatchSummary(data,match)');
     assert.equal(result.status,'final');
-    assert.match(result.title,/Two 승리.*2 : 0/);
-    assert.doesNotMatch(result.title,/역전|예측|90|One가/);
+    assert.deepEqual(result.score,{a:0,b:2});
+    assert.match(result.title,/One.*Bind.*과거 맵 승률/);
+    assert.doesNotMatch(result.title,/승리|2 : 0|역전|예측|90/);
     h.run("match.live_score.series_score_b='unavailable'");
-    assert.match(h.read('MatchUI.buildMatchSummary(data,match)').title,/확인/);
+    assert.equal(h.read('MatchUI.buildMatchSummary(data,match)').score,null);
+    assert.equal(h.read('MatchUI.buildMatchSummary(data,match)').title,result.title);
 });
 
 test('live zero scores and phase changes update insight without replacing modules or career data', () => {
@@ -850,15 +1125,18 @@ test('live zero scores and phase changes update insight without replacing module
     const ids=()=>parent.children.map(child=>[...h.elements.entries()].find(([,value])=>value===child)[0]);
     assert.deepEqual(ids(),['map-preview-card','veto-card','player-impact-card','live-scoreboard-panel']);
     const nodes=[...parent.children];
+    const insight=h.elements.get('insight-title').textContent;
     h.run("match.live_score.status='live';MatchUI.refresh()");
-    assert.match(h.elements.get('insight-title').textContent,/0 : 0.*동률/);
+    assert.equal(h.elements.get('hero-phase').textContent,'진행 중');
+    assert.equal(h.elements.get('insight-title').textContent,insight);
     assert.deepEqual(ids(),['live-scoreboard-panel','map-preview-card','veto-card','player-impact-card']);
     h.run("match.live_score={status:'final',series_score_a:'2',series_score_b:'1'};MatchUI.refresh();MatchUI.refresh()");
     assert.deepEqual(ids(),['live-scoreboard-panel','map-preview-card','veto-card','player-impact-card']);
     assert.equal(new Set(parent.children).size,4);
     assert.ok(nodes.every(node=>parent.children.includes(node)));
     assert.equal(h.elements.get('impact-a-acs').textContent,'220.0');
-    assert.match(h.elements.get('insight-title').textContent,/One 승리.*2 : 1/);
+    assert.equal(h.elements.get('hero-phase').textContent,'최종 결과');
+    assert.equal(h.elements.get('insight-title').textContent,insight);
 });
 
 test('selecting a match previews its hero locally and clears old analysis before a new request', async () => {
@@ -867,10 +1145,11 @@ test('selecting a match previews its hero locally and clears old analysis before
     await h.run('handleMatchSelection()');
     assert.equal(h.elements.get('match-report').dataset.reportState,'preview');
     assert.equal(h.elements.get('match-report').classList.contains('hidden'),false);
-    assert.equal(h.elements.get('hero-analyze-btn').disabled,false);
+    assert.equal(h.elements.get('analyze-btn').disabled,false);
+    assert.equal(h.elements.get('match-selection-panel').open,true);
     assert.equal(h.read('MatchUI.analysis'),null);
     h.run('beginReport()');
-    assert.equal(h.elements.get('hero-analyze-btn').disabled,true);
+    assert.equal(h.elements.get('analyze-btn').textContent,'분석 중…');
     assert.equal(h.elements.get('match-report').dataset.reportState,'loading');
 });
 

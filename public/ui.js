@@ -461,6 +461,9 @@ async function exportReportImage() {
             onclone: doc => {
                 const report = doc.getElementById('match-report');
                 report.classList.add('export-report');
+                report.querySelectorAll('details').forEach(detail => { detail.open = true; });
+                const refreshNotice = report.querySelector('#report-refresh-status');
+                if (refreshNotice) refreshNotice.hidden = true;
                 // Isolate the report from the mobile page and open every data column.
                 doc.body.replaceChildren(report);
             }
@@ -538,7 +541,7 @@ function percent(won, total) {
         ? `${Math.round(won / total * 100)}%` : '—';
 }
 
-// The legacy map IDs now label column groups in one direct comparison table.
+// The legacy map IDs label each team's primary comparison column.
 function renderMapsTable(tableId, mapsData) {
     mapComparison[tableId === 'team-a-maps-table' ? 'a' : 'b'] = mapsData || {};
     renderMapComparison();
@@ -560,13 +563,17 @@ function renderMapComparison() {
         Number(pool.includes(y)) - Number(pool.includes(x)) ||
         ((a[y]?.played || 0) + (b[y]?.played || 0)) - ((a[x]?.played || 0) + (b[x]?.played || 0)) || x.localeCompare(y));
     const cells = (s, team) => {
-        if (!s || !(s.played > 0)) return '<td class="team-start muted">—</td><td class="muted">—</td><td class="muted">—</td>';
+        if (!s || !(s.played > 0)) return '<td class="number muted">—</td>';
         const width = Math.max(0, Math.min(100, s.w / s.played * 100));
-        return `<td class="team-start"><div class="map-record"><b>${percent(s.w, s.played)}</b><small>${escapeHTML(s.w)}–${escapeHTML(s.l)}</small></div><span class="map-rate team-${team}" aria-hidden="true"><span style="width:${width}%"></span></span>${s.played < MIN_MAP_SAMPLE ? '<span class="map-note">표본 부족</span>' : ''}</td><td>${percent(s.atk_won, s.atk_total)}</td><td>${percent(s.def_won, s.def_total)}</td>`;
+        return `<td class="number"><div class="map-record"><b class="team-${team}">${percent(s.w, s.played)}</b><small>${escapeHTML(s.w)}–${escapeHTML(s.l)}</small></div><span class="map-rate team-${team}" aria-hidden="true"><span style="width:${width}%"></span></span>${s.played < MIN_MAP_SAMPLE ? '<span class="map-note">표본 부족</span>' : ''}</td>`;
     };
     names.forEach(name => {
         const row = document.createElement('tr');
-        row.innerHTML = `<th scope="row">${escapeHTML(name)}${pool.includes(name) ? '' : '<span class="map-note">풀 외</span>'}</th>${cells(a[name], 'a')}${cells(b[name], 'b')}`;
+        const details = ['atk', 'def'].map(side => ['a', 'b'].map(team => {
+            const s = mapComparison[team][name];
+            return `<td class="detail-column number">${s?.played > 0 ? percent(s[`${side}_won`], s[`${side}_total`]) : '—'}</td>`;
+        }).join('')).join('');
+        row.innerHTML = `<th scope="row">${escapeHTML(name)}${pool.includes(name) ? '' : '<span class="map-note">풀 외</span>'}</th>${cells(a[name], 'a')}${cells(b[name], 'b')}${details}`;
         body.appendChild(row);
     });
     if (!names.length) body.innerHTML = '<tr><td colspan="7" class="empty-row">선택한 범위에 수집된 맵 기록이 없습니다.</td></tr>';
@@ -623,6 +630,9 @@ function syncReportTeamNames() {
             document.getElementById(id).textContent = reportTeamName(team);
         }
     }
+    document.querySelectorAll('[data-map-team]').forEach(label => {
+        label.textContent = reportTeamName(label.dataset.mapTeam);
+    });
 }
 
 function updateReportNavigation() {
@@ -655,18 +665,31 @@ function initReportNavigation() {
 }
 
 function setReportState(state) {
-    const ready = state === 'ready';
-    const showHero = ready || (['preview', 'loading', 'error'].includes(state) && selectedMatch?.details_ready);
+    const hasResults = ['ready', 'refreshing', 'refresh-error'].includes(state);
+    const loading = state === 'loading' || state === 'refreshing';
+    const showHero = hasResults || (['preview', 'loading', 'error'].includes(state) && selectedMatch?.details_ready);
     document.getElementById('match-report').classList[showHero ? 'remove' : 'add']('hidden');
-    document.getElementById('report-toolbar').classList[ready ? 'remove' : 'add']('hidden');
-    document.getElementById('match-report').setAttribute('aria-busy', String(state === 'loading'));
-    analyzeBtn.textContent = state === 'loading' ? '분석 중…' : ready ? '다시 분석' : '경기 분석';
-    if (!ready) reportSnapshot = null;
+    document.getElementById('report-toolbar').classList[hasResults ? 'remove' : 'add']('hidden');
+    document.getElementById('export-img-btn').disabled = loading || exportRunning;
+    document.getElementById('match-report').setAttribute('aria-busy', String(loading));
+    analyzeBtn.textContent = loading ? (hasResults ? '갱신 중…' : '분석 중…') : hasResults ? '다시 분석' : '경기 분석';
+    if (!hasResults) reportSnapshot = null;
+    const refreshStatus = document.getElementById('report-refresh-status');
+    if (refreshStatus) {
+        refreshStatus.hidden = !['refreshing', 'refresh-error'].includes(state);
+        refreshStatus.textContent = state === 'refreshing' ? '갱신 중 · 완료될 때까지 이전 분석 결과를 표시합니다.'
+            : state === 'refresh-error' ? '갱신 실패 · 이전 분석 결과를 유지했습니다. 다시 분석해 주세요.' : '';
+    }
     MatchUI.onReportState(state);
+    updateAnalysisScope();
     updateReportNavigation();
 }
 
 function beginReport() {
+    if (reportSnapshot?.match.id === selectedMatch?.id && MatchUI.matchId === selectedMatch.id && MatchUI.analysis) {
+        setReportState('refreshing');
+        return;
+    }
     setReportState('loading');
     destroyCharts();
     mapComparison = { a: {}, b: {} };
@@ -704,20 +727,51 @@ function renderReportSummary(data, match, events) {
         document.getElementById(`summary-${team}-sample`).textContent = `맵 표본 ${total.toLocaleString('ko-KR')}개 · ${maps.filter(([, s]) => s.played > 0).length}종`;
     }
     const filterNames = (events || []).map(id => [...teamAEvents, ...teamBEvents].find(e => e.id === id)?.name || `대회 #${id}`);
-    document.getElementById('report-scope').textContent = `맵 기록 범위: ${filterNames.length ? filterNames.join(' / ') : '수집된 전체 대회'}. 표시된 맵 승률은 과거 기록이며 이 경기의 예측 승률이 아닙니다.`;
+    document.getElementById('report-scope').textContent = `맵 기록 범위: ${filterNames.length ? filterNames.join(' / ') : '수집된 전체 대회'}. 표시된 맵 승률은 과거 기록이며 이 경기의 예측 승률이 아닙니다. 커리어 비교는 대회 필터와 무관합니다.`;
     const date = new Date(data.updated_at);
     document.getElementById('report-updated').textContent = `통계 수집: ${Number.isFinite(date.getTime()) ? date.toLocaleString('ko-KR') : '시각 확인 불가'}${data.stale ? ' · 갱신 지연으로 이전 데이터 사용' : ''}`;
     document.getElementById('map-pool-note').textContent = `${match.map_pool?.length ? '확인된 대회 맵 풀' : '대회 맵 풀 미확인 · 기본 풀'}을 먼저 표시합니다. ‘풀 외’는 이 풀에 포함되지 않는 과거 맵입니다. 5맵 미만은 ‘표본 부족’으로 표시하며 주요 맵 선정에서 제외합니다. 기록이 없는 값은 —로 표시합니다.`;
     MatchUI.render(data, match);
     setReportState('ready');
-    document.getElementById('match-selection-panel').open = false;
-    document.getElementById('advanced-filters').open = false;
-    document.getElementById('tournament-explorer').open = false;
-    document.getElementById('overview').focus({ preventScroll: true });
+    // A response applies the requested scope, not edits made while it was loading.
+    if (sameEventSelection(events, selectedEvents)) {
+        document.getElementById('match-selection-panel').open = false;
+    }
+}
+
+function sameEventSelection(left, right) {
+    const a = [...(left || [])].map(String).sort();
+    const b = [...(right || [])].map(String).sort();
+    return a.length === b.length && a.every((id, index) => id === b[index]);
+}
+
+function describeEventSelection(events) {
+    const ids = [...(events || [])];
+    if (!ids.length) return '수집된 전체 대회';
+    return ids.map(id => [...teamAEvents, ...teamBEvents].find(event => event.id === id)?.name || `대회 #${id}`).join(' / ');
+}
+
+function updateAnalysisScope() {
+    const hasReport = Boolean(reportSnapshot && selectedMatch && reportSnapshot.match.id === selectedMatch.id);
+    const dirty = Boolean(hasReport && !sameEventSelection(reportSnapshot.events, selectedEvents));
+    const draft = document.getElementById('selection-scope');
+    const applied = document.getElementById('applied-scope');
+    const status = document.getElementById('filter-apply-status');
+    if (draft) draft.textContent = `선택한 기록 범위: ${describeEventSelection(selectedEvents)}`;
+    if (applied) {
+        applied.hidden = !hasReport;
+        applied.textContent = hasReport ? `현재 결과 기준: ${describeEventSelection(reportSnapshot.events)}` : '';
+    }
+    if (status) {
+        status.hidden = !dirty;
+        status.dataset.state = dirty ? 'dirty' : 'applied';
+        status.textContent = dirty ? '변경사항 미적용 · 다시 분석하면 선택한 기록 범위를 적용합니다.' : '';
+    }
 }
 
 function updateFilterCount() {
     document.getElementById('filter-count').textContent = selectedEvents.size ? `· ${selectedEvents.size}개 선택` : '';
+    updateAnalysisScope();
 }
 
 function clearDashboard() {

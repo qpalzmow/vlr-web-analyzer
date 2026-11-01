@@ -33,13 +33,24 @@ jobs:
       VLR_REFRESH_MODE: local
       VLR_REQUEST_INTERVAL_SECONDS: '1.0'
     steps:
+      - name: Start shared job budget
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, time
+          start = time.monotonic()
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write(f'COLLECTOR_JOB_STARTED={start}\nCOLLECTOR_JOB_DEADLINE={start + 3300}\n')
+          PY
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -m pip install -r requirements.txt
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: python -m pip install -r requirements.txt
       - name: Check source clock
         if: ${{ inputs.check_source == true }}
         run: |
@@ -57,13 +68,19 @@ jobs:
         if: ${{ inputs.check_source != true }}
         shell: bash
         run: |
-          if git ls-remote --exit-code --heads origin catalog-data; then
-            git fetch origin catalog-data
-            git worktree add --detach "$RUNNER_TEMP/published" FETCH_HEAD
-          else
-            mkdir -p "$RUNNER_TEMP/published"
-            git -C "$RUNNER_TEMP/published" init -b catalog-data
-          fi
+          code=0
+          timeout --kill-after=5s 30s git ls-remote --exit-code --heads origin catalog-data || code=$?
+          case "$code" in
+            0)
+              timeout --kill-after=5s 30s git fetch origin catalog-data
+              git worktree add --detach "$RUNNER_TEMP/published" FETCH_HEAD
+              ;;
+            2)
+              mkdir -p "$RUNNER_TEMP/published"
+              git -C "$RUNNER_TEMP/published" init -b catalog-data
+              ;;
+            *) exit "$code" ;;
+          esac
       - name: Check whether collection is due
         id: due
         if: ${{ inputs.check_source != true }}
@@ -77,30 +94,32 @@ jobs:
           fi
           echo "collect=$due" >> "$GITHUB_OUTPUT"
           if [ "$due" != "true" ]; then
-            echo "Published catalog is less than one hour old; collection skipped." >> "$GITHUB_STEP_SUMMARY"
+            echo "Collection is not due: completed data uses one hour; unsuccessful stages retry after 15 minutes." >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Restore collector cache
         id: collector-cache
         if: ${{ steps.due.outputs.collect == 'true' }}
+        timeout-minutes: 1
         continue-on-error: true
         uses: actions/cache/restore@v4
         with:
           path: .collector-data
-          key: vlr-collector-v2-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: vlr-collector-v3-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
+            vlr-collector-v3-${{ runner.os }}-
             vlr-collector-v2-${{ runner.os }}-
+      - name: Recover verified collector checkpoint
+        if: ${{ steps.due.outputs.collect == 'true' }}
+        shell: bash
+        run: |
+          python -m app.collector_runner --stage recover --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json"
       - name: Prepare snapshot publisher
         if: ${{ steps.due.outputs.collect == 'true' }}
         shell: bash
         run: |
           cat > "$RUNNER_TEMP/publish-snapshot.sh" <<'BASH'
           set -euo pipefail
-          python - <<'PY'
-          import json, os
-          from pathlib import Path
-          from app.snapshot_feed import validate
-          validate(json.loads((Path(os.environ['RUNNER_TEMP']) / 'snapshot.json').read_text()))
-          PY
+          timeout --kill-after=2s 20s python -m app.collector_runner --validate-publish "$RUNNER_TEMP/snapshot.json"
           cp "$RUNNER_TEMP/snapshot.json" "$RUNNER_TEMP/published/snapshot.json"
           cd "$RUNNER_TEMP/published"
           git config user.name "github-actions[bot]"
@@ -109,42 +128,81 @@ jobs:
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "Update prepared VLR data"
           if git remote get-url origin >/dev/null 2>&1; then
-            git push origin HEAD:catalog-data
+            timeout --kill-after=5s 35s git push origin HEAD:catalog-data
           else
             # Use checkout's existing scoped credential configuration.
-            git -C "$GITHUB_WORKSPACE" fetch "$RUNNER_TEMP/published" catalog-data
-            git -C "$GITHUB_WORKSPACE" push origin FETCH_HEAD:catalog-data
+            timeout --kill-after=5s 35s git -C "$GITHUB_WORKSPACE" fetch "$RUNNER_TEMP/published" catalog-data
+            timeout --kill-after=5s 35s git -C "$GITHUB_WORKSPACE" push origin FETCH_HEAD:catalog-data
           fi
           BASH
-      - name: Collect match catalog
+      - name: Collect match catalog under a process limit
+        id: catalog
         if: ${{ steps.due.outputs.collect == 'true' }}
         shell: bash
         run: |
-          python -m app.snapshot_export --catalog-only --catalog-max-seconds 600 --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json"
-      - name: Publish catalog before analysis
-        if: ${{ steps.due.outputs.collect == 'true' }}
-        shell: bash
-        run: |
-          bash "$RUNNER_TEMP/publish-snapshot.sh"
-          echo "New match catalog published; earlier prepared team records retained." >> "$GITHUB_STEP_SUMMARY"
-      - name: Collect incremental analysis
-        id: analysis
-        if: ${{ steps.due.outputs.collect == 'true' && inputs.catalog_only != true }}
-        shell: bash
-        run: |
-          set +e
-          timeout 45m python -m app.snapshot_export --analysis-only --max-seconds 2400 --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json"
-          code=$?
-          set -e
+          code=0
+          python -m app.collector_runner --stage catalog --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json" || code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          if [ "$code" -ne 0 ]; then
-            echo "::warning::Analysis stopped with exit code $code; checking the last completed checkpoint."
-          fi
-      - name: Publish completed analysis or valid checkpoint
-        if: ${{ steps.due.outputs.collect == 'true' && inputs.catalog_only != true }}
+      - name: Recover interrupted catalog checkpoint
+        id: catalog-finalize
+        if: ${{ steps.catalog.outputs.exit_code != '' && steps.catalog.outputs.exit_code != '0' }}
         shell: bash
         env:
-          ANALYSIS_EXIT_CODE: ${{ steps.analysis.outputs.exit_code }}
+          COLLECTOR_EXIT_CODE: ${{ steps.catalog.outputs.exit_code }}
+        run: |
+          code=0
+          python -m app.collector_runner --stage finalize --interrupted-stage catalog --exit-code "$COLLECTOR_EXIT_CODE" --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json" || code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+      - name: Publish validated catalog or retained previous generation
+        id: catalog-publish
+        if: ${{ steps.catalog.outputs.exit_code != '' }}
+        shell: bash
+        env:
+          COLLECTOR_EXIT_CODE: ${{ steps.catalog.outputs.exit_code }}
+          FINALIZE_EXIT_CODE: ${{ steps.catalog-finalize.outputs.exit_code }}
+        run: |
+          bash "$RUNNER_TEMP/publish-snapshot.sh"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          payload = json.loads((Path(os.environ['RUNNER_TEMP']) / 'snapshot.json').read_text())
+          result = payload.get('collection', {}).get('catalog', {})
+          status = result.get('status', 'legacy')
+          can_analyze = (status in ('completed', 'partial') and os.environ['COLLECTOR_EXIT_CODE'] in ('0', '124')
+                         and os.environ['FINALIZE_EXIT_CODE'] in ('', '0'))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write(f"run_analysis={str(can_analyze).lower()}\n")
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write(f"Catalog: {status}; data clock: {payload['catalog']['updated_at']}; "
+                            f"generation: {payload['catalog']['generation']}; exit code: {os.environ['COLLECTOR_EXIT_CODE']}\n\n")
+          if status != 'completed':
+              print(f'::warning::Catalog is {status}; its actual data clock and verified checkpoint were preserved.')
+          if not can_analyze:
+              print('Analysis skipped: no newly accepted complete/partial catalog, or catalog recovery failed.')
+          PY
+      - name: Collect incremental analysis under the remaining job budget
+        id: analysis
+        if: ${{ steps.catalog-publish.outputs.run_analysis == 'true' && inputs.catalog_only != true }}
+        shell: bash
+        run: |
+          code=0
+          python -m app.collector_runner --stage analysis --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json" || code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+      - name: Recover interrupted analysis checkpoint
+        id: analysis-finalize
+        if: ${{ steps.analysis.outputs.exit_code != '' && steps.analysis.outputs.exit_code != '0' }}
+        shell: bash
+        env:
+          COLLECTOR_EXIT_CODE: ${{ steps.analysis.outputs.exit_code }}
+        run: |
+          code=0
+          python -m app.collector_runner --stage finalize --interrupted-stage analysis --exit-code "$COLLECTOR_EXIT_CODE" --output "$RUNNER_TEMP/snapshot.json" --previous "$RUNNER_TEMP/published/snapshot.json" || code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+      - name: Publish completed analysis or verified checkpoint
+        if: ${{ steps.analysis.outputs.exit_code != '' }}
+        shell: bash
+        env:
+          COLLECTOR_EXIT_CODE: ${{ steps.analysis.outputs.exit_code }}
         run: |
           bash "$RUNNER_TEMP/publish-snapshot.sh"
           python - <<'PY'
@@ -152,22 +210,40 @@ jobs:
           from pathlib import Path
           payload = json.loads((Path(os.environ['RUNNER_TEMP']) / 'snapshot.json').read_text())
           collection = payload.get('collection', {})
-          code = int(os.environ['ANALYSIS_EXIT_CODE'])
-          status = collection.get('status', 'unknown')
-          note = f"Catalog published: {payload['catalog']['updated_at']}\n\nAnalysis: {status}; results: {collection.get('results', {})}; exit code: {code}\n"
+          result = collection.get('analysis', {})
+          status = result.get('status', collection.get('status', 'unknown'))
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
-              summary.write(note)
-          if status != 'completed' or code:
-              print('::warning::Analysis is partial; completed records were published and previous unavailable scopes were retained.')
+              summary.write(f"Analysis: {status}; results: {result.get('results', collection.get('results', {}))}; "
+                            f"exit code: {os.environ['COLLECTOR_EXIT_CODE']}\n\n")
+          if status != 'completed' or os.environ['COLLECTOR_EXIT_CODE'] != '0':
+              print('::warning::Analysis is partial or interrupted; only verified data was published.')
           PY
-          case "$ANALYSIS_EXIT_CODE" in
-            0|124|130|143) ;;
-            *) exit "$ANALYSIS_EXIT_CODE" ;;
-          esac
+      - name: Report unexpected collection or recovery failures
+        if: ${{ always() && steps.due.outputs.collect == 'true' }}
+        shell: bash
+        env:
+          CATALOG_EXIT_CODE: ${{ steps.catalog.outputs.exit_code }}
+          ANALYSIS_EXIT_CODE: ${{ steps.analysis.outputs.exit_code }}
+          CATALOG_FINALIZE_EXIT_CODE: ${{ steps.catalog-finalize.outputs.exit_code }}
+          ANALYSIS_FINALIZE_EXIT_CODE: ${{ steps.analysis-finalize.outputs.exit_code }}
+        run: |
+          python - <<'PY'
+          import os
+          failures = []
+          for key in ('CATALOG_EXIT_CODE', 'ANALYSIS_EXIT_CODE'):
+              if os.environ[key] not in ('', '0', '124'):
+                  failures.append(f'{key}={os.environ[key]}')
+          for key in ('CATALOG_FINALIZE_EXIT_CODE', 'ANALYSIS_FINALIZE_EXIT_CODE'):
+              if os.environ[key] not in ('', '0'):
+                  failures.append(f'{key}={os.environ[key]}')
+          if failures:
+              raise SystemExit('Unexpected failure after checkpoint publication: ' + ', '.join(failures))
+          PY
       - name: Save reusable collector cache
         if: ${{ always() && steps.due.outputs.collect == 'true' && steps.collector-cache.outcome == 'success' }}
+        timeout-minutes: 1
         continue-on-error: true
         uses: actions/cache/save@v4
         with:
           path: .collector-data
-          key: vlr-collector-v2-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: vlr-collector-v3-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}

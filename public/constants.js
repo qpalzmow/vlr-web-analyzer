@@ -15,6 +15,7 @@ let teamBEvents = [];
 let selectedEvents = new Set();
 let analysisRunning = false;
 let catalogGeneration = null;
+let catalogUpdatedAt = null;
 let catalogRefreshTimer = null;
 let catalogFetchRunning = false;
 let sharedSelectionRestored = false;

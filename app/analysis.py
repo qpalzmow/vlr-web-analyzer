@@ -10,6 +10,7 @@ from app import analysis_sources as sources
 from app.db import (get_analysis_teams, get_analysis_metadata, save_analysis_team,
                     save_analysis_seed, get_catalog_snapshot)
 from app.scraper.metrics import calculate_advanced_metrics, find_ace_player_from_stats, simulate_banpick
+from app.scraper.http import CollectionBudgetExceeded
 
 logger = logging.getLogger(__name__)
 SCHEMA_VERSION = 3
@@ -69,6 +70,7 @@ def prepare_team(team_id, events, previous=None, *, force=False):
     old_scopes = previous.get('scopes', {})
     scopes = copy.deepcopy(old_scopes)
     failed = []
+    budget_exhausted = False
     def needs_scope(key):
         return (force or previous.get('schema_version') != SCHEMA_VERSION
                 or key in previous.get('failed_scopes', [])
@@ -84,11 +86,15 @@ def prepare_team(team_id, events, previous=None, *, force=False):
             scopes['all'] = {'maps': overview['maps'], 'players': players, 'collected_at': now_iso(),
                              'career_roster_verified': True,
                              'players_available': any(p['rounds'] > 0 for p in players.values())}
-        except Exception:
+        except Exception as exc:
             logger.exception('All-time player collection failed for %s', team_id)
             failed.append('all')
+            budget_exhausted = isinstance(exc, CollectionBudgetExceeded)
     for event_id in sorted(required):
         if not needs_scope(event_id):
+            continue
+        if budget_exhausted:
+            failed.append(event_id)
             continue
         try:
             maps = sources.event_maps(team_id, event_id)
@@ -99,10 +105,12 @@ def prepare_team(team_id, events, previous=None, *, force=False):
         except Exception as exc:
             logger.warning('Analysis event %s/%s: %s', team_id, event_id, exc)
             failed.append(event_id)
+            budget_exhausted = isinstance(exc, CollectionBudgetExceeded)
     data = {'schema_version': SCHEMA_VERSION, 'team_id': team_id, 'team_name': profile['name'],
             'form': profile['form'], 'recent_matches': profile.get('recent_matches', []),
             'logo': profile.get('logo'), 'available_events': sorted(available), 'scopes': scopes,
             'updated_at': now_iso(), 'failed_scopes': failed,
+            'budget_exhausted': budget_exhausted,
             'last_attempt_at': now_iso(), 'last_success_at': previous.get('last_success_at', previous.get('updated_at')) if failed else now_iso(),
             'last_error': 'scope_collection_failed' if failed else None}
     save_analysis_team(team_id, data)
@@ -130,20 +138,30 @@ def refresh_analysis(matches, stop=None, force=False, on_progress=None):
     with ThreadPoolExecutor(max_workers=4, thread_name_prefix='vlr-prepared-analysis') as pool:
         # Bounded batches make shutdown responsive without queueing thousands of requests.
         for i in range(0, len(todo), 4):
-            if stop and stop.is_set():
+            if results.get('budget_exhausted') or (stop and stop.is_set()):
                 break
             jobs = {pool.submit(prepare_team, tid, events, previous.get(tid), force=force): tid
                     for tid, events in todo[i:i+4]}
             for future in as_completed(jobs):
                 try:
                     prepared = future.result()
+                    if prepared.get('budget_exhausted'):
+                        results['budget_exhausted'] = True
+                        if stop is not None:
+                            stop.set()
                     # A returned record can still contain failed scopes and older data.
-                    results['failed' if prepared.get('last_error') else 'updated'] += 1
+                    results['failed' if prepared.get('last_error') or prepared.get('budget_exhausted') else 'updated'] += 1
                 except Exception as exc:
                     results['failed'] += 1
+                    budget_exhausted = isinstance(exc, CollectionBudgetExceeded)
+                    if budget_exhausted:
+                        results['budget_exhausted'] = True
+                        if stop is not None:
+                            stop.set()
                     tid = jobs[future]
                     old = copy.deepcopy(previous.get(tid, {}))
-                    old.update(last_attempt_at=now_iso(), last_error='team_collection_failed')
+                    old.update(last_attempt_at=now_iso(), last_error='team_collection_failed',
+                               budget_exhausted=budget_exhausted)
                     save_analysis_team(tid, old)
                     logger.warning('Keeping previous analysis for team %s: %s', jobs[future], exc)
                 if on_progress:

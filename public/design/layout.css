@@ -17,8 +17,8 @@ main { min-height: calc(100vh - 190px); padding-top: var(--space-2); }
 .overview-story { padding: 0; }
 .module-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-4); }
 .player-impact, .live-scoreboard { grid-column: 1 / -1; }
-.report-details { display: grid; gap: var(--space-5); margin-top: var(--space-6); }
-.detail-section { padding: var(--space-8); }
+.report-details { display: grid; gap: var(--space-5); margin-top: var(--space-8); }
+.detail-section { min-width: 0; padding: var(--space-8) 0 0; border-top: 1px solid var(--line); }
 .section-heading, .card-heading { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); margin-bottom: var(--space-5); }
 .section-heading p { font-size: var(--type-meta); color: var(--muted); }
 .card-heading .eyebrow { margin-bottom: var(--space-1); }
@@ -37,7 +37,7 @@ main { min-height: calc(100vh - 190px); padding-top: var(--space-2); }
   .shell { width: calc(100% - 40px); }
   .report-toolbar { flex-wrap: wrap; }
   .report-actions { margin-left: auto; }
-  .detail-section { padding: var(--space-6); }
+  .detail-section { padding-top: var(--space-6); }
 }
 @media (max-width: 600px) {
   .shell { width: calc(100% - 24px); }
@@ -46,7 +46,6 @@ main { min-height: calc(100vh - 190px); padding-top: var(--space-2); }
   .site-header p { display: none; }
   #db-sync-badge { text-align: left; }
   .module-grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
-  .analysis-card { padding: var(--space-5); border-radius: var(--radius-md); }
   .report-nav { width: 100%; justify-content: space-between; gap: 0; }
   .report-nav a { padding: 0 10px; }
   .report-actions { margin-left: 0; }

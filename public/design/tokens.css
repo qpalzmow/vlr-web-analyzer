@@ -18,10 +18,10 @@
   --positive-soft: #25392f;
   --negative: #eaa297;
   --negative-soft: #3b2c2e;
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -35,7 +35,8 @@
   --type-body: 14px;
   --type-heading: 18px;
   --duration: 180ms;
-  --shadow-card: 0 8px 24px #00000012;
+  --card-padding: var(--space-6);
+  --card-radius: var(--radius-md);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
   font-size: var(--type-body);
   font-weight: 400;
@@ -68,7 +69,8 @@ input[type="checkbox"] { width: 18px; height: 18px; flex: 0 0 18px; accent-color
 .team-a { color: var(--a); }
 .team-b { color: var(--b); }
 .eyebrow { color: var(--muted); font-size: var(--type-meta); font-weight: 500; margin-bottom: var(--space-2); }
-.analysis-card { background: var(--surface); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-card); min-width: 0; }
+.analysis-card { background: var(--surface); border-radius: var(--card-radius); padding: var(--card-padding); min-width: 0; }
+.match-hero { --card-padding: var(--space-8); --card-radius: var(--radius-lg); }
 .primary-button { border: 0; background: var(--accent); color: var(--bg); font-weight: 600; min-width: 136px; }
 .primary-button:hover:not(:disabled) { background: var(--accent-hover); }
 .primary-button:disabled { background: var(--surface-elevated); color: var(--muted); }
@@ -76,3 +78,7 @@ input[type="checkbox"] { width: 18px; height: 18px; flex: 0 0 18px; accent-color
 .detail-link { display: inline-flex; align-items: center; min-height: 44px; gap: var(--space-2); color: var(--accent); font-size: 13px; white-space: nowrap; }
 .skip-link { position: absolute; top: -100px; left: 16px; background: var(--text); color: var(--bg); padding: 12px; z-index: 10; }
 .skip-link:focus { top: 12px; }
+@media (max-width: 600px) {
+  :root { --card-padding: var(--space-5); }
+  .match-hero { --card-padding: var(--space-5); }
+}

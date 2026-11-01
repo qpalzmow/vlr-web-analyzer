@@ -9,15 +9,33 @@ function renderCatalogStatus(data) {
     const delayed = Number.isFinite(age) && age >= 2 * 60 * 60 * 1000 ? ' · 갱신 지연' : '';
     const refreshing = data.sync_status === 'running' ? ' · 갱신 중' : '';
     const failed = data.sync_status === 'error' ? ' · 이전 데이터 유지' : '';
-    const partial = external && data.sync_details?.collection?.status === 'partial' ? ' · 분석 일부 갱신' : '';
+    const collection = data.sync_details?.collection || {};
+    const matchesGeneration = phase => phase && (!phase.catalog_generation || phase.catalog_generation === data.generation);
+    const catalogPhase = matchesGeneration(collection.catalog) ? collection.catalog
+        : matchesGeneration(data.collection) ? data.collection : {};
+    const analysisPhase = matchesGeneration(collection.analysis) ? collection.analysis : {};
+    const catalogState = external ? ({partial:' · 목록 일부 갱신', retained_previous:' · 이전 목록 유지', failed:' · 목록 수집 실패'}[catalogPhase.status] || '') : '';
+    const legacyPartial = !collection.catalog && !collection.analysis && collection.status === 'partial';
+    const partial = external && (['partial','failed'].includes(analysisPhase.status) || legacyPartial) ? ' · 분석 일부 갱신' : '';
     const analytics = data.analytics_status?.stale_teams ? ` · 분석 갱신 대기 ${data.analytics_status.stale_teams}팀` : '';
+    const stateLabel = {completed:'완료', partial:'일부 갱신', retained_previous:'이전 목록 유지', failed:'실패', running:'진행 중', skipped:'건너뜀'};
+    const phaseNotes = [];
+    for (const [name, phase] of [['목록', catalogPhase], ['분석', analysisPhase]]) {
+        if (!phase.status) continue;
+        phaseNotes.push(`${name} 수집: ${stateLabel[phase.status] || phase.status}`);
+        if (phase.budget_exhausted) phaseNotes.push(`${name} 수집 예산 소진`);
+        const reasons = [...new Set((phase.failures || []).map(item => item.reason).filter(Boolean))];
+        if (reasons.length) phaseNotes.push(`${name} 실패 원인: ${reasons.join(', ')}`);
+        if (phase.next_retry_at) phaseNotes.push(`${name} 재시도 목표: ${phase.next_retry_at}`);
+    }
     if (badge) badge.title = [external
         ? '외부 수집은 매시간 실행을 목표로 하며 GitHub 실행 대기나 수집 오류로 지연될 수 있습니다. Render 서버는 시작할 때 저장된 데이터를 불러옵니다.'
         : '서버가 실행 중일 때 1시간 간격으로 수집합니다.',
-        updated ? `마지막 경기 목록 수집: ${data.updated_at} (표시 시간: KST)` : '아직 수집된 경기 목록이 없습니다.'
+        updated ? `마지막 경기 목록 수집: ${data.updated_at} (표시 시간: KST)` : '아직 수집된 경기 목록이 없습니다.',
+        ...phaseNotes
     ].join('\n');
     if (badge) badge.textContent = updated
-        ? `${external ? '외부 자동 수집' : '1시간마다 업데이트'} · ${updated} 기준${delayed}${refreshing}${failed}${partial}${analytics}`
+        ? `${external ? '외부 자동 수집' : '1시간마다 업데이트'} · ${updated} 기준${delayed}${refreshing}${failed}${catalogState}${partial}${analytics}`
         : '첫 경기 목록을 준비하고 있습니다';
 }
 
@@ -30,8 +48,9 @@ async function fetchMatches(background = false) {
         if (!response.ok) throw new Error(`서버 에러: ${response.status}`);
         const data = await response.json();
         renderCatalogStatus(data);
-        if (data.generation !== catalogGeneration || !allMatches.length) {
+        if (data.generation !== catalogGeneration || data.updated_at !== catalogUpdatedAt || !allMatches.length) {
             catalogGeneration = data.generation;
+            catalogUpdatedAt = data.updated_at;
             allMatches = data.matches || [];
             // An ongoing analysis stays tied to its chosen generation.
             if (background && selectedMatch && !allMatches.some(m => m.id === selectedMatch.id)) {
@@ -97,6 +116,7 @@ async function restoreSharedSelection() {
 async function handleMatchSelection(restoredEventIds = [], autoAnalyze = false) {
     const value = matchSelect.value;
     const requestMatch = value === '' ? null : filteredMatches[Number(value)];
+    if (requestMatch && requestMatch === selectedMatch && requestMatch.details_ready && !restoredEventIds.length && !autoAnalyze) return;
     clearDashboard();
     selectedEvents.clear();
     teamAEvents = [];
@@ -165,9 +185,11 @@ async function runAnalysis() {
     analyzeBtn.disabled = true;
     progressBarContainer.classList.remove('hidden');
 
+    const retainedReport = reportSnapshot?.match.id === analysisMatch.id && MatchUI.matchId === analysisMatch.id && Boolean(MatchUI.analysis);
     beginReport();
 
-    updateStatus('info', '전력 분석을 시작합니다...', '미리 수집한 통계를 한 번에 불러오고 있습니다.', 10);
+    updateStatus('info', retainedReport ? '분석 결과 갱신 중…' : '전력 분석을 시작합니다...', retainedReport
+        ? '완료될 때까지 이전 분석 결과를 표시합니다.' : '미리 수집한 통계를 한 번에 불러오고 있습니다.', 10);
 
     const payload = {
         team_a_id: analysisMatch.team_a_id,
@@ -211,9 +233,9 @@ async function runAnalysis() {
         const partial = data.ace_a.partial || data.ace_b.partial;
         const notice = (data.stale ? ' · 갱신 지연: 이전 데이터 사용' : '') +
             (unavailableTeams.length ? ` · ${unavailableTeams.join(', ')}: 커리어 비교 불가 (선수 표의 안내 확인)` : '') +
-            (partial ? ' · 기록 없는 선수는 커리어 대표 선정에서 제외' : '') +
-            ' · 커리어 비교는 대회 필터와 무관 · 팀 FK·FD 및 예측 승률 미표시';
+            (partial ? ' · 기록 없는 선수는 커리어 대표 선정에서 제외' : '');
         document.getElementById('report-integrity-note').textContent = notice.replace(/^ · /, '');
+        document.getElementById('report-integrity-note').hidden = !notice;
         updateStatus(data.stale || unavailableTeams.length || partial ? 'alert' : 'success', '전력 분석 완료.', `${timestamp} 기준${data.stale ? ' · 갱신 지연: 이전 데이터 사용' : ''}${unavailableTeams.length || partial ? ' · 선수별 표본 안내 확인' : ''}`, 100);
         // Live score is independent and does not delay any analysis panel.
         if (!analysisMatch.live_updates_started) {
@@ -222,18 +244,20 @@ async function runAnalysis() {
         }
     } catch (err) {
         if (err.name !== 'AbortError' && !signal.aborted && selectedMatch === analysisMatch) {
-            setReportState('error');
-            document.getElementById('match-selection-panel').open = true;
-            renderMapsComparison({}, {});
-            renderFormBadges('team-a-form', []);
-            renderFormBadges('team-b-form', []);
-            renderAcsTrendChart([], []);
-            clearAceCompare('커리어를 불러오지 못했습니다. 다시 분석해 주세요.');
-            renderAgentBadges('team-a-agents', []);
-            renderAgentBadges('team-b-agents', []);
-            renderBanPickResults({bans:[],picks:[]});
-            document.getElementById('win-probability-section').classList.add('hidden');
-            updateStatus('alert', '전력 분석을 표시하지 못했습니다.', err.message, 0);
+            setReportState(retainedReport ? 'refresh-error' : 'error');
+            if (!retainedReport) {
+                document.getElementById('match-selection-panel').open = true;
+                renderMapsComparison({}, {});
+                renderFormBadges('team-a-form', []);
+                renderFormBadges('team-b-form', []);
+                renderAcsTrendChart([], []);
+                clearAceCompare('커리어를 불러오지 못했습니다. 다시 분석해 주세요.');
+                renderAgentBadges('team-a-agents', []);
+                renderAgentBadges('team-b-agents', []);
+                renderBanPickResults({bans:[],picks:[]});
+                document.getElementById('win-probability-section').classList.add('hidden');
+            }
+            updateStatus('alert', retainedReport ? '갱신 실패 · 이전 분석 결과 유지' : '전력 분석을 표시하지 못했습니다.', err.message, 0);
         }
     } finally {
         if (!signal.aborted && selectedMatch === analysisMatch) {

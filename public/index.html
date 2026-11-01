@@ -41,7 +41,7 @@
             }).catch(e => console.error(e));
         });
     </script>
-<link href="design/tokens.css?v=20261009.1" rel="stylesheet"/><link href="design/theme.css?v=20261009.1" rel="stylesheet"/><link href="design/layout.css?v=20261009.1" rel="stylesheet"/><link href="report.css?v=20261009.1" rel="stylesheet"/><link href="design/animation.css?v=20261009.1" rel="stylesheet"/></head>
+<link href="design/tokens.css?v=20261101.1" rel="stylesheet"/><link href="design/theme.css?v=20261101.1" rel="stylesheet"/><link href="design/layout.css?v=20261101.1" rel="stylesheet"/><link href="report.css?v=20261101.1" rel="stylesheet"/><link href="design/animation.css?v=20261101.1" rel="stylesheet"/></head>
 <body>
 <a class="skip-link" href="#main-content">본문으로 이동</a>
 <header class="site-header shell">
@@ -68,7 +68,6 @@
 <div class="browser-heading"><div aria-label="경기 상태 필터" class="status-filters" id="match-status-filters"></div><p class="meta" id="match-results-count" role="status"></p></div>
 <div aria-label="날짜별 경기 · 스크롤 가능" class="match-browser" id="match-browser" role="region" tabindex="0"><p class="meta">경기 목록을 준비하고 있습니다.</p></div>
 </section>
-<div class="finder-actions"><p class="meta" id="match-selection-hint">목록에서 경기를 고른 뒤 분석하세요.</p><button class="primary-button" disabled="" id="analyze-btn" type="button">경기 분석</button></div>
 <details class="native-match-select"><summary>경기 선택 메뉴로 보기</summary><div class="field"><label for="match-select">경기</label><select aria-describedby="tournament-selection-help" disabled="" id="match-select"><option value="">분석할 경기를 선택하세요</option></select><p id="tournament-selection-help">대진이 확정된 경기만 분석할 수 있습니다.</p></div></details>
 <div class="filter-tools">
 <details id="tournament-explorer">
@@ -83,6 +82,11 @@
 </select></div>
 </div>
 </details>
+</div>
+</div>
+</details>
+<section aria-label="선택 경기와 분석 조건" class="analysis-controls">
+<div class="finder-actions"><div class="selection-context"><p id="match-selection-hint">목록에서 경기를 선택하세요.</p><p class="meta" id="selection-scope">맵 기록: 수집된 전체 대회</p><p class="meta" hidden="" id="applied-scope"></p><p class="apply-status" hidden="" id="filter-apply-status" role="status" aria-live="polite"></p></div><button class="primary-button" disabled="" id="analyze-btn" type="button">경기 분석</button></div>
 <details id="advanced-filters">
 <summary>상세 필터 · 맵 기록 범위 <span id="filter-count"></span></summary>
 <p class="meta">선택하지 않으면 수집된 전체 대회 기록을 사용합니다. 현역 선수 커리어에는 적용되지 않습니다.</p>
@@ -93,9 +97,7 @@
 <div aria-label="맵 기록에 사용할 대회" id="tournament-checklist" role="group"></div>
 </div>
 </details>
-</div>
-</div>
-</details>
+</section>
 <div aria-atomic="true" aria-live="polite" class="status-area" id="analysis-status" role="status">
 <span aria-hidden="true" id="status-icon-container"><span id="status-icon"></span></span>
 <span id="status-text">경기 목록을 준비하고 있습니다.</span><span id="sub-status-text"></span>
@@ -107,6 +109,7 @@
 <div class="report-actions"><button class="text-button" id="export-link-btn" type="button">링크 복사</button><button class="text-button" id="export-img-btn" type="button">이미지 저장</button></div>
 </div>
 <article aria-busy="false" aria-label="경기 분석 리포트" class="hidden" id="match-report">
+<p class="report-refresh-status" hidden="" id="report-refresh-status" role="status" aria-live="polite"></p>
 <section aria-label="두 팀 요약" class="report-section overview-story" id="overview" tabindex="-1"><div class="analysis-card match-hero" data-balance="unknown" data-match-state="unknown" id="match-hero"><div class="hero-heading"><p class="eyebrow" id="hero-phase">경기 정보</p><div class="report-kicker"><a id="report-event" rel="noopener noreferrer" target="_blank"></a><span id="report-fixture"></span></div></div><div class="matchup">
 <div class="matchup-side"><div class="team-heading"><img alt="" class="team-logo" hidden="" id="team-a-logo"/><a id="team-a-source" rel="noopener noreferrer" target="_blank"><h2 class="team-a" id="team-a-name">—</h2></a></div><div class="summary-stat"><strong id="summary-a-rate">—</strong><span id="summary-a-record"></span></div><p class="meta">수집된 맵 승률</p></div>
 <div class="versus"><strong id="match-summary-score">vs</strong><span class="meta" id="match-summary-status"></span><span class="meta" id="match-summary-format"></span><a class="meta" id="match-source" rel="noopener noreferrer" target="_blank">VLR 경기</a></div>
@@ -115,7 +118,7 @@
 <p class="meta">참고 전력 지수 · 제공된 지표이며 실제 경기 결과를 보장하지 않습니다.</p>
 <div class="probability-labels"><span><span id="win-prob-team-a"></span> <b id="win-prob-val-a"></b></span><span><span id="win-prob-team-b"></span> <b id="win-prob-val-b"></b></span></div>
 <div aria-hidden="true" class="probability-track"><div id="win-prob-bar-a"></div><div id="win-prob-bar-b"></div></div>
-</div><div class="hero-footer"><p class="meta" id="hero-data-note"></p><div class="hero-actions"><p class="meta" id="hero-action-note"></p><button class="primary-button" id="hero-analyze-btn" type="button">매치업 분석</button></div></div></div><section aria-labelledby="insight-title" class="insight-strip" id="insight-strip">
+</div><div class="hero-footer"><p class="meta" id="hero-data-note"></p></div></div><section aria-labelledby="insight-title" class="insight-strip" id="insight-strip">
 <div class="insight-story"><p class="eyebrow" id="insight-kicker">기록을 보는 관점</p><h2 id="insight-title"></h2><p class="meta" id="insight-detail"></p><p class="data-notice" hidden="" id="insight-freshness"></p></div>
 <div class="insight-form"><div class="form-summary"><p class="team-a" id="insight-form-a"></p><div aria-label="최근 경기 결과 · 최신순" class="form-strip" id="team-a-form"></div><p class="meta" id="insight-form-note-a"></p></div><div class="form-summary"><p class="team-b" id="insight-form-b"></p><div aria-label="최근 경기 결과 · 최신순" class="form-strip" id="team-b-form"></div><p class="meta" id="insight-form-note-b"></p></div><p class="form-direction meta">왼쪽이 최신 경기</p></div>
 </section><div class="module-grid" id="report-modules"><section aria-label="맵별 스코어" class="analysis-card live-scoreboard hidden" id="live-scoreboard-panel">
@@ -133,21 +136,23 @@
 
 
 <p class="scope-note overview-scope" id="report-scope"></p>
-</section><div class="report-details" id="report-details"><section aria-labelledby="maps-heading" class="report-section analysis-card detail-section" id="maps">
-<div class="section-heading"><h2 id="maps-heading">맵 기록 자세히 보기</h2><p>승률 · 승–패 · 공격 / 수비 라운드 승률</p></div>
-<div aria-label="맵 비교 표 · 좌우 스크롤 가능" class="table-scroll" role="region" tabindex="0">
-<table class="map-table"><caption class="hidden">동일한 맵에서 두 팀의 기록 비교</caption><thead><tr><th rowspan="2" scope="col">맵</th><th class="team-a team-start" colspan="3" id="team-a-maps-table" scope="colgroup">—</th><th class="team-b team-start" colspan="3" id="team-b-maps-table" scope="colgroup">—</th></tr><tr><th class="team-start" scope="col">승률 / 전적</th><th scope="col">공격</th><th scope="col">수비</th><th class="team-start" scope="col">승률 / 전적</th><th scope="col">공격</th><th scope="col">수비</th></tr></thead><tbody id="maps-comparison-body"></tbody></table>
-</div><p class="scope-note" id="map-pool-note"></p>
-</section><section aria-labelledby="players-heading" class="report-section analysis-card detail-section" id="players">
+</section><div class="report-details" id="report-details"><section aria-labelledby="maps-heading" class="report-section detail-section" id="maps">
+<div class="section-heading"><div><h2 id="maps-heading">맵 기록</h2><p>승률과 전적을 같은 맵에서 비교합니다.</p></div><button aria-controls="maps-table-region" aria-expanded="false" class="table-details-toggle text-button" data-table-details="maps" type="button">공격·수비 펼치기</button></div>
+<div aria-label="맵 비교 표 · 좌우 스크롤 가능" class="table-scroll" id="maps-table-region" role="region" tabindex="0">
+<table class="map-table"><caption class="hidden">동일한 맵에서 두 팀의 기록 비교</caption><thead><tr><th scope="col">맵</th><th class="team-a number" id="team-a-maps-table" scope="col">—</th><th class="team-b number" id="team-b-maps-table" scope="col">—</th><th class="detail-column number" scope="col"><span class="team-a" data-map-team="a"></span> 공격</th><th class="detail-column number" scope="col"><span class="team-b" data-map-team="b"></span> 공격</th><th class="detail-column number" scope="col"><span class="team-a" data-map-team="a"></span> 수비</th><th class="detail-column number" scope="col"><span class="team-b" data-map-team="b"></span> 수비</th></tr></thead><tbody id="maps-comparison-body"></tbody></table>
+</div><p class="table-scroll-hint">↔ 좌우로 움직여 공격·수비 기록을 비교하세요. 맵 이름은 고정됩니다.</p><p class="scope-note" id="map-pool-note"></p>
+</section><section aria-labelledby="players-heading" class="report-section detail-section" id="players">
 <div class="section-heading"><h2 id="players-heading">현역 선수 커리어 비교</h2><div aria-label="선수 정렬" class="status-filters" id="roster-sort"><button aria-pressed="true" data-sort="team" type="button">팀별</button><button aria-pressed="false" data-sort="acs" type="button">ACS순</button></div></div>
-<div aria-label="전체 현역 선수 커리어 · 좌우 스크롤 가능" class="table-scroll" role="region" tabindex="0"><table class="roster-table"><caption class="sr-only">확인된 양 팀 현역 선수 전체 커리어 비교</caption><thead><tr><th scope="col">선수</th><th scope="col">팀</th><th class="number" scope="col">커리어 ACS</th><th class="number" scope="col">K/D</th><th class="number" scope="col">킬–데스 차</th><th class="number" scope="col">라운드</th><th scope="col">주요 요원</th></tr></thead><tbody id="career-roster-body"></tbody></table></div>
+<button aria-controls="roster-table-region" aria-expanded="false" class="table-details-toggle text-button" data-table-details="players" type="button">라운드·요원 펼치기</button>
+<div aria-label="전체 현역 선수 커리어 · 좌우 스크롤 가능" id="roster-table-region" class="table-scroll" role="region" tabindex="0"><table class="roster-table"><caption class="sr-only">확인된 양 팀 현역 선수 전체 커리어 비교</caption><thead><tr><th scope="col">선수</th><th class="number" scope="col">ACS</th><th class="number" scope="col">K/D</th><th class="detail-column" scope="col">팀</th><th class="detail-column number" scope="col">킬–데스 차</th><th class="detail-column number" scope="col">라운드</th><th class="detail-column" scope="col">주요 요원</th></tr></thead><tbody id="career-roster-body"></tbody></table></div>
+<p class="table-scroll-hint">↔ 좌우로 움직여 추가 기록을 확인하세요. 선수 이름은 고정됩니다.</p>
 <details class="career-leaders"><summary>커리어 ACS 대표 선수 비교</summary>
 <div aria-label="선수 커리어 표 · 좌우 스크롤 가능" class="table-scroll" role="region" tabindex="0">
-<table class="player-table" id="career-acs-chart"><thead><tr><th scope="col">선수</th><th scope="col">팀</th><th class="number" scope="col">커리어 ACS</th><th class="number" scope="col">K/D</th><th class="number" scope="col">누적 킬–데스 차</th><th class="number" scope="col">라운드</th></tr></thead><tbody><tr><th class="player-name" id="ace-a-nickname" scope="row">—</th><td class="team-a" id="ace-a-team">—</td><td class="number acs-value" id="ace-a-acs">—</td><td class="number" id="ace-a-kd-ratio">—</td><td class="number"><span id="ace-a-kd">—</span></td><td class="number" id="ace-a-rounds">—</td></tr><tr><th class="player-name" id="ace-b-nickname" scope="row">—</th><td class="team-b" id="ace-b-team">—</td><td class="number acs-value" id="ace-b-acs">—</td><td class="number" id="ace-b-kd-ratio">—</td><td class="number"><span id="ace-b-kd">—</span></td><td class="number" id="ace-b-rounds">—</td></tr></tbody></table>
+<table class="player-table" id="career-acs-chart"><thead><tr><th scope="col">선수</th><th class="number" scope="col">ACS</th><th class="number" scope="col">K/D</th><th class="detail-column" scope="col">팀</th><th class="detail-column number" scope="col">누적 킬–데스 차</th><th class="detail-column number" scope="col">라운드</th></tr></thead><tbody><tr><th class="player-name" id="ace-a-nickname" scope="row">—</th><td class="number acs-value" id="ace-a-acs">—</td><td class="number" id="ace-a-kd-ratio">—</td><td class="detail-column team-a" id="ace-a-team">—</td><td class="detail-column number"><span id="ace-a-kd">—</span></td><td class="detail-column number" id="ace-a-rounds">—</td></tr><tr><th class="player-name" id="ace-b-nickname" scope="row">—</th><td class="number acs-value" id="ace-b-acs">—</td><td class="number" id="ace-b-kd-ratio">—</td><td class="detail-column team-b" id="ace-b-team">—</td><td class="detail-column number"><span id="ace-b-kd">—</span></td><td class="detail-column number" id="ace-b-rounds">—</td></tr></tbody></table>
 </div><p class="scope-note" hidden="" id="career-acs-empty"></p></details>
 <div class="player-notes"><div><h3 class="team-a" id="ace-a-note-team">—</h3><p class="meta" id="ace-a-coverage"></p><p class="agents"><span class="muted">주요 요원 </span><span id="ace-a-agents"></span></p><p aria-hidden="true" class="hidden" id="team-a-agents"></p><p class="meta" id="ace-a-collected"></p></div><div><h3 class="team-b" id="ace-b-note-team">—</h3><p class="meta" id="ace-b-coverage"></p><p class="agents"><span class="muted">주요 요원 </span><span id="ace-b-agents"></span></p><p aria-hidden="true" class="hidden" id="team-b-agents"></p><p class="meta" id="ace-b-collected"></p></div></div>
-<p class="scope-note">ACS는 라운드당 평균 전투 점수입니다. 선수별 전체 커리어 기록으로 비교하며 맵 기록 필터와 무관합니다. 출전 기간과 표본 차이를 함께 확인하세요.</p>
-</section><section aria-labelledby="form-heading" class="report-section analysis-card detail-section" id="form">
+<p class="scope-note">ACS: 라운드당 평균 전투 점수 · K/D: 킬 ÷ 데스. 출전 기간과 표본 차이를 함께 확인하세요.</p>
+</section><section aria-labelledby="form-heading" class="report-section detail-section" id="form">
 <div class="section-heading"><h2 id="form-heading">최근 경기 흐름</h2><p>최신순 · 수집된 최근 최대 5경기</p></div>
 <table class="form-table"><thead><tr><th scope="col">순서</th><th class="team-a" id="form-a-team" scope="col">—</th><th class="team-b" id="form-b-team" scope="col">—</th></tr></thead><tbody id="acs-trend-chart"></tbody></table>
 <p class="scope-note">각 팀의 최신 경기부터 나란히 표시합니다. 같은 행이 같은 날짜의 경기를 의미하지는 않습니다.</p>
@@ -163,5 +168,5 @@
 <div aria-live="polite" class="toast" hidden="" id="app-toast" role="status"></div>
 <script async="" src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-<script defer="" src="constants.js?v=20261009.1"></script><script defer="" src="components/primitives.js?v=20261009.1"></script><script defer="" src="match-context.js?v=20261009.1"></script><script defer="" src="charts.js?v=20261009.1"></script><script defer="" src="components/insight-strip.js?v=20261009.1"></script><script defer="" src="components/matchup-hero.js?v=20261009.1"></script><script defer="" src="components/map-card.js?v=20261009.1"></script><script defer="" src="components/player-card.js?v=20261009.1"></script><script defer="" src="ui.js?v=20261009.1"></script><script defer="" src="api.js?v=20261009.1"></script><script defer="" src="pages/match.js?v=20261009.1"></script><script defer="" src="app.js?v=20261009.1"></script></body>
+<script defer="" src="constants.js?v=20261101.1"></script><script defer="" src="components/primitives.js?v=20261101.1"></script><script defer="" src="match-context.js?v=20261101.1"></script><script defer="" src="charts.js?v=20261101.1"></script><script defer="" src="components/insight-strip.js?v=20261101.1"></script><script defer="" src="components/matchup-hero.js?v=20261101.1"></script><script defer="" src="components/map-card.js?v=20261101.1"></script><script defer="" src="components/player-card.js?v=20261101.1"></script><script defer="" src="ui.js?v=20261101.1"></script><script defer="" src="api.js?v=20261101.1"></script><script defer="" src="pages/match.js?v=20261101.1"></script><script defer="" src="app.js?v=20261101.1"></script></body>
 </html>

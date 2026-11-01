@@ -198,9 +198,24 @@ function renderRosterTable() {
         const name = sourceAnchor(player.nickname, vlrLink('player', player.player_id));
         const team = sourceAnchor(reportTeamName(player.side), vlrLink('team', selectedMatch?.selection_data?.details?.[`team_${player.side}_id`]));
         const status = player.rosterUnavailable ? '현역 명단 수집 대기' : !available ? '커리어 기록 없음' : '';
-        row.innerHTML = `<th scope="row">${name}${status ? `<small class="map-note">${status}</small>` : ''}</th><td class="team-${player.side}">${team}</td><td class="number">${number(player.acs,1)}</td><td class="number">${number(player.kd_ratio,2)}</td><td class="number">${available && Number.isFinite(player.kd_margin) && player.kd_margin > 0 ? '+' : ''}${number(player.kd_margin)}</td><td class="number">${number(player.rounds)}</td><td class="roster-agents">${escapeHTML(available && player.agents?.length ? player.agents.join(', ') : '—')}</td>`;
+        row.innerHTML = `<th scope="row">${name}<small class="mobile-team team-${player.side}">${escapeHTML(reportTeamName(player.side))}</small>${status ? `<small class="map-note">${status}</small>` : ''}</th><td class="number">${number(player.acs,1)}</td><td class="number">${number(player.kd_ratio,2)}</td><td class="detail-column team-${player.side}">${team}</td><td class="detail-column number">${available && Number.isFinite(player.kd_margin) && player.kd_margin > 0 ? '+' : ''}${number(player.kd_margin)}</td><td class="detail-column number">${number(player.rounds)}</td><td class="detail-column roster-agents">${escapeHTML(available && player.agents?.length ? player.agents.join(', ') : '—')}</td>`;
         body.appendChild(row);
     }
     if (!rows.length) body.innerHTML = '<tr><td colspan="7" class="empty-row">전력 분석 후 현역 선수 명단을 표시합니다.</td></tr>';
     document.querySelectorAll('#roster-sort button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.sort === careerSort)));
+}
+
+function initTableDetails() {
+    document.querySelectorAll('[data-table-details]').forEach(button => {
+        button.addEventListener('click', () => {
+            const section = document.getElementById(button.dataset.tableDetails);
+            const expanded = button.getAttribute('aria-expanded') !== 'true';
+            section.classList.toggle('show-details', expanded);
+            button.setAttribute('aria-expanded', String(expanded));
+            button.textContent = button.dataset.tableDetails === 'maps'
+                ? (expanded ? '공격·수비 접기' : '공격·수비 펼치기')
+                : (expanded ? '라운드·요원 접기' : '라운드·요원 펼치기');
+            if (!expanded) section.querySelectorAll('.table-scroll').forEach(region => { region.scrollLeft = 0; });
+        });
+    });
 }

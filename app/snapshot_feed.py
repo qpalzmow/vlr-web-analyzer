@@ -1,4 +1,5 @@
 """Import public data collected independently of a sleeping web service."""
+import copy
 import json
 import os
 import time
@@ -6,10 +7,12 @@ from datetime import datetime, timedelta, timezone
 
 import httpx
 
-from app.db import install_prepared_snapshot
+from app.db import get_catalog_snapshot, install_prepared_snapshot
 
 FEED_URL = 'https://raw.githubusercontent.com/qpalzmow/vlr-web-analyzer/catalog-data/snapshot.json'
 MAX_BYTES = 16 * 1024 * 1024
+CATALOG_STATES = {'completed', 'partial', 'retained_previous', 'failed'}
+ANALYSIS_STATES = {'completed', 'partial', 'running', 'pending', 'skipped', 'failed'}
 
 
 def enabled():
@@ -21,6 +24,23 @@ def timestamp(value):
     if date.tzinfo is None or date > datetime.now(timezone.utc) + timedelta(minutes=5):
         raise ValueError('Invalid snapshot timestamp')
     return date
+
+
+def validate_phase(phase, generation, stage):
+    if not isinstance(phase, dict) or phase.get('catalog_generation') != generation:
+        raise ValueError('Collection state belongs to another catalog generation')
+    allowed = CATALOG_STATES if stage == 'catalog' else ANALYSIS_STATES
+    if phase.get('status') not in allowed:
+        raise ValueError('Unsupported collection state')
+    for key in ('started_at', 'completed_at'):
+        if phase.get(key) is not None:
+            timestamp(phase[key])
+    if phase.get('next_retry_at') is not None:
+        date = datetime.fromisoformat(phase['next_retry_at'])
+        if date.tzinfo is None:
+            raise ValueError('Retry clock must have a timezone')
+    if 'failures' in phase and not isinstance(phase['failures'], list):
+        raise ValueError('Invalid collection failures')
 
 
 def validate(payload):
@@ -40,6 +60,18 @@ def validate(payload):
         raise ValueError('Invalid selection count')
     if not catalog['ready_count'] or not teams:
         raise ValueError('Public snapshot has no prepared data')
+    canonical = catalog.get('collection')
+    if canonical is not None:
+        validate_phase(canonical, catalog['generation'], 'catalog')
+    collection = payload.get('collection')
+    if collection is not None:
+        if not isinstance(collection, dict):
+            raise ValueError('Invalid collection metadata')
+        for stage in ('catalog', 'analysis'):
+            if stage in collection:
+                validate_phase(collection[stage], catalog['generation'], stage)
+        if canonical is not None and 'catalog' in collection and canonical != collection['catalog']:
+            raise ValueError('Conflicting catalog collection metadata')
     for match in matches:
         if not str(match['id']).isdigit():
             raise ValueError('Invalid match ID')
@@ -89,8 +121,16 @@ def download():
 def refresh():
     payload = download()
     installed = install(payload)
+    current = get_catalog_snapshot()
     result = {**installed, 'published_at': payload['published_at'],
-              'catalog_updated_at': payload['catalog']['updated_at']}
-    if isinstance(payload.get('collection'), dict):
-        result['collection'] = payload['collection']
+              'catalog_updated_at': current['updated_at'], 'catalog_generation': current['generation']}
+    if current['generation'] == payload['catalog']['generation']:
+        if isinstance(payload.get('collection'), dict):
+            result['collection'] = copy.deepcopy(payload['collection'])
+            if current.get('collection'):
+                result['collection']['catalog'] = copy.deepcopy(current['collection'])
+        elif current.get('collection'):
+            result['collection'] = {'catalog': copy.deepcopy(current['collection'])}
+    elif current.get('collection'):
+        result['collection'] = {'catalog': copy.deepcopy(current['collection'])}
     return result
