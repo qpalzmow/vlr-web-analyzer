@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "published_at": "2026-11-01T23:22:46.665389+00:00",
+  "published_at": "2026-11-02T02:23:17.938721+00:00",
   "catalog": {
     "schema_version": 1,
-    "generation": "5d22c17aa9fc42a081923d843cad5ae8",
-    "updated_at": "2026-11-01T23:03:56.546626+00:00",
+    "generation": "3f0eb338e97e479182be869b57c4928b",
+    "updated_at": "2026-11-02T02:23:17.684675+00:00",
     "refresh_interval_seconds": 3600,
     "matches": [
       {
@@ -19,7 +19,7 @@
         "round_name": "Group Stage Round 3 Spike Series 2026: Convergence EMEA DACH",
         "region": "EMEA",
         "tier": "S-Tier",
-        "status": "Upcoming 2d 18h",
+        "status": "Upcoming 2d 14h",
         "time": "11:00 AM",
         "date": "Wed, November 4, 2026",
         "scheduled_at": null,
@@ -161,7 +161,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -178,7 +178,7 @@
         "round_name": "Group Stage Round 3 Spike Series 2026: Convergence EMEA DACH",
         "region": "EMEA",
         "tier": "S-Tier",
-        "status": "Upcoming 2d 18h",
+        "status": "Upcoming 2d 14h",
         "time": "11:00 AM",
         "date": "Wed, November 4, 2026",
         "scheduled_at": null,
@@ -284,7 +284,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -301,7 +301,7 @@
         "round_name": "Group Stage Round 2 Spike Series 2026: Convergence EMEA DACH",
         "region": "EMEA",
         "tier": "S-Tier",
-        "status": "Upcoming 2d 19h",
+        "status": "Upcoming 2d 15h",
         "time": "12:00 PM",
         "date": "Wed, November 4, 2026",
         "scheduled_at": null,
@@ -419,7 +419,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -436,7 +436,7 @@
         "round_name": "Group Stage Round 4 Spike Series 2026: Convergence EMEA DACH",
         "region": "EMEA",
         "tier": "S-Tier",
-        "status": "Upcoming 6d 18h",
+        "status": "Upcoming 6d 14h",
         "time": "11:00 AM",
         "date": "Sun, November 8, 2026",
         "scheduled_at": null,
@@ -558,7 +558,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -575,7 +575,7 @@
         "round_name": "Group Stage Round 4 Spike Series 2026: Convergence EMEA DACH",
         "region": "EMEA",
         "tier": "S-Tier",
-        "status": "Upcoming 6d 18h",
+        "status": "Upcoming 6d 14h",
         "time": "11:00 AM",
         "date": "Sun, November 8, 2026",
         "scheduled_at": null,
@@ -717,7 +717,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -734,7 +734,7 @@
         "round_name": "Group Stage Round 4 Spike Series 2026: Convergence EMEA DACH",
         "region": "EMEA",
         "tier": "S-Tier",
-        "status": "Upcoming 6d 18h",
+        "status": "Upcoming 6d 14h",
         "time": "11:00 AM",
         "date": "Sun, November 8, 2026",
         "scheduled_at": null,
@@ -868,7 +868,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1023,7 +1023,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1178,7 +1178,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1377,7 +1377,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1596,7 +1596,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1731,7 +1731,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -1890,7 +1890,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2065,7 +2065,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2224,7 +2224,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2403,7 +2403,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2534,7 +2534,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2551,7 +2551,7 @@
         "round_name": "결승전",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 5h 0m",
+        "status": "Completed 8h 19m",
         "time": "12:00 PM",
         "date": "Sun, November 1, 2026 Today",
         "status_code": "final",
@@ -2829,7 +2829,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -2846,7 +2846,7 @@
         "round_name": "Group Stage Round 3 Spike Series 2026: Convergence EMEA DACH",
         "region": "EMEA",
         "tier": "S-Tier",
-        "status": "Completed 6h 0m",
+        "status": "Completed 9h 19m",
         "time": "11:00 AM",
         "date": "Sun, November 1, 2026 Today",
         "status_code": "final",
@@ -3112,7 +3112,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3129,7 +3129,7 @@
         "round_name": "결승전",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 14h 0m",
+        "status": "Completed 17h 19m",
         "time": "3:00 AM",
         "date": "Sun, November 1, 2026 Today",
         "status_code": "final",
@@ -3391,7 +3391,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3408,7 +3408,7 @@
         "round_name": "하위 결승",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1d 5h",
+        "status": "Completed 1d 8h",
         "time": "1:00 PM",
         "date": "Sat, October 31, 2026 Yesterday",
         "status_code": "final",
@@ -3708,7 +3708,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -3725,7 +3725,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 1d 10h",
+        "status": "Completed 1d 14h",
         "time": "7:15 AM",
         "date": "Sat, October 31, 2026 Yesterday",
         "status_code": "final",
@@ -3993,7 +3993,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4010,7 +4010,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 1d 14h",
+        "status": "Completed 1d 17h",
         "time": "4:00 AM",
         "date": "Sat, October 31, 2026 Yesterday",
         "status_code": "final",
@@ -4240,7 +4240,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4257,7 +4257,7 @@
         "round_name": "Main Event Lower Round 4",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 2d 1h",
+        "status": "Completed 2d 4h",
         "time": "4:40 PM",
         "date": "Fri, October 30, 2026",
         "status_code": "final",
@@ -4537,7 +4537,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4554,7 +4554,7 @@
         "round_name": "상위 결승",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 2d 5h",
+        "status": "Completed 2d 8h",
         "time": "1:00 PM",
         "date": "Fri, October 30, 2026",
         "status_code": "final",
@@ -4812,7 +4812,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -4829,7 +4829,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 2d 11h",
+        "status": "Completed 2d 14h",
         "time": "7:00 AM",
         "date": "Fri, October 30, 2026",
         "status_code": "final",
@@ -5107,7 +5107,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5124,7 +5124,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 2d 14h",
+        "status": "Completed 2d 17h",
         "time": "4:00 AM",
         "date": "Fri, October 30, 2026",
         "status_code": "final",
@@ -5390,7 +5390,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5407,7 +5407,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 3d 11h",
+        "status": "Completed 3d 14h",
         "time": "7:00 AM",
         "date": "Thu, October 29, 2026",
         "status_code": "final",
@@ -5665,7 +5665,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5682,7 +5682,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 3d 14h",
+        "status": "Completed 3d 17h",
         "time": "4:00 AM",
         "date": "Thu, October 29, 2026",
         "status_code": "final",
@@ -5944,7 +5944,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -5961,7 +5961,7 @@
         "round_name": "하위 3R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 4d 3h",
+        "status": "Completed 4d 6h",
         "time": "2:40 PM",
         "date": "Wed, October 28, 2026",
         "status_code": "final",
@@ -6241,7 +6241,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6258,7 +6258,7 @@
         "round_name": "하위 3R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 4d 5h",
+        "status": "Completed 4d 8h",
         "time": "1:00 PM",
         "date": "Wed, October 28, 2026",
         "status_code": "final",
@@ -6538,7 +6538,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6555,7 +6555,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 4d 11h",
+        "status": "Completed 4d 14h",
         "time": "6:25 AM",
         "date": "Wed, October 28, 2026",
         "status_code": "final",
@@ -6823,7 +6823,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -6840,7 +6840,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 4d 14h",
+        "status": "Completed 4d 17h",
         "time": "4:00 AM",
         "date": "Wed, October 28, 2026",
         "status_code": "final",
@@ -7092,7 +7092,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7109,7 +7109,7 @@
         "round_name": "상위 4강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 5d 2h",
+        "status": "Completed 5d 6h",
         "time": "3:05 PM",
         "date": "Tue, October 27, 2026",
         "status_code": "final",
@@ -7389,7 +7389,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7406,7 +7406,7 @@
         "round_name": "상위 4강",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 5d 5h",
+        "status": "Completed 5d 8h",
         "time": "1:00 PM",
         "date": "Tue, October 27, 2026",
         "status_code": "final",
@@ -7654,7 +7654,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7671,7 +7671,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 5d 10h",
+        "status": "Completed 5d 13h",
         "time": "7:50 AM",
         "date": "Tue, October 27, 2026",
         "status_code": "final",
@@ -7919,7 +7919,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -7936,7 +7936,7 @@
         "round_name": "2주차",
         "region": "China",
         "tier": "S-Tier",
-        "status": "Completed 5d 14h",
+        "status": "Completed 5d 17h",
         "time": "4:00 AM",
         "date": "Tue, October 27, 2026",
         "status_code": "final",
@@ -8162,7 +8162,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8179,7 +8179,7 @@
         "round_name": "하위 2R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 6d 2h",
+        "status": "Completed 6d 6h",
         "time": "3:10 PM",
         "date": "Mon, October 26, 2026",
         "status_code": "final",
@@ -8459,7 +8459,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -8476,7 +8476,7 @@
         "round_name": "하위 2R",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 6d 5h",
+        "status": "Completed 6d 8h",
         "time": "1:00 PM",
         "date": "Mon, October 26, 2026",
         "status_code": "final",
@@ -8756,7 +8756,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9033,7 +9033,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9308,7 +9308,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9626,7 +9626,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -9933,7 +9933,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10230,7 +10230,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10527,7 +10527,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -10835,7 +10835,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11132,7 +11132,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11429,7 +11429,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -11727,7 +11727,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12024,7 +12024,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12299,7 +12299,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12564,7 +12564,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -12871,7 +12871,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13178,7 +13178,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13455,7 +13455,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -13724,7 +13724,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14001,7 +14001,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14298,7 +14298,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14571,7 +14571,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -14814,7 +14814,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15095,7 +15095,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15402,7 +15402,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15679,7 +15679,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -15974,7 +15974,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16203,7 +16203,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16500,7 +16500,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -16807,7 +16807,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17088,7 +17088,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17341,7 +17341,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17594,7 +17594,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -17891,7 +17891,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18172,7 +18172,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18469,7 +18469,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18734,7 +18734,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -18987,7 +18987,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19260,7 +19260,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19577,7 +19577,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -19894,7 +19894,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20201,7 +20201,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20508,7 +20508,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -20835,7 +20835,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21132,7 +21132,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21429,7 +21429,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -21736,7 +21736,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22044,7 +22044,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22351,7 +22351,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22648,7 +22648,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -22945,7 +22945,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23252,7 +23252,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23559,7 +23559,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -23866,7 +23866,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24173,7 +24173,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24470,7 +24470,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -24767,7 +24767,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25064,7 +25064,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25361,7 +25361,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25658,7 +25658,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -25965,7 +25965,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26262,7 +26262,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26569,7 +26569,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -26866,7 +26866,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27163,7 +27163,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27470,7 +27470,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -27767,7 +27767,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28064,7 +28064,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28371,7 +28371,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28678,7 +28678,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -28975,7 +28975,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29272,7 +29272,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29569,7 +29569,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -29876,7 +29876,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30173,7 +30173,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30470,7 +30470,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -30767,7 +30767,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31074,7 +31074,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31335,7 +31335,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31629,7 +31629,7 @@
             ]
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31684,22 +31684,26 @@
           },
           "team_a_events": [
             {
-              "id": "3108",
-              "name": "EVC: The Surge 13"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
+            },
+            {
+              "id": "3108",
+              "name": "EVC: The Surge 13"
             }
           ],
           "team_b_events": [
             {
-              "id": "2878",
-              "name": "Road to VCL 2026: North Africa League"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "2878",
+              "name": "Road to VCL 2026: North Africa League"
             }
           ],
           "map_pool": [
@@ -31727,7 +31731,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31784,6 +31788,10 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
@@ -31817,7 +31825,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31874,12 +31882,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -31907,7 +31923,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -31970,6 +31986,10 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -31997,7 +32017,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32054,16 +32074,24 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
-              "id": "3108",
-              "name": "EVC: The Surge 13"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
+            },
+            {
+              "id": "3108",
+              "name": "EVC: The Surge 13"
             }
           ],
           "map_pool": [
@@ -32091,7 +32119,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32148,16 +32176,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
-              "id": "2878",
-              "name": "Road to VCL 2026: North Africa League"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "2878",
+              "name": "Road to VCL 2026: North Africa League"
             }
           ],
           "map_pool": [
@@ -32185,7 +32217,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32248,6 +32280,10 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -32275,7 +32311,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32332,6 +32368,10 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
@@ -32365,7 +32405,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32422,16 +32462,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
-              "id": "2878",
-              "name": "Road to VCL 2026: North Africa League"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "2878",
+              "name": "Road to VCL 2026: North Africa League"
             }
           ],
           "map_pool": [
@@ -32459,7 +32503,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32516,16 +32560,24 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
-              "id": "3108",
-              "name": "EVC: The Surge 13"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
+            },
+            {
+              "id": "3108",
+              "name": "EVC: The Surge 13"
             }
           ],
           "map_pool": [
@@ -32553,7 +32605,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32643,7 +32695,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32700,12 +32752,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -32733,7 +32793,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32794,12 +32854,12 @@
           ],
           "team_b_events": [
             {
-              "id": "2878",
-              "name": "Road to VCL 2026: North Africa League"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "2878",
+              "name": "Road to VCL 2026: North Africa League"
             }
           ],
           "map_pool": [
@@ -32827,7 +32887,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32884,12 +32944,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -32917,7 +32985,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -32978,12 +33046,16 @@
           ],
           "team_b_events": [
             {
-              "id": "3108",
-              "name": "EVC: The Surge 13"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
+            },
+            {
+              "id": "3108",
+              "name": "EVC: The Surge 13"
             }
           ],
           "map_pool": [
@@ -33011,7 +33083,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33068,12 +33140,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -33101,7 +33181,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33158,16 +33238,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
-              "id": "2878",
-              "name": "Road to VCL 2026: North Africa League"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "2878",
+              "name": "Road to VCL 2026: North Africa League"
             }
           ],
           "map_pool": [
@@ -33195,7 +33279,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33250,18 +33334,26 @@
           },
           "team_a_events": [
             {
-              "id": "3108",
-              "name": "EVC: The Surge 13"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
+            },
+            {
+              "id": "3108",
+              "name": "EVC: The Surge 13"
             }
           ],
           "team_b_events": [
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -33289,7 +33381,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33346,6 +33438,10 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
@@ -33379,7 +33475,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33442,6 +33538,10 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -33469,7 +33569,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33532,6 +33632,10 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -33559,7 +33663,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33616,16 +33720,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
-              "id": "2878",
-              "name": "Road to VCL 2026: North Africa League"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "2878",
+              "name": "Road to VCL 2026: North Africa League"
             }
           ],
           "map_pool": [
@@ -33653,7 +33761,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33710,12 +33818,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -33743,7 +33859,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33798,12 +33914,16 @@
           },
           "team_a_events": [
             {
-              "id": "3108",
-              "name": "EVC: The Surge 13"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
+            },
+            {
+              "id": "3108",
+              "name": "EVC: The Surge 13"
             }
           ],
           "team_b_events": [
@@ -33837,7 +33957,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33892,18 +34012,26 @@
           },
           "team_a_events": [
             {
-              "id": "3108",
-              "name": "EVC: The Surge 13"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
+            },
+            {
+              "id": "3108",
+              "name": "EVC: The Surge 13"
             }
           ],
           "team_b_events": [
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -33931,7 +34059,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -33988,6 +34116,10 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
@@ -34021,7 +34153,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -34082,12 +34214,12 @@
           ],
           "team_b_events": [
             {
-              "id": "2878",
-              "name": "Road to VCL 2026: North Africa League"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "2878",
+              "name": "Road to VCL 2026: North Africa League"
             }
           ],
           "map_pool": [
@@ -34115,7 +34247,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -34172,12 +34304,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -34205,7 +34345,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -34222,7 +34362,7 @@
         "round_name": "Round 8 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1d 5h",
+        "status": "Completed 1d 8h",
         "time": "1:00 PM",
         "date": "Sat, October 31, 2026 Yesterday",
         "scheduled_at": "2026-10-31T18:00:00+00:00",
@@ -34262,6 +34402,10 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
@@ -34295,7 +34439,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -34312,7 +34456,7 @@
         "round_name": "Round 8 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1d 4h",
+        "status": "Completed 1d 7h",
         "time": "2:00 PM",
         "date": "Sat, October 31, 2026 Yesterday",
         "scheduled_at": "2026-10-31T19:00:00+00:00",
@@ -34358,6 +34502,10 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -34385,7 +34533,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -34402,7 +34550,7 @@
         "round_name": "Round 8 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1d 3h",
+        "status": "Completed 1d 6h",
         "time": "3:00 PM",
         "date": "Sat, October 31, 2026 Yesterday",
         "scheduled_at": "2026-10-31T20:00:00+00:00",
@@ -34440,22 +34588,26 @@
           },
           "team_a_events": [
             {
-              "id": "2878",
-              "name": "Road to VCL 2026: North Africa League"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "2878",
+              "name": "Road to VCL 2026: North Africa League"
             }
           ],
           "team_b_events": [
             {
-              "id": "3108",
-              "name": "EVC: The Surge 13"
-            },
-            {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
+            },
+            {
+              "id": "3108",
+              "name": "EVC: The Surge 13"
             }
           ],
           "map_pool": [
@@ -34483,7 +34635,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -34500,7 +34652,7 @@
         "round_name": "Round 8 Group Stage Kaizen Valorant Championship Season 1: Division 1",
         "region": "Other",
         "tier": "S-Tier",
-        "status": "Completed 1d 2h",
+        "status": "Completed 1d 5h",
         "time": "4:00 PM",
         "date": "Sat, October 31, 2026 Yesterday",
         "scheduled_at": "2026-10-31T21:00:00+00:00",
@@ -34540,12 +34692,20 @@
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "team_b_events": [
             {
               "id": "3128",
               "name": "Kaizen Valorant Championship Season 1: Division 1"
+            },
+            {
+              "id": "3200",
+              "name": "INSTITUT FRANÇAIS ALGÉRIE 2026"
             }
           ],
           "map_pool": [
@@ -34573,7 +34733,7 @@
             "actual_veto": []
           },
           "cached": true,
-          "collected_at": "2026-11-01T23:03:56.546626+00:00",
+          "collected_at": "2026-11-02T02:23:17.684675+00:00",
           "stale": false
         },
         "selection_status": "ready"
@@ -221869,23 +222029,16 @@
     }
   },
   "collection": {
-    "status": "partial",
-    "started_at": "2026-11-01T23:04:00.113559+00:00",
-    "completed_at": "2026-11-01T23:22:46.665378+00:00",
-    "mode": "analysis_only",
-    "results": {
-      "updated": 72,
-      "failed": 2,
-      "total": 74
-    },
-    "budget_exhausted": false,
-    "remaining_teams": 0,
+    "status": "catalog_only",
+    "started_at": "2026-11-02T02:18:19.321789+00:00",
+    "completed_at": "2026-11-02T02:23:17.932742+00:00",
+    "mode": "catalog_only",
     "analytics": {
       "teams": 74,
       "failed_teams": 2,
       "stored_teams": 130,
       "pending_teams": 0,
-      "stale_teams": 2
+      "stale_teams": 74
     }
   }
 }
