@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "published_at": "2026-11-02T10:25:09.445408+00:00",
+  "published_at": "2026-11-02T10:25:17.778125+00:00",
   "catalog": {
     "schema_version": 1,
     "generation": "d640a172faf74d518529ffa274189f1a",
@@ -45647,11 +45647,12 @@
             "unavailable_reason": "team_match_coverage_unverified"
           }
         },
-        "updated_at": "2026-11-02T09:42:25.480330+00:00",
+        "updated_at": "2026-11-02T10:25:17.745633+00:00",
         "failed_scopes": [
           "all"
         ],
-        "last_attempt_at": "2026-11-02T09:42:25.480333+00:00",
+        "budget_exhausted": false,
+        "last_attempt_at": "2026-11-02T10:25:17.745647+00:00",
         "last_success_at": "2026-10-25T19:34:07.230697+00:00",
         "last_error": "scope_collection_failed"
       },
@@ -71212,11 +71213,12 @@
             "unavailable_reason": "team_match_coverage_unverified"
           }
         },
-        "updated_at": "2026-11-02T09:42:11.476214+00:00",
+        "updated_at": "2026-11-02T10:25:17.016715+00:00",
         "failed_scopes": [
           "all"
         ],
-        "last_attempt_at": "2026-11-02T09:42:11.476216+00:00",
+        "budget_exhausted": false,
+        "last_attempt_at": "2026-11-02T10:25:17.016727+00:00",
         "last_success_at": "2026-10-23T22:39:34.747521+00:00",
         "last_error": "scope_collection_failed"
       },
@@ -224461,11 +224463,11 @@
     }
   },
   "collection": {
-    "status": "catalog_only",
-    "started_at": "2026-11-02T10:20:09.907861+00:00",
-    "completed_at": "2026-11-02T10:25:09.416091+00:00",
-    "mode": "catalog_only",
-    "previous_catalog_generation": "ba1f1c228a76447f9bc6a1b5768d210d",
+    "status": "partial",
+    "started_at": "2026-11-02T10:25:15.770075+00:00",
+    "completed_at": "2026-11-02T10:25:17.761559+00:00",
+    "mode": "analysis_only",
+    "previous_catalog_generation": "d640a172faf74d518529ffa274189f1a",
     "catalog": {
       "status": "completed",
       "catalog_generation": "d640a172faf74d518529ffa274189f1a",
@@ -224476,14 +224478,34 @@
       "next_retry_at": null
     },
     "analysis": {
-      "status": "skipped",
+      "status": "partial",
       "catalog_generation": "d640a172faf74d518529ffa274189f1a",
-      "started_at": null,
-      "completed_at": "2026-11-02T10:25:09.416057+00:00",
+      "started_at": "2026-11-02T10:25:15.770169+00:00",
+      "completed_at": "2026-11-02T10:25:17.761559+00:00",
       "budget_exhausted": false,
+      "results": {
+        "updated": 0,
+        "failed": 2,
+        "total": 2
+      },
+      "remaining_teams": 0,
+      "analytics": {
+        "teams": 74,
+        "failed_teams": 2,
+        "stored_teams": 130,
+        "pending_teams": 0,
+        "stale_teams": 2
+      },
       "failures": [],
-      "reason": "catalog_only"
+      "next_retry_at": "2026-11-02T10:40:17.761559+00:00"
     },
+    "results": {
+      "updated": 0,
+      "failed": 2,
+      "total": 2
+    },
+    "budget_exhausted": false,
+    "remaining_teams": 0,
     "analytics": {
       "teams": 74,
       "failed_teams": 2,
