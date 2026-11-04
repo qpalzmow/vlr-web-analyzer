@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "published_at": "2026-11-04T13:48:57.292875+00:00",
+  "published_at": "2026-11-04T13:49:02.135956+00:00",
   "catalog": {
     "schema_version": 1,
     "generation": "3e634f3fedb942c98fde2f55c3b03f33",
@@ -225318,11 +225318,11 @@
     }
   },
   "collection": {
-    "status": "catalog_only",
-    "started_at": "2026-11-04T13:44:07.919840+00:00",
-    "completed_at": "2026-11-04T13:48:57.275018+00:00",
-    "mode": "catalog_only",
-    "previous_catalog_generation": "e27214d45aa64053bdd74a115bb78e73",
+    "status": "completed",
+    "started_at": "2026-11-04T13:49:01.575569+00:00",
+    "completed_at": "2026-11-04T13:49:02.126045+00:00",
+    "mode": "analysis_only",
+    "previous_catalog_generation": "3e634f3fedb942c98fde2f55c3b03f33",
     "catalog": {
       "status": "completed",
       "catalog_generation": "3e634f3fedb942c98fde2f55c3b03f33",
@@ -225333,14 +225333,34 @@
       "next_retry_at": null
     },
     "analysis": {
-      "status": "skipped",
+      "status": "completed",
       "catalog_generation": "3e634f3fedb942c98fde2f55c3b03f33",
-      "started_at": null,
-      "completed_at": "2026-11-04T13:48:57.274996+00:00",
+      "started_at": "2026-11-04T13:49:01.575633+00:00",
+      "completed_at": "2026-11-04T13:49:02.126045+00:00",
       "budget_exhausted": false,
+      "results": {
+        "updated": 0,
+        "failed": 0,
+        "total": 0
+      },
+      "remaining_teams": 0,
+      "analytics": {
+        "teams": 74,
+        "failed_teams": 0,
+        "stored_teams": 130,
+        "pending_teams": 0,
+        "stale_teams": 0
+      },
       "failures": [],
-      "reason": "catalog_only"
+      "next_retry_at": null
     },
+    "results": {
+      "updated": 0,
+      "failed": 0,
+      "total": 0
+    },
+    "budget_exhausted": false,
+    "remaining_teams": 0,
     "analytics": {
       "teams": 74,
       "failed_teams": 0,
