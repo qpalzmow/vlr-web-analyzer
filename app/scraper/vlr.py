@@ -1,7 +1,7 @@
 import re
 import logging
 from datetime import datetime, timezone
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, SoupStrainer
 
 logger = logging.getLogger(__name__)
 
@@ -287,7 +287,9 @@ def get_team_events(team_id, strict=False):
             raise ValueError(f"Team events returned HTTP {res.status_code}")
         return []
 
-    soup = BeautifulSoup(res.text, 'html.parser')
+    # Team statistics pages also contain years of expanded map records. This
+    # endpoint needs only selectors; do not allocate those unrelated DOM trees.
+    soup = BeautifulSoup(res.text, 'html.parser', parse_only=SoupStrainer('select'))
     events = []
     # Target strictly the tournament event selector, NOT the sub-stage selectors (filter-series, filter-subseries)
     event_select = soup.find('select', attrs={'name': 'event_id'}) or soup.find('select', class_='filter-event')

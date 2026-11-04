@@ -123,7 +123,7 @@ class RecoveryStopped(Exception):
 
 def _run_stage(stage, directory, env):
     output, previous = directory / 'snapshot.json', directory / 'previous.json'
-    command = [sys.executable, '-m', 'app.snapshot_export', '--output', str(output),
+    command = [sys.executable, '-m', 'app.recovery_worker', '--output', str(output),
                '--previous', str(previous)]
     hard = STAGE_SECONDS[stage]
     command += (['--catalog-only', '--catalog-max-seconds', str(hard - 60)] if stage == 'catalog'
@@ -132,7 +132,7 @@ def _run_stage(stage, directory, env):
     if code == 130 or _stop.is_set():
         raise RecoveryStopped()
     if code:
-        finalize = [sys.executable, '-m', 'app.snapshot_export', '--output', str(output),
+        finalize = [sys.executable, '-m', 'app.recovery_worker', '--output', str(output),
                     '--previous', str(previous), '--finalize-interrupted', '--stage', stage,
                     '--exit-code', str(code)]
         final_code = supervise(finalize, hard_seconds=30, grace_seconds=2, env=env, stop_event=_stop)
@@ -175,7 +175,8 @@ def _recover():
             directory = Path(db.DB_DIR).resolve() / 'recovery'
             directory.mkdir(parents=True, exist_ok=True)
             env = dict(os.environ, VLR_DATA_DIR=str(directory), VLR_REFRESH_MODE='local',
-                       VLR_REQUEST_INTERVAL_SECONDS='1.0')
+                       VLR_REQUEST_INTERVAL_SECONDS='1.0', VLR_COLLECTION_WORKERS='1',
+                       MALLOC_ARENA_MAX='2')
             baseline = make_payload(catalog=catalog)
             atomic_write(directory / 'previous.json', baseline)
             payload, code = baseline, 0

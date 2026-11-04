@@ -4,6 +4,14 @@ import json
 
 PORT = int(os.environ.get("PORT", 7860))
 
+
+def collection_workers():
+    """Use a small configurable pool; recovery shares a free web instance."""
+    try:
+        return max(1, min(4, int(os.environ.get('VLR_COLLECTION_WORKERS', '4'))))
+    except ValueError:
+        return 4
+
 if getattr(sys, 'frozen', False):
     BASE_DIR = sys._MEIPASS
 else:

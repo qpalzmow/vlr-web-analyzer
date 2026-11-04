@@ -12,6 +12,7 @@ from app.db import (get_analysis_teams, get_analysis_metadata, save_analysis_tea
 from app.scraper.metrics import (calculate_advanced_metrics, find_ace_player_from_stats, simulate_banpick,
                                  has_valid_acs, career_player_stats)
 from app.scraper.http import CollectionBudgetExceeded
+from app.config import collection_workers
 
 logger = logging.getLogger(__name__)
 SCHEMA_VERSION = 3
@@ -158,14 +159,15 @@ def refresh_analysis(matches, stop=None, force=False, on_progress=None):
     # while leaving the end of the queue untouched.
     todo.sort(key=lambda item: previous.get(item[0], {}).get('last_success_at') or
               previous.get(item[0], {}).get('updated_at') or '')
-    with ThreadPoolExecutor(max_workers=4, thread_name_prefix='vlr-prepared-analysis') as pool:
+    workers = collection_workers()
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix='vlr-prepared-analysis') as pool:
         # Bounded batches make shutdown responsive without queueing thousands of requests.
-        for i in range(0, len(todo), 4):
+        for i in range(0, len(todo), workers):
             if results.get('budget_exhausted') or (stop and stop.is_set()):
                 break
             jobs = {pool.submit(prepare_team, tid, events, previous.get(tid), force=force,
                                 **({'known_events': own_events[tid]} if own_events.get(tid) else {})): tid
-                    for tid, events in todo[i:i+4]}
+                    for tid, events in todo[i:i+workers]}
             for future in as_completed(jobs):
                 try:
                     prepared = future.result()

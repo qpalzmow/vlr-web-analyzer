@@ -17,6 +17,7 @@ from app.scraper.vlr import get_matches, get_match_details, get_team_events, get
 from app.scraper.http import (CollectionBudgetExceeded, check_collection_budget,
                               validate_vlr_url)
 from app.sync_lease import sync_lease
+from app.config import collection_workers
 
 logger = logging.getLogger(__name__)
 INTERVAL_SECONDS = 3600
@@ -60,12 +61,13 @@ def _collect(keys, fetch, failures, kind, *, collected_at=None, on_progress=None
     results, times = {}, collected_at if collected_at is not None else {}
     pending = iter(dict.fromkeys(keys))
     exhausted = False
-    with ThreadPoolExecutor(max_workers=4, thread_name_prefix="vlr-catalog") as pool:
+    workers = collection_workers()
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="vlr-catalog") as pool:
         jobs = {}
 
         def submit():
             nonlocal exhausted
-            while not exhausted and len(jobs) < 4:
+            while not exhausted and len(jobs) < workers:
                 try:
                     key = next(pending)
                 except StopIteration:
