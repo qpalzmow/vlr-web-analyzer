@@ -9,7 +9,8 @@ from pathlib import Path
 from app import analysis_sources as sources
 from app.db import (get_analysis_teams, get_analysis_metadata, save_analysis_team,
                     save_analysis_seed, get_catalog_snapshot)
-from app.scraper.metrics import calculate_advanced_metrics, find_ace_player_from_stats, simulate_banpick
+from app.scraper.metrics import (calculate_advanced_metrics, find_ace_player_from_stats, simulate_banpick,
+                                 has_valid_acs, career_player_stats)
 from app.scraper.http import CollectionBudgetExceeded
 
 logger = logging.getLogger(__name__)
@@ -61,11 +62,29 @@ def requirements(matches):
     return teams
 
 
-def prepare_team(team_id, events, previous=None, *, force=False):
+def own_event_requirements(matches):
+    """Participation confirmed by a team's own menu, excluding its opponent's."""
+    teams = {}
+    for match in matches:
+        selection = match.get('selection_data') or {}
+        details = selection.get('details') or {}
+        for side in ('a', 'b'):
+            tid = details.get(f'team_{side}_id')
+            if tid:
+                teams.setdefault(str(tid), set()).update(
+                    str(event['id']) for event in selection.get(f'team_{side}_events', []))
+    return teams
+
+
+def prepare_team(team_id, events, previous=None, *, force=False, known_events=None):
     previous = previous or {}
-    overview = sources.team_overview(team_id)
+    confirmed = set(known_events or [])
+    overview = (sources.team_overview(team_id, expected_events=confirmed) if confirmed
+                else sources.team_overview(team_id))
     profile = sources.team_profile(team_id)
-    available = set(overview['available_events'])
+    # The validated catalog's own menu is also participation evidence. If the
+    # overview lags behind it, collect the event scope instead of inventing zero.
+    available = set(overview['available_events']) | confirmed
     required = set(events) & available
     old_scopes = previous.get('scopes', {})
     scopes = copy.deepcopy(old_scopes)
@@ -85,6 +104,8 @@ def prepare_team(team_id, events, previous=None, *, force=False):
                        for pid, name in profile['roster'].items()}
             scopes['all'] = {'maps': overview['maps'], 'players': players, 'collected_at': now_iso(),
                              'career_roster_verified': True,
+                             'acs_missing_players': sum(p['rounds'] > 0 and not has_valid_acs(p) for p in players.values()),
+                             'acs_missing_rounds': sum(p.get('acs_missing_rounds', 0) for p in players.values()),
                              'players_available': any(p['rounds'] > 0 for p in players.values())}
         except Exception as exc:
             logger.exception('All-time player collection failed for %s', team_id)
@@ -121,13 +142,15 @@ def prepare_team(team_id, events, previous=None, *, force=False):
 def refresh_analysis(matches, stop=None, force=False, on_progress=None):
     sources.refresh_started_at = datetime.now(timezone.utc) if force else None
     previous = get_analysis_teams()
+    own_events = own_event_requirements(matches)
     todo = []
     for tid, events in requirements(matches).items():
         old = previous.get(tid, {})
-        required = (set(events) & set(old.get('available_events', []))) | {'all'}
+        required = (set(events) & set(old.get('available_events', []))) | own_events.get(tid, set()) | {'all'}
         scopes = old.get('scopes', {})
         fresh = all(not expired(scopes.get(key, {}).get('collected_at')) for key in required)
-        if (force or not fresh or old.get('schema_version') != SCHEMA_VERSION
+        if (force or not fresh or own_events.get(tid, set()) - set(old.get('available_events', []))
+                or old.get('schema_version') != SCHEMA_VERSION
                 or old.get('last_error') or old.get('failed_scopes')):
             todo.append((tid, events))
     results = {'updated': 0, 'failed': 0, 'total': len(todo)}
@@ -140,7 +163,8 @@ def refresh_analysis(matches, stop=None, force=False, on_progress=None):
         for i in range(0, len(todo), 4):
             if results.get('budget_exhausted') or (stop and stop.is_set()):
                 break
-            jobs = {pool.submit(prepare_team, tid, events, previous.get(tid), force=force): tid
+            jobs = {pool.submit(prepare_team, tid, events, previous.get(tid), force=force,
+                                **({'known_events': own_events[tid]} if own_events.get(tid) else {})): tid
                     for tid, events in todo[i:i+4]}
             for future in as_completed(jobs):
                 try:
@@ -160,6 +184,8 @@ def refresh_analysis(matches, stop=None, force=False, on_progress=None):
                             stop.set()
                     tid = jobs[future]
                     old = copy.deepcopy(previous.get(tid, {}))
+                    if own_events.get(tid):
+                        old['available_events'] = sorted(set(old.get('available_events', [])) | own_events[tid])
                     old.update(last_attempt_at=now_iso(), last_error='team_collection_failed',
                                budget_exhausted=budget_exhausted)
                     save_analysis_team(tid, old)
@@ -195,6 +221,7 @@ def career_comparison(data):
                 if player.get('rounds', 0) > 0]
     missing = [player.get('name', pid) for pid, player in players.items()
                if player.get('rounds', 0) <= 0]
+    missing_acs = [player for player in recorded if not has_valid_acs(player)]
     ace = find_ace_player_from_stats(recorded)
     reason = None
     if not scope:
@@ -205,9 +232,15 @@ def career_comparison(data):
         reason = 'no_roster'
     elif not recorded:
         reason = 'no_player_stats'
-    return {**ace, 'scope': 'career', 'available': bool(recorded),
-            'partial': bool(recorded) and bool(missing),
+    elif not ace['acs_available']:
+        reason = 'source_acs_missing'
+    return {**ace, 'scope': 'career', 'available': ace['acs_available'],
+            'acs_unavailable_reason': reason if not ace['acs_available'] else None,
+            'partial': bool(recorded) and bool(missing or missing_acs),
             'roster_size': len(players), 'players_with_stats': len(recorded),
+            'players_with_acs': len(recorded) - len(missing_acs),
+            'players_missing_acs': [player.get('name', player['player_id']) for player in missing_acs],
+            'acs_missing_rounds': sum(player.get('acs_missing_rounds', 0) for player in recorded),
             'missing_players': missing, 'unavailable_reason': reason,
             'collected_at': scope.get('collected_at')}
 
@@ -254,7 +287,7 @@ def career_roster(data):
     rows = []
     for pid, player in scope.get('players', {}).items():
         has_stats = player.get('rounds', 0) > 0
-        stats = find_ace_player_from_stats([{**player, 'player_id': pid}])
+        stats = career_player_stats({**player, 'player_id': pid})
         rows.append({**stats, 'nickname': player.get('name', pid), 'player_id': pid,
                      'available': has_stats, 'scope': 'career', 'collected_at': scope.get('collected_at')})
     return sorted(rows, key=lambda p: (not p['available'], -(p['acs'] or 0), -(p['rounds'] or 0), p['player_id']))

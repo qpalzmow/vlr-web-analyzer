@@ -94,13 +94,15 @@ def install_prepared_snapshot(catalog, teams):
             for tid, payload in teams.items():
                 row = conn.execute("SELECT payload_json FROM analysis_teams WHERE team_id = ?", (tid,)).fetchone()
                 old = json.loads(row[0]) if row else {}
-                incoming = payload.get('last_attempt_at') or payload['updated_at']
-                incoming_date = stamp(incoming)
-                prior = old.get('last_attempt_at') or old.get('updated_at')
-                if prior and old.get('schema_version') == payload['schema_version'] and stamp(prior) >= incoming_date:
+                stamp(payload.get('last_attempt_at') or payload['updated_at'])
+                # Remote and awake-server collectors can finish in either order.
+                # A newer attempt must not replace a fresher individual scope
+                # with the other collector's retained, older copy.
+                merged = merge_analysis_records({tid: old}, {tid: payload})[tid]
+                if merged == old:
                     continue
                 conn.execute("INSERT INTO analysis_teams VALUES (?, ?) ON CONFLICT(team_id) DO UPDATE SET payload_json=excluded.payload_json",
-                             (tid, json.dumps(payload, ensure_ascii=False)))
+                             (tid, json.dumps(merged, ensure_ascii=False)))
                 updated += 1
         return {'catalog_changed': catalog_changed, 'updated_teams': updated}
     finally:

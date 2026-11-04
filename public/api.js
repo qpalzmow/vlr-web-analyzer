@@ -6,7 +6,12 @@ function renderCatalogStatus(data) {
         ? collectedAt.toLocaleString('ko-KR', {timeZone:'Asia/Seoul',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
     const age = collectedAt ? Date.now() - collectedAt.getTime() : NaN;
     const external = data.sync_details?.source === 'github_hourly';
-    const delayed = Number.isFinite(age) && age >= 2 * 60 * 60 * 1000 ? ' · 갱신 지연' : '';
+    const recovered = data.data_origin === 'render_recovery' || data.sync_details?.data_origin === 'render_recovery';
+    const recovery = data.recovery || {};
+    const recoveryState = recovery.status === 'running' ? ' · 최신 기록 보충 중'
+        : ['failed', 'partial', 'interrupted'].includes(recovery.status) && (age >= 75 * 60000 || data.analytics_status?.stale_teams)
+            ? ' · 보충 수집 재시도 대기' : '';
+    const delayed = Number.isFinite(age) && age >= 75 * 60 * 1000 ? ' · 갱신 지연' : '';
     const refreshing = data.sync_status === 'running' ? ' · 갱신 중' : '';
     const failed = data.sync_status === 'error' ? ' · 이전 데이터 유지' : '';
     const collection = data.sync_details?.collection || {};
@@ -14,9 +19,9 @@ function renderCatalogStatus(data) {
     const catalogPhase = matchesGeneration(collection.catalog) ? collection.catalog
         : matchesGeneration(data.collection) ? data.collection : {};
     const analysisPhase = matchesGeneration(collection.analysis) ? collection.analysis : {};
-    const catalogState = external ? ({partial:' · 목록 일부 갱신', retained_previous:' · 이전 목록 유지', failed:' · 목록 수집 실패'}[catalogPhase.status] || '') : '';
+    const catalogState = external || recovered ? ({partial:' · 목록 일부 갱신', retained_previous:' · 이전 목록 유지', failed:' · 목록 수집 실패'}[catalogPhase.status] || '') : '';
     const legacyPartial = !collection.catalog && !collection.analysis && collection.status === 'partial';
-    const partial = external && (['partial','failed'].includes(analysisPhase.status) || legacyPartial) ? ' · 분석 일부 갱신' : '';
+    const partial = (external || recovered) && (['partial','failed'].includes(analysisPhase.status) || legacyPartial) ? ' · 분석 일부 갱신' : '';
     const analytics = data.analytics_status?.stale_teams ? ` · 분석 갱신 대기 ${data.analytics_status.stale_teams}팀` : '';
     const stateLabel = {completed:'완료', partial:'일부 갱신', retained_previous:'이전 목록 유지', failed:'실패', running:'진행 중', skipped:'건너뜀'};
     const phaseNotes = [];
@@ -28,14 +33,16 @@ function renderCatalogStatus(data) {
         if (reasons.length) phaseNotes.push(`${name} 실패 원인: ${reasons.join(', ')}`);
         if (phase.next_retry_at) phaseNotes.push(`${name} 재시도 목표: ${phase.next_retry_at}`);
     }
-    if (badge) badge.title = [external
-        ? '외부 수집은 매시간 실행을 목표로 하며 GitHub 실행 대기나 수집 오류로 지연될 수 있습니다. Render 서버는 시작할 때 저장된 데이터를 불러옵니다.'
+    if (badge) badge.title = [external || recovered
+        ? '외부 수집은 매시간 실행을 목표로 하며 GitHub 실행 대기나 수집 오류로 지연될 수 있습니다. Render 서버는 시작할 때 저장된 데이터를 불러옵니다. 서버 실행 중 목록 또는 필요한 분석이 75분 이상 오래되면 백그라운드에서 보충 수집합니다.'
         : '서버가 실행 중일 때 1시간 간격으로 수집합니다.',
         updated ? `마지막 경기 목록 수집: ${data.updated_at} (표시 시간: KST)` : '아직 수집된 경기 목록이 없습니다.',
+        ...(recovery.status === 'running' ? ['서버 보충 수집 진행 중: 기존 분석은 계속 이용할 수 있습니다.'] : []),
+        ...(recovery.next_retry_at ? [`서버 보충 수집 재시도 목표: ${recovery.next_retry_at}`] : []),
         ...phaseNotes
     ].join('\n');
     if (badge) badge.textContent = updated
-        ? `${external ? '외부 자동 수집' : '1시간마다 업데이트'} · ${updated} 기준${delayed}${refreshing}${failed}${catalogState}${partial}${analytics}`
+        ? `${recovered ? '서버 보충 수집' : external ? '외부 자동 수집' : '1시간마다 업데이트'} · ${updated} 기준${delayed}${refreshing}${failed}${catalogState}${partial}${analytics}${recoveryState}`
         : '첫 경기 목록을 준비하고 있습니다';
 }
 
@@ -233,7 +240,7 @@ async function runAnalysis() {
         const partial = data.ace_a.partial || data.ace_b.partial;
         const notice = (data.stale ? ' · 갱신 지연: 이전 데이터 사용' : '') +
             (unavailableTeams.length ? ` · ${unavailableTeams.join(', ')}: 커리어 비교 불가 (선수 표의 안내 확인)` : '') +
-            (partial ? ' · 기록 없는 선수는 커리어 대표 선정에서 제외' : '');
+            (partial ? ' · ACS를 확인할 수 있는 선수만 커리어 대표 선정에 포함' : '');
         document.getElementById('report-integrity-note').textContent = notice.replace(/^ · /, '');
         document.getElementById('report-integrity-note').hidden = !notice;
         updateStatus(data.stale || unavailableTeams.length || partial ? 'alert' : 'success', '전력 분석 완료.', `${timestamp} 기준${data.stale ? ' · 갱신 지연: 이전 데이터 사용' : ''}${unavailableTeams.length || partial ? ' · 선수별 표본 안내 확인' : ''}`, 100);

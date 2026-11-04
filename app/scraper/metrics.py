@@ -1,4 +1,5 @@
 import re
+import math
 from typing import List
 
 def normalize_team_name(name: str) -> str:
@@ -64,26 +65,43 @@ def calculate_advanced_metrics(maps_data: dict, total_fk: int, total_fd: int, to
         "top_compositions": []
     }
 
-def find_ace_player_from_stats(players_stats: List[dict]) -> dict:
-    valid_players = [p for p in players_stats if p and p.get('rounds', 0) > 0]
-    if not valid_players:
-        return {'nickname': 'N/A', 'player_id': None, 'acs': None,
-                'rounds': None, 'kills': None, 'deaths': None,
-                'kd_margin': None, 'kd_ratio': None, 'agents': []}
+def has_valid_acs(player: dict) -> bool:
+    weighted = player.get('weighted_acs')
+    return (player.get('rounds', 0) > 0 and player.get('acs_available') is not False
+            and isinstance(weighted, (int, float)) and not isinstance(weighted, bool)
+            and math.isfinite(weighted) and weighted >= 0)
 
+
+def career_player_stats(player: dict) -> dict:
+    """Keep known career counts even when the source does not provide ACS."""
+    has_stats = player.get('rounds', 0) > 0
+    rounds = player.get('rounds') if has_stats else None
+    kills, deaths = player.get('kills'), player.get('deaths')
+    if not has_stats:
+        kills = deaths = None
+    agents = sorted(player.get('agents', {}).items(), key=lambda item: (-item[1], item[0]))
+    acs_available = has_valid_acs(player)
+    return {'nickname': player.get('name', 'N/A'), 'player_id': player.get('player_id'),
+            'acs': round(player['weighted_acs'] / rounds, 1) if acs_available else None, 'rounds': rounds,
+            'kills': kills, 'deaths': deaths,
+            'kd_margin': kills - deaths if kills is not None and deaths is not None else None,
+            'kd_ratio': round(kills / deaths, 4) if kills is not None and deaths else None,
+            'agents': [agent.capitalize() for agent, count in agents[:3] if count > 0],
+            'acs_available': acs_available,
+            'acs_unavailable_reason': None if acs_available else (
+                player.get('acs_unavailable_reason') or ('source_acs_missing' if has_stats else 'no_player_stats')),
+            'acs_missing_rounds': player.get('acs_missing_rounds', 0)}
+
+
+def find_ace_player_from_stats(players_stats: List[dict]) -> dict:
+    valid_players = [p for p in players_stats if p and has_valid_acs(p)]
+    if not valid_players:
+        return career_player_stats({})
     # Compare unrounded ACS; equal scores prefer the larger recorded sample.
     player = sorted(valid_players, key=lambda p: (
         -p['weighted_acs'] / p['rounds'], -p['rounds'],
         str(p.get('player_id', p.get('name', '')))))[0]
-    rounds = player['rounds']
-    kills, deaths = player.get('kills'), player.get('deaths')
-    agents = sorted(player.get('agents', {}).items(), key=lambda item: (-item[1], item[0]))
-    return {'nickname': player.get('name', 'N/A'), 'player_id': player.get('player_id'),
-            'acs': round(player['weighted_acs'] / rounds, 1), 'rounds': rounds,
-            'kills': kills, 'deaths': deaths,
-            'kd_margin': kills - deaths if kills is not None and deaths is not None else None,
-            'kd_ratio': round(kills / deaths, 4) if kills is not None and deaths else None,
-            'agents': [agent.capitalize() for agent, count in agents[:3] if count > 0]}
+    return career_player_stats(player)
 
 def simulate_banpick(maps_a: dict, maps_b: dict, map_pool: list) -> dict:
     if not map_pool:

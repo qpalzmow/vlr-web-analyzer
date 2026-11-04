@@ -11,18 +11,18 @@ logger = logging.getLogger(__name__)
 LEASE_SECONDS = 300
 
 
-def _claim(owner):
+def _claim(owner, key='daily_sync'):
     conn = get_db_connection()
     try:
         with conn:
             now = time.time()
             return conn.execute("""
                 INSERT INTO sync_lease (key, owner, expires_at)
-                VALUES ('daily_sync', ?, ?)
+                VALUES (?, ?, ?)
                 ON CONFLICT(key) DO UPDATE SET
                     owner = excluded.owner, expires_at = excluded.expires_at
                 WHERE sync_lease.expires_at <= ?
-            """, (owner, now + LEASE_SECONDS, now)).rowcount == 1
+            """, (key, owner, now + LEASE_SECONDS, now)).rowcount == 1
     finally:
         conn.close()
 
@@ -38,9 +38,9 @@ def _renew(owner):
 
 
 @contextmanager
-def sync_lease():
+def sync_lease(key='daily_sync'):
     owner = uuid.uuid4().hex
-    if not _claim(owner):
+    if not _claim(owner, key):
         yield False
         return
     stop = threading.Event()

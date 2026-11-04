@@ -187,18 +187,23 @@ function renderRosterTable() {
     const body = document.getElementById('career-roster-body');
     body.innerHTML = '';
     const rows = [...careerRows].sort((a,b) => (careerSort === 'team' ? a.side.localeCompare(b.side) : 0) ||
-        Number(b.available) - Number(a.available) || (b.acs || 0) - (a.acs || 0) || (b.rounds || 0) - (a.rounds || 0) || a.nickname.localeCompare(b.nickname));
+        Number(hasCareerPlayerStats(b)) - Number(hasCareerPlayerStats(a)) ||
+        (hasCareerPlayerStats(a) && hasCareerPlayerStats(b) ? b.acs - a.acs : 0) ||
+        Number(hasCareerRosterStats(b)) - Number(hasCareerRosterStats(a)) ||
+        (Number.isFinite(b.rounds) ? b.rounds : 0) - (Number.isFinite(a.rounds) ? a.rounds : 0) ||
+        String(a.nickname || '').localeCompare(String(b.nickname || '')));
     let previousSide = '';
     for (const player of rows) {
         const row = document.createElement('tr');
         if (careerSort === 'team' && previousSide && previousSide !== player.side) row.className = 'roster-team-divider';
         previousSide = player.side;
-        const available = hasCareerPlayerStats(player);
+        const available = hasCareerRosterStats(player), acsAvailable = hasCareerPlayerStats(player);
         const number = (value, digits) => available && Number.isFinite(value) ? value.toLocaleString('ko-KR', digits === undefined ? {} : {minimumFractionDigits: digits, maximumFractionDigits: digits}) : '—';
         const name = sourceAnchor(player.nickname, vlrLink('player', player.player_id));
         const team = sourceAnchor(reportTeamName(player.side), vlrLink('team', selectedMatch?.selection_data?.details?.[`team_${player.side}_id`]));
-        const status = player.rosterUnavailable ? '현역 명단 수집 대기' : !available ? '커리어 기록 없음' : '';
-        row.innerHTML = `<th scope="row">${name}<small class="mobile-team team-${player.side}">${escapeHTML(reportTeamName(player.side))}</small>${status ? `<small class="map-note">${status}</small>` : ''}</th><td class="number">${number(player.acs,1)}</td><td class="number">${number(player.kd_ratio,2)}</td><td class="detail-column team-${player.side}">${team}</td><td class="detail-column number">${available && Number.isFinite(player.kd_margin) && player.kd_margin > 0 ? '+' : ''}${number(player.kd_margin)}</td><td class="detail-column number">${number(player.rounds)}</td><td class="detail-column roster-agents">${escapeHTML(available && player.agents?.length ? player.agents.join(', ') : '—')}</td>`;
+        const status = player.rosterUnavailable ? '현역 명단 수집 대기' : !available ? '커리어 기록 없음' : !acsAvailable
+            ? player.acs_unavailable_reason === 'source_acs_missing' ? 'ACS 원본 미제공' : 'ACS 확인 불가' : '';
+        row.innerHTML = `<th scope="row">${name}<small class="mobile-team team-${player.side}">${escapeHTML(reportTeamName(player.side))}</small>${status ? `<small class="map-note">${status}</small>` : ''}</th><td class="number">${acsAvailable ? number(player.acs,1) : '—'}</td><td class="number">${number(player.kd_ratio,2)}</td><td class="detail-column team-${player.side}">${team}</td><td class="detail-column number">${available && Number.isFinite(player.kd_margin) && player.kd_margin > 0 ? '+' : ''}${number(player.kd_margin)}</td><td class="detail-column number">${number(player.rounds)}</td><td class="detail-column roster-agents">${escapeHTML(available && player.agents?.length ? player.agents.join(', ') : '—')}</td>`;
         body.appendChild(row);
     }
     if (!rows.length) body.innerHTML = '<tr><td colspan="7" class="empty-row">전력 분석 후 현역 선수 명단을 표시합니다.</td></tr>';

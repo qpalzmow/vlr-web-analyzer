@@ -295,6 +295,49 @@ def build_snapshot(previous=None, on_checkpoint=None):
     return result
 
 
+def read_sync_status(snapshot=None):
+    """Expose the installed generation, including independent local recovery."""
+    from app.recovery import get_status
+    snapshot = get_catalog_snapshot() if snapshot is None else snapshot
+    status = get_sync_status()
+    recovery = get_status()
+    status['recovery'] = recovery
+    if not snapshot:
+        return status
+    generation = snapshot.get('generation')
+    details = status.setdefault('details', {})
+    phases = details.get('collection') or {}
+    # Keep legacy metadata only while it describes the installed catalog.
+    if details.get('catalog_generation') not in (None, generation):
+        phases = {}
+    phases = copy.deepcopy(phases)
+    for name in ('catalog', 'analysis'):
+        if phases.get(name, {}).get('catalog_generation') not in (None, generation):
+            phases.pop(name)
+    if snapshot.get('collection'):
+        phases['catalog'] = copy.deepcopy(snapshot['collection'])
+    phases = _preserve_newer_analysis(phases, recovery, generation)
+    if phases:
+        details['collection'] = phases
+    else:
+        details.pop('collection', None)
+    details.update(catalog_generation=generation, catalog_updated_at=snapshot.get('updated_at'))
+    details['data_origin'] = snapshot.get('data_origin', details.get('source'))
+    local_analysis = (recovery.get('collection') or {}).get('analysis')
+    locally_repaired = (local_analysis and local_analysis.get('catalog_generation') == generation
+                        and phases.get('analysis') == local_analysis)
+    if (details['data_origin'] == 'render_recovery' or locally_repaired) and status.get('status') != 'running':
+        details['external_sync_status'] = status.get('status')
+        incomplete = any(phases.get(name, {}).get('status') in
+                         {'partial', 'retained_previous', 'failed'} for name in ('catalog', 'analysis'))
+        try:
+            outdated = utcnow() - datetime.fromisoformat(snapshot['updated_at']) >= timedelta(minutes=75)
+        except (KeyError, TypeError, ValueError):
+            outdated = True
+        status['status'] = 'degraded' if incomplete or outdated else 'completed'
+    return status
+
+
 def read_catalog():
     snapshot = get_catalog_snapshot() or {
         "schema_version": SCHEMA_VERSION, "generation": None, "updated_at": None,
@@ -303,10 +346,11 @@ def read_catalog():
     }
     from app.analysis import analysis_status
     snapshot['analytics_status'] = analysis_status(snapshot['matches'])
-    status = get_sync_status()
+    status = read_sync_status(snapshot)
     snapshot["sync_status"] = status.get("status", "pending")
     snapshot["next_refresh_at"] = status.get("details", {}).get("next_refresh_at")
     snapshot['sync_details'] = status.get('details', {})
+    snapshot['recovery'] = status['recovery']
     return snapshot
 
 
@@ -399,7 +443,7 @@ def refresh_catalog():
                 imported = snapshot_feed.refresh()
                 meta.update(imported, source='github_hourly', completed_at=utcnow().isoformat(),
                             next_refresh_at=(utcnow() + timedelta(minutes=5)).isoformat())
-                stale = utcnow() - datetime.fromisoformat(imported['catalog_updated_at']) >= timedelta(hours=2)
+                stale = utcnow() - datetime.fromisoformat(imported['catalog_updated_at']) >= timedelta(minutes=75)
                 phases = _preserve_newer_analysis(imported.get('collection'), previous_details,
                                                   imported.get('catalog_generation'))
                 meta.pop('collection', None)
@@ -459,6 +503,10 @@ def _scheduler_loop():
         try:
             if refresh_due(get_sync_status()):
                 refresh_catalog()
+            # Request handlers only read stored data. A separate, bounded child
+            # fills scheduling gaps without extending HTTP request latency.
+            from app.recovery import maybe_start
+            maybe_start()
         except Exception:
             logger.exception("Catalog scheduler failed")
         _stop.wait(15)
@@ -469,6 +517,8 @@ def start_catalog_scheduler():
     bootstrap_snapshot()
     if _worker is None or not _worker.is_alive():
         _stop.clear()
+        from app.recovery import start
+        start()
         from app.snapshot_feed import enabled
         if enabled():
             # On a cold start, load the persisted external generation before
@@ -480,5 +530,7 @@ def start_catalog_scheduler():
 
 def stop_catalog_scheduler():
     _stop.set()
+    from app.recovery import stop
+    stop()
     if _worker:
         _worker.join(timeout=2)

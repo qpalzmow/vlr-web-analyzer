@@ -21,7 +21,7 @@ from app.scraper.vlr import get_live_score
 from app.scraper.metrics import simulate_banpick
 from app.db import init_db, get_sync_status, get_catalog_snapshot
 from app.catalog import (start_catalog_scheduler, stop_catalog_scheduler, refresh_catalog,
-                         read_catalog, read_selection)
+                         read_catalog, read_selection, read_sync_status)
 from app.analysis import bootstrap_analysis, full_analysis, AnalysisNotReady
 from app.logos import team_logo
 
@@ -233,7 +233,7 @@ def api_analyze_advanced(payload: TeamAnalysisPayload):
 @app.get("/api/sync/status")
 def api_get_sync_status_endpoint():
     from app.analysis import analysis_status
-    return JSONResponse(content={**get_sync_status(), 'analytics': analysis_status()})
+    return JSONResponse(content={**read_sync_status(), 'analytics': analysis_status()})
 
 @app.post("/api/sync/trigger")
 def api_trigger_sync_endpoint(request: Request):

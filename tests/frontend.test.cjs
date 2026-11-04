@@ -4,6 +4,27 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
+test('freshness shows background recovery and preserves the actual data clock', () => {
+    const h = setup();
+    const old = new Date(Date.now() - 76 * 60000).toISOString();
+    h.context.data = {generation:'current', updated_at:old,
+        sync_details:{source:'github_hourly'}, recovery:{status:'running'},
+        analytics_status:{stale_teams:2}};
+    h.run('renderCatalogStatus(data)');
+    const badge = h.elements.get('sync-badge-text');
+    assert.match(badge.textContent, /갱신 지연/);
+    assert.match(badge.textContent, /최신 기록 보충 중/);
+    assert.ok(badge.title.includes(old));
+    assert.match(badge.title, /75분 이상 오래되면/);
+    h.context.data.data_origin = 'render_recovery';
+    h.context.data.updated_at = new Date().toISOString();
+    h.context.data.recovery = {status:'completed'};
+    h.context.data.analytics_status = {stale_teams:0};
+    h.run('renderCatalogStatus(data)');
+    assert.match(badge.textContent, /^서버 보충 수집/);
+    assert.doesNotMatch(badge.textContent, /갱신 지연|보충 중|재시도 대기/);
+});
+
 test('catalog status exposes delayed data even when the last import completed', () => {
     const h = setup();
     h.context.data = {updated_at:'2020-01-01T00:00:00Z',sync_status:'completed',
@@ -1165,4 +1186,47 @@ test('map preview preserves missing attack rounds, escapes names and labels low 
     h.context.data={...analysisResult(),maps_a:{Ascent:{...mapSample(10,6),atk_total:0}},maps_b:{Ascent:mapSample(10,5)}};
     h.run('MatchUI.renderMapCard(data,match,MatchUI.buildMatchSummary(data,match))');
     assert.match(h.elements.get('map-preview-list').children[0].innerHTML,/공격 비교 표본 부족/);
+});
+
+test('missing ACS keeps full roster counts and K/D without displaying a fabricated average', () => {
+    const h=setup();h.context.match=readyMatch();
+    h.context.a=[{...careerPlayer('Sharks <img>',null),player_id:'64849',rounds:165,kd_ratio:129/121,
+        kd_margin:8,acs_available:false,acs_unavailable_reason:'source_acs_missing',agents:['Jett']},
+        {...careerPlayer('Known',230),player_id:'8'}];
+    h.context.b=[];
+    h.run('selectedMatch=match;renderCareerRoster(a,b)');
+    const rows=h.elements.get('career-roster-body').children;
+    const gap=rows.find(row=>row.innerHTML.includes('Sharks'));
+    assert.ok(gap);assert.match(gap.innerHTML,/ACS 원본 미제공/);
+    assert.match(gap.innerHTML,/>—<\/td>/);assert.match(gap.innerHTML,/>1\.07<\/td>/);
+    assert.match(gap.innerHTML,/>165<\/td>/);assert.match(gap.innerHTML,/Jett/);
+    assert.doesNotMatch(gap.innerHTML,/<img|커리어 기록 없음/);
+    h.run("careerSort='acs';renderRosterTable()");
+    assert.match(h.elements.get('career-roster-body').children[0].innerHTML,/Known/);
+});
+
+test('ACS coverage distinguishes source gaps from players with no career records', () => {
+    const h=setup();
+    h.context.ace={...careerPlayer('Known',230),partial:true,roster_size:3,players_with_stats:2,
+        players_with_acs:1,missing_players:['Newcomer'],players_missing_acs:['Sharks'],acs_missing_rounds:21};
+    h.run("populateAceCard('a',ace)");
+    const coverage=h.elements.get('ace-a-coverage').textContent;
+    assert.match(coverage,/기록 있는 현역 2\/3명/);assert.match(coverage,/ACS 확인 1\/3명/);
+    assert.match(coverage,/기록 없음: Newcomer/);assert.match(coverage,/ACS 미제공: Sharks/);
+    h.context.match=readyMatch();h.context.result={ace_a:h.context.ace,ace_b:h.context.ace};
+    h.run('MatchUI.renderPlayerCard(result,match)');
+    assert.match(h.elements.get('impact-a-detail').textContent,/일부 현역 ACS 미제공/);
+});
+
+test('all missing ACS suppresses leader comparison but points to available roster counts', () => {
+    const h=setup();h.context.match=readyMatch();
+    h.context.ace={nickname:'N/A',acs:null,available:false,unavailable_reason:'source_acs_missing',
+        players_with_stats:1,players_with_acs:0,roster_size:1,players_missing_acs:['SereNa'],missing_players:[]};
+    h.context.result={ace_a:h.context.ace,ace_b:h.context.ace};
+    h.run("populateAceCard('a',ace);renderCareerAcsChart(ace,ace);MatchUI.renderPlayerCard(result,match)");
+    assert.equal(h.elements.get('ace-a-acs').textContent,'—');
+    assert.match(h.elements.get('ace-a-coverage').textContent,/ACS 원본 미제공/);
+    assert.match(h.elements.get('career-acs-empty').textContent,/라운드·K\/D는 전체 선수 표/);
+    assert.equal(h.elements.get('summary-a-player').innerHTML,'ACS 대표 선정 불가');
+    assert.match(h.elements.get('impact-a-detail').textContent,/기록 있는 현역 1\/1명/);
 });

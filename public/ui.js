@@ -591,18 +591,7 @@ function populateAceCard(teamLetter, aceData) {
     // Neutral text keeps team and result colors meaningful.
     kdEl.className = '';
     const coverage = document.getElementById(`ace-${teamLetter}-coverage`);
-    if (available) {
-        const missing = aceData.partial && aceData.missing_players?.length ? ` · 기록 없음: ${aceData.missing_players.join(', ')}` : '';
-        coverage.textContent = `기록 있는 현역 ${aceData.players_with_stats}/${aceData.roster_size}명 기준${missing}`;
-    } else {
-        const reasons = {
-            career_not_ready: '현역 선수 커리어 수집 대기 중',
-            roster_unverified: '현역 선수 명단을 확인할 수 없어 비교 불가',
-            no_roster: '확인 가능한 현역 선수 명단 없음',
-            no_player_stats: '확인 가능한 현역 선수 기록 없음'
-        };
-        coverage.textContent = reasons[aceData?.unavailable_reason] || '확인 가능한 현역 선수 기록 없음';
-    }
+    coverage.textContent = careerCoverageText(aceData);
     coverage.className = 'meta';
     const collected = aceData?.collected_at ? new Date(aceData.collected_at) : null;
     document.getElementById(`ace-${teamLetter}-collected`).textContent = collected && Number.isFinite(collected.getTime())

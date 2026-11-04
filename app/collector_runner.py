@@ -51,25 +51,44 @@ def _signal_group(process, *, force):
             pass
 
 
-def supervise(command, *, hard_seconds, grace_seconds=60, env=None):
-    """Return the child's exit code, or 124 after reclaiming a timed-out group.
+def supervise(command, *, hard_seconds, grace_seconds=60, env=None, stop_event=None):
+    """Return the child's exit code, 124 on timeout, or 130 after shutdown cancellation.
 
     TERM starts before the absolute hard limit. Its grace period is included in
     that limit; a blocked HTTP response cannot extend it by another full grace.
     """
     if not (math.isfinite(hard_seconds) and 0 < grace_seconds < hard_seconds):
         raise ValueError('The hard limit must exceed a positive termination grace')
+    if stop_event is not None and stop_event.is_set():
+        return 130
     started = time.monotonic()
     reap_margin = min(2, grace_seconds / 4)
     options = {'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == 'nt' else {'start_new_session': True}
     process = subprocess.Popen(command, env=env, **options)
+    def wait_until(deadline):
+        if stop_event is None:
+            return process.wait(timeout=max(0, deadline - time.monotonic()))
+        while True:
+            if stop_event.is_set():
+                _signal_group(process, force=True)
+                process.wait(timeout=2)
+                return 130
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise subprocess.TimeoutExpired(command, hard_seconds)
+            try:
+                return process.wait(timeout=min(.25, remaining))
+            except subprocess.TimeoutExpired:
+                pass
     try:
         try:
-            return process.wait(timeout=max(0, started + hard_seconds - grace_seconds - time.monotonic()))
+            return wait_until(started + hard_seconds - grace_seconds)
         except subprocess.TimeoutExpired:
             _signal_group(process, force=False)
         try:
-            process.wait(timeout=max(0, started + hard_seconds - reap_margin - time.monotonic()))
+            result = wait_until(started + hard_seconds - reap_margin)
+            if result == 130:
+                return 130
         except subprocess.TimeoutExpired:
             _signal_group(process, force=True)
             process.wait(timeout=max(reap_margin, started + hard_seconds - time.monotonic()))

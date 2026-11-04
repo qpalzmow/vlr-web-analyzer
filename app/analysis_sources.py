@@ -1,12 +1,13 @@
 """Background-only source collection. Store counts, not averaged percentages."""
 import re
+import math
 import threading
 from concurrent.futures import Future
 from bs4 import BeautifulSoup
 
 from app.db import get_analysis_source, save_analysis_source
 from app.scraper.http import request_with_retry
-from app.scraper.parsers import (clean_text, safe_int, safe_float,
+from app.scraper.parsers import (clean_text, safe_int,
                                  parse_column_indices_from_header, parse_player_column_indices_from_header,
                                  source_link, logo_link)
 from app.scraper.metrics import team_matches
@@ -17,9 +18,9 @@ _lock = threading.Lock()
 refresh_started_at = None
 
 
-def source(key, fetch):
+def source(key, fetch, accept_cached=None):
     cached = get_analysis_source(key, not_before=refresh_started_at)
-    if cached is not None:
+    if cached is not None and (accept_cached is None or accept_cached(cached)):
         return cached
     with _lock:
         leader = key not in _flights
@@ -83,14 +84,18 @@ def parse_maps(soup):
     return maps
 
 
-def team_overview(team_id):
+def team_overview(team_id, expected_events=None):
     def fetch():
         soup = page(f'https://www.vlr.gg/team/stats/{team_id}')
         selector = soup.select_one('select[name="event_id"], select.filter-event')
         if selector is None:
             raise ValueError('Team events selector missing')
         return {'maps': parse_maps(soup), 'available_events': [o['value'] for o in selector.select('option[value]') if o['value'].isdigit()]}
-    return source(f'overview:{team_id}', fetch)
+    # A newer catalog may already confirm participation missing from this
+    # otherwise fresh cache. Refetch only this team's overview in that case.
+    expected = set(expected_events or [])
+    return source(f'overview:{team_id}', fetch,
+                  accept_cached=lambda cached: expected <= set(cached.get('available_events', [])))
 
 
 def event_maps(team_id, event_id):
@@ -155,7 +160,21 @@ def team_profile(team_id):
 
 
 def empty_player():
-    return {'rounds': 0, 'weighted_acs': 0, 'kills': 0, 'deaths': 0, 'fk': 0, 'fd': 0, 'agents': {}}
+    return {'rounds': 0, 'weighted_acs': 0, 'kills': 0, 'deaths': 0, 'fk': 0, 'fd': 0, 'agents': {},
+            'acs_available': False, 'acs_unavailable_reason': 'no_player_stats', 'acs_missing_rounds': 0}
+
+
+def parse_acs(value):
+    """An explicit source blank is missing; malformed numeric values still fail."""
+    raw = clean_text(value)
+    if raw in ('', '-', '\u2014'):
+        return None
+    if not re.fullmatch(r'\+?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?', raw):
+        raise ValueError('Invalid ACS')
+    result = float(raw)
+    if not math.isfinite(result) or result < 0:
+        raise ValueError('Invalid ACS')
+    return result
 
 
 def parse_player(soup):
@@ -178,10 +197,14 @@ def parse_player(soup):
             raise ValueError('Invalid player counts')
         if any(safe_int(cells[cols[k]].get_text()) > rounds for k in ('fk','fd')):
             raise ValueError('First kill/death counts exceed player rounds')
-        if safe_float(cells[cols['acs']].get_text(), -1) < 0:
-            raise ValueError('Invalid ACS')
+        acs = parse_acs(cells[cols['acs']].get_text())
         player['rounds'] += rounds
-        player['weighted_acs'] += safe_float(cells[cols['acs']].get_text()) * rounds
+        if acs is None:
+            player['acs_missing_rounds'] += rounds
+        else:
+            player['weighted_acs'] += acs * rounds
+            if not math.isfinite(player['weighted_acs']):
+                raise ValueError('Invalid weighted ACS')
         for key in ('kills','deaths','fk','fd'):
             player[key] += safe_int(cells[cols[key]].get_text())
         img = cells[cols['agent']].find('img')
@@ -189,6 +212,14 @@ def parse_player(soup):
         player['agents'][agent.lower()] = player['agents'].get(agent.lower(), 0) + rounds
     if not table.select('tbody tr'):
         raise ValueError('Player statistics rows missing')
+    if player['acs_missing_rounds']:
+        # A partial numerator cannot represent the whole career, even though
+        # round counts and K/D remain valid for every recorded agent row.
+        player['weighted_acs'] = None
+        player['acs_unavailable_reason'] = 'source_acs_missing'
+    elif player['rounds']:
+        player['acs_available'] = True
+        player['acs_unavailable_reason'] = None
     return player
 
 
