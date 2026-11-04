@@ -99,9 +99,11 @@ def test_opponents_new_event_does_not_make_other_team_pending():
 
 
 def test_due_boundary_uses_real_collection_clock():
-    current = datetime.now(timezone.utc)
     data = payload()
     snapshot_feed.install(data)
+    # Capture the comparison clock after constructing the scopes: Linux can
+    # resolve microseconds that Windows rounds to the same clock tick.
+    current = datetime.now(timezone.utc)
     data['catalog']['updated_at'] = (current - timedelta(seconds=4499)).isoformat()
     assert recovery._needs_recovery(data['catalog'], current) == (False, False)
     data['catalog']['updated_at'] = (current - timedelta(seconds=4500)).isoformat()
