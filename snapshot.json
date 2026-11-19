@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "published_at": "2026-11-19T08:08:57.272325+00:00",
+  "published_at": "2026-11-19T17:25:20.077756+00:00",
   "catalog": {
     "schema_version": 1,
     "generation": "e72bd94b899d43b9a8795efebf3016be",
@@ -34752,8 +34752,8 @@
     "collection": {
       "status": "retained_previous",
       "catalog_generation": "e72bd94b899d43b9a8795efebf3016be",
-      "started_at": "2026-11-19T07:58:57.149388+00:00",
-      "completed_at": "2026-11-19T08:08:57.239194+00:00",
+      "started_at": "2026-11-19T17:15:19.993268+00:00",
+      "completed_at": "2026-11-19T17:25:20.057164+00:00",
       "budget_exhausted": true,
       "failures": [
         {
@@ -34763,7 +34763,7 @@
           "exit_code": 124
         }
       ],
-      "next_retry_at": "2026-11-19T08:23:57.239194+00:00"
+      "next_retry_at": "2026-11-19T17:40:20.057164+00:00"
     }
   },
   "analysis": {
@@ -317687,15 +317687,15 @@
   },
   "collection": {
     "status": "retained_previous",
-    "started_at": "2026-11-19T07:58:57.149388+00:00",
-    "completed_at": "2026-11-19T08:08:57.239194+00:00",
+    "started_at": "2026-11-19T17:15:19.993268+00:00",
+    "completed_at": "2026-11-19T17:25:20.057164+00:00",
     "mode": "catalog_only",
     "previous_catalog_generation": "e72bd94b899d43b9a8795efebf3016be",
     "catalog": {
       "status": "retained_previous",
       "catalog_generation": "e72bd94b899d43b9a8795efebf3016be",
-      "started_at": "2026-11-19T07:58:57.149388+00:00",
-      "completed_at": "2026-11-19T08:08:57.239194+00:00",
+      "started_at": "2026-11-19T17:15:19.993268+00:00",
+      "completed_at": "2026-11-19T17:25:20.057164+00:00",
       "budget_exhausted": true,
       "failures": [
         {
@@ -317705,7 +317705,7 @@
           "exit_code": 124
         }
       ],
-      "next_retry_at": "2026-11-19T08:23:57.239194+00:00"
+      "next_retry_at": "2026-11-19T17:40:20.057164+00:00"
     },
     "budget_exhausted": true
   }
